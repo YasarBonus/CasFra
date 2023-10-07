@@ -1,0 +1,38 @@
+<style>
+    .display-wrapper {
+      width: 100%;
+        margin:auto;
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    
+    .display-head {
+        font-weight:bold;
+        font-size:26px;
+    }
+    </style>
+    <section class="display-wrapper">
+      <div>
+    <p class="display-head">{{row.bonus_1}} %</p>
+    <p style="font-size:18px">up to {{row.bonus_1_max}} €</p>
+    <p style="font-size:14px">{{row.bonus_1_sticky}}</p>
+    </div>
+      <div>
+    
+    <p class="display-head">{{row.max_bet}} €</p>
+    <p style="font-size:14px">Max Bet</p>
+    </div>  
+    
+      <div>
+    <p class="display-head">{{row.max_cashout}}</p>
+    <p style="font-size:14px">Max Cashout</p>
+      </div>
+      <div>
+    
+    <p class="display-head">{{row.wager}}</p>
+    <p style="font-size:14px">Wager</p>
+    </div>  </div>
+    </section>
+    

@@ -1,0 +1,39 @@
+<style>
+    .display-extended-wrapper {
+      width: 100%;
+      margin:auto;
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: top;
+    }
+        
+        .display-head {
+            font-weight:bold;
+            font-size:26px;
+        }
+        </style>
+        <section class="display-extended-wrapper">
+            <div>
+        
+                <p class="display-head">Casino Bonus</p>
+                <p style="font-size:18px">{{row.bonus_text}}</p>
+</div>
+            <div>
+        <p class="display-head">Casino Features</p>
+        <p style="font-size:18px">{{row.features}}</p>
+        </div>
+          <div>
+        
+        <p class="display-head">Provider</p>
+        <p style="font-size:16px">{{row.provider}}</p>
+        </div>  
+        
+          <div>
+        <p class="display-head">Payment Methods</p>
+        <p style="font-size:16px">{{row.payment}} </p>
+          </div>
+      </div>
+        </section>
+        
