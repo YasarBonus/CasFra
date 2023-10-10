@@ -1,2 +1,28 @@
-<a href="{{row.link}}" target="_blank" onclick="_paq.push(['trackEvent', 'Casino', 'Casino Link Click', '{{row.casino_name}}']);"><button type="button" style="background-color:#00820D;font-size: 16px">Claim Bonus</button></a>
-<center><p style="font-size:12px;text-align:center;">T&C apply</p></center>
+<style>
+    .casino-link-button {
+	box-shadow: 0px 0px 0px 0px #3dc21b;
+	background-color:#5CBF2A;
+	border-radius:30px;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-size:20px;
+	font-weight:bold;
+	padding:12px 25px !important;
+	text-decoration:none !important;
+}
+.casino-link-button:hover {
+	background-color:#5cbf2a !important;
+}
+.casino-link-button:active {
+	position:relative;
+	top:1px;
+}
+
+</style>
+
+<a class="casino-link-button" href="{{row.link}}" target="_blank">PLAY NOW</a>
+<br>
+<span style="font-size:12px;">T&amp;C apply</span>
+<br><br>
+<span class="footable-toggle" style="font-size: padding-top:40px!important;">Show More <img width="15px;" src="http://yasarbonus.com/wp-content/uploads/2023/10/show-more-button.png"></span>
