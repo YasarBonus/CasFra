@@ -8,33 +8,32 @@
     gap: 8px;
     text-align: top;
   }
-      
-      .display-head {
-          font-weight:bold;
-          font-size:26px;
-      }
-      </style>
-      <section class="display-extended-wrapper">
-          <div>
-      
-              <p class="display-head">Casino Bonus</p>
-              <p style="font-size:18px">{{row.bonus_text}}</p>
-              <p class="display-head"></p>
-              <p style="font-size:18px;padding-top: 40px;">{{row.casino_features}}</p>
+  .display-extended-box {
+    border: 2px solid; border-color: #BD504E;
+    padding: 20px;
+  }
+  .display-extended-head {
+      font-weight:bold;
+      font-size:26px;
+  }
+</style>
+<div class="display-extended-wrapper">
+  <div class="display-extended-box">
+    <p class="display-extended-head">Casino Bonus</p>
+    <p style="font-size:18px">{{row.bonus_text}}</p>
+    <p class="display-extended-head" style="padding-top: 20px;">Tags</p>
+    <p style="font-size:18px;">{{row.casino_features}}</p>
+  </div>
+  <div class="display-extended-box">
+    <p class="display-extended-head">Casino Features</p>
+    <p style="font-size:18px">{{row.features}}</p>
+  </div>
+  <div class="display-extended-box">
+    <p class="display-extended-head">Provider</p>
+    <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.provider}}"></iframe>
+  </div>  
+  <div class="display-extended-box">
+    <p class="display-extended-head">Payment Methods</p>
+    <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.payment}}"></iframe>
+  </div>
 </div>
-          <div>
-      <p class="display-head">Casino Features</p>
-      <p style="font-size:18px">{{row.features}}</p>
-      </div>
-        <div>
-      
-      <p class="display-head">Provider</p>
-      <p style="font-size:16px">{{row.provider}}</p>
-      </div>  
-      
-        <div>
-      <p class="display-head">Payment Methods</p>
-      <iframe width="100%" src="/api/img.php?name={{row.payment}}"></iframe>
-        </div>
-    </div>
-      </section>
