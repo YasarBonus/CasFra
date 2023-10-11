@@ -1,38 +1,124 @@
+<html>
+<head>
 <style>
-    .display-wrapper {
-      width: 100%;
-        margin:auto;
-      display: grid;
-      grid-template-rows: 1fr;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-    
-    .display-head {
-        font-weight:bold;
-        font-size:26px;
-    }
-    </style>
-    <section class="display-wrapper">
-      <div>
-    <p class="display-head">{{row.bonus_1}} %</p>
-    <p style="font-size:18px">up to {{row.bonus_1_max}} €</p>
-    <p style="font-size:14px">{{row.bonus_1_sticky}}</p>
+  .display-wrapper {
+    width: 100%;
+    margin:auto;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 4fr 1fr;
+    gap: 8px;
+  }
+
+  .display-head-row {
+    display: grid;
+    margin: auto;
+    width: 100%;
+    grid-template-rows: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    padding-left: 15%;
+    padding-right: 0%;
+    box-sizing: border-box;
+  }
+  @media only screen and (max-device-width: 600px){
+  .display-head-row {
+  grid-template-columns: repeat(2, 2fr);
+  }
+  .display-head-row{
+    width: 500px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  }
+  
+  .display-head {
+      font-weight:800;
+      font-size:30px;
+      color:orange;
+  }
+
+  .display-logo {
+    padding-left: 10%;
+  }
+
+  .foo-table img {
+    max-width: 140%;
+}
+
+  .display-link {
+    padding-right: 10%;
+    min-width: 160px;
+  }
+
+.casino-label {
+  color: white;
+  padding: 4px;
+  font-family: Arial;
+font-size:12px;
+font-weight: 600;
+text-transform: uppercase;
+}
+.success {background-color: #04AA6D;} /* Green */
+.info {background-color: #A9325C;} /* Blue */
+.warning {background-color: #ff9800;} /* Orange */
+.danger {background-color: #f44336;} /* Red */ 
+.other {background-color: #e7e7e7; color: black;} /* Gray */ 
+.casino-link-button {
+	box-shadow: 0px 0px 0px 0px #3dc21b;
+	background-color:#5CBF2A;
+	border-radius:30px;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-size:20px;
+	font-weight:bold;
+	padding:12px 25px !important;
+	text-decoration:none !important;
+}
+.casino-link-button:hover {
+	background-color:#5cbf2a !important;
+}
+.casino-link-button:active {
+	position:relative;
+	top:1px;
+}
+</style>
+</head>
+<body>
+  <section class="display-wrapper">
+    <div class="display-logo">
+      <span class="casino-label info">{{row.logo_text}}</span>
+      <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
     </div>
-      <div>
-    
-    <p class="display-head">{{row.max_bet}} €</p>
-    <p style="font-size:14px">Max Bet</p>
+    <div class="display-head-row">
+    <div class="display-head-row-item">
+      <p class="display-head">{{row.bonus_1}} %</p>
+      <p style="font-size:18px">up to {{row.bonus_1_max}} €</p>
+      <p style="font-size:14px">{{row.bonus_1_sticky}}</p>
+    </div>
+    <div class="display-head-row-item">
+      <p class="display-head">{{row.max_bet}} €</p>
+      <p style="font-size:14px">Max Bet</p>
     </div>  
-    
-      <div>
-    <p class="display-head">{{row.max_cashout}}</p>
-    <p style="font-size:14px">Max Cashout</p>
-      </div>
-      <div>
-    
-    <p class="display-head">{{row.wager}}</p>
-    <p style="font-size:14px">Wager</p>
-    </div>  </div>
-    </section>
-    
+    <div class="display-head-row-item">
+      <p class="display-head">{{row.max_cashout}}</p>
+      <p style="font-size:14px">Max Cashout</p>
+    </div>
+    <div class="display-head-row-item">
+      <p class="display-head">{{row.wager}}</p>
+      <p style="font-size:14px">Wager</p>
+    </div>
+  </div>
+    <div class="display-link">
+      <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
+      <br>
+      <span style="font-size:12px">T&amp;C apply</span>
+      <br>
+    </div>
+  </div>
+</section>
+<div class="show-more-button">
+  <span class="footable-toggle" style="font-size:18px;padding-top:40px!important">show details &varr;</span>
+</div>
+</body>
+</html>
