@@ -6,7 +6,7 @@
     margin:auto;
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-columns: 2fr 4fr 1fr;
     gap: 8px;
   }
 
@@ -16,10 +16,11 @@
     width: 100%;
     grid-template-rows: 1fr;
     grid-template-columns: repeat(4, 1fr);
-    padding-left: 15%;
+    padding-left: 5%;
     padding-right: 0%;
     box-sizing: border-box;
   }
+
   @media only screen and (max-device-width: 600px){
   .display-head-row {
   grid-template-columns: repeat(2, 2fr);
@@ -35,14 +36,15 @@
       font-weight:800;
       font-size:30px;
       color:orange;
+      margin: auto;
   }
 
   .display-logo {
-    padding-left: 10%;
+    padding-left: 0%;
   }
 
   .foo-table img {
-    max-width: 140%;
+    width: 180px;
 }
 
   .display-link {
