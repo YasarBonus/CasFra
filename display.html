@@ -84,6 +84,45 @@ text-transform: uppercase;
 	position:relative;
 	top:1px;
 }
+
+.display-extended-wrapper {
+    width: 100%;
+    margin:auto;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    text-align: top;
+  }
+  .display-extended-box {
+    border: 2px solid; border-color: #BD504E;
+    padding: 20px;
+  }
+  .display-extended-head {
+      font-weight:bold;
+      font-size:26px;
+  }
+
+  /*
+ CSS for the main interaction
+*/
+.accordion > input[type="checkbox"] {
+  position: absolute;
+  left: -100vw;
+}
+
+.accordion .content {
+  overflow-y: hidden;
+  height: 0;
+  transition: height 0.3s ease;
+}
+
+.accordion > input[type="checkbox"]:checked ~ .content {
+  height: auto;
+  overflow: visible;
+}
+
+
 </style>
 </head>
 <body>
@@ -122,5 +161,37 @@ text-transform: uppercase;
 <div class="show-more-button">
   <span class="footable-toggle" style="font-size:18px;padding-top:40px!important">show details &varr;</span>
 </div>
+
+<section class="accordion">
+  <input type="checkbox" name="collapse" id="handle">
+    <label for="handle">  <p style="font-size:18px;padding-top:40px!important">show details &varr;</p>
+    </label>
+  </input>
+  <div class="content">
+    <div class="display-extended-wrapper">
+      <div class="display-extended-box">
+        <p class="display-extended-head">Casino Bonus</p>
+        <p style="font-size:18px">{{row.casino_bonus}}</p>
+        <p class="display-extended-head" style="padding-top: 20px">Tags</p>
+        <p style="font-size:18px">{{row.tags}}</p>
+      </div>
+      <div class="display-extended-box">
+        <p class="display-extended-head">Casino Features</p>
+        <p style="font-size:18px">{{row.casino_features}}</p>
+      </div>
+      <div class="display-extended-box">
+        <p class="display-extended-head">Provider</p>
+        <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.provider}}"></iframe>
+      </div>  
+      <div class="display-extended-box">
+        <p class="display-extended-head">Payment Methods</p>
+        <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.payment}}"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
 </body>
 </html>
+
+
+</div>
