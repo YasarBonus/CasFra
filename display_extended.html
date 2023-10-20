@@ -1,47 +1,48 @@
+<html>
 <style>
-.display-extended-wrapper {
-    width: 100%;
-    margin:auto;
-    display: grid;
-    grid-template-rows: repeat(2, 1fr);
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    text-align: top;
+  .display-extended-wrapper {
+      width: 100%;
+      margin:auto;
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: top;
+    }
+    .display-extended-box {
+      border: 2px solid; border-color: #BD504E;
+      padding: 20px;
+    }
+    .display-extended-head {
+        font-weight:bold;
+        font-size:26px;
+    }
+  
+    .iframe-loader {
+    background:url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
+    background-size: 20px;
   }
-  .display-extended-box {
-    border: 5px solid; border-color: #000000;
-    border-radius: 25px;
-    padding: 10px;
-    background-color: #BD504E;
-    color: white;
-  }
-  .display-extended-head {
-      font-weight:bold;
-      font-size:26px;
-  }
-
-  .iframe-loader {
-  background:url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
-  background-size: 20px;
-}
-</style>
-<div class="display-extended-wrapper">
-  <div class="display-extended-box">
-    <p class="display-extended-head">Casino Bonus</p>
-    <p style="font-size:18px">{{row.casino_bonus}}</p>
-    <p class="display-extended-head" style="padding-top: 20px">Tags</p>
-    <p style="font-size:18px">{{row.tags}}</p>
+  </style>
+  <body>
+  <div class="display-extended-wrapper">
+    <div class="display-extended-box">
+      <p class="display-extended-head">Casino Bonus</p>
+      <p style="font-size:18px">{{row.casino_bonus}}</p>
+      <p class="display-extended-head" style="padding-top: 20px">Tags</p>
+      <p style="font-size:18px">{{row.tags}}</p>
+    </div>
+    <div class="display-extended-box">
+      <p class="display-extended-head">Casino Features</p>
+      <p style="font-size:18px!important">{{row.casino_features}}</p>
+    </div>
+    <div class="display-extended-box">
+      <p class="display-extended-head">Provider</p>
+      <div class="iframe-loader"><iframe style="background: transparent" width="100%" src="/api/img.php?name={{row.provider}}"></iframe></div>
+    </div>  
+    <div class="display-extended-box">
+      <p class="display-extended-head">Payment Methods</p>
+      <div class="iframe-loader"><iframe style="background: transparent" width="100%" src="/api/img.php?name={{row.payment}}"></iframe></div>
+    </div>
   </div>
-  <div class="display-extended-box">
-    <p class="display-extended-head">Casino Features</p>
-    <p style="font-size:18px!important;">{{row.casino_features}}</p>
-  </div>
-  <div class="display-extended-box">
-    <p class="display-extended-head">Provider</p>
-    <div class="iframe-loader"><iframe style="background: transparent" width="100%" src="/api/img.php?name={{row.provider}}"></iframe></div>
-  </div>  
-  <div class="display-extended-box">
-    <p class="display-extended-head">Payment Methods</p>
-    <div class="iframe-loader"><iframe style="background: transparent" width="100%" src="/api/img.php?name={{row.payment}}"></iframe></div>
-  </div>
-</div>
+  </body>
+  </html>
