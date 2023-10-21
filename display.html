@@ -20,21 +20,17 @@
       padding-right: 0%;
       box-sizing: border-box;
     }
+    .display-logo-mobile{
+      display: none;
+    }
+    .display-link-mobile{
+      display: none;
+    }
   
-    @media only screen and (max-device-width: 600px){
-    .display-head-row {
-    grid-template-columns: repeat(2, 2fr);
-    }
-    .display-head-row{
-      width: 500px;
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-    }
     
     .display-head {
-        font-weight:800;
-        font-size:30px;
+        font-weight:900;
+        font-size:32px;
         color:orange;
         margin: auto;
     }
@@ -102,13 +98,44 @@
         font-weight:bold;
         font-size:26px;
     }
-  
+    @media only screen and (max-device-width: 600px){
+    .display-head-row {
+    grid-template-columns: repeat(2, 2fr);
+    width: 80%;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .display-logo-mobile{
+      display: block;
+    }
+    .display-logo{
+      display: none;
+    }
+    .display-link-mobile{
+      display:block;
+    }
+    .display-link{
+      display:none
+    }
+    .display-wrapper {
+      width: 100%;
+      margin:auto;
+      display: grid;
+      grid-template-columns: 3fr;
+      gap: 8px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .foo-table img {
+      width: 220px;
+  }
+  }
     /*
    CSS for the main interaction
   */
   
   .accordion{
-    display: none;
+    display:none;
   }
   .accordion &gt; input[type="checkbox"] {
     position: absolute;
@@ -119,11 +146,15 @@
     height: 0;
     transition: height 0.3s ease;
   }
-  .accordion &gt; input[type="checkbox"]:checked ~ .content {
+  .accordion &gt input[type="checkbox"]:checked ~ .content {
     height: auto;
     overflow: visible;
   }
   </style>
+        <div class="display-logo-mobile">
+          <span class="casino-label info">{{row.logo_text}}</span>
+          <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
+        </div>
     <section class="display-wrapper">
       <div class="display-logo">
         <span class="casino-label info">{{row.logo_text}}</span>
@@ -156,13 +187,23 @@
       </div>
     </div>
   </section>
+  <div class="display-link-mobile">
+    <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
+    <br>
+    <span style="font-size:12px">T&amp;C apply</span>
+    <br>
+  </div>
+
+
+
+
   <div class="show-more-button">
-    <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:20px">show details &amp;varr;</span>
+    <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:0px;color:gray;">show details &#8597;</span>
   </div>
   
   <section class="accordion">
     <input type="checkbox" name="collapse" id="handle">
-      <label for="handle">  <p style="font-size:18px;padding-top:40px!important">show details &amp;varr;</p>
+      <label for="handle">  <p style="font-size:18px;padding-top:40px!important">show details &#8597;</p>
       </label>
     </input>
     <div class="content">
