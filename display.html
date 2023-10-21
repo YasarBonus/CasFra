@@ -1,15 +1,16 @@
 <html>
+
 <head>
   <style>
     .display-wrapper {
       width: 100%;
-      margin:auto;
+      margin: auto;
       display: grid;
       grid-template-rows: 1fr;
       grid-template-columns: 2fr 4fr 1fr;
       gap: 8px;
     }
-  
+
     .display-head-row {
       display: grid;
       margin: auto;
@@ -20,147 +21,189 @@
       padding-right: 0%;
       box-sizing: border-box;
     }
-    .display-logo-mobile{
+
+    .display-logo-mobile {
       display: none;
     }
-    .display-link-mobile{
+
+    .display-link-mobile {
       display: none;
     }
-  
-    
+
+
     .display-head {
-        font-weight:900;
-        font-size:32px;
-        color:orange;
-        margin: auto;
+      font-weight: 900;
+      font-size: 32px;
+      color: orange;
+      margin: auto;
     }
-  
+
     .display-logo {
       padding-left: 0%;
     }
-  
+
     .foo-table img {
       width: 180px;
-  }
-  
+    }
+
     .display-link {
       padding-right: 10%;
       min-width: 160px;
     }
-  
-  .casino-label {
-    color: white;
-    padding: 4px;
-    font-family: Arial;
-  font-size:12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  }
-  .success {background-color: #04AA6D;} /* Green */
-  .info {background-color: #A9325C;} /* Blue */
-  .warning {background-color: #ff9800;} /* Orange */
-  .danger {background-color: #f44336;} /* Red */ 
-  .other {background-color: #e7e7e7; color: black;} /* Gray */ 
-  .casino-link-button {
-    box-shadow: 0px 0px 0px 0px #3dc21b;
-    background-color:#5CBF2A;
-    border-radius:30px;
-    display:inline-block;
-    cursor:pointer;
-    color:#ffffff;
-    font-size:20px;
-    font-weight:bold;
-    padding:12px 25px !important;
-    text-decoration:none !important;
-  }
-  .casino-link-button:hover {
-    background-color:#5cbf2a !important;
-  }
-  .casino-link-button:active {
-    position:relative;
-    top:1px;
-  }
-  
-  .display-extended-wrapper {
+
+    .casino-label {
+      color: white;
+      padding: 4px;
+      font-family: Arial;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .success {
+      background-color: #04AA6D;
+    }
+
+    /* Green */
+    .info {
+      background-color: #A9325C;
+    }
+
+    /* Blue */
+    .warning {
+      background-color: #ff9800;
+    }
+
+    /* Orange */
+    .danger {
+      background-color: #f44336;
+    }
+
+    /* Red */
+    .other {
+      background-color: #e7e7e7;
+      color: black;
+    }
+
+    /* Gray */
+    .casino-link-button {
+      box-shadow: 0px 0px 0px 0px #3dc21b;
+      background-color: #5CBF2A;
+      border-radius: 30px;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 25px !important;
+      text-decoration: none !important;
+    }
+
+    .casino-link-button:hover {
+      background-color: #5cbf2a !important;
+    }
+
+    .casino-link-button:active {
+      position: relative;
+      top: 1px;
+    }
+
+    .display-extended-wrapper {
       width: 100%;
-      margin:auto;
+      margin: auto;
       display: grid;
       grid-template-rows: repeat(2, 1fr);
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       text-align: top;
     }
+
     .display-extended-box {
-      border: 2px solid; border-color: #BD504E;
+      border: 2px solid;
+      border-color: #BD504E;
       padding: 20px;
     }
+
     .display-extended-head {
-        font-weight:bold;
-        font-size:26px;
+      font-weight: bold;
+      font-size: 26px;
     }
-    @media only screen and (max-device-width: 600px){
-    .display-head-row {
-    grid-template-columns: repeat(2, 2fr);
-    width: 80%;
-      padding-left: 0px;
-      padding-right: 0px;
+
+    @media only screen and (max-device-width: 600px) {
+      .display-head-row {
+        grid-template-columns: repeat(2, 2fr);
+        width: 80%;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .display-logo-mobile {
+        display: block;
+      }
+
+      .display-logo {
+        display: none;
+      }
+
+      .display-link-mobile {
+        display: block;
+      }
+
+      .display-link {
+        display: none
+      }
+
+      .display-wrapper {
+        width: 100%;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 3fr;
+        gap: 8px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .foo-table img {
+        width: 220px;
+      }
     }
-    .display-logo-mobile{
-      display: block;
-    }
-    .display-logo{
-      display: none;
-    }
-    .display-link-mobile{
-      display:block;
-    }
-    .display-link{
-      display:none
-    }
-    .display-wrapper {
-      width: 100%;
-      margin:auto;
-      display: grid;
-      grid-template-columns: 3fr;
-      gap: 8px;
-      padding-top: 10px;
-      padding-bottom: 10px;
-    }
-    .foo-table img {
-      width: 220px;
-  }
-  }
+
     /*
    CSS for the main interaction
   */
-  
-  .accordion{
-    display:none;
-  }
-  .accordion &gt; input[type="checkbox"] {
-    position: absolute;
-    left: -100vw;
-  }
-  .accordion .content {
-    overflow-y: hidden;
-    height: 0;
-    transition: height 0.3s ease;
-  }
-  .accordion &gt input[type="checkbox"]:checked ~ .content {
-    height: auto;
-    overflow: visible;
-  }
+
+    .accordion {
+      display: none;
+    }
+
+    .accordion &gt;
+
+    input[type="checkbox"] {
+      position: absolute;
+      left: -100vw;
+    }
+
+    .accordion .content {
+      overflow-y: hidden;
+      height: 0;
+      transition: height 0.3s ease;
+    }
+
+    .accordion &gt input[type="checkbox"]:checked~.content {
+      height: auto;
+      overflow: visible;
+    }
   </style>
-        <div class="display-logo-mobile">
-          <span class="casino-label info">{{row.logo_text}}</span>
-          <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
-        </div>
-    <section class="display-wrapper">
-      <div class="display-logo">
-        <span class="casino-label info">{{row.logo_text}}</span>
-        <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
-      </div>
-      <div class="display-head-row">
+  <div class="display-logo-mobile">
+    <span class="casino-label info">{{row.logo_text}}</span>
+    <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
+  </div>
+  <section class="display-wrapper">
+    <div class="display-logo">
+      <span class="casino-label info">{{row.logo_text}}</span>
+      <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
+    </div>
+    <div class="display-head-row">
       <div class="display-head-row-item">
         <p class="display-head">{{row.bonus_1}} %</p>
         <p style="font-size:18px">up to {{row.bonus_1_max}} €</p>
@@ -169,7 +212,7 @@
       <div class="display-head-row-item">
         <p class="display-head">{{row.max_bet}} €</p>
         <p style="font-size:14px">Max Bet</p>
-      </div>  
+      </div>
       <div class="display-head-row-item">
         <p class="display-head">{{row.max_cashout}}</p>
         <p style="font-size:14px">Max Cashout</p>
@@ -179,12 +222,12 @@
         <p style="font-size:14px">Wager</p>
       </div>
     </div>
-      <div class="display-link">
-        <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
-        <br>
-        <span style="font-size:12px">T&amp;C apply</span>
-        <br>
-      </div>
+    <div class="display-link">
+      <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
+      <br>
+      <span style="font-size:12px">T&amp;C apply</span>
+      <br>
+    </div>
     </div>
   </section>
   <div class="display-link-mobile">
@@ -198,13 +241,15 @@
 
 
   <div class="show-more-button">
-    <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:0px;color:gray;">show details &#8597;</span>
+    <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:0px;color:gray;">show
+      details &#8597;</span>
   </div>
-  
+
   <section class="accordion">
     <input type="checkbox" name="collapse" id="handle">
-      <label for="handle">  <p style="font-size:18px;padding-top:40px!important">show details &#8597;</p>
-      </label>
+    <label for="handle">
+      <p style="font-size:18px;padding-top:40px!important">show details &#8597;</p>
+    </label>
     </input>
     <div class="content">
       <div class="display-extended-wrapper">
@@ -221,7 +266,7 @@
         <div class="display-extended-box">
           <p class="display-extended-head">Provider</p>
           <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.provider}}"></iframe>
-        </div>  
+        </div>
         <div class="display-extended-box">
           <p class="display-extended-head">Payment Methods</p>
           <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.payment}}"></iframe>
@@ -229,8 +274,8 @@
       </div>
     </div>
   </section>
-  
-  
-  
-  
+
+
+
+
   </div>
