@@ -128,7 +128,9 @@
       font-weight: bold;
       font-size: 26px;
     }
-
+    .display-wrapper2-mobile {
+        display: none;
+      }
     @media only screen and (max-device-width: 600px) {
       .display-head-row {
         grid-template-columns: repeat(2, 2fr);
@@ -146,7 +148,7 @@
       }
 
       .display-link-mobile {
-        display: block;
+        display: none;
       }
 
       .display-link {
@@ -163,37 +165,28 @@
         padding-bottom: 10px;
       }
 
+      .display-wrapper2-mobile {
+        width: 90%;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
       .foo-table img {
         width: 220px;
       }
+      .show-more-button {
+        display: none!important;
+      }
+      .display-link {display: none;}
     }
-
-    /*
-   CSS for the main interaction
-  */
-
-    .accordion {
-      display: none;
-    }
-
-    .accordion &gt;
-
-    input[type="checkbox"] {
-      position: absolute;
-      left: -100vw;
-    }
-
-    .accordion .content {
-      overflow-y: hidden;
-      height: 0;
-      transition: height 0.3s ease;
-    }
-
-    .accordion &gt input[type="checkbox"]:checked~.content {
-      height: auto;
-      overflow: visible;
-    }
+    
   </style>
+  </head>
+  <body>
   <div class="display-logo-mobile">
     <span class="casino-label info">{{row.logo_text}}</span>
     <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
@@ -236,46 +229,23 @@
     <span style="font-size:12px">T&amp;C apply</span>
     <br>
   </div>
-
-
-
-
+  </body>
   <div class="show-more-button">
     <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:0px;color:gray;">show
-      details &#8597;</span>
+      details &#128269;</span>
   </div>
-
-  <section class="accordion">
-    <input type="checkbox" name="collapse" id="handle">
-    <label for="handle">
-      <p style="font-size:18px;padding-top:40px!important">show details &#8597;</p>
-    </label>
-    </input>
-    <div class="content">
-      <div class="display-extended-wrapper">
-        <div class="display-extended-box">
-          <p class="display-extended-head">Casino Bonus</p>
-          <p style="font-size:18px">{{row.casino_bonus}}</p>
-          <p class="display-extended-head" style="padding-top: 20px">Tags</p>
-          <p style="font-size:18px">{{row.tags}}</p>
-        </div>
-        <div class="display-extended-box">
-          <p class="display-extended-head">Casino Features</p>
-          <p style="font-size:18px">{{row.casino_features}}</p>
-        </div>
-        <div class="display-extended-box">
-          <p class="display-extended-head">Provider</p>
-          <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.provider}}"></iframe>
-        </div>
-        <div class="display-extended-box">
-          <p class="display-extended-head">Payment Methods</p>
-          <iframe width="100%" src="https://yasarbonus.com/api/img.php?name={{row.payment}}"></iframe>
-        </div>
-      </div>
+  <section class="display-wrapper2-mobile">
+    <div style="padding-top: 15px;">
+      <span class="footable-toggle" style="font-size:18px;padding-top:40px!important;padding-right:0px;color:gray;">show
+        details &#128269;</span>
     </div>
-  </section>
+    <div>
+      <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
+      <br>
+      <span style="font-size:12px">T&amp;C apply</span>
+      <br>
+    </div>
+    </section>
 
-
-
-
-  </div>
+</body>
+</html>

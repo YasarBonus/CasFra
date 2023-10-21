@@ -1,7 +1,7 @@
 <html>
 <style>
   .display-extended-wrapper {
-    width: 100%;
+    width: 80%;
     margin: auto;
     display: grid;
     grid-template-rows: repeat(2, 1fr);
@@ -24,6 +24,15 @@
   .iframe-loader {
     background: url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
     background-size: 20px;
+  }
+
+  @media only screen and (max-device-width: 600px) {
+    .display-extended-wrapper {
+    width: 100%;
+  }
+  ol, ul {
+    margin: 0 0 1.5em 1em;
+}
   }
 </style>
 
