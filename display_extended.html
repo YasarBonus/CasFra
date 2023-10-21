@@ -1,29 +1,33 @@
 <html>
 <style>
   .display-extended-wrapper {
-      width: 100%;
-      margin:auto;
-      display: grid;
-      grid-template-rows: repeat(2, 1fr);
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      text-align: top;
-    }
-    .display-extended-box {
-      border: 2px solid; border-color: #BD504E;
-      padding: 10px;
-    }
-    .display-extended-head {
-        font-weight:bold;
-        font-size:26px;
-    }
-  
-    .iframe-loader {
-    background:url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
+    width: 100%;
+    margin: auto;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    text-align: top;
+  }
+
+  .display-extended-box {
+    border: 2px solid;
+    border-color: #BD504E;
+    padding: 10px;
+  }
+
+  .display-extended-head {
+    font-weight: bold;
+    font-size: 26px;
+  }
+
+  .iframe-loader {
+    background: url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
     background-size: 20px;
   }
-  </style>
-  <body>
+</style>
+
+<body>
   <div class="display-extended-wrapper">
     <div class="display-extended-box">
       <p class="display-extended-head">Casino Bonus</p>
@@ -36,13 +40,16 @@
       <p style="font-size:18px!important">{{row.casino_features}}</p>
     </div>
     <div class="display-extended-box
-      <p class="display-extended-head">Provider</p>
-      <div class="iframe-loader"><iframe style="background: transparent" width="100%" src="/api/img.php?name={{row.provider}}"></iframe></div>
-    </div>  
+      <p class=" display-extended-head">Provider</p>
+      <div class="iframe-loader"><iframe style="background: transparent" width="100%"
+          src="/api/img.php?name={{row.provider}}"></iframe></div>
+    </div>
     <div class="display-extended-box">
       <p class="display-extended-head">Payment Methods</p>
-      <div class="iframe-loader"><iframe style="bac‡kground: transparent" width="100%" src="/api/img.php?name={{row.payment}}"></iframe></div>
+      <div class="iframe-loader"><iframe style="bac‡kground: transparent" width="100%"
+          src="/api/img.php?name={{row.payment}}"></iframe></div>
     </div>
   </div>
-  </body>
-  </html>
+</body>
+
+</html>
