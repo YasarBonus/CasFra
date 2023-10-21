@@ -21,6 +21,8 @@
     font-size: 26px;
   }
 
+  .display-extended-text { font-size: 18px;}
+
   .iframe-loader {
     background: url(/wp-content/uploads/2023/10/loading.gif) center center no-repeat;
     background-size: 20px;
@@ -29,6 +31,12 @@
   @media only screen and (max-device-width: 600px) {
     .display-extended-wrapper {
     width: 100%;
+  }
+  .display-extended-text{
+    font-size: 16px;
+  }
+  .display-extended-head{
+    font-size: 20px;
   }
   ol, ul {
     margin: 0 0 1.5em 1em;
@@ -40,13 +48,13 @@
   <div class="display-extended-wrapper">
     <div class="display-extended-box">
       <div class="display-extended-head">Casino Bonus</div>
-      <div style="font-size:18px">{{row.casino_bonus}}</div>
+      <div class="display-extended-text">{{row.casino_bonus}}</div>
       <div class="display-extended-head" style="padding-top: 20px">Tags</div>
-      <div style="font-size:18px">{{row.tags}}</div>
+      <div class="display-extended-text">{{row.tags}}</div>
     </div>
     <div class="display-extended-box">
       <div class="display-extended-head">Casino Features</div>
-      <div style="font-size:18px!important">{{row.casino_features}}</div>
+      <div class="display-extended-text">{{row.casino_features}}</div>
     </div>
     <div class="display-extended-box">
       <div class="display-extended-head">Provider</div>
