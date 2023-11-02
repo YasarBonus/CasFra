@@ -1,0 +1,93 @@
+<!-- FILEPATH: /Users/joshua2504/Projekte/yasarbonus-ninjatables-snippets/table.html -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Table with JSON data source and filters</title>
+        <!-- Add Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Table with JSON data source and filters</h1>
+            <div class="form-group">
+                <label for="filter-name">Filter by name:</label>
+                <input type="text" class="form-control" id="filter-name">
+            </div>
+            <div class="form-group">
+                <label for="filter-age">Filter by age:</label>
+                <select class="form-control" id="filter-age" multiple>
+                    <option value="">All</option>
+                    <option value="18">18+</option>
+                    <option value="21">21+</option>
+                    <option value="30">30+</option>
+                </select>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Bootstrap JS and jQuery -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-+5zgZ7zvz6JZzJ7z5X9Zx9zJ5jvzZ1zL9z5Q1vJ5z5vL6yZ7VZJUZ8g3Zg9z7Z3" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+        <script>
+            // Fetch JSON data from data source
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Get table body element
+                    const tableBody = document.getElementById('table-body');
+                    // Loop through data and create table rows
+                    data.forEach(person => {
+                        const row = document.createElement('tr');
+                        // Create cells for each property in the object
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = person.name;
+                        row.appendChild(nameCell);
+                        const ageCell = document.createElement('td');
+                        ageCell.textContent = person.age;
+                        row.appendChild(ageCell);
+                        const genderCell = document.createElement('td');
+                        genderCell.textContent = person.gender;
+                        row.appendChild(genderCell);
+                        // Add row to table body
+                        tableBody.appendChild(row);
+                    });
+                    // Add event listeners to filter elements
+                    const filterName = document.getElementById('filter-name');
+                    filterName.addEventListener('input', filterTable);
+                    const filterAge = document.getElementById('filter-age');
+                    filterAge.addEventListener('change', filterTable);
+                    // Define filter function
+                    function filterTable() {
+                        const filterNameValue = filterName.value.toLowerCase();
+                        const filterAgeValue = filterAge.value;
+                        const rows = tableBody.getElementsByTagName('tr');
+                        for (let i = 0; i < rows.length; i++) {
+                            const name = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+                            const age = rows[i].getElementsByTagName('td')[1].textContent;
+                            if ((name.includes(filterNameValue) || filterNameValue === '') &&
+                                    (filterAgeValue === '' || parseInt(age) >= parseInt(filterAgeValue))) {
+                                rows[i].style.display = '';
+                            } else {
+                                rows[i].style.display = 'none';
+                            }
+                        }
+                    }
+                });
+        </script>
+    </body>
+</html>
