@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+	body {
+	background-color: #FFFFFF;
+	}
+
+        /* CSS für die Bildzentrierung */
+        .image-container {
+/*            text-align: center;*/
+	padding-top:10px;
+        }
+        .image-container img {
+/*            display: inline-block;
+            margin: 0 auto;*/
+	padding-left:5px;
+        }
+        .show-more {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<script>
+// Bilder-Dateien und Verzeichnis festlegen
+const imageNames = new URLSearchParams(window.location.search).get('name')?.split(',') ?? [];
+const imageDirectory = 'images/';
+
+// Prüfen, ob Bilder angegeben wurden
+if (imageNames.length > 0) {
+    // Container-Div für die Bilder erstellen
+    document.write('<div class="image-container">');
+
+    // Schleife durch die Bildnamen
+    imageNames.forEach((imageName, index) => {
+        // Leerzeichen entfernen und in Kleinbuchstaben umwandeln
+        const formattedImageName = imageName.toLowerCase().replace(/ /g, '');
+
+        // Bildpfad zusammensetzen
+        const imagePath = imageDirectory + formattedImageName + '.png';
+
+        // Prüfen, ob die Datei existiert
+        if (imagePath) {
+            // Bild ausgeben
+            if (index < 6) {
+                document.write(`<img width="70px" src="${imagePath}" alt="${imageName}" /> `);
+            } else {
+                document.write(`<img class="show-more" width="70px" src="${imagePath}" alt="${imageName}" /> `);
+            }
+        } else {
+            // Falls das Bild nicht existiert, eine Meldung ausgeben
+            document.write(imageName);
+        }
+    });
+
+    // Container-Div schließen
+    document.write('</div>');
+
+    // Show more button
+    if (imageNames.length > 6) {
+        document.write('<button onclick="showMore()">Show more</button>');
+    }
+
+    // Show more function
+    function showMore() {
+        const showMoreImages = document.querySelectorAll('.show-more');
+        showMoreImages.forEach(image => {
+            image.style.display = 'inline-block';
+        });
+        document.querySelector('button').style.display = 'none';
+    }
+} else {
+    // Falls keine Bildnamen angegeben wurden, eine Meldung ausgeben
+    document.write('Missing Parameters.');
+}
+</script>
+</body>
+</html>
+
