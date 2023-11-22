@@ -1,0 +1,269 @@
+<!-- FILEPATH: /Users/joshua2504/Projekte/yasarbonus-ninjatables-snippets/www/index.html -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+         <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .display-wrapper {
+      width: 100%;
+      margin: auto;
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 2fr 4fr 1fr;
+      gap: 8px;
+    }
+
+    .display-head-row {
+      display: grid;
+      margin: auto;
+      width: 100%;
+      grid-template-rows: 1fr;
+      grid-template-columns: repeat(4, 1fr);
+      box-sizing: border-box;
+    }
+
+    .display-logo {
+      padding-left: 0%;
+    }
+
+    .display-link {
+      padding-right: 10%;
+      min-width: 160px;
+      margin: auto;
+    }
+
+    .casino-label {
+      color: white;
+      padding: 4px;
+      font-family: Arial;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .success {
+      background-color: #04AA6D;
+    }
+
+    /* Green */
+    .info {
+      background-color: #A9325C;
+    }
+
+    /* Blue */
+    .warning {
+      background-color: #ff9800;
+    }
+
+    /* Orange */
+    .danger {
+      background-color: #f44336;
+    }
+
+    /* Red */
+    .other {
+      background-color: #e7e7e7;
+      color: black;
+    }
+
+    /* Gray */
+    .casino-link-button {
+      box-shadow: 0px 0px 0px 0px #3dc21b;
+      background-color: #5CBF2A;
+      border-radius: 30px;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 25px !important;
+      text-decoration: none !important;
+    }
+
+    .casino-link-button:hover {
+      background-color: #5cbf2a !important;
+    }
+
+    .casino-link-button:active {
+      position: relative;
+      top: 1px;
+    }
+
+    .casino {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    }
+    .casino .logo-text {
+    color: red;
+    padding: 4px;
+    font-family: Arial;
+    font-size: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: #A9325C'
+    }
+</style>
+    </head>
+    <body>
+        
+      <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="filterText">Filter by Text:</label>
+                    <input type="text" id="filterText" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="filterCategory">Filter by Category:</label>
+                    <select id="filterCategory" class="form-control">
+                        <option value="">All</option>
+                        <option value="casino">Casino</option>
+                        <option value="hotel">Hotel</option>
+                        <option value="restaurant">Restaurant</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Additional Filters:</label>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterBonushunt" class="form-check-input">
+                        <label for="filterBonushunt" class="form-check-label">Bonushunt allowed</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterVpn" class="form-check-input">
+                        <label for="filterVpn" class="form-check-label">VPN allowed</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterSportbets" class="form-check-input">
+                        <label for="filterSportbets" class="form-check-label">Sportbets</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="casino"></div>
+    </div>
+        <script>
+            // Load JSON data
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    const filterText = document.getElementById('filterText');
+                    const filterCategory = document.getElementById('filterCategory');
+                    const filterBonushunt = document.getElementById('filterBonushunt');
+                    const filterVpn = document.getElementById('filterVpn');
+                    const filterSportbets = document.getElementById('filterSportbets');
+                    const dataDiv = document.getElementById('casino');
+
+                    // Function to filter the data based on selected filters
+                    const filterData = () => {
+                        const searchText = filterText.value.toLowerCase();
+                        const selectedCategory = filterCategory.value;
+                        const isBonushunt = filterBonushunt.checked;
+                        const isVpn = filterVpn.checked;
+                        const isSportbets = filterSportbets.checked;
+
+                        const filteredData = data.filter(casino => {
+                            // Filter by text
+                            if (searchText && !casino.title.toLowerCase().includes(searchText)) {
+                                return false;
+                            }
+                            // Filter by category
+                            if (selectedCategory && casino.category !== selectedCategory) {
+                                return false;
+                            }
+                            // Filter by additional filters
+                            if (isBonushunt && casino.bonushunt !== 'allowed') {
+                                return false;
+                            }
+                            if (isVpn && casino.vpn !== 'allowed') {
+                                return false;
+                            }
+                            if (isSportbets && casino.sportbets !== 'true') {
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        // Clear existing HTML elements
+                        dataDiv.innerHTML = '';
+
+                        // Create HTML elements for each filtered item
+
+                        const casinos = filteredData.map(casino => {
+                        const div = document.createElement('section');
+                        div.classList.add('display-wrapper');
+                        div.innerHTML = `
+                            <div class="display-logo">
+                                ${casino.logo_text ? `<div id="logo-text" class="logo-text">${casino.logo_text}</div>` : ''}
+                                <div class="logo">
+                                    <img style="max-width:180px" src="${casino.logo_url}">
+                                </div>
+                            </div>
+                            <div class="display-head-row-item">
+                                <p class="display-head">${casino.bonus_1}</p>
+                                <p style="font-size:18px">up to ${casino.bonus_1_max} €</p>
+                                <p style="font-size:14px">
+                                ${casino.bonus_1_sticky == "true" ? `Sticky` : `Non-Sticky`}
+                                </p>
+                            </div>
+                            <div class="display-head-row-item">
+                                <p class="display-head">${casino.max_bet} €</p>
+                                <p style="font-size:14px">Max Bet</p>
+                            </div>
+                            <div class="display-head-row-item">
+                                <p class="display-head">${casino.max_cashout}</p>
+                                <p style="font-size:14px">Max Cashout</p>
+                            </div>
+                            <div class="display-head-row-item">
+                                <p class="display-head">${casino.wager} (${casino.wager_type})</p>
+                                <p style="font-size:14px">Wager</p>
+                            </div>
+                            <div class="display-link">
+                                <a class="casino-link-button" href="/{{row.woo_posttitle}}" target="_blank">PLAY NOW</a>
+                                <br>
+                                <span style="font-size:12px">T&amp;C apply</span>
+                                <br>
+                            </div>
+                            
+                        `;
+
+                            return div;
+                        });
+
+                        // Add the HTML elements to the page
+                        casinos.forEach(casino => dataDiv.appendChild(casino));
+                    };
+
+                    // Add event listeners to the filter elements
+                    filterText.addEventListener('input', filterData);
+                    filterCategory.addEventListener('change', filterData);
+                    filterBonushunt.addEventListener('change', filterData);
+                    filterVpn.addEventListener('change', filterData);
+                    filterSportbets.addEventListener('change', filterData);
+
+                    // Initial data load
+                    filterData();
+                });
+        </script>
+        <!-- Add Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-+J9zv9zqzJmJQ9Q6vzJ9z7z7vZl6t9y8zJjz0JfZJx5WJZ8zjzQJzJZ7WJZ8zjz" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JK" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+      </script>
+    
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+        integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+      </script>
+    </body>
+</html>
