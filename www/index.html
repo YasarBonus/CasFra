@@ -1,129 +1,489 @@
-<!-- FILEPATH: /Users/joshua2504/Projekte/yasarbonus-ninjatables-snippets/www/index.html -->
-
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>JSON to HTML</title>
-        <!-- Add Bootstrap CSS -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JK" crossorigin="anonymous">
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="filterText">Filter by Text:</label>
-                        <input type="text" id="filterText" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="filterCategory">Filter by Category:</label>
-                        <select id="filterCategory" class="form-control">
-                            <option value="">All</option>
-                            <option value="casino">Casino</option>
-                            <option value="hotel">Hotel</option>
-                            <option value="restaurant">Restaurant</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Additional Filters:</label>
-                        <div class="form-check">
-                            <input type="checkbox" id="filterBonushunt" class="form-check-input">
-                            <label for="filterBonushunt" class="form-check-label">Bonushunt allowed</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" id="filterVpn" class="form-check-input">
-                            <label for="filterVpn" class="form-check-label">VPN allowed</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" id="filterSportbets" class="form-check-input">
-                            <label for="filterSportbets" class="form-check-label">Sportbets</label>
-                        </div>
-                    </div>
-                </div>
+         <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+        @font-face {
+	font-family: 'Candara Regular';
+	src: url('fonts/candara_regular.ttf') format('truetype');
+}
+    body {
+      padding-top: 100px;
+      font-family: "Candara Regular", monospace;
+    }
+    .navbar-brand img {
+      max-width: 80px;
+      padding-right: 20px;
+    }
+    .navbar-brand {
+      font-size: 26px;
+    }
+    .paymentMethod img {
+      max-width: 50px;
+    }
+    .provider img {
+      max-width: 50px;
+    }
+    
+
+
+    .display-logo-mobile {
+      display: none;
+    }
+
+    .display-link-mobile {
+      display: none;
+    }
+
+    .display-logo {
+      padding-left: 0%;
+    }
+
+    .success {
+      background-color: #04AA6D;
+    }
+
+    /* Gray */
+    .casino-link-button {
+      box-shadow: 0px 0px 0px 0px #3dc21b;
+      background-color: #5CBF2A;
+      border-radius: 30px;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 25px !important;
+      text-decoration: none !important;
+    }
+
+    .casino-link-button:hover {
+      background-color: #5cbf2a !important;
+    }
+
+    .casino-link-button:active {
+      position: relative;
+      top: 1px;
+    }
+
+    .display-extended-wrapper {
+      width: 100%;
+      margin: auto;
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: top;
+    }
+
+    .display-extended-box {
+      border: 2px solid;
+      border-color: #BD504E;
+      padding: 20px;
+    }
+
+    .display-extended-head {
+      font-weight: bold;
+      font-size: 26px;
+    }
+    .display-wrapper2-mobile {
+        display: none;
+      }
+    @media only screen and (max-device-width: 600px) {
+      .display-head-row {
+        grid-template-columns: repeat(2, 2fr);
+        width: 80%;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .display-logo-mobile {
+        display: grid;
+      }
+
+      .display-logo {
+        display: none;
+      }
+
+      .display-link-mobile {
+        display: none;
+      }
+
+      .display-link {
+        display: none
+      }
+
+      .display-wrapper {
+        width: 100%;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 3fr;
+        gap: 8px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .display-wrapper2-mobile {
+        width: 90%;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .foo-table img {
+        width: 220px;
+        padding-top: 5px;
+      }
+      .show-more-button {
+        display: none!important;
+      }
+      .display-link {display: none;}
+    }
+    .bg-yasarred {
+      background-color: #BD504E!important;
+    }
+
+    .bc-yasarred {
+      border-color: #BD504E!important;
+    }
+
+    .bg-yasarpink {
+      background-color: #B151BD!important;
+    }
+    
+  </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-yasarred fixed-top p-3">
+      <a class="navbar-brand" href="#">
+        <!-- img src="img/logo-egon-animated.gif" alt="Logo" -->
+        <h2>YasarBonus</h2>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container-fluid border-1">
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+          <div class="col-3 p-3">
+            <div>
+              <img style="max-width:180px" src="img/logo-egon-animated.gif">
             </div>
-            <div class="row" id="casino"></div>
+          </div>
+          <div class="col-9 p-5">
+            <div>
+              <h1>Online Casino Bonus Comparison</h1>
+            </div>
         </div>
-        <script>
-            // Load JSON data
-            fetch('data.json')
-                .then(response => response.json())
-                .then(data => {
-                    const filterText = document.getElementById('filterText');
-                    const filterCategory = document.getElementById('filterCategory');
-                    const filterBonushunt = document.getElementById('filterBonushunt');
-                    const filterVpn = document.getElementById('filterVpn');
-                    const filterSportbets = document.getElementById('filterSportbets');
-                    const dataDiv = document.getElementById('casino');
+      </div>
+      </div>
+    </div>
+    <div class="container p-3">
+      <div class="row">
+      <div class="col-12 col-xl-3">
+      <div class="row">
+          <div class="col-12">
+            <div class="dropdown d-none">
+              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Dropdown button
+              </button>
+              <ul class="dropdown-menu d-none">
+                <li><label class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </div>
+            <div class="form-group d-none">
+                <label for="filterText">Filter by Text:</label>
+                <input type="text" id="filterText" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="filterCategory">Filter by Category:</label>
+              <select id="filterCategory" class="form-control">
+                  <option value="">All</option>
+                  <option value=""></option>
+                  <option value="hotel">Hotel</option>
+                  <option value="restaurant">Restaurant</option>
+              </select>
+            </div>
+            <div class="row align-items-start">
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Features:</label>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterBonushunt" class="form-check-input">
+                      <label for="filterBonushunt" class="form-check-label">Bonushunt allowed</label>
+                  </div>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterVpn" class="form-check-input">
+                      <label for="filterVpn" class="form-check-label">VPN allowed</label>
+                  </div>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterSportbets" class="form-check-input">
+                      <label for="filterSportbets" class="form-check-label">Sportbets</label>
+                  </div>
+                  <div class="form-check">
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label></label>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterNoDeposit" class="form-check-input">
+                      <label for="filterNoDeposit" class="form-check-label">No Deposit Bonus</label>
+                  </div>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterProhibitedGamesProtection" class="form-check-input">
+                      <label for="filterProhibitedGamesProtection" class="form-check-label">Prohibited Games Protection</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Categories:</label>
+                  <div class="form-check">
+                    <script></script>
+                      <input type="checkbox" id="filterCategories" class="form-check-input">
+                      <label for="filterCategories" class="form-check-label">Bonushunt allowed</label>
+                  </div>
+                  <div class="form-check">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-xl-9">      <div id="casino"></div>
+    </div>
+      </div>
 
-                    // Function to filter the data based on selected filters
-                    const filterData = () => {
-                        const searchText = filterText.value.toLowerCase();
-                        const selectedCategory = filterCategory.value;
-                        const isBonushunt = filterBonushunt.checked;
-                        const isVpn = filterVpn.checked;
-                        const isSportbets = filterSportbets.checked;
+    </div>
 
-                        const filteredData = data.filter(casino => {
-                            // Filter by text
-                            if (searchText && !casino.title.toLowerCase().includes(searchText)) {
-                                return false;
-                            }
-                            // Filter by category
-                            if (selectedCategory && casino.category !== selectedCategory) {
-                                return false;
-                            }
-                            // Filter by additional filters
-                            if (isBonushunt && casino.bonushunt !== 'allowed') {
-                                return false;
-                            }
-                            if (isVpn && casino.vpn !== 'allowed') {
-                                return false;
-                            }
-                            if (isSportbets && casino.sportbets !== 'true') {
-                                return false;
-                            }
-                            return true;
-                        });
 
-                        // Clear existing HTML elements
-                        dataDiv.innerHTML = '';
+    <script>
+      // Load JSON data
+      fetch('data.json')
+          .then(response => response.json())
+          .then(data => {
+              // Get the filter elements
+              const filterText = document.getElementById('filterText');
+              const filterCategory = document.getElementById('filterCategory');
+              const filterBonushunt = document.getElementById('filterBonushunt');
+              const filterCategories = document.getElementById('filterCategories');
+              const filterVpn = document.getElementById('filterVpn');
+              const filterSportbets = document.getElementById('filterSportbets');
+              const filterNoDeposit = document.getElementById('filterNoDeposit');
+              const filterProhibitedGamesProtection = document.getElementById('filterProhibitedGamesProtection');
 
-                        // Create HTML elements for each filtered item
-                        const casinos = filteredData.map(casino => {
-                            const div = document.createElement('div');
-                            div.classList.add('col-md-4', 'mb-3');
-                            div.innerHTML = `
-                                <div class="card">
-                                    <img src="${casino.image}" class="card-img-top" alt="${casino.title}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${casino.title}</h5>
-                                        <p class="card-text">${casino.description}</p>
-                                    </div>
-                                </div>
-                                
-                            `;
-                            return div;
-                        });
+              const dataDiv = document.getElementById('casino');
 
-                        // Add the HTML elements to the page
-                        casinos.forEach(casino => dataDiv.appendChild(casino));
-                    };
+              // Function to filter the data based on selected filters
+              const filterData = () => {
+                  const searchText = filterText.value.toLowerCase();
+                  const selectedCategory = filterCategory.value;
+                  const isBonushunt = filterBonushunt.checked;
+                  const isVpn = filterVpn.checked;
+                  const isSportbets = filterSportbets.checked;
+                  const isNoDeposit = filterNoDeposit.checked;
+                  const isProhibitedGamesProtection = filterProhibitedGamesProtection.checked;
 
-                    // Add event listeners to the filter elements
-                    filterText.addEventListener('input', filterData);
-                    filterCategory.addEventListener('change', filterData);
-                    filterBonushunt.addEventListener('change', filterData);
-                    filterVpn.addEventListener('change', filterData);
-                    filterSportbets.addEventListener('change', filterData);
 
-                    // Initial data load
-                    filterData();
-                });
-        </script>
-        <!-- Add Bootstrap JS -->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-+J9zv9zqzJmJQ9Q6vzJ9z7z7vZl6t9y8zJjz0JfZJx5WJZ8zjzQJzJZ7WJZ8zjz" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JK" crossorigin="anonymous"></script>
-    </body>
+                  const filteredData = data.filter(casino => {
+                      // Filter by text
+                      if (searchText && !casino.name.toLowerCase().includes(searchText)) {
+                          return false;
+                      }
+                      // Filter by category
+                      if (selectedCategory && casino.category !== selectedCategory) {
+                          return false;
+                      }
+                      // Filter by additional filters
+                      if (isBonushunt && casino.bonushunt !== 'allowed') {
+                          return false;
+                      }
+                      if (isVpn && casino.vpn !== 'allowed') {
+                          return false;
+                      }
+                      if (isSportbets && casino.sportbets !== 'true') {
+                          return false;
+                      }
+                      if (isNoDeposit && casino.no_deposit !== 'true') {
+                          return false;
+                      }
+                      if (isProhibitedGamesProtection && casino.prohibited_games_protection !== 'true') {
+                          return false;
+                      }
+                      return true;
+                  });
+
+                  // Clear existing HTML elements
+                  dataDiv.innerHTML = '';
+
+                  // Create HTML elements for each filtered item
+                  
+                  const sortedCasinos = filteredData.sort((a, b) => {
+                    if (!a.sorting && !b.sorting) {
+                      return 0;
+                    } else if (!a.sorting) {
+                      return 1;
+                    } else if (!b.sorting) {
+                      return -1;
+                    } else {
+                      return a.sorting - b.sorting;
+                    }
+                  });
+
+                  const casinos = sortedCasinos.map(casino => {
+                  const div = document.createElement('div');
+                  div.classList.add('container');
+                  div.style.paddingTop = '15px';
+                  div.innerHTML = `
+                  <div class="row g-0 p-3 border border-2 b-2 rounded-3 bc-yasarred bg-light align-items-center" align="center">
+                    <div class="col-sm-12 col-md-8 col-lg-3 col-xl-3 order-1 order-lg-1 order-md-1">
+                      
+                      <div class="">
+                      ${casino.logo_text ? `<div class="pb-3"><span class="p-1 badge bg-info bg-large">${casino.logo_text}</span></div>` : ''}
+                        <div>
+                          <img style="max-width:180px" src="${casino.logo_url}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-7 col-xl-6 order-2 order-lg-2 order-xl-2 order-md-3" align-items-center>
+                      <div class="row col-sm g-0 align-items-center">
+                      <div class="col-3">
+                        <div>
+                          <h2>${casino.bonus_1}</h2>
+                          <h6>up to ${casino.bonus_1_max} €</h6>
+                          <h5>${casino.bonus_1_sticky == "true" ? `Sticky` : `Non-Sticky`}</h5>  
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div>
+                          <h2>${casino.max_bet} €</h2>
+                          <h6>Max Bet</h6>  
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div>
+                          <h2>${casino.max_cashout}</h2>
+                          <h6>Max Cashout</h6>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div>
+                          <h2>${casino.wager}</h2> <h4>(${casino.wager_type})</h4>
+                          <h6>Wager</h6>
+                        </div>
+                      </div>
+                      </div>
+                  </div>
+                  <div class="col-sm-8 col-md-3 col-lg-2 col-xl-3 col-xxl-3 p-1 order-3 order-lg-3 order-md-2">
+                      <a class="btn btn-lg btn-success" href="/${casino.aff_url}" target="_blank">PLAY NOW</a>
+                      <br>
+                      <span style="font-size:12px">T&amp;C apply</span>
+                  </div>
+                  <div class="col-sm-4 col-md-12 col-lg-12 col-xl-12 order-4 order-md-4 p-1" align="center">
+                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${casino.name}" aria-expanded="false" aria-controls="collapse${casino.name}">
+                      Show Details
+                      </button>
+                  </div>
+                  <div class="collapse p-3 order-5" id="collapse${casino.name}">
+                    <div class="row col-md-12" align="left">
+                    <div class="col-6">
+                      <h3>Casino Bonus</h3>
+                      <ul class="list-group-flush">
+                      ${casino.boni ? casino.boni.map(bonus => `<li class="list-group-item">${bonus}</li>`).join('') : ''}
+                      </ul>
+                      <h5>Tags</h5>
+                      <p>${casino.tags ? casino.tags.map(tag => `${tag}`).join(', ') : ''}</p>
+                    </div>
+                    <div class="col-6">
+                      <h3>Casino Features</h3>
+                      <ul class="list-group-flush">
+                      ${casino.features ? casino.features.map(feature => `<li class="list-group-item">${feature}</li>`).join('') : ''}
+                      </ul>
+                    </div> 
+                    <div class="col-6">
+                      <h3>Provider</h3>
+                      <div class="row">
+                      ${casino.providers ? casino.providers.map(provider => `<div class="col-4 col-md-3 col-lg-2 provider"><img src="img/images/${provider}.png" /></div>`).join('') : ''}
+                      </div>                    
+                    </div> 
+                    <div class="col-6">
+                      <h3>Payment Methods</h3>
+                      <div class="row">
+                      ${casino.paymentMethods ? casino.paymentMethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
+                      </div>
+                    </div> 
+                    </div>
+                    <br>
+                  </div>
+                  </div>
+                  
+                  `;
+
+                      return div;
+                  });
+
+                  // Add the HTML elements to the page
+                  casinos.forEach(casino => dataDiv.appendChild(casino));
+
+                
+
+
+
+              };
+
+              // Add event listeners to the filter elements
+              filterText.addEventListener('input', filterData);
+              filterCategory.addEventListener('change', filterData);
+              filterBonushunt.addEventListener('change', filterData);
+              filterVpn.addEventListener('change', filterData);
+              filterSportbets.addEventListener('change', filterData);
+              filterNoDeposit.addEventListener('change', filterData);
+              filterProhibitedGamesProtection.addEventListener('change', filterData);
+
+              // Initial data load
+              filterData();
+              
+          });
+  </script>
+
+<!-- Add Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" crossorigin="anonymous">
+</script>
+
+</body>
 </html>
