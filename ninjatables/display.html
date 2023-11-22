@@ -188,14 +188,15 @@
   </style>
   </head>
   <body>
+    
   <div class="display-logo-mobile">
-    <iframe scrolling="no" style="background: transparent" width="100%" height="30px"
+    <iframe scrolling="no" style="display:block;background:transparent" width="100%" height="32px"
       src="https://yasarbonus.com/api/text.php?text={{row.logo_text}}"></iframe>
     <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
   </div>
   <section class="display-wrapper">
     <div class="display-logo">
-      <iframe scrolling="no" style="background: transparent" width="100%" height="30px"
+      <iframe scrolling="no" style="display:block;background: transparent" width="100%" height="32px"
         src="https://yasarbonus.com/api/text.php?text={{row.logo_text}}"></iframe>
       <p><a href="/{{row.woo_posttitle}}" target="_blank">{{row.woo_product_image}}</a></p>
     </div>
@@ -214,7 +215,7 @@
         <p style="font-size:14px">Max Cashout</p>
       </div>
       <div class="display-head-row-item">
-        <p class="display-head">{{row.wager}}</p>
+        <p class="display-head">{{row.wager}} ({{row.wager_type}})</p>
         <p style="font-size:14px">Wager</p>
       </div>
     </div>

@@ -9,7 +9,7 @@
         /* CSS für die Bildzentrierung */
         .image-container {
 /*            text-align: center;*/
-	padding-top:10px;
+	padding-top:0px;
         }
         .image-container img {
 /*            display: inline-block;
@@ -19,13 +19,30 @@
         .show-more {
             display: none;
         }
+        .button-show-more {
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  text-shadow: 1px 1px 3px #666666;
+  color: #ffffff;
+  font-size: 12px;
+  background: #BD504E;
+  padding: 5px 10px 5px 10px;
+  text-decoration: none;
+  border: none;
+}
+
+.button-show-more:hover {
+  background: #BD634D;
+  text-decoration: none;
+}
     </style>
 </head>
 <body>
 <script>
 // Bilder-Dateien und Verzeichnis festlegen
 const imageNames = new URLSearchParams(window.location.search).get('name')?.split(',') ?? [];
-const imageDirectory = 'images/';
+const imageDirectory = 'api/images/';
 
 // Prüfen, ob Bilder angegeben wurden
 if (imageNames.length > 0) {
@@ -44,9 +61,9 @@ if (imageNames.length > 0) {
         if (imagePath) {
             // Bild ausgeben
             if (index < 6) {
-                document.write(`<img width="70px" src="${imagePath}" alt="${imageName}" /> `);
+                document.write(`<img width="80px" src="${imagePath}" alt="${imageName}" /> `);
             } else {
-                document.write(`<img class="show-more" width="70px" src="${imagePath}" alt="${imageName}" /> `);
+                document.write(`<img class="show-more" width="80px" src="${imagePath}" alt="${imageName}" />`);
             }
         } else {
             // Falls das Bild nicht existiert, eine Meldung ausgeben
@@ -54,13 +71,13 @@ if (imageNames.length > 0) {
         }
     });
 
-    // Container-Div schließen
-    document.write('</div>');
-
     // Show more button
     if (imageNames.length > 6) {
-        document.write('<button onclick="showMore()">Show more</button>');
+        document.write('<button class="button-show-more" onclick="showMore()">Show more</button>');
     }
+
+    // Container-Div schließen
+    document.write('</div>');
 
     // Show more function
     function showMore() {
@@ -77,4 +94,23 @@ if (imageNames.length > 0) {
 </script>
 </body>
 </html>
+
+
+<!-- Add a div with an id to your HTML file -->
+
+<!-- Add the following script to your HTML file -->
+<script>
+    // Get the content of the HTML file
+    const filePath = 'img.html';
+    fetch(filePath)
+        .then(response => response.text())
+        .then(data => {
+            // Assign the content to the div
+            const myDiv = document.getElementById('myDiv');
+            myDiv.innerHTML = data;
+        })
+        .catch(error => console.error(error));
+</script>
+
+<div id="myDiv"></div>
 
