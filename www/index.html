@@ -8,14 +8,18 @@
   <!-- Bootstrap CSS v5.2.1 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/components/dropdown.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+
   <style>
-        @font-face {
-	font-family: 'Candara Regular';
-	src: url('fonts/candara_regular.ttf') format('truetype');
-}
-    body {
-      padding-top: 100px;
-      font-family: "Candara Regular", monospace;
+    @import url(https://db.onlinewebfonts.com/c/91f73e4ff49f2826f489894acdb18c6a?family=Cresci+LP+W01+Regular);
+
+    @font-face {
+      font-family: 'Candara Regular';
+      src: url('fonts/candara_regular.ttf') format('truetype');
+    }
+    .body {
+      /* font-family: "Candara Regular", monospace;*/
     }
     .navbar-brand img {
       max-width: 80px;
@@ -27,11 +31,11 @@
     .paymentMethod img {
       max-width: 50px;
     }
-    .provider img {
-      max-width: 50px;
-    }
     
-
+    .regnum-font-2 {
+      font-family: "Cresci LP W01 Regular";
+      font-weight: 600;
+    }
 
     .display-logo-mobile {
       display: none;
@@ -163,16 +167,16 @@
   </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-yasarred fixed-top p-3">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-yasarred p-3">
       <a class="navbar-brand" href="#">
         <!-- img src="img/logo-egon-animated.gif" alt="Logo" -->
         <h2>YasarBonus</h2>
       </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler d-none" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto d-none">
           <li class="nav-item">
             <a class="nav-link" href="#">Home</a>
           </li>
@@ -185,55 +189,57 @@
         </ul>
       </div>
     </nav>
-    <div class="container-fluid border-1">
+    <div class="container">
       <div class="row">
         <div class="col-12">
           <div class="row">
-          <div class="col-3 p-3">
+          <div class="col-4 p-3">
             <div>
               <img style="max-width:180px" src="img/logo-egon-animated.gif">
             </div>
           </div>
-          <div class="col-9 p-5">
+          <div class="col-8 p-5">
             <div>
-              <h1>Online Casino Bonus Comparison</h1>
+              <h1>YasarBonus.com</h1>
+              <h2>Online Casino Bonus Comparison</h2>
             </div>
         </div>
       </div>
       </div>
     </div>
-    <div class="container p-3">
-      <div class="row">
-      <div class="col-12 col-xl-3">
-      <div class="row">
-          <div class="col-12">
-            <div class="dropdown d-none">
-              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown button
-              </button>
-              <ul class="dropdown-menu d-none">
-                <li><label class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
-            </div>
-            <div class="form-group d-none">
-                <label for="filterText">Filter by Text:</label>
-                <input type="text" id="filterText" class="form-control">
-            </div>
+    </div>
+    <div class="container p-3 border border-5 bc-yasarred rounded-3">
+      <div class="row align-items-start">
+        <div class="col-12 col-xl-2">
+          <div class="row">
+          <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
             <div class="form-group">
-              <label for="filterCategory">Filter by Category:</label>
-              <select id="filterCategory" class="form-control">
-                  <option value="">All</option>
-                  <option value=""></option>
-                  <option value="hotel">Hotel</option>
-                  <option value="restaurant">Restaurant</option>
-              </select>
-            </div>
-            <div class="row align-items-start">
-              <div class="col-6">
+                  <label for="filterText">Name</label>
+                  <input type="text" id="filterText" class="form-control">
+                </div>
+              </div>
+              <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
                 <div class="form-group">
-                  <label>Features:</label>
+                  <label for="filterCategory">Category</label>
+                  <select id="filterCategory" class="form-control">
+                      <option value="">All</option>
+                      <option value="non-sticky">Non-Sticky</option>
+                      <option value="sticky">Sticky</option>
+                      <option value="wagerfree">Wagerfree</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
+                <div class="form-group">
+                  <label>Payment Methods</label>
+                  <select multiple="" name="skills" class="ui fluid normal dropdown" style="height:100px">
+                  <option value="">All</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
+                <div class="form-group">
+                  <label>Features</label>
                   <div class="form-check">
                       <input type="checkbox" id="filterBonushunt" class="form-check-input">
                       <label for="filterBonushunt" class="form-check-label">Bonushunt allowed</label>
@@ -247,100 +253,297 @@
                       <label for="filterSportbets" class="form-check-label">Sportbets</label>
                   </div>
                   <div class="form-check">
+                    <input type="checkbox" id="filterNoDeposit" class="form-check-input">
+                    <label for="filterNoDeposit" class="form-check-label">No Deposit Bonus</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="filterProhibitedGamesProtection" class="form-check-input">
+                    <label for="filterProhibitedGamesProtection" class="form-check-label">Prohibited Games Protection</label>
+                </div>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
+                <div class="form-group">
+                  <label>Specials</label>
+                  <div class="form-check">
+                      <input type="checkbox" id="filterGamomat" class="form-check-input">
+                      <label for="filterGamomat" class="form-check-label">Gamomat</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="filterPlayngo" class="form-check-input">
+                    <label for="filterPlayngo" class="form-check-label">Play n Go</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="filterYasarsBest" class="form-check-input">
+                    <label for="filterYasarsBest" class="form-check-label">Yasar's Best</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="filter150andmore" class="form-check-input">
+                    <label for="filter150andmore" class="form-check-label">150% & more</label>
                   </div>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-6 col-sm-6 col-md-3 col-lg-4 col-xl-12">
                 <div class="form-group">
-                  <label></label>
-                  <div class="form-check">
-                      <input type="checkbox" id="filterNoDeposit" class="form-check-input">
-                      <label for="filterNoDeposit" class="form-check-label">No Deposit Bonus</label>
-                  </div>
-                  <div class="form-check">
-                      <input type="checkbox" id="filterProhibitedGamesProtection" class="form-check-input">
-                      <label for="filterProhibitedGamesProtection" class="form-check-label">Prohibited Games Protection</label>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="form-group">
-                  <label>Categories:</label>
-                  <div class="form-check">
-                    <script></script>
-                      <input type="checkbox" id="filterCategories" class="form-check-input">
-                      <label for="filterCategories" class="form-check-label">Bonushunt allowed</label>
-                  </div>
-                  <div class="form-check">
+                    <label>Companies</label>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterN1" class="form-check-input">
+                        <label for="filterN1" class="form-check-label">N1 Interactive Ltd.</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterHollycorn" class="form-check-input">
+                        <label for="filterHollycorn" class="form-check-label">Hollycorn NV</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="filterDama" class="form-check-input">
+                        <label for="filterDama" class="form-check-label">Dama NV</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="filterRabidi" class="form-check-input">
+                      <label for="filterRabidi" class="form-check-label">Rabidi NV</label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-12 col-xl-9">      <div id="casino"></div>
-    </div>
-      </div>
 
+      <div class="col-12 col-xl-10">
+        <div class="container">
+          <div id="casinosCount"></div>
+        </div>
+        <div id="casino"></div>
+      </div>
     </div>
+    </div>
+
+
 
 
     <script>
+
       // Load JSON data
       fetch('data.json')
           .then(response => response.json())
           .then(data => {
+
+           
+
               // Get the filter elements
               const filterText = document.getElementById('filterText');
+
+              // category
               const filterCategory = document.getElementById('filterCategory');
+
+              // features
               const filterBonushunt = document.getElementById('filterBonushunt');
-              const filterCategories = document.getElementById('filterCategories');
               const filterVpn = document.getElementById('filterVpn');
               const filterSportbets = document.getElementById('filterSportbets');
               const filterNoDeposit = document.getElementById('filterNoDeposit');
               const filterProhibitedGamesProtection = document.getElementById('filterProhibitedGamesProtection');
 
+              // companies
+              const filterN1 = document.getElementById('filterN1');
+              const filterHollycorn = document.getElementById('filterHollycorn');
+              const filterDama = document.getElementById('filterDama');
+              const filterRabidi = document.getElementById('filterRabidi');
+
+              // specials
+              const filterGamomat = document.getElementById('filterGamomat');
+              const filterPlayngo = document.getElementById('filterPlayngo');
+              const filterYasarsBest = document.getElementById('filterYasarsBest');
+              const filter150andmore = document.getElementById('filter150andmore');
+
+
               const dataDiv = document.getElementById('casino');
+              const casinosCountDiv = document.getElementById('casinosCount');
+
+              
 
               // Function to filter the data based on selected filters
+              
               const filterData = () => {
-                  const searchText = filterText.value.toLowerCase();
-                  const selectedCategory = filterCategory.value;
-                  const isBonushunt = filterBonushunt.checked;
-                  const isVpn = filterVpn.checked;
-                  const isSportbets = filterSportbets.checked;
-                  const isNoDeposit = filterNoDeposit.checked;
-                  const isProhibitedGamesProtection = filterProhibitedGamesProtection.checked;
+                
+                console.log(new Date().toString());
+                console.log("Casinos in Database:", (data).length);
 
+                  var searchText = filterText.value.toLowerCase();
+                  var selectedCategory = filterCategory.value;
+                  var isBonushunt = filterBonushunt.checked;
+                  var isVpn = filterVpn.checked;
+                  var isSportbets = filterSportbets.checked;
+                  var isNoDeposit = filterNoDeposit.checked;
+                  var isProhibitedGamesProtection = filterProhibitedGamesProtection.checked;
+                  var isGamomat = filterGamomat.checked;
+                  var isPlayngo = filterPlayngo.checked;
+                  var isYasarsBest = filterYasarsBest.checked;
+                  var is150andmore = filter150andmore.checked;
+                  var isN1 = filterN1.checked;
+                  var isHollycorn = filterHollycorn.checked;
+                  var isDama = filterDama.checked;
+                  var isRabidi = filterRabidi.checked;
+
+ // Parse URL parameters
+ var urlParams = new URLSearchParams(window.location.search);
+
+ if (urlParams.has('search')) {
+   searchText = urlParams.get('search');
+   filterText.value = searchText;
+ }
+
+
+                  // Log the selected filters
+
+                  if (selectedCategory) {
+                    console.log("Category Filter:", selectedCategory)
+                  } 
+                  if (isBonushunt) {
+                    console.log("Filter: Bonushunt")
+                  }
+                  if (isVpn) {
+                    console.log("Filter: VPN")
+                  }
+                  if (isSportbets) {
+                    console.log("Filter: Sportbets")
+                  }
+                  if (isNoDeposit) {
+                    console.log("Filter: No Deposit")
+                  }
+                  if (isProhibitedGamesProtection) {
+                    console.log("Filter: Prohibited Games Protection")
+                  }                  
+
+                  // build array of special filters
+
+                  var specialFilters = []; 
+
+                  if (isGamomat) {
+                      specialFilters.push('gamomat');
+                  }
+
+                  if (isPlayngo) {
+                      specialFilters.push('playngo');
+                  }
+
+                  if (isYasarsBest) {
+                      specialFilters.push('yasarsbest');
+                  }
+
+                  if (is150andmore) {
+                      specialFilters.push('150andmore');
+                  }
+
+                  console.log("Special Filters:", specialFilters);
+
+
+                  // build array of company filters
+
+                  var companyFilters = []; 
+
+                  if (isRabidi) {
+                    companyFilters.push('rabidi');
+                  }
+
+                  if (isN1) {
+                    companyFilters.push('n1');
+                  }
+
+                  if (isHollycorn) {
+                    companyFilters.push('hollycorn');
+                  }
+
+                  if (isDama) {
+                    companyFilters.push('dama');
+                  }
+
+                  console.log("Company Filters:", companyFilters);
 
                   const filteredData = data.filter(casino => {
+
+
+
+                      // Filter by text
+                      if (searchText && !casino.name.toLowerCase().includes(searchText)) {
+                        return false;
+                      }
+
+                      // Filter by category
+                      if (selectedCategory == 'wagerfree' && casino.wager !== '0x') {
+                        return false;
+                      } 
+                      if (selectedCategory == 'sticky' && casino.bonus_display_sticky !== 'true') {
+                        return false;
+                      }
+                      if (selectedCategory == 'non-sticky' && casino.bonus_display_sticky !== 'false') {
+                        return false;
+                      }
+
+                    
                       // Filter by text
                       if (searchText && !casino.name.toLowerCase().includes(searchText)) {
                           return false;
                       }
                       // Filter by category
-                      if (selectedCategory && casino.category !== selectedCategory) {
+                      if (selectedCategory == 'wagerfree' && casino.wager !== '0x') {
+                          return false;
+                      } 
+                      if (selectedCategory == 'sticky' && casino.bonus_display_sticky !== 'true') {
                           return false;
                       }
+                      if (selectedCategory == 'non-sticky' && casino.bonus_display_sticky !== 'false') {
+                          return false;
+                      }
+                      //if (selectedCategory && casino.category !== selectedCategory) {
+                      //    return false;
+                      //}
                       // Filter by additional filters
-                      if (isBonushunt && casino.bonushunt !== 'allowed') {
+
+                      const bonushunt = casino.tags.includes('Bonushunt allowed') ? 'true' : 'false';
+                      if (isBonushunt && bonushunt !== 'true') {
                           return false;
                       }
-                      if (isVpn && casino.vpn !== 'allowed') {
+                      const vpn = casino.tags.includes('VPN allowed') ? 'true' : 'false';
+                      if (isVpn && vpn !== 'true') {
                           return false;
                       }
-                      if (isSportbets && casino.sportbets !== 'true') {
+                      const sportbets = casino.tags.includes('Sportbets') ? 'true' : 'false';
+                      if (isSportbets && sportbets !== 'true') {
                           return false;
                       }
-                      if (isNoDeposit && casino.no_deposit !== 'true') {
+                      const noDeposit = casino.tags.includes('No Deposit') ? 'true' : 'false';
+                      if (isNoDeposit && noDeposit !== 'true') {
                           return false;
                       }
-                      if (isProhibitedGamesProtection && casino.prohibited_games_protection !== 'true') {
+                      const prohibitedGamesProtection = casino.tags.includes('Prohibited Games Protection') ? 'true' : 'false';
+                      if (isProhibitedGamesProtection && prohibitedGamesProtection !== 'true') {
                           return false;
                       }
+
+                      const yasarsBest = casino.tags.includes('Yasars Best') ? 'true' : 'false';
+                      if (isYasarsBest && yasarsBest !== 'true') {
+                          return false;
+                      }
+                      
+                      var providersLowercase = casino.providers.map(function(x){ return x.toLowerCase() });
+                      casino.providers = providersLowercase;
+                      if (specialFilters.length > 0 && specialFilters.includes ("gamomat" || "playngo") && !specialFilters.every(v => providersLowercase.includes(v))) {
+                          return false;
+                      }
+                      if (companyFilters.length > 0 && !companyFilters.some(v => casino.company == v)) {
+                          return false;
+                      }
+
+                      var paymentMethodsLowercase = casino.paymentMethods.map(function(x){ return x.toLowerCase() });
+                      casino.paymentMethods = paymentMethodsLowercase;
+                      
+
                       return true;
+
                   });
+
+                  console.log("Casinos filtered:", (filteredData).length);
+                  
+                  var casinosCount = (filteredData).length;
+                  casinosCountDiv.innerHTML = "Showing " + casinosCount + " Casinos";
 
                   // Clear existing HTML elements
                   dataDiv.innerHTML = '';
@@ -358,29 +561,36 @@
                       return a.sorting - b.sorting;
                     }
                   });
-
                   const casinos = sortedCasinos.map(casino => {
+                  var lowercaseName = casino.name.toLowerCase();
+
+                  const lowercasePaymentMethods = casino.paymentMethods.map(method => method.toLowerCase());
+                  casino.paymentMethods = lowercasePaymentMethods;
+                  console.log("Payment Methods:", casino.paymentMethods);
+ 
+                                 
                   const div = document.createElement('div');
+                  div.id = casino.name;
                   div.classList.add('container');
                   div.style.paddingTop = '15px';
                   div.innerHTML = `
                   <div class="row g-0 p-3 border border-2 b-2 rounded-3 bc-yasarred bg-light align-items-center" align="center">
                     <div class="col-sm-12 col-md-8 col-lg-3 col-xl-3 order-1 order-lg-1 order-md-1">
-                      
+      
                       <div class="">
                       ${casino.logo_text ? `<div class="pb-3"><span class="p-1 badge bg-info bg-large">${casino.logo_text}</span></div>` : ''}
                         <div>
-                          <img style="max-width:180px" src="${casino.logo_url}">
+                          <img class="lazyload" src="img/casinos/${lowercaseName}.png" data-src="img/casinos/${lowercaseName}.png" alt="foo" style="max-width:200px" height="auto" lazyload="on" />
                         </div>
                       </div>
                     </div>
-                    <div class="col-sm-12 col-md-12 col-lg-7 col-xl-6 order-2 order-lg-2 order-xl-2 order-md-3" align-items-center>
-                      <div class="row col-sm g-0 align-items-center">
+                    <div class="col-sm-12 col-md-12 col-lg-7 col-xl-6 order-2 order-lg-2 order-xl-2 order-md-3 " >
+                      <div class="row col-sm g-0 align-self-stretch">
                       <div class="col-3">
                         <div>
-                          <h2>${casino.bonus_1}</h2>
-                          <h6>up to ${casino.bonus_1_max} €</h6>
-                          <h5>${casino.bonus_1_sticky == "true" ? `Sticky` : `Non-Sticky`}</h5>  
+                          <h2>${casino.bonus_display} %</h2>
+                          <h6>up to ${casino.bonus_display_max} €</h6>
+                          <h5>${casino.bonus_display_sticky == "true" ? `Sticky` : casino.bonus_display_sticky == "false" ? `Non-Sticky` : casino.bonus_display_sticky == "wagerfree" ? `Wagerfree` : ``}</h5>  
                         </div>
                       </div>
                       <div class="col-2">
@@ -397,7 +607,7 @@
                       </div>
                       <div class="col-4">
                         <div>
-                          <h2>${casino.wager}</h2> <h4>(${casino.wager_type})</h4>
+                          <h2>${casino.wager} (${casino.wager_type})</h2>
                           <h6>Wager</h6>
                         </div>
                       </div>
@@ -432,13 +642,13 @@
                     <div class="col-6">
                       <h3>Provider</h3>
                       <div class="row">
-                      ${casino.providers ? casino.providers.map(provider => `<div class="col-4 col-md-3 col-lg-2 provider"><img src="img/images/${provider}.png" /></div>`).join('') : ''}
+                      ${casino.providers ? casino.providers.map(provider => `<div class="col-4 col-md-3 col-lg-2"><img style="max-width:60px;" src="img/images/${provider}.png" /></div>`).join('') : ''}
                       </div>                    
                     </div> 
                     <div class="col-6">
                       <h3>Payment Methods</h3>
                       <div class="row">
-                      ${casino.paymentMethods ? casino.paymentMethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
+                      ${casino.paymentMethods ? casino.paymentMethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img style="max-width:60px;" src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
                       </div>
                     </div> 
                     </div>
@@ -447,12 +657,18 @@
                   </div>
                   
                   `;
+                  console.log("Loaded Casino:", casino.paymentMethods);
 
                       return div;
                   });
 
+
                   // Add the HTML elements to the page
                   casinos.forEach(casino => dataDiv.appendChild(casino));
+                  console.log("Casinos Loaded:", (casinos).length);
+                  casinosCountDiv.appendChild(casinosCount);
+
+
 
                 
 
@@ -468,11 +684,26 @@
               filterSportbets.addEventListener('change', filterData);
               filterNoDeposit.addEventListener('change', filterData);
               filterProhibitedGamesProtection.addEventListener('change', filterData);
+              filterGamomat.addEventListener('change', filterData);
+              filterPlayngo.addEventListener('change', filterData);
+              filterYasarsBest.addEventListener('change', filterData);
+              filter150andmore.addEventListener('change', filterData);
+              filterN1.addEventListener('change', filterData);
+              filterHollycorn.addEventListener('change', filterData);
+              filterDama.addEventListener('change', filterData);
+              filterRabidi.addEventListener('change', filterData);
+              
+              
 
               // Initial data load
+
+              
               filterData();
+
+              
               
           });
+          
   </script>
 
 <!-- Add Bootstrap JS -->
@@ -484,6 +715,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" crossorigin="anonymous">
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/components/dropdown.min.js" integrity="sha512-PD2QRjH0s7TFz8Oicpi4UFJBdKP0vFeYpmNPsEoNDHfG3QcGLTs8XUrkXWEQXX2Q0g+1oEwvow27TM2VfPdTxw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </body>
 </html>
