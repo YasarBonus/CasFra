@@ -1,11 +1,5 @@
 // Pre-define filter values from URL parameters
-$('.lazyload')
-  .visibility({
-    type       : 'image',
-    transition : 'fade in',
-    duration   : 1000
-  })
-;
+
         // Pre-set the checkbox and dropdown filters based on URL parameters
         const urlParams = new URLSearchParams(window.location.search);
 
