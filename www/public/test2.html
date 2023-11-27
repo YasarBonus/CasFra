@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Semantic UI Website</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.css" >
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div class="ui fixed inverted menu">
+        <div class="ui container">
+          <a href="#" class="header item">
+            <img class="logo" src="img/logo-egon-animated.gif">
+            YasarBonus
+          </a>
+          <a href="#" class="item">Home</a>
+          <div class="ui simple dropdown item">
+            Dropdown <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item" href="#">Link Item</a>
+              <a class="item" href="#">Link Item</a>
+              <div class="divider"></div>
+              <div class="header">Header Item</div>
+              <div class="item">
+                <i class="dropdown icon"></i>
+                Sub Menu
+                <div class="menu">
+                  <a class="item" href="#">Link Item</a>
+                  <a class="item" href="#">Link Item</a>
+                </div>
+              </div>
+              <a class="item" href="#">Link Item</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui container" style="margin-top: 100px !important;">
+      <div class="ui two column stackable grid">
+        
+        <div class="four wide column">
+            <div class="ui container grid">
+                <div class="row">
+                    <h5>Category</h5>
+                    <div class="field">
+                        <select multiple class="ui dropdown" id="categoryFilter">
+                            <option value="">All</option>
+                            <option value="sticky">Sticky</option>
+                            <option value="nonsticky">Non-Sticky</option>
+                            <option value="wagerfree">Wagerfree</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>Payment Methods</h5>
+                    <div class="field">
+                        <select multiple class="ui dropdown" id="paymentmethodsFilter">
+                            <option value="">All</option>
+
+                            <option value="BankTransfer">Bank Transfer</option>
+                            <option value="Paysafecard">Paysafecard</option>
+                            <option value="Crypto">Crypto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>Provider</h5>
+                    <div class="field">
+                        <select multiple class="ui dropdown" id="providerFilter">
+                            <option value="">All</option>
+                            <option value="Endorphina">Endorphina</option>
+                            <option value="BigTimeGaming">BigTimeGaming</option>
+                            <option value="AvatarUx">AvatarUx</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>Features</h5>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="vpnFilter">
+                            <label>VPN allowed</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="bonushuntFilter">
+                            <label>Bonushunt allowed</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="sportbetsFilter">
+                            <label>Sportbets</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="nodepositFilter">
+                            <label>No Deposit Bonus</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="prohibitedgamesprotectionFilter">
+                            <label>Prohibited Games Protection</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>Specials</h5>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="150andmoreFilter">
+                            <label>150% & more</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="yasarsbestFilter">
+                            <label>Yasar's Best</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>Companies</h5>
+                    <div class="field">
+                        <select multiple class="ui dropdown" id="companyFilter">
+                            <option value="">None</option>
+                            <option value="n1">N1 Interactive Ltd.</option>
+                            <option value="hollycorn">Hollycorn NV</option>
+                            <option value="dama">Dama NV</option>
+                            <option value="rabidi">Rabidi NV</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="twelve wide column">
+            <div class="ui container casinocontainer">
+            <div id="responseContainer"><div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+        </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/casinos.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+
+<!-- script src="bootstrap-5.3.2-dist/js/bootstrap.js" crossorigin="anonymous"></script -->
+</body>
+</html>

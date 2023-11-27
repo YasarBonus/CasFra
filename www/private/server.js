@@ -13,7 +13,7 @@ app.get('/api', (req, res) => {
 });
 
 const fs = require('fs');
-app.get('/api/casinos/html', (req, res) => {
+app.get('/api/casinos/htmldiv', (req, res) => {
   fs.readFile('private/data/casinos.json', 'utf8', (err, data) => {
     console.log('test');
     // Error handling
@@ -118,15 +118,25 @@ app.get('/api/casinos/html', (req, res) => {
       }
 
       if (company) {
+        const companyArray = company.split(',');
+        console.log(companyArray);
+        filteredData = filteredData.filter(casino => companyArray.every(company => casino.company.includes(company)));
+      }
+
+      
+
+      
+
+      if (company) {
         filteredData = filteredData.filter(casino => casino.company.toLowerCase().includes(company.toLowerCase()));
       }
       // END: abpxx6d04wxr
 
       console.log('Number of filtered items:', filteredData.length);
-      var casino = filteredData;
+      // var casino = filteredData;
       // var lowercaseName = filteredData.name.toLowerCase();
       // console.log(filteredData);
-      console.log(filteredData[0].name);
+      // console.log(casino[0].name);
       var html = ``;
       filteredData.forEach(casino => {
       
@@ -207,7 +217,7 @@ app.get('/api/casinos/html', (req, res) => {
       <div class="col-6">
         <h3>Payment Methods</h3>
         <div class="row">
-        ${casino.paymentMethods ? casino.paymentMethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img style="max-width:60px;" src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
+        ${casino.paymentmethods ? casino.paymentmethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img style="max-width:60px;" src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
         </div>
       </div> 
       </div>
