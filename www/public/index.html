@@ -4,21 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Semantic UI Website</title>
+    <!-- link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.css" -->
+
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <!-- script src="bootstrap-5.3.2-dist/js/bootstrap.js" crossorigin="anonymous"></script -->
+
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    <link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.css" >
     <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/speechbubbles.css">
+    <script src="https://kit.fontawesome.com/a35631f35d.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="ui fixed inverted menu">
-        <div class="ui container">
+        <div class="ui container" style="font-size:20px">
           <a href="#" class="header item">
             <img class="logo" src="img/logo-egon-animated.gif">
             YasarBonus
           </a>
           <a href="#" class="item">Home</a>
-          <div class="ui simple dropdown item">
+          <!-- div class="ui simple dropdown item">
             Dropdown <i class="dropdown icon"></i>
             <div class="menu">
               <a class="item" href="#">Link Item</a>
@@ -35,13 +43,19 @@
               </div>
               <a class="item" href="#">Link Item</a>
             </div>
+          </div -->
+          <div class="right menu">
+            <a class="item"><i class="fa-brands fa-discord"></i></a>
+            <a class="item"><i class="fa-brands fa-telegram"></i></a>
+            <a class="item"><i class="fa-brands fa-instagram"></i></a>
+            <!-- a class="item"><i class="fa-brands fa-twitch"></i></a -->
           </div>
         </div>
       </div>
+
       <div class="ui container" style="margin-top: 100px !important;">
       <div class="ui two column stackable grid">
-        
-        <div class="four wide column">
+        <div class="three wide column">
             <div class="ui container grid">
                 <div class="row">
                     <h5>Category</h5>
@@ -59,10 +73,28 @@
                     <div class="field">
                         <select multiple class="ui dropdown" id="paymentmethodsFilter">
                             <option value="">All</option>
-
-                            <option value="BankTransfer">Bank Transfer</option>
-                            <option value="Paysafecard">Paysafecard</option>
+                            <option value="ApplePay">ApplePay</option>
+                            <option value="AstroPay">AstroPay</option>
+                            <option value="BankTransfer">BankTransfer</option>
+                            <option value="CashtoCode">CashtoCode</option>
                             <option value="Crypto">Crypto</option>
+                            <option value="BankTransfer">BankTransfer</option>
+                            <option value="Flexespin">Flexespin</option>
+                            <option value="GiroPay">GiroPay</option>
+                            <option value="GooglePay">GooglePay</option>
+                            <option value="Jeton">Jeton</option>
+                            <option value="Mastercard">Mastercard</option>
+                            <option value="mercuryo">Mercuryo (buy Crypto)</option>
+                            <option value="Neteller">Neteller</option>
+                            <option value="N26">N26</option>
+                            <option value="Paysafecard">Paysafecard</option>
+                            <option value="Revolut">Revolut</option>
+                            <option value="Skinsback">Skinsback</option>
+                            <option value="Skrill">Skrill</option>
+                            <option value="Sofort">Sofort</option>
+                            <option value="Visa">Visa</option>
+                            <option value="eZeeWallet">eZeeWallet</option>
+                            <option value="ecoPayz">ecoPayz</option>
                         </select>
                     </div>
                 </div>
@@ -71,14 +103,33 @@
                     <div class="field">
                         <select multiple class="ui dropdown" id="providerFilter">
                             <option value="">All</option>
-                            <option value="Endorphina">Endorphina</option>
+                            <option value="AvatarUx">AvatarUX</option>
+                            <option value="BGaming">BGaming</option>
                             <option value="BigTimeGaming">BigTimeGaming</option>
-                            <option value="AvatarUx">AvatarUx</option>
+                            <option value="Elk">BigTimeGaming</option>
+                            <option value="Endorphina">Endorphina</option>
+                            <option value="gamomat">BigTimeGaming</option>
+                            <option value="hacksaw">BigTimeGaming</option>
+                            <option value="merkur">BigTimeGaming</option>
+                            <option value="netent">BigTimeGaming</option>
+                            <option value="nolimit">BigTimeGaming</option>
+                            <option value="novomatic">BigTimeGaming</option>
+                            <option value="playngo">BigTimeGaming</option>
+                            <option value="playson">BigTimeGaming</option>
+                            <option value="pragmaticplay">BigTimeGaming</option>
+                            <option value="pushagming">BigTimeGaming</option>
+                            <option value="quickspin">BigTimeGaming</option>
+                            <option value="redtiger">BigTimeGaming</option>
+                            <option value="relax">BigTimeGaming</option>
+                            <option value="skinsback">BigTimeGaming</option>
+                            <option value="thunderkick">BigTimeGaming</option>
+                            <option value="yggdrasil">BigTimeGaming</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <h5>Features</h5>
+                    <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
                             <input type="checkbox" id="vpnFilter">
@@ -89,6 +140,12 @@
                         <div class="ui checkbox">
                             <input type="checkbox" id="bonushuntFilter">
                             <label>Bonushunt allowed</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="nomaxcashoutFilter">
+                            <label>No Max Cashout</label>
                         </div>
                     </div>
                     <div class="field">
@@ -110,12 +167,14 @@
                         </div>
                     </div>
                 </div>
+                </div>
                 <div class="row">
                     <h5>Specials</h5>
+                    <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
                             <input type="checkbox" id="150andmoreFilter">
-                            <label>150% & more</label>
+                            <label>Bonus 150% & more</label>
                         </div>
                     </div>
                     <div class="field">
@@ -124,6 +183,7 @@
                             <label>Yasar's Best</label>
                         </div>
                     </div>
+                </div>
                 </div>
                 <div class="row">
                     <h5>Companies</h5>
@@ -139,10 +199,19 @@
                 </div>
             </div>
         </div>
-        <div class="twelve wide column">
-            <div class="ui container casinocontainer">
-            <div id="responseContainer"><div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+        
+        <div class="thirteen wide column">
+
+                <div id="responseContainer">
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                </div>
         </div>
+      </div>
         </div>
         </div>
       </div>
@@ -150,9 +219,12 @@
 
     <script src="js/casinos.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script>
 
-<!-- script src="bootstrap-5.3.2-dist/js/bootstrap.js" crossorigin="anonymous"></script -->
+    </script>
+    <script>
+        
+
+    </script>
 </body>
 </html>

@@ -27,7 +27,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       const jsonData = JSON.parse(data);
 
       // Apply filter based on URL parameters
-      const { name, vpn, sticky, category, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, yasarsbest} = req.query;
+      const { name, vpn, sticky, category, nomaxcashout, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, egonsbest} = req.query;
       console.log(req.query);
 
       // Filter data based on URL parameters (if they exist)
@@ -59,49 +59,57 @@ app.get('/api/casinos/htmldiv', (req, res) => {
 
       if (sportbets) {
         if (sportbets === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Sportbets'));
-        } else if (sportbets === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Sportbets'));
+          filteredData = filteredData.filter(casino => casino.sportbets === 'true');
+        } else if (sportbets === '') {
+          filteredData = filteredData.filter(casino => casino.sportbets === 'false');
+        }
+      }
+
+      if (nomaxcashout) {
+        if (nomaxcashout === 'true') {
+          filteredData = filteredData.filter(casino => casino.max_cashout === 'No');
+        } else if (bonushunt === 'false') {
+          filteredData = filteredData.filter(casino => !casino.max_cashout === 'No');
         }
       }
 
       if (bonushunt) {
         if (bonushunt === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Bonushunt allowed'));
+          filteredData = filteredData.filter(casino => casino.bonushunt === 'true');
         } else if (bonushunt === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Bonushunt allowed'));
+          filteredData = filteredData.filter(casino => !casino.bonushunt === 'true');
         }
       }
 
       if (nodeposit) {
         if (nodeposit === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('No Deposit'));
+          filteredData = filteredData.filter(casino => casino.nodeposit === 'true');
         } else if (nodeposit === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('No Deposit'));
+          filteredData = filteredData.filter(casino => casino.nodeposit === 'false');
         }
       }
 
       if (vpn) {
         if (vpn === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('VPN allowed'));
+          filteredData = filteredData.filter(casino => casino.vpn === 'true');
         } else if (vpn === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('VPN allowed'));
+          filteredData = filteredData.filter(casino => casino.vpn === 'false');
         }
       }
 
       if (prohibitedgamesprotection) {
         if (prohibitedgamesprotection === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Prohibited Games Protection'));
+          filteredData = filteredData.filter(casino => casino.prohibitedgamesprotection === 'true');
         } else if (prohibitedgamesprotection === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Prohibited Games Protection'));
+          filteredData = filteredData.filter(casino => !casino.prohibitedgamesprotection === 'true');
         }
       }
 
-      if (yasarsbest) {
-        if (yasarsbest === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Yasars Best'));
-        } else if (yasarsbest === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Yasars Best'));
+      if (egonsbest) {
+        if (egonsbest === 'true') {
+          filteredData = filteredData.filter(casino => casino.tags.includes('Egons Best'));
+        } else if (egonsbest === 'false') {
+          filteredData = filteredData.filter(casino => !casino.tags.includes('Egons Best'));
         }
       }
 
@@ -142,89 +150,168 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       
        var lowercaseName = casino.name.toLowerCase();
       html += `
-      <div class="pb-3" id="casino${lowercaseName}">
-      <div class="row g-0 p-3 border border-2 b-2 rounded-3 bc-yasarred bg-light align-items-center" align="center">
-      <div class="col-sm-12 col-md-8 col-lg-3 col-xl-3 order-1 order-lg-1 order-md-1">
+      <div class="top attached ui segment" id="casino${lowercaseName}">
+                <div class="ui styled six column grid" style="">
+                  <div class="ui three wide column">
+                  ${casino.label ? `<div class="ui teal ribbon label">${casino.label}</div>` : ''}
+                  </div>
+                  <div class="ui three wide left aligned column">
+                  ${casino.egons_best == "true" ? `<div class="ui small orange image label"><img src="/img/avatar/egon.png"> Egon's Best</div>` : ``}
 
-        <div class="">
-        ${casino.logo_text ? `<div class="pb-3"><span class="p-1 badge bg-info bg-large">${casino.logo_text}</span></div>` : ''}
-          <div>
-            <img class="lazyload" src="img/casinos/${lowercaseName}.png" data-src="img/casinos/${lowercaseName}.png" alt="foo" style="max-width:200px" height="auto" lazyload="on" />
-          </div>
+                  ${casino.code ? `
+                  
+                  <!-- div class="ui small input">
+                          <input class="" type="text" value="${casino.code}"></input>
+                          <button type="button"  onclick="copyText('${casino.code}')"  name="copyToken" value="copy" class="copyToken ui right icon button">
+                              <i class="clipboard icon"></i>
+                          </button>
+                  </div -->
+                  
+                  ` : ``}
+                  </div>
+                  <div class="ui ten wide right aligned column">
+                  ${casino.tags ? casino.tags.map(tag => `<div class="ui mini olive tag label">${tag}</div>`).join('    ') : ''}
+                  ${casino.prohibitedgamesprotection == "true" ? `<div class="ui right floated small blue circular label"><i class="plus icon"></i> Prohibited Games Protection</div>` : ``}
+                  ${casino.nodeposit == "true" ? `<div class="ui right floated small blue circular label"><i class="plus icon"></i> Nodeposit</div>` : ``}
+                  ${casino.sportbets == "true" ? `<div class="ui right floated small blue circular label"><i class="plus icon"></i> Sportbets</div>` : ``}
+                  ${casino.bonus_display_sticky == "true" ? `<div class="ui right floated small purple circular label">Sticky</div>` : casino.bonus_display_sticky == "false" ? `<div class="ui right floated small purple circular label">Non-Sticky</div>` : casino.bonus_display_sticky == "wagerfree" ? `<div class="ui right floated small purple circular label">Wagerfree</div>` : ``}
+                  ${casino.bonushunt == "true" ? `<div class="ui right floated small green circular label"><i class="check icon"></i> Bonushunt</div>` : `<div class="ui right small floated red circular label"><i class="x icon"></i> Bonushunt</div>`}
+                  ${casino.vpn == "true" ? `<div class="ui right floated small green circular label"><i class="check icon"></i> VPN</div>` : ` <div class="ui right small floated red circular label"><i class="x icon"></i> VPN</div>`}
+                  </div>
+                  <!-- div class="ui one wide column">
+                  ${casino.label ? `<div class="ui orange right corner label"><i class="heart icon"></i></div>` : ''}
+                  </div -->
+                </div>
+                <div class="ui styled three column grid" style=""> 
+                    <div class="ui three wide column">
+                        <img style="width:160px;" src="img/casinos/${lowercaseName}.png">
+                    </div>
+                    <div class="ui ten wide center aligned column">
+                        <div class="ui center aligned four column grid"> 
+                            <div class="row" style="padding-top:20px"> 
+                                <div class="four wide computer eight wide mobile column">
+
+                                    <span style="font-size:30px; padding-top:15px;">${casino.bonus_display} %</span><br>
+                                    <span style="font-size:18px; padding-top:15px;">up to ${casino.bonus_display_max} €</span><br>
+                                    <h2 class="ui sub header">
+                                    Bonus
+                                </h2>
+                                  </div>
+                                  <div class="three wide computer eight wide mobile column">
+
+                                    <span style="font-size:30px; padding-top:15px;">${casino.max_bet} €</span>
+                                    <h2 class="ui sub header" style="padding:0px">
+                                    Max Bet
+                                </h2>
+                                    </div>
+                                  <div class="four wide computer eight wide mobile column">
+
+                                    <span style="font-size:30px; padding-top:15px;">${casino.max_cashout}</span>
+                                    <h2 class="ui sub header">
+                                    Max Cashout
+                                </h2>
+                                    </div>
+                                  <div class="five wide computer eight wide mobile column">
+
+                                    <span style="font-size:30px; padding-top:15px;">${casino.wager} (${casino.wager_type})</span>
+                                    <h2 class="ui sub header">
+                                    Wager
+                                </h2>
+                                    </div>
+                            </div> 
+                        </div> 
+                    </div>
+                    <div class="ui three wide right aligned column">
+                        <div class="ui right floated">
+                            <a href="${casino.aff_url}" target="_blank" class="ui large green button">
+                                PLAY NOW
+                                <!-- i class="right chevron icon"></i -->
+                            </a>
+                              <div class="attached">
+                                <div style="text-align: center;">T&C apply</div>
+                              </div>
+                        </div>
+                    </div>
+                    <div class="ui twelve wide left floated column">
+                    
+                    </div>
+                    <div class="ui four wide right aligned column">
+                        <!-- div class="ui right floated">
+                            <a onclick="copyText()" class="ui mini gray button">
+                                Details
+                                <!-- i class="right chevron icon"></i -->
+                            </a>
+                        </div -->
+                    </div>
+                    <div id="div${lowercaseName}details" style="display:none;">
+                    <div class="attached ui segment" style="border:0px";>
+                    <div class="ui styled four column grid">
+                        <div class="eight wide column">
+                          <h3>Casino Bonus</h3>
+                          <ul class="ui list">
+                          ${casino.boni ? casino.boni.map(bonus => `<div class="item">${bonus}</div>`).join('') : ''}
+                          </ul>
+                          ${casino.review_small ? `
+                          <div class="ui comments">
+  <div class="short comment">
+    <a class="avatar">
+      <img src="/img/avatar/egon.png">
+    </a>
+    <div class="content">
+      <div class="author">Egon's Review</div>
+      <!-- div class="metadata">
+        <div class="date">2 days ago</div>
+        <div class="rating">
+          <i class="star icon"></i>
+          5 Faves
         </div>
+      </div -->
+      <div class="text">
+      ${casino.review_small}
       </div>
-      <div class="col-sm-12 col-md-12 col-lg-7 col-xl-6 order-2 order-lg-2 order-xl-2 order-md-3 " >
-        <div class="row col-sm g-0 align-self-stretch">
-        <div class="col-3">
-          <div>
-            <h2>${casino.bonus_display} %</h2>
-            <h6>up to ${casino.bonus_display_max} €</h6>
-            <h5>${casino.bonus_display_sticky == "true" ? `Sticky` : casino.bonus_display_sticky == "false" ? `Non-Sticky` : casino.bonus_display_sticky == "wagerfree" ? `Wagerfree` : ``}</h5>  
-          </div>
-        </div>
-        <div class="col-2">
-          <div>
-            <h2>${casino.max_bet} €</h2>
-            <h6>Max Bet</h6>  
-          </div>
-        </div>
-        <div class="col-3">
-          <div>
-            <h2>${casino.max_cashout}</h2>
-            <h6>Max Cashout</h6>
-          </div>
-        </div>
-        <div class="col-4">
-          <div>
-            <h2>${casino.wager} (${casino.wager_type})</h2>
-            <h6>Wager</h6>
-          </div>
-        </div>
-        </div>
     </div>
-    <div class="col-sm-8 col-md-3 col-lg-2 col-xl-3 col-xxl-3 p-1 order-3 order-lg-3 order-md-2">
-        <a class="btn btn-lg btn-success" href="/${casino.aff_url}" target="_blank">PLAY NOW</a>
-        <br>
-        <span style="font-size:12px">T&amp;C apply</span>
-    </div>
-    <div class="col-sm-4 col-md-12 col-lg-12 col-xl-12 order-4 order-md-4 p-1" align="center">
-      <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${casino.name}" aria-expanded="false" aria-controls="collapse${casino.name}">
-        Show Details
-        </button>
-    </div>
-    <div class="collapse p-3 order-5" id="collapse${casino.name}">
-      <div class="row col-md-12" align="left">
-      <div class="col-6">
-        <h3>Casino Bonus</h3>
-        <ul class="list-group-flush">
-        ${casino.boni ? casino.boni.map(bonus => `<li class="list-group-item">${bonus}</li>`).join('') : ''}
-        </ul>
-        <h5>Tags</h5>
-        <p>${casino.tags ? casino.tags.map(tag => `${tag}`).join(', ') : ''}</p>
+  </div>
+</div>` : ''}
+                        </div>
+                        
+                        <div class="eight wide column">
+                          <h3>Casino Features</h3>
+                          <ul class="ui list">
+                            ${casino.features ? casino.features.map(feature => `<div class="item">${feature}</div>`).join('') : ''}
+                          </ul>
+                        </div> 
+                        <div class="eight wide column">
+                          <h3>Provider</h3>
+                          <div class="ui five column grid container">
+                          ${casino.providers ? casino.providers.map(provider => `<div class="column"><img style="max-width:60px;" src="img/provider/${provider}.png" /></div>`).join('') : ''}
+                          </div>                    
+                        </div> 
+                        <div class="eight wide column">
+                          <h3>Payment Methods</h3>
+
+                          <div class="ui five column grid container">
+                          ${casino.paymentmethods ? casino.paymentmethods.map(paymentMethod => `<div class="column"><img style="max-width:60px;" src="img/paymentmethods/${paymentMethod}.png" /></div>`).join('') : ''}
+                          </div>
+                        </div> 
+                        </div>
+                        </div>
+                </div>
+                
+
+            </div>
+            <div class="bottom attached ui button" id="toggleBtn${lowercaseName}">
+            Details
       </div>
-      <div class="col-6">
-        <h3>Casino Features</h3>
-        <ul class="list-group-flush">
-        ${casino.features ? casino.features.map(feature => `<li class="list-group-item">${feature}</li>`).join('') : ''}
-        </ul>
-      </div> 
-      <div class="col-6">
-        <h3>Provider</h3>
-        <div class="row">
-        ${casino.providers ? casino.providers.map(provider => `<div class="col-4 col-md-3 col-lg-2"><img style="max-width:60px;" src="img/images/${provider}.png" /></div>`).join('') : ''}
-        </div>                    
-      </div> 
-      <div class="col-6">
-        <h3>Payment Methods</h3>
-        <div class="row">
-        ${casino.paymentmethods ? casino.paymentmethods.map(paymentMethod => `<div class="col-4 col-md-3 col-lg-2 paymentMethod"><img style="max-width:60px;" src="img/images/${paymentMethod}.png" /></div>`).join('') : ''}
-        </div>
-      </div> 
-      </div>
-      <br>
-    </div>
-    </div>
-    </div>
+      <script>
+      document.getElementById("toggleBtn${lowercaseName}").onclick = function() {
+          var div${lowercaseName}details = document.getElementById("div${lowercaseName}details");
+          if (div${lowercaseName}details.style.display === "none") {
+            div${lowercaseName}details.style.display = "block";
+          } else {
+            div${lowercaseName}details.style.display = "none";
+          }
+      };
+  </script>
       `;
       });
       res.send(html)
@@ -253,7 +340,7 @@ app.get('/api/casinos', (req, res) => {
       const jsonData = JSON.parse(data);
 
       // Apply filter based on URL parameters
-      const { name, vpn, sticky, category, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, yasarsbest} = req.query;
+      const { name, vpn, sticky, category, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, egonsbest} = req.query;
       console.log(req.query);
 
       // Filter data based on URL parameters (if they exist)
@@ -285,9 +372,9 @@ app.get('/api/casinos', (req, res) => {
 
       if (sportbets) {
         if (sportbets === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Sportbets'));
-        } else if (sportbets === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Sportbets'));
+          filteredData = filteredData.filter(casino => casino.sportbets === 'true');
+        } else if (sportbets === '') {
+          filteredData = filteredData.filter(casino => casino.sportbets === 'false');
         }
       }
 
@@ -323,11 +410,11 @@ app.get('/api/casinos', (req, res) => {
         }
       }
 
-      if (yasarsbest) {
-        if (yasarsbest === 'true') {
-          filteredData = filteredData.filter(casino => casino.tags.includes('Yasars Best'));
-        } else if (yasarsbest === 'false') {
-          filteredData = filteredData.filter(casino => !casino.tags.includes('Yasars Best'));
+      if (egonsbest) {
+        if (egonsbest === 'true') {
+          filteredData = filteredData.filter(casino => casino.tags.includes('Egons Best'));
+        } else if (egonsbest === 'false') {
+          filteredData = filteredData.filter(casino => !casino.tags.includes('Egons Best'));
         }
       }
 

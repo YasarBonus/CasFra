@@ -18,6 +18,9 @@
         const vpnFilterValue = urlParams.get('vpn');
         $('#vpnFilter').prop('checked', vpnFilterValue === 'true');
 
+        const nomaxcashoutFilterValue = urlParams.get('nomaxcashout');
+        $('#nomaxcashoutFilter').prop('checked', nomaxcashoutFilterValue === 'true');
+
         const bonushuntFilterValue = urlParams.get('bonushuntFilter');
         $('#bonushuntFilter').prop('checked', bonushuntFilterValue === 'true');
 
@@ -58,6 +61,13 @@
                 fetchUrl.searchParams.append('vpn', '');
             }
 
+            const nomaxcashoutFilterChecked = $('#nomaxcashoutFilter').prop('checked');
+            if (nomaxcashoutFilterChecked === true) {
+                fetchUrl.searchParams.append('nomaxcashout', 'true');
+            } else {
+                fetchUrl.searchParams.append('nomaxcashout', '');
+            }
+
             const bonushuntFilterChecked = $('#bonushuntFilter').prop('checked');
             if (bonushuntFilterChecked) {
                 fetchUrl.searchParams.append('bonushunt', 'true');
@@ -68,6 +78,7 @@
             const sportbetsFilterChecked = $('#sportbetsFilter').prop('checked');
             if (sportbetsFilterChecked) {
                 fetchUrl.searchParams.append('sportbets', 'true');
+                console.log('sportbetsFilterChecked', sportbetsFilterChecked);
             } else {
                 fetchUrl.searchParams.append('sportbets', '');
             }
@@ -106,10 +117,24 @@
         }
 
         // Load the data automatically and each time the filters are changed
-        $('#categoryFilter, #paymentmethodsFilter, #providerFilter, #vpnFilter, #bonushuntFilter, #sportbetsFilter, #nodepositFilter, #prohibitedgamesprotectionFilter, #companyFilter').on('change', function() {
+        $('#categoryFilter, #paymentmethodsFilter, #providerFilter, #nomaxcashoutFilter, #vpnFilter, #bonushuntFilter, #sportbetsFilter, #nodepositFilter, #prohibitedgamesprotectionFilter, #companyFilter').on('change', function() {
             // const customFiltersSet = $('#dropdown').dropdown('is set') || $('#vpnFilter').prop('checked') || $('#bonushuntFilter').prop('checked');
             history.replaceState(null, '', window.location.pathname);
             
             fetchData();
         });
+        //document.getElementById("toggleBtn").onclick = function() {
+        //    var secondDiv = document.getElementById("secondDiv");
+        //    if (secondDiv.style.display === "none") {
+        //        secondDiv.style.display = "block";
+        //    } else {
+        //        secondDiv.style.display = "none";
+        //    }
+        //};
         fetchData();
+        function copyText(textInput) {
+     
+            /* Copy text into clipboard */
+            navigator.clipboard.writeText
+                (textInput);
+        }
