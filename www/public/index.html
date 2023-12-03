@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Semantic UI Website</title>
+    <link rel="icon" href="img/favicon.png" type="image/png">
+
+    <title>Yasarbonus</title>
     <!-- link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.css" -->
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
@@ -17,15 +19,32 @@
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/speechbubbles.css">
     <script src="https://kit.fontawesome.com/a35631f35d.js" crossorigin="anonymous"></script>
+    <!-- Matomo -->
+<script>
+    var _paq = window._paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="//analytics.yasarbonus.com/";
+      _paq.push(['setTrackerUrl', u+'matomo.php']);
+      _paq.push(['setSiteId', '13']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+  <noscript><p><img src="//analytics.yasarbonus.com/matomo.php?idsite=13&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+  <!-- End Matomo Code -->
+  
 </head>
 <body>
     <div class="ui fixed inverted menu">
         <div class="ui container" style="font-size:20px">
-          <a href="#" class="header item">
+          <a href="/" class="header item">
             <img class="logo" src="img/logo-egon-animated.gif">
             YasarBonus
           </a>
-          <a href="#" class="item">Home</a>
+          <a href="/" class="item">Home</a>
           <!-- div class="ui simple dropdown item">
             Dropdown <i class="dropdown icon"></i>
             <div class="menu">
@@ -45,9 +64,9 @@
             </div>
           </div -->
           <div class="right menu">
-            <a class="item"><i class="fa-brands fa-discord"></i></a>
-            <a class="item"><i class="fa-brands fa-telegram"></i></a>
-            <a class="item"><i class="fa-brands fa-instagram"></i></a>
+            <a href="/discord" target="_blank" class="item"><i class="fa-brands fa-discord"></i></a>
+            <a href="/telegram" target="_blank" class="item"><i class="fa-brands fa-telegram"></i></a>
+            <a href="/instagram" target="_blank" class="item"><i class="fa-brands fa-instagram"></i></a>
             <!-- a class="item"><i class="fa-brands fa-twitch"></i></a -->
           </div>
         </div>
@@ -55,10 +74,12 @@
 
       <div class="ui container" style="margin-top: 100px !important;">
       <div class="ui two column stackable grid">
-        <div class="three wide column">
-            <div class="ui container grid">
+        <div class="four wide column">
+            <div class="ui segment">
+            <div class="ui container grid filter">
+               
                 <div class="row">
-                    <h5>Category</h5>
+                    <div class="filterhead">Category</div>
                     <div class="field">
                         <select multiple class="ui dropdown" id="categoryFilter">
                             <option value="">All</option>
@@ -69,7 +90,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <h5>Payment Methods</h5>
+                    <div class="filterhead">Payment Methods</div>
                     <div class="field">
                         <select multiple class="ui dropdown" id="paymentmethodsFilter">
                             <option value="">All</option>
@@ -99,7 +120,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <h5>Provider</h5>
+                    <div class="filterhead">Provider</div><br>
                     <div class="field">
                         <select multiple class="ui dropdown" id="providerFilter">
                             <option value="">All</option>
@@ -128,7 +149,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <h5>Features</h5>
+                    <div class="filterhead">Features</div><br>
                     <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
@@ -169,26 +190,26 @@
                 </div>
                 </div>
                 <div class="row">
-                    <h5>Specials</h5>
+                    <div style="padding-right:80px" class="filterhead">Specials</div>
                     <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
-                            <input type="checkbox" id="150andmoreFilter">
+                            <input type="checkbox" id="bonus150andmoreFilter">
                             <label>Bonus 150% & more</label>
                         </div>
                     </div>
                     <div class="field">
                         <div class="ui checkbox">
-                            <input type="checkbox" id="yasarsbestFilter">
-                            <label>Yasar's Best</label>
+                            <input type="checkbox" id="egonsbestFilter">
+                            <label>Egon's Best</label>
                         </div>
                     </div>
                 </div>
                 </div>
                 <div class="row">
-                    <h5>Companies</h5>
+                    <div class="filterhead">Company</div>
                     <div class="field">
-                        <select multiple class="ui dropdown" id="companyFilter">
+                        <select class="ui dropdown" id="companyFilter">
                             <option value="">None</option>
                             <option value="n1">N1 Interactive Ltd.</option>
                             <option value="hollycorn">Hollycorn NV</option>
@@ -197,11 +218,16 @@
                         </select>
                     </div>
                 </div>
+                <div class="row" id="resetFiltersBtn" style="display:none">
+                    <div class="center aligned medium orange ui button">Reset Filter</div>
+                </div>
             </div>
         </div>
-        
-        <div class="thirteen wide column">
+        </div>
 
+        
+        
+        <div class="twelve wide column">
                 <div id="responseContainer">
                     <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
                     <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
@@ -223,7 +249,11 @@
 
     </script>
     <script>
-        
+        $('.ui.selection.dropdown')
+  .dropdown({
+    clearable: true
+  })
+;
 
     </script>
 </body>
