@@ -48,13 +48,13 @@ function checkLastVisit() {
         console.log('lastVisitTimestamp', lastVisitTimestamp);
         console.log('currentTimestamp', currentTimestamp);
 
-    }
+    };
+}
 
     // Dismiss the initial dialog
     function dismissInitialDialog(){
-        document.getElementById('dismissInitialDialog').parentNode.style.display='none';
+        document.getElementById('initialDialog').style.display='none';
     };
-}
 
 ///////////////////////////
 // Pre-define filter values from URL parameters
@@ -203,6 +203,11 @@ $(filterElements.join(', ')).on('change', async function() {
     clearUrlFilters();
     checkFilterElementsForResetFiltersBtn();
     fetchData();
+
+    $.toast({
+        message: 'I am a toast, nice to meet you !'
+      })
+      ;
 });
 
 function checkFilterElementsForResetFiltersBtn() {
