@@ -223,7 +223,6 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       // console.log(casino[0].name);
       var html = ``;
 
-
       if (filteredData.length === 0) {
         html += `
         <div class="ui icon message">
@@ -240,6 +239,9 @@ app.get('/api/casinos/htmldiv', (req, res) => {
 </div>
         `;
       } else {
+        html += `<div class="ui compact message">
+        <p>Found ${filteredData.length} Casinos</p>
+      </div>`;
         filteredData.forEach(casino => {
       
        var lowercaseName = casino.name.toLowerCase();
