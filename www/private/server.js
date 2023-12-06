@@ -94,7 +94,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       
 
       // Apply filter based on URL parameters
-      const { name, vpn, sticky, category, nomaxcashout, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, egonsbest} = req.query;
+      const { minbonus, name, vpn, sticky, category, nomaxcashout, bonushunt, sportbets, nodeposit, prohibitedgamesprotection, provider, paymentmethod, company, egonsbest} = req.query;
       console.log(req.query);
 
       // Filter data based on URL parameters (if they exist)
@@ -207,10 +207,10 @@ app.get('/api/casinos/htmldiv', (req, res) => {
         } 
       }
 
+      if (minbonus) {
+        filteredData = filteredData.filter(casino => parseInt(casino.bonus_display) >= parseInt(minbonus));
+      }
       
-
-      
-
       if (company) {
         filteredData = filteredData.filter(casino => casino.company.toLowerCase().includes(company.toLowerCase()));
       }
