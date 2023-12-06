@@ -1,6 +1,52 @@
+document.addEventListener('DOMContentLoaded', function() {
+    checkLastVisit();
+    setFilters();
+    clearUrlFilters();
+    checkFilterElementsForResetFiltersBtn();
+
+    fetchData();
+    $('#fetchingIndicator').hide();
+});
+
+function hideResetFiltersBtn() {
+    $('#resetFiltersBtn').hide();
+}
+
+
+// Display a message if the user has not visited the site before or the last visit was more than X days ago
+function checkLastVisit() {
+    const visitedBefore = localStorage.getItem('visitedBefore');
+    const lastVisitTimestamp = localStorage.getItem('lastVisitTimestamp');
+    const currentTimestamp = Date.now();
+
+    const initialDialog = $('#initialDialog');
+
+    // If the user has not visited the site before or the last visit was more than 7 days ago
+    if (!visitedBefore || (currentTimestamp - lastVisitTimestamp > 7 * 24 * 60 * 60 * 1000)) {
+        // Perform actions for the first visit in the past 7 days
+        console.log('First visit in the past 7 days');
+        
+        // Update the last visit timestamp
+        localStorage.setItem('lastVisitTimestamp', currentTimestamp);
+        console.log('currentTimestamp', currentTimestamp);
+        localStorage.setItem('visitedBefore', true); // Set the 'visitedBefore' flag to true
+        initialDialog.modal('show');
+
+    } else {
+        console.log('lastVisitTimestamp', lastVisitTimestamp);
+        console.log('currentTimestamp', currentTimestamp);
+
+    }
+
+    // Dismiss the initial dialog
+    function dismissInitialDialog(){
+        document.getElementById('dismissInitialDialog').parentNode.style.display='none';
+    };
+}
+
+///////////////////////////
 // Pre-define filter values from URL parameters
 
-// Pre-set the checkbox and dropdown filters based on URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 
 const filterValues = {
@@ -18,19 +64,25 @@ const filterValues = {
     prohibitedgamesprotection: urlParams.get('prohibitedgamesprotection')
 };
 
-Object.entries(filterValues).forEach(([filter, value]) => {
-    const filterElement = $(`#${filter}Filter`);
-    if (filterElement.length) {
-        filterElement.prop('checked', value === 'true');
-    } else {
-        filterElement.dropdown('set selected', value);
-    }
-});
+// Set the filter values from URL parameters
 
+function setFilters() {
+    Object.entries(filterValues).forEach(([filter, value]) => {
+        const filterElement = $(`#${filter}Filter`);
+        if (filterElement.length) {
+            if (filterElement.is('input[type="checkbox"]')) {
+                filterElement.prop('checked', value === 'true');
+            } else if (filterElement.is('select')) {
+                filterElement.dropdown('set selected', value);
+            }
+        }
+    });
+}
 
 
 // Fetch API based on filter parameters and display the response
 function fetchData() {
+    $('#fetchingIndicator').show();
     const selectedPaymentmethods = $('#paymentmethodsFilter').dropdown('get value');
     console.log ('selectedPaymentmethods', selectedPaymentmethods);
 
@@ -115,27 +167,33 @@ function fetchData() {
         .then(response => response.text())
         .then(html => {
             $('#responseContainer').html(html);
+            $('#fetchingIndicator').hide();
             // console.log('API response:', html);
         })
         .catch(error => console.error('API error:', error));
+        
+
 }
 
 // Load the data automatically and each time the filters are changed
+
 const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#bonus150andmoreFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter'];
 
 $(filterElements.join(', ')).on('change', async function() {
     // $('div[id^="casino"]').remove();
     // $('div[id^="toggleBtn"]').remove();
-    history.replaceState(null, '', window.location.pathname);
-    checkFilterElements();
+    $('#fetchingIndicator').show();
+    clearUrlFilters();
+    checkFilterElementsForResetFiltersBtn();
     fetchData();
 });
 
-function checkFilterElements() {
+function checkFilterElementsForResetFiltersBtn() {
+
     const resetFiltersBtn = $('#resetFiltersBtn');
 
     const isAnyFilterSet = filterElements.some(filterElement => {
-        if ($(filterElement).is(':checked')) {
+        if ($(filterElement).is(':checked') || $(filterElement).val() !== '') {
             return true;
         }
     });
@@ -148,19 +206,20 @@ function checkFilterElements() {
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    checkFilterElements();
-    fetchData();
-});
 
 
-// fetchData();
+
+
+// Copy text into clipboard
 
 function copyText(textInput) {
     /* Copy text into clipboard */
     navigator.clipboard.writeText
         (textInput);
 }
+
+
+// Reset all filters function
 
 function resetFilters() {
     // Reset checkbox filters
@@ -179,13 +238,36 @@ function resetFilters() {
     $('#companyFilter').dropdown('clear');
     $('#categoryFilter').dropdown('clear');
 
-    history.replaceState(null, '', window.location.pathname);
+    clearUrlFilters();
     fetchData();
 }
 
-// Call the resetFilters function when the reset button is clicked
+function clearUrlFilters() {
+    history.replaceState(null, '', window.location.pathname);
+}
+
+// Call the resetFilters function when the reset button is clicked and hide it
 $('#resetFiltersBtn').on('click', function() {
     resetFilters();
     $(this).hide();
 });
+
+
+// Set the checkbox and fetch data
+function setCheckboxAndFetchData(checkboxId, value) {
+    if ($(checkboxId).prop('checked')) {
+        $(checkboxId).prop('checked', false);
+    } else {
+        $(checkboxId).prop('checked', value);
+    }
+    clearUrlFilters();
+    fetchData();
+}
+
+// Set the dropdown and fetch data
+function setDropdownAndFetchData(dropdownId, value) {
+    $(dropdownId).val(value);
+    clearUrlFilters();
+    fetchData();
+}
 

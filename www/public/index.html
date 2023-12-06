@@ -37,9 +37,11 @@
   <!-- End Matomo Code -->
   
 </head>
-<body>
+<body class="bg-yasarred">
     <div class="ui fixed inverted menu">
         <div class="ui container" style="font-size:20px">
+            <div style="" id="fetchingIndicator" class="ui right aligned active large loader"></div>
+
           <a href="/" class="header item">
             <img class="logo" src="img/logo-egon-animated.gif">
             YasarBonus
@@ -72,27 +74,33 @@
         </div>
       </div>
 
+      <div class="ui container inverted segment" id="initialDialog" style="display: none; z-index: 2">
+        <img src="/img/logo-egon-animated.gif" width="100px">
+        <h1>Welcome to YasarBonus</h1>
+        <h2>Only continue if you are 18 years or older</h2>
+        <div id="dismissInitialDialog" class="center aligned large green ui button">Continue</div>
+    </div>
+
+
       <div class="ui container" style="margin-top: 100px !important;">
+
       <div class="ui two column stackable grid">
-        <div class="four wide column">
-            <div class="ui segment">
+        <div class="sixteen wide mobile sixteen wide tablet four wide computer four wide large screen four wide widescreen column">
+            <div class="ui segment" style="background-color: beige;">                     
             <div class="ui container grid filter">
-               
-                <div class="row">
-                    <div class="filterhead">Category</div>
-                    <div class="field">
-                        <select multiple class="ui dropdown" id="categoryFilter">
+                <div class="sixteen wide eight wide tablet eight wide mobile column" style="padding:none">
+                <div class="filteritem">
+                    <div class="filterhead"><i class="compass icon"></i> Category</div>
+                        <select multiple class="ui fluid dropdown" id="categoryFilter">
                             <option value="">All</option>
                             <option value="sticky">Sticky</option>
                             <option value="nonsticky">Non-Sticky</option>
                             <option value="wagerfree">Wagerfree</option>
                         </select>
-                    </div>
                 </div>
-                <div class="row">
-                    <div class="filterhead">Payment Methods</div>
-                    <div class="field">
-                        <select multiple class="ui dropdown" id="paymentmethodsFilter">
+                <div class="filteritem">
+                    <div class="filterhead"><i class="credit card outline icon"></i> Payment Methods</div>
+                        <select multiple class="ui fluid dropdown" id="paymentmethodsFilter">
                             <option value="">All</option>
                             <option value="ApplePay">ApplePay</option>
                             <option value="AstroPay">AstroPay</option>
@@ -117,12 +125,10 @@
                             <option value="eZeeWallet">eZeeWallet</option>
                             <option value="ecoPayz">ecoPayz</option>
                         </select>
-                    </div>
                 </div>
-                <div class="row">
-                    <div class="filterhead">Provider</div><br>
-                    <div class="field">
-                        <select multiple class="ui dropdown" id="providerFilter">
+                <div class="filteritem">
+                    <div class="filterhead"><i class="handshake outline icon"></i> Provider</div>
+                        <select multiple class="ui fluid dropdown" id="providerFilter">
                             <option value="">All</option>
                             <option value="AvatarUx">AvatarUX</option>
                             <option value="BGaming">BGaming</option>
@@ -148,8 +154,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="filterhead">Features</div><br>
+                <div class="sixteen wide eight wide tablet eight wide mobile column" style="padding:none">
+                <div class="filteritem">
+                    <div class="filterhead"><i class="tags icon"></i> Features</div>
                     <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
@@ -189,8 +196,8 @@
                     </div>
                 </div>
                 </div>
-                <div class="row">
-                    <div style="padding-right:80px" class="filterhead">Specials</div>
+                <div class="filteritem">
+                    <div class="filterhead"><i class="yellow star icon"></i> Specials</div>
                     <div class="grid">
                     <div class="field">
                         <div class="ui checkbox">
@@ -206,20 +213,28 @@
                     </div>
                 </div>
                 </div>
-                <div class="row">
-                    <div class="filterhead">Company</div>
-                    <div class="field">
-                        <select class="ui dropdown" id="companyFilter">
+                <div class="filteritem">
+                    <div class="filterhead"><i class="building icon"></i> Company</div>
+                        <select class="ui fluid company dropdown" id="companyFilter">
                             <option value="">None</option>
-                            <option value="n1">N1 Interactive Ltd.</option>
+                            <!-- option value="n1">N1 Interactive Ltd.</option -->
                             <option value="hollycorn">Hollycorn NV</option>
                             <option value="dama">Dama NV</option>
                             <option value="rabidi">Rabidi NV</option>
                         </select>
-                    </div>
                 </div>
-                <div class="row" id="resetFiltersBtn" style="display:none">
+                <script>
+                    $('.ui.fluid.company.dropdown')
+                    .dropdown({
+                        clearable: true
+                    })
+                    ;
+                </script>
+            </div>
+                <div class="filteritem" id="resetFiltersBtn" style="display:none">
                     <div class="center aligned medium orange ui button">Reset Filter</div>
+                </div>
+                <div id="" class="ui active">
                 </div>
             </div>
         </div>
@@ -227,14 +242,17 @@
 
         
         
-        <div class="twelve wide column">
-                <div id="responseContainer">
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
-                    <div class="ui placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+        <div class="sixteen wide mobile sixteen wide tablet twelve wide computer twelve wide large screen twelve wide widescreen column">
+
+           
+
+            <div id="responseContainer">
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
+                    <div class="ui  placeholder"><div class="image header"><div class="line"></div><div class="line"></div></div><div class="paragraph"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div></div>
                 </div>
         </div>
       </div>
@@ -242,19 +260,40 @@
         </div>
       </div>
     </div>
+    <div class="ui inverted vertical footer segment">
+    <div class="ui container">
+      <div class="ui stackable inverted divided equal height stackable grid">
+        <div class="three wide column">
+          <h4 class="ui inverted header">About</h4>
+          <div class="ui inverted link list">
+            <a href="#" class="item">Sitemap</a>
+            <a href="#" class="item">Contact Us</a>
+            <a href="#" class="item">Religious Ceremonies</a>
+            <a href="#" class="item">Gazebo Plans</a>
+          </div>
+        </div>
+        <div class="three wide column">
+          <h4 class="ui inverted header">Services</h4>
+          <div class="ui inverted link list">
+            <a href="#" class="item">Banana Pre-Order</a>
+            <a href="#" class="item">DNA FAQ</a>
+            <a href="#" class="item">How To Access</a>
+            <a href="#" class="item">Favorite X-Men</a>
+          </div>
+        </div>
+        <div class="seven wide column">
+          <h4 class="ui inverted header">Footer Header</h4>
+          <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
     <script src="js/casinos.js"></script>
 
     <script>
 
     </script>
-    <script>
-        $('.ui.selection.dropdown')
-  .dropdown({
-    clearable: true
-  })
-;
 
-    </script>
 </body>
 </html>

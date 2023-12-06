@@ -222,11 +222,29 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       // console.log(filteredData);
       // console.log(casino[0].name);
       var html = ``;
-      filteredData.forEach(casino => {
+
+
+      if (filteredData.length === 0) {
+        html += `
+        <div class="ui icon message">
+  <i class="user secret icon"></i>
+  <div class="content">
+    <div class="header">
+      No Casinos found
+    </div>
+    <p>Please try some other search term.</p>
+  </div>
+  <div class="filteritem" onclick="resetFilters()">
+    <div class="center aligned medium orange ui button">Reset Filter</div>
+  </div>
+</div>
+        `;
+      } else {
+        filteredData.forEach(casino => {
       
        var lowercaseName = casino.name.toLowerCase();
       html += `
-      <div class="top attached ui segment" id="casino${lowercaseName}">
+      <div class="top attached ui segment" id="casino${lowercaseName}" style="background-color: beige;">
                 <div class="ui styled six column grid" style="">
                   <div class="ui three wide column">
                   ${casino.label ? `<div class="ui teal ribbon label">${casino.label}</div>` : ''}
@@ -248,18 +266,18 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                   </div>
                   <div class="ui ten wide right aligned column" style="padding-right:10px;">
                   ${casino.tags ? casino.tags.map(tag => `<div class="ui mini olive tag label">${tag}</div>`).join('    ') : ''}
-                  ${casino.prohibitedgamesprotection == "true" ? `<a data-tooltip="Prohibited Games Protection" href="?prohibitedgamesprotection=true" class="ui right floated small blue circular label"><i class="lock icon"></i> PGP</a>` : casino.prohibitedgamesprotection == "false" ? `<a data-tooltip="No Prohibited Games Protection" href="?prohibitedgamesprotection=true" class="ui right floated small red circular label"><i class="lock open icon"></i> PGP</a>` : ``}
-                  ${casino.nodeposit == "true" ? `<a data-tooltip="No Deposit Bonus - Cool!" href="?nodeposit=true" class="right floated small blue circular ui label"><i class="plus icon"></i> Nodeposit</a>` : ``}
-                  ${casino.sportbets == "true" ? `<a data-tooltip="Sportbets available" href="?sportbets=true" class="ui right floated small blue circular label"><i class="plus icon"></i> Sportbets</a>` : ``}
-                  ${casino.bonus_display_sticky == "true" ? `<a data-tooltip="Sticky Bonus" href="?category=sticky" class="ui right floated small purple circular label">Sticky</a>` : casino.bonus_display_sticky == "false" ? `<a data-tooltip="Non-Sticky Bonus" href="?category=nonsticky" class="ui right floated small purple circular label">Non-Sticky</a>` : casino.bonus_display_sticky == "wagerfree" ? `<a data-tooltip="Wagerfree Bonus" href="?category=wagerfree" class="ui right floated small purple circular label">Wagerfree</a>` : ``}
-                  ${casino.bonushunt == "true" ? `<a data-tooltip="Bonushunt is allowed" href="?bonushunt=true" class="ui right floated small green circular label"><i class="check icon"></i> Bonushunt</a>` : `<a data-tooltip="Bonushunt is not allowed" href="?bonushunt=true" class="ui right small floated red circular label"><i class="x icon"></i> Bonushunt</a>`}
-                  ${casino.vpn == "true" ? `<a data-tooltip="VPN is allowed" href="?vpn=true" class="ui right floated small green circular label"><i class="check icon"></i> VPN</a>` : ` <a data-tooltip="VPN is allowed" href="?vpn=true" class="ui right small floated red circular label"><i class="x icon"></i> VPN</a>`}
+                  ${casino.prohibitedgamesprotection == "true" ? `<a data-tooltip="Prohibited Games Protection" onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)" class="ui right floated small blue circular label"><i class="lock icon"></i> PGP</a>` : casino.prohibitedgamesprotection == "false" ? `<a data-tooltip="No Prohibited Games Protection" onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)" class="ui right floated small red circular label"><i class="lock open icon"></i> PGP</a>` : ``}
+                  ${casino.nodeposit == "true" ? `<a data-tooltip="No Deposit Bonus - Cool!" onclick="setCheckboxAndFetchData(nodepositFilter, true)" class="right floated small blue circular ui label"><i class="plus icon"></i> Nodeposit</a>` : ``}
+                  ${casino.sportbets == "true" ? `<a data-tooltip="Sportbets available" onclick="setCheckboxAndFetchData(sportbetsFilter, true)" class="ui right floated small blue circular label"><i class="plus icon"></i> Sportbets</a>` : ``}
+                  ${casino.bonus_display_sticky == "true" ? `<a data-tooltip="Sticky Bonus" onclick="setCheckboxAndFetchData(nonstickyFilter, true)" class="ui right floated small purple circular label">Sticky</a>` : casino.bonus_display_sticky == "false" ? `<a data-tooltip="Non-Sticky Bonus" onclick="setCheckboxAndFetchData(nonstickyFilter, true)" class="ui right floated small purple circular label">Non-Sticky</a>` : casino.bonus_display_sticky == "wagerfree" ? `<a data-tooltip="Wagerfree Bonus" onclick="setCheckboxAndFetchData(wagerfreeFilter, true)" class="ui right floated small purple circular label">Wagerfree</a>` : ``}
+                  ${casino.bonushunt == "true" ? `<a data-tooltip="Bonushunt is allowed" onclick="setCheckboxAndFetchData(bonushuntFilter, true)" class="ui right floated small green circular label"><i class="check icon"></i> Bonushunt</a>` : `<a data-tooltip="Bonushunt is not allowed" onclick="setCheckboxAndFetchData(bonushuntFilter, true)" class="ui right small floated red circular label"><i class="x icon"></i> Bonushunt</a>`}
+                  ${casino.vpn == "true" ? `<a data-tooltip="VPN is allowed" onclick="setCheckboxAndFetchData(vpnFilter, true)" class="ui right floated small green circular label"><i class="check icon"></i> VPN</a>` : ` <a data-tooltip="VPN is allowed" onclick="setCheckboxAndFetchData(vpnFilter, true)" class="ui right small floated red circular label"><i class="x icon"></i> VPN</a>`}
                   </div>
                   <!-- div class="ui one wide column">
                   ${casino.label ? `<div class="ui orange right corner label"><i class="heart icon"></i></div>` : ''}
                   </div -->
                 </div>
-                <div class="ui styled three column grid" style=""> 
+                <div class="ui styled three column grid " style=""> 
                     <div class="ui three wide column" style="padding-left:15px">
                         <img style="width:160px;" src="img/casinos/${lowercaseName}.png">
                     </div>
@@ -274,6 +292,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                                 <div class="three wide computer eight wide mobile column">
                                     <div class="bonustext">${casino.max_bet} €</div>
                                     <div class="bonushead">Max Bet</div>
+                                    
                                 </div>
                                 <div class="three wide computer eight wide mobile column">
                                     <div class="bonustext">${casino.max_cashout}</div>
@@ -309,7 +328,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                         </div -->
                     </div>
                     <div id="div${lowercaseName}details" style="display:none;">
-                    <div class="attached ui segment" style="border:0px";>
+                    <div class="attached ui segment" style="border:0px; background-color: beige;">
                     <div class="ui styled four column grid">
                         <div class="eight wide column">
                           <h3>Casino Bonus</h3>
@@ -378,7 +397,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       };
   </script>
       `;
-      });
+      })};
       res.send(html)
       
     } catch (error) {

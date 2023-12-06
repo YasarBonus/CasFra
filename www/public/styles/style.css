@@ -24,11 +24,34 @@
   font-size: 16px;
 }
 
+.filteritem {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.filteritem .field {
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
 .filterhead {
   font-size: 16px;
   font-weight: 500;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.rotate {
+  animation: rotation 300 infinite linear;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
 }
 
 /*.ui.grid>.column:not(.row), .ui.grid>.row>.column {
