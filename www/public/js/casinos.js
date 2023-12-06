@@ -8,6 +8,18 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#fetchingIndicator').hide();
 });
 
+function dryRun() {
+    console.log('dryRun');
+    checkFilterElementsForResetFiltersBtn();
+    fetchData();
+}
+
+function getBonusFilterRangeValue() {
+    const bonusFilterRangeValue = $('#bonusFilter').slider('get value');
+    console.log('bonusFilterRangeValue', bonusFilterRangeValue);
+    return bonusFilterRangeValue;
+}
+
 function hideResetFiltersBtn() {
     $('#resetFiltersBtn').hide();
 }
@@ -61,7 +73,8 @@ const filterValues = {
     nodeposit: urlParams.get('nodeposit'),
     egonsbest: urlParams.get('egonsbest'),
     bonus150andmore: urlParams.get('bonus150'),
-    prohibitedgamesprotection: urlParams.get('prohibitedgamesprotection')
+    prohibitedgamesprotection: urlParams.get('prohibitedgamesprotection'),
+    minbonus: urlParams.get('minbonus'),
 };
 
 // Set the filter values from URL parameters
@@ -94,6 +107,9 @@ function fetchData() {
 
     const selectedCategory = $('#categoryFilter').dropdown('get value');
     console.log ('selectedCategory', selectedCategory);
+
+    const selectedMinBonus = $('#bonusFilter').slider('get value');
+    console.log ('selectedMinBonus', selectedMinBonus);
 
 
     const apiUrl = 'http://jphev.dynv6.net:3000/api/casinos/htmldiv';
@@ -159,6 +175,7 @@ function fetchData() {
     fetchUrl.searchParams.append('paymentmethod', selectedPaymentmethods.join(','));
     fetchUrl.searchParams.append('provider', selectedProvider.join(','));
     fetchUrl.searchParams.append('company', selectedCompany);
+    fetchUrl.searchParams.append('minbonus', selectedMinBonus);
     fetchUrl.searchParams.append('category', selectedCategory.join(','));
 
 
@@ -177,7 +194,7 @@ function fetchData() {
 
 // Load the data automatically and each time the filters are changed
 
-const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#bonus150andmoreFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter'];
+const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#bonus150andmoreFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter', '#bonusFilter'];
 
 $(filterElements.join(', ')).on('change', async function() {
     // $('div[id^="casino"]').remove();
@@ -189,16 +206,14 @@ $(filterElements.join(', ')).on('change', async function() {
 });
 
 function checkFilterElementsForResetFiltersBtn() {
-
     const resetFiltersBtn = $('#resetFiltersBtn');
-
     const isAnyFilterSet = filterElements.some(filterElement => {
         if ($(filterElement).is(':checked') || $(filterElement).val() !== '') {
             return true;
         }
     });
 
-    if (isAnyFilterSet) {
+    if (isAnyFilterSet || $('#bonusFilter').slider('get value') !== '100') {
         resetFiltersBtn.show();
     } else {
         resetFiltersBtn.hide();
@@ -238,6 +253,9 @@ function resetFilters() {
     $('#companyFilter').dropdown('clear');
     $('#categoryFilter').dropdown('clear');
 
+    // Reset Slider filter
+    $('#bonusFilter').slider('set value', 100);
+
     clearUrlFilters();
     fetchData();
 }
@@ -270,4 +288,5 @@ function setDropdownAndFetchData(dropdownId, value) {
     clearUrlFilters();
     fetchData();
 }
+
 

@@ -217,6 +217,25 @@
                 </div>
                 </div>
                 <div class="filteritem">
+                    <div class="filterhead"><i class="building icon"></i> Minimum Bonus</div>
+                    <div id="">
+                    <div class="ui labeled bonus slider" id="bonusFilter"></div>
+                </div>
+                </div>
+                <script>
+                    $('.ui.labeled.bonus.slider')
+                        .slider({
+                            min: 100,
+                            max: 250,
+                            start: 100,
+                            step: 50,
+                            smooth: true,
+                            onChange: function(value) {
+                                fetchData();
+                            }
+                        });                    
+                </script>
+                <div class="filteritem">
                     <div class="filterhead"><i class="building icon"></i> Company</div>
                         <select class="ui fluid company dropdown" id="companyFilter">
                             <option value="">None</option>
