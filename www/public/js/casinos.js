@@ -204,10 +204,7 @@ $(filterElements.join(', ')).on('change', async function() {
     checkFilterElementsForResetFiltersBtn();
     fetchData();
 
-    $.toast({
-        message: 'I am a toast, nice to meet you !'
-      })
-      ;
+
 });
 
 function checkFilterElementsForResetFiltersBtn() {
