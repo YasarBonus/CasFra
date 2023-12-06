@@ -72,7 +72,6 @@ const filterValues = {
     sportbets: urlParams.get('sportbets'),
     nodeposit: urlParams.get('nodeposit'),
     egonsbest: urlParams.get('egonsbest'),
-    bonus150andmore: urlParams.get('bonus150'),
     prohibitedgamesprotection: urlParams.get('prohibitedgamesprotection'),
     minbonus: urlParams.get('minbonus'),
 };
@@ -158,13 +157,6 @@ function fetchData() {
         fetchUrl.searchParams.append('egonsbest', '');
     }
 
-    const bonus150andmoreFilterChecked = $('#bonus150andmoreFilter').prop('checked');
-    if (bonus150andmoreFilterChecked) {
-        fetchUrl.searchParams.append('bonus150andmore', 'true');
-    } else {
-        fetchUrl.searchParams.append('bonus150andmore', '');
-    }
-
     const prohibitedgamesprotectionFilterChecked = $('#prohibitedgamesprotectionFilter').prop('checked');
     if (prohibitedgamesprotectionFilterChecked) {
         fetchUrl.searchParams.append('prohibitedgamesprotection', 'true');
@@ -194,7 +186,7 @@ function fetchData() {
 
 // Load the data automatically and each time the filters are changed
 
-const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#bonus150andmoreFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter', '#bonusFilter'];
+const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter', '#bonusFilter'];
 
 $(filterElements.join(', ')).on('change', async function() {
     // $('div[id^="casino"]').remove();
@@ -246,7 +238,6 @@ function resetFilters() {
     $('#sportbetsFilter').prop('checked', false);
     $('#nodepositFilter').prop('checked', false);
     $('#egonsbestFilter').prop('checked', false);
-    $('#bonus150andmoreFilter').prop('checked', false);
     $('#prohibitedgamesprotectionFilter').prop('checked', false);
 
     // Reset dropdown filters
