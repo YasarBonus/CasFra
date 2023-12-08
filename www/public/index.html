@@ -40,6 +40,7 @@
   <!-- End Matomo Code -->
   
 </head>
+<a href="#" id="scroll" style="display: none; z-index:1000"><span></span></a>
 <body class="bg-yasarred">
     <div class="ui fixed inverted menu">
         <div class="ui container" style="font-size:20px">
@@ -453,6 +454,19 @@
 
     <script>
 
+$(document).ready(function(){ 
+    $(window).scroll(function(){ 
+        if ($(this).scrollTop() > 100) { 
+            $('#scroll').fadeIn(); 
+        } else { 
+            $('#scroll').fadeOut(); 
+        } 
+    }); 
+    $('#scroll').click(function(){ 
+        $("html, body").animate({ scrollTop: 0 }, 600); 
+        return false; 
+    }); 
+});
     </script>
 
 </body>
