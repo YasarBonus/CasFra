@@ -278,7 +278,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                 </div>
                 <div class="ui styled three column grid " style=""> 
                     <div class="ui three wide column" style="padding-left:15px">
-                        <img style="width:160px;" src="img/casinos/${lowercaseName}.png">
+                        <img style="width:160px;" src="img/casinos/${lowercaseName}.png" alt="${lowercaseName} ">
                     </div>
                     <div class="ui ten wide center aligned column">
                         <div class="ui center aligned four column grid"> 
@@ -366,14 +366,14 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                         <div class="eight wide column">
                           <h3>Provider</h3>
                           <div class="ui five column grid container">
-                          ${casino.providers ? casino.providers.map(provider => `<div class="column"><img style="max-width:60px;" src="img/provider/${provider}.png" /></div>`).join('') : ''}
+                          ${casino.providers ? casino.providers.map(provider => `<div class="column"><img style="max-width:60px;" src="img/provider/${provider}.png" alt="${provider}" /></div>`).join('') : ''}
                           </div>                    
                         </div> 
                         <div class="eight wide column">
                           <h3>Payment Methods</h3>
 
                           <div class="ui five column grid container">
-                          ${casino.paymentmethods ? casino.paymentmethods.map(paymentMethod => `<div class="column"><img style="max-width:60px;" src="img/paymentmethods/${paymentMethod}.png" /></div>`).join('') : ''}
+                          ${casino.paymentmethods ? casino.paymentmethods.map(paymentMethod => `<div class="column"><img style="max-width:60px;" src="img/paymentmethods/${paymentMethod}.png" alt="${paymentMethod}" /></div>`).join('') : ''}
                           </div>
                         </div> 
                         </div>
