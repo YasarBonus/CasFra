@@ -3713,5 +3713,17 @@
     "vpn": "true",
     "wager": "0x",
     "wager_type": ""
+  },
+  {
+    "name": "instagram",
+    "affiliate_link":"https://www.instagram.com/twitchyasar92/"
+  },
+  {
+    "name": "telegram",
+    "affiliate_link":"https://t.me/+5XJAkomDbms0M2Iy"
+  },
+  {
+    "name": "discord",
+    "affiliate_link":"https://discord.com/invite/nvQJYeqfBs"
   }
 ]

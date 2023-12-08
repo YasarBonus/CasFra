@@ -245,7 +245,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       html += `
       <div class="top attached ui segment" id="casino${lowercaseName}" style="background-color: beige;">
                 <div class="ui styled six column grid" style="">
-                  <div class="ui three wide column">
+                  <div class="ui four wide column">
                   ${casino.label ? `<div class="ui teal large ribbon label">${casino.label}</div>` : ''}
                   </div>
                   <div class="ui three wide left aligned column">
@@ -263,7 +263,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                   
                   ` : ``}
                   </div>
-                  <div class="ui ten wide right aligned column" style="padding-right:10px;">
+                  <div class="ui nine wide right aligned column" style="padding-right:10px;">
                   ${casino.tags ? casino.tags.map(tag => `<div class="ui mini olive tag label">${tag}</div>`).join('    ') : ''}
                   ${casino.prohibitedgamesprotection == "true" ? `<a data-tooltip="Prohibited Games Protection" onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)" class="ui right floated small blue circular label"><i class="lock icon"></i> PGP</a>` : casino.prohibitedgamesprotection == "false" ? `<a data-tooltip="No Prohibited Games Protection" onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)" class="ui right floated small red circular label"><i class="lock open icon"></i> PGP</a>` : ``}
                   ${casino.nodeposit == "true" ? `<a data-tooltip="No Deposit Bonus - Cool!" onclick="setCheckboxAndFetchData(nodepositFilter, true)" class="right floated small blue circular ui label"><i class="plus icon"></i> Nodeposit</a>` : ``}
@@ -423,17 +423,17 @@ app.get('/api/casinos', (req, res) => {
 
 // 301 Redirect
 app.get('/instagram', (req, res) => {
-  res.redirect(301, 'https://www.instagram.com/twitchyasar92/');
+  res.redirect(301, '/go/instagram');
 });
 
 // 301 Redirect
 app.get('/telegram', (req, res) => {
-  res.redirect(301, 'https://t.me/+5XJAkomDbms0M2Iy');
+  res.redirect(301, '/go/telegram');
 });
 
 // 301 Redirect
 app.get('/discord', (req, res) => {
-  res.redirect(301, 'https://discord.com/invite/nvQJYeqfBs');
+  res.redirect(301, '/go/discord');
 });
 
 // 301 Redirect
