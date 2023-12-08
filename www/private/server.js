@@ -421,6 +421,13 @@ app.get('/api/casinos', (req, res) => {
   });
 });
 
+
+// 301 Redirect
+app.get ('/store', (req, res) => {
+  res.redirect(301, '/go/store');
+});
+
+
 // 301 Redirect
 app.get('/instagram', (req, res) => {
   res.redirect(301, '/go/instagram');
