@@ -51,10 +51,10 @@ function checkLastVisit() {
     };
 }
 
-    // Dismiss the initial dialog
-    function dismissInitialDialog(){
-        document.getElementById('initialDialog').style.display='none';
-    };
+// Dismiss the initial dialog
+function dismissInitialDialog(){
+    document.getElementById('initialDialog').style.display='none';
+};
 
 ///////////////////////////
 // Pre-define filter values from URL parameters
@@ -111,7 +111,7 @@ function fetchData() {
     console.log ('selectedMinBonus', selectedMinBonus);
 
 
-    const apiUrl = 'http://jphev.dynv6.net:3000/api/casinos/htmldiv';
+    const apiUrl = 'http://127.0.0.1:3000/api/casinos/htmldiv';
     const fetchUrl = new URL(apiUrl);
 
     const vpnFilterChecked = $('#vpnFilter').prop('checked');

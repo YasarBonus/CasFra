@@ -249,7 +249,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
       <div class="top attached ui segment" id="casino${lowercaseName}" style="background-color: beige;">
                 <div class="ui styled six column grid" style="">
                   <div class="ui three wide column">
-                  ${casino.label ? `<div class="ui teal ribbon label">${casino.label}</div>` : ''}
+                  ${casino.label ? `<div class="ui teal large ribbon label">${casino.label}</div>` : ''}
                   </div>
                   <div class="ui three wide left aligned column">
                   ${casino.egons_best == "true" ? `<div class="ui small orange image label"><img src="/img/avatar/egon.png"> Egon's Best</div>` : ``}
