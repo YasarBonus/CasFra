@@ -27,7 +27,43 @@ db.run(`CREATE TABLE IF NOT EXISTS link_hits (
   time TEXT
 )`);
 
-
+app.get('/:link', (req, res) => {
+  const linkName = req.params.link;
+  
+  fs.readFile('private/data/links.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error reading JSON file');
+      return;
+    }
+    
+    try {
+      const jsonData = JSON.parse(data);
+      const link = jsonData.find(link => link.name.toLowerCase() === linkName.toLowerCase());
+      console.log(link);
+      
+      if (link) {
+        // Insert link hit into the database
+        const currentDate = new Date().toLocaleDateString();
+        const currentTime = new Date().toLocaleTimeString();
+        const name = link.name.toLowerCase();
+        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('Error inserting link hit into the database');
+          } else {
+            res.redirect(link.url);
+          }
+        });
+      } else {
+        res.status(404).send('Link not found');
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error parsing JSON data');
+    }
+  });
+});
 
 app.get('/go/:casino', (req, res) => {
   const casinoName = req.params.casino;
@@ -48,12 +84,15 @@ app.get('/go/:casino', (req, res) => {
         // Insert link hit into the database
         const currentDate = new Date().toLocaleDateString();
         const currentTime = new Date().toLocaleTimeString();
-        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [casino.name, currentDate, currentTime], (err) => {
+        // transform to lowercase before inserting into database
+        const name = casino.name.toLowerCase();
+        // const name = casino.name.toLowerCase();
+        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
           if (err) {
             console.error(err);
             res.status(500).send('Error inserting link hit into the database');
           } else {
-            res.redirect(casino.affiliate_link);
+            res.redirect(casino.url);
           }
         });
       } else {
@@ -65,6 +104,18 @@ app.get('/go/:casino', (req, res) => {
     }
   });
 });
+
+app.get('/api/link-hits', (req, res) => {
+  db.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error retrieving link hits from the database');
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
 
 // Close the database connection when the server is shut down
 process.on('SIGINT', () => {

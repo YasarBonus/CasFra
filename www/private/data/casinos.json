@@ -1,6 +1,6 @@
 [
   {
-    "affiliate_link": "https://www.dripcasino.com/refer/5f9f4c4c",
+    "url": "https://www.dripcasino.com/refer/5f9f4c4c",
     "boni": [
       "150% up to 600 €"
     ],
@@ -766,7 +766,7 @@
     "max_bet": 5,
     "max_cashout": "No",
     "name": "ggbet200",
-    "affiliate_link": "",
+    "url": "",
     "paymentmethods": [
       "ApplePay",
       "BankTransfer",
@@ -1164,7 +1164,7 @@
     "wager_type": "D+B"
   },
   {
-    "affiliate_link": "",
+    "url": "",
     "boni": [
       "100% up to 1000 €",
       "200% up to 1000 € Crypto Bonus"
@@ -3716,18 +3716,18 @@
   },
   {
     "name": "instagram",
-    "affiliate_link":"https://www.instagram.com/twitchyasar92/"
+    "url":"https://www.instagram.com/twitchyasar92/"
   },
   {
     "name": "telegram",
-    "affiliate_link":"https://t.me/+5XJAkomDbms0M2Iy"
+    "url":"https://t.me/+5XJAkomDbms0M2Iy"
   },
   {
     "name": "discord",
-    "affiliate_link":"https://discord.com/invite/nvQJYeqfBs"
+    "url":"https://discord.com/invite/nvQJYeqfBs"
   },
   {
     "name": "store",
-    "affiliate_link":"https://streamelements.com/yasar92/store"
+    "url":"https://streamelements.com/yasar92/store"
   }
 ]
