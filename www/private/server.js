@@ -493,28 +493,6 @@ app.get('/api/casinos', (req, res) => {
   });
 });
 
-
-// 301 Redirect
-app.get ('/store', (req, res) => {
-  res.redirect(301, '/go/store');
-});
-
-
-// 301 Redirect
-app.get('/instagram', (req, res) => {
-  res.redirect(301, '/go/instagram');
-});
-
-// 301 Redirect
-app.get('/telegram', (req, res) => {
-  res.redirect(301, '/go/telegram');
-});
-
-// 301 Redirect
-app.get('/discord', (req, res) => {
-  res.redirect(301, '/go/discord');
-});
-
 // 301 Redirect
 app.get('/casinos', (req, res) => {
   res.redirect(301, '/');

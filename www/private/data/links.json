@@ -1,6 +1,18 @@
 [
     {
-        "name": "test",
-        "url": "http://localhost:3000"
+        "name": "instagram",
+        "url":"https://www.instagram.com/twitchyasar92/"
+    },
+    {
+        "name": "telegram",
+        "url":"https://t.me/+5XJAkomDbms0M2Iy"
+    },
+    {
+        "name": "discord",
+        "url":"https://discord.com/invite/nvQJYeqfBs"
+    },
+    {
+        "name": "store",
+        "url":"https://streamelements.com/yasar92/store"
     }
 ]
