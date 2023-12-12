@@ -1,51 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="img/favicon.png" type="image/png">
+  <%- include('../partials/head') %>
+  <%- include('../partials/header') %>
 
-    <title>YasarBonus Casino Comparison</title>
-    <meta name="description" content="Yasarbonus is a website that compares online casinos and their bonuses.">
-    <meta name="keywords" content="yasarbonus, yasarbonus, yasar, bonus, casino, online casino, online casinos, casino bonus, casino bonuses, bonus comparison, casino comparison, casino reviews, casino review, casino bonus comparison, casino bonus comparisons, casino bonus comparison, casino bonus comparison">
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
-    
-    <link rel="stylesheet" href="styles/style.css">
-
-    <script src="https://kit.fontawesome.com/a35631f35d.js" crossorigin="anonymous"></script>
-
-    <!-- Matomo -->
-  <script>
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="//analytics.yasarbonus.com/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '13']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
-  <noscript><p><img src="//analytics.yasarbonus.com/matomo.php?idsite=13&amp;rec=1" style="border:0;" alt="" /></p></noscript>
-  <!-- End Matomo Code -->
-  
-</head>
-<a href="#" id="scroll" style="display: none; z-index:1000"><span></span></a>
 <body class="bg-yasarred">
-    <div id="nav"></div>
-    <div id="entryModal"></div>
-
-
-      <div class="ui container" style="margin-top: 100px !important;">
+      <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
 
       <div class="ui two column stackable grid">
         <div class="sixteen wide mobile sixteen wide tablet four wide computer four wide large screen four wide widescreen column">
-            <div class="ui segment" style="background-color: beige;">                     
+            <div class="ui segment">                     
             <div class="ui container grid filter">
                 <div class="sixteen wide eight wide tablet eight wide mobile column" style="padding:none">
                 <div class="filteritem">
@@ -348,18 +311,13 @@
         </div>
       </div>
     </div>
-   <div id="footer">
 
-   </div>
+   <%- include('../partials/footer') %>
 
-<script src="js/casinos.js"></script>
-<script src="js/backToTop.js"></script>
+   <script src="js/casinos.js"></script>
 
-<script>
-  $( "#entryModal" ).load( "load/entryModal.html" );
-  $( "#nav" ).load( "load/nav.html" );
-  $( "#footer" ).load( "load/footer.html" );
-</script>
+
+
 
 </body>
 </html>

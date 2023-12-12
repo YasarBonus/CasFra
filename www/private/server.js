@@ -4,6 +4,8 @@ const port = 3000;
 
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static('public'));
+app.set('view engine', 'ejs')
+
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -47,107 +49,87 @@ db.run(`CREATE TABLE IF NOT EXISTS link_hits (
   time TEXT
 )`);
 
-app.get('/:link', (req, res) => {
-  const linkName = req.params.link;
-  
-  fs.readFile('private/data/links.json', 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error reading JSON file');
-      return;
-    }
-    
-    try {
-      const jsonData = JSON.parse(data);
-      const link = jsonData.find(link => link.name.toLowerCase() === linkName.toLowerCase());
-      console.log(link);
-      
-      if (link) {
-        // Insert link hit into the database
-        const currentDate = new Date().toLocaleDateString();
-        const currentTime = new Date().toLocaleTimeString();
-        const name = link.name.toLowerCase();
-        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
-          if (err) {
-            console.error(err);
-            res.status(500).send('Error inserting link hit into the database');
-          } else {
-            res.redirect(link.url);
-            
-          }
-        });
-      } else {
-        res.status(404).send('Link not found');
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error parsing JSON data');
-    }
-  });
+
+app.get('/', (req, res) => {
+  const user = {
+    firstName: 'Tim',
+    lastName: 'Cook',
+  };
+  res.render('pages/index', {
+      user: user
+  })
 });
 
-app.get('/go/:casino', (req, res) => {
-  const casinoName = req.params.casino;
-  
+app.get('/faq', (req, res) => {
+  const user = {
+    firstName: 'Tim',
+    lastName: 'Cook',
+  };
+  res.render('pages/faq', {
+      user: user
+  })
+});
+
+app.get('/admin', (req, res) => {
+  const user = {
+    firstName: 'Tim',
+    lastName: 'Cook',
+  };
+  res.render('pages/admin', {
+      user: user
+  })
+});
+
+app.get('/twitch-store', (req, res) => {
+  const user = {
+    firstName: 'Tim',
+    lastName: 'Cook',
+  };
+  res.render('pages/twitch-store', {
+      user: user
+  })
+});
+
+const ejs = require('ejs');
+
+app.get('/casino/:name', (req, res) => {
+  const name = req.params.name.toLowerCase();
   fs.readFile('private/data/casinos.json', 'utf8', (err, data) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Error reading JSON file');
-      return;
-    }
-    
-    try {
-      const jsonData = JSON.parse(data);
-      const casino = jsonData.find(casino => casino.name.toLowerCase() === casinoName.toLowerCase());
-      console.log(casino);
-      
+      res.status(500).send('Error reading casinos.json');
+    } else {
+      const casinos = JSON.parse(data);
+      const casino = casinos.find(casino => casino.name.toLowerCase() === name);
       if (casino) {
-        // Insert link hit into the database
-        const currentDate = new Date().toLocaleDateString();
-        const currentTime = new Date().toLocaleTimeString();
-        // transform to lowercase before inserting into database
-        const name = casino.name.toLowerCase();
-        // const name = casino.name.toLowerCase();
-        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
+        fs.readFile(`pages/casinotemplate`, 'utf8', (err, templateData) => {
           if (err) {
             console.error(err);
-            res.status(500).send('Error inserting link hit into the database');
+            res.status(500).send('Error reading template file');
           } else {
-            res.redirect(casino.url);
+            const processedHtml = ejs.render(templateData, { casino });
+            res.send(processedHtml);
           }
         });
       } else {
         res.status(404).send('Casino not found');
       }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error parsing JSON data');
     }
   });
 });
 
-app.get('/api/link-hits', (req, res) => {
-  db.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
+app.get('/api/faq', (req, res) => {
+  fs.readFile('private/data/faq.json', 'utf8', (err, data) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Error retrieving link hits from the database');
+      res.status(500).send('Error reading faq.json');
     } else {
-      res.json(rows);
+      res.send(data);
     }
   });
 });
 
-
-// Close the database connection when the server is shut down
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Closed the database connection.');
-    process.exit(0);
-  });
-});
+// Rest of the code...
 
 // const fs = require('fs');
 app.get('/api/casinos/htmldiv', (req, res) => {
@@ -387,16 +369,6 @@ app.get('/api/casinos/htmldiv', (req, res) => {
                               </div>
                         </div>
                     </div>
-                    <div class="ui twelve wide left floated column">
-                    
-                    </div>
-                    <div class="ui four wide right aligned column">
-                        <!-- div class="ui right floated">
-                            <a onclick="copyText()" class="ui mini gray button">
-                                Details
-                                <!-- i class="right chevron icon"></i -->
-                            </a>
-                        </div -->
                     </div>
                     <div id="div${lowercaseName}details" style="display:none;">
                     <div class="attached ui segment" style="border:0px; background-color: beige;">
@@ -490,6 +462,108 @@ app.get('/api/casinos', (req, res) => {
     } else {
       res.send(data);
     }
+  });
+});
+
+app.get('/:link', (req, res) => {
+  const linkName = req.params.link;
+  
+  fs.readFile('private/data/links.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error reading JSON file');
+      return;
+    }
+    
+    try {
+      const jsonData = JSON.parse(data);
+      const link = jsonData.find(link => link.name.toLowerCase() === linkName.toLowerCase());
+      console.log(link);
+      
+      if (link) {
+        // Insert link hit into the database
+        const currentDate = new Date().toLocaleDateString();
+        const currentTime = new Date().toLocaleTimeString();
+        const name = link.name.toLowerCase();
+        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('Error inserting link hit into the database');
+          } else {
+            res.redirect(link.url);
+            
+          }
+        });
+      } else {
+        res.status(404).send('Link not found');
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error parsing JSON data');
+    }
+  });
+});
+
+app.get('/go/:casino', (req, res) => {
+  const casinoName = req.params.casino;
+  
+  fs.readFile('private/data/casinos.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error reading JSON file');
+      return;
+    }
+    
+    try {
+      const jsonData = JSON.parse(data);
+      const casino = jsonData.find(casino => casino.name.toLowerCase() === casinoName.toLowerCase());
+      console.log(casino);
+      
+      if (casino) {
+        // Insert link hit into the database
+        const currentDate = new Date().toLocaleDateString();
+        const currentTime = new Date().toLocaleTimeString();
+        // transform to lowercase before inserting into database
+        const name = casino.name.toLowerCase();
+        // const name = casino.name.toLowerCase();
+        db.run(`INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)`, [name, currentDate, currentTime], (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('Error inserting link hit into the database');
+          } else {
+            res.redirect(casino.url);
+          }
+        });
+      } else {
+        res.status(404).send('Casino not found');
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error parsing JSON data');
+    }
+  });
+});
+
+app.get('/api/link-hits', (req, res) => {
+  db.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error retrieving link hits from the database');
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+
+// Close the database connection when the server is shut down
+process.on('SIGINT', () => {
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Closed the database connection.');
+    process.exit(0);
   });
 });
 
