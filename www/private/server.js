@@ -1,4 +1,10 @@
 const express = require('express');
+const mysql = require('mysql');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+
 const app = express();
 const port = 3000;
 
@@ -29,20 +35,324 @@ function sendTelegram(message) {
 
 // Routen
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(session({
+    secret: 'haa1NeeJ4aijiabee3PheTiethu6yaihahDiewoophooneipeePaeJee2aey',
+    resave: false,
+    saveUninitialized: false
+}));
+
+const db = mysql.createConnection({
+    host: 'cax.treudler.net',
+    user: 'casfra_admin',
+    password: 'jienohnoikoh0ir7xaeji2aathaeNiegaiCaizaetheeleewu9eiph0jieVe',
+    database: 'casfra_admin'
+});
+
+db.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to database');
+
+    // Create table if it does not exist
+    const createTableQuery = `CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL
+    )`;
+
+    db.query(createTableQuery, (err, result) => {
+        if (err) throw err;
+        console.log('Users table created or already exists');
+    });
+
+    // Insert initial data if table is empty
+    const checkDataQuery = `SELECT COUNT(*) AS count FROM users`;
+    db.query(checkDataQuery, (err, result) => {
+        if (err) throw err;
+        const count = result[0].count;
+        if (count === 0) {
+            const username = 'admin';
+            const password = 'admin123';
+            bcrypt.hash(password, 10, (err, hash) => {
+                if (err) throw err;
+                const insertDataQuery = `INSERT INTO users (username, password) VALUES (?, ?)`;
+                db.query(insertDataQuery, [username, hash], (err, result) => {
+                    if (err) throw err;
+                    console.log('Initial data inserted');
+                });
+            });
+        }
+    });
+
+    // Create dashboard table if it does not exist
+    const createDashboardTableQuery = `CREATE TABLE IF NOT EXISTS data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL
+    )`;
+
+    db.query(createDashboardTableQuery, (err, result) => {
+        if (err) throw err;
+        console.log('Dashboard table created or already exists');
+    });
+
+    // Insert initial data for dashboard if table is empty
+    const checkDashboardDataQuery = `SELECT COUNT(*) AS count FROM data`;
+    db.query(checkDashboardDataQuery, (err, result) => {
+        if (err) throw err;
+        const count = result[0].count;
+        if (count === 0) {
+            const title = 'Welcome';
+            const content = 'This is the dashboard content.';
+            const insertDashboardDataQuery = `INSERT INTO data (title, content) VALUES (?, ?)`;
+            db.query(insertDashboardDataQuery, [title, content], (err, result) => {
+                if (err) throw err;
+                console.log('Initial dashboard data inserted');
+            });
+        }
+    });
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/login', (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    db.query('SELECT * FROM users WHERE username = ?', [username], (err, result) => {
+        if (err) throw err;
+
+        if (result.length > 0) {
+            bcrypt.compare(password, result[0].password, (err, response) => {
+                if (response) {
+                    req.session.user = result;
+                    res.redirect('/dashboard');
+                } else {
+                    res.send('Incorrect username and/or password!');
+                }
+            });
+        } else {
+            res.send('Incorrect username and/or password!');
+        }
+    });
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.post('/register', (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    bcrypt.hash(password, 10, (err, hash) => {
+        if (err) throw err;
+
+        db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash], (err, result) => {
+            if (err) throw err;
+
+            res.redirect('/login');
+        });
+    });
+});
+
+// Middleware to check if the user is logged in
+function checkLoggedIn(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+// Dashboard route
+app.get('/dashboard', checkLoggedIn, (req, res) => {
+    db.query('SELECT * FROM data', (err, results) => {
+        if (err) throw err;
+
+        res.render('dashboard', { data: results });
+    });
+});
+
+app.get('/get-data', checkLoggedIn, (req, res) => {
+    db.query('SELECT * FROM data', (err, results) => {
+        if (err) throw err;
+
+        res.json(results);
+    });
+});
+
+app.get('/add-data', (req, res) => {
+    res.sendFile(__dirname + '/add-data.html');
+});
+
+app.post('/add-data', (req, res) => {
+    const title = req.body.title;
+    const content = req.body.content;
+    console.log (title, content);
+
+    const bodyParser = require('body-parser');
+    app.use(bodyParser.json());
+
+    db.query('INSERT INTO data (title, content) VALUES (?, ?)', [title, content], (err, result) => {
+        if (err) throw err;
+
+        res.redirect('/dashboard');
+    });
+});
+
+app.post('/delete-data', checkLoggedIn, (req, res) => {
+    const id = req.body.id;
+
+    db.query('DELETE FROM data WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
+app.post('/update-data', checkLoggedIn, (req, res) => {
+    const id = req.body.id;
+    const title = req.body.title;
+    const content = req.body.content;
+
+    db.query('UPDATE data SET title = ?, content = ? WHERE id = ?', [title, content, id], (err, result) => {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
+const fs = require('fs');
+
+app.post('/save-data', checkLoggedIn, (req, res) => {
+    db.query('SELECT * FROM data', (err, results) => {
+        if (err) throw err;
+
+        fs.writeFile('data.json', JSON.stringify(results), (err) => {
+            if (err) throw err;
+
+            res.json({ success: true });
+        });
+    });
+});
+
+app.post('/load-data', checkLoggedIn, (req, res) => {
+    // ...
+    fs.readFile('data.json', 'utf8', (err, data) => {
+        if (err) throw err;
+
+        const jsonData = JSON.parse(data);
+
+        // Get all existing IDs from the database
+        db.query('SELECT id FROM data', (err, results) => {
+            if (err) throw err;
+
+            const existingIDs = results.map(result => result.id);
+
+            // Iterate through each item in the JSON data
+            jsonData.forEach(item => {
+                if (existingIDs.includes(item.id)) {
+                    // Entry with the same ID already exists, update it
+                    db.query('UPDATE data SET title = ?, content = ? WHERE id = ?', [item.title, item.content, item.id], (err, result) => {
+                        if (err) throw err;
+                    });
+                } else {
+                    // Entry with the same ID doesn't exist, insert it
+                    db.query('INSERT INTO data (id, title, content) VALUES (?, ?, ?)', [item.id, item.title, item.content], (err, result) => {
+                        if (err) throw err;
+                    });
+                }
+            });
+
+            // Delete entries with IDs not present in the JSON data
+            const jsonIDs = jsonData.map(item => item.id);
+            const deleteIDs = existingIDs.filter(id => !jsonIDs.includes(id));
+
+            if (deleteIDs.length > 0) {
+                db.query('DELETE FROM data WHERE id IN (?)', [deleteIDs], (err, result) => {
+                    if (err) throw err;
+                });
+            }
+
+            res.json({ success: true });
+        });
+    });
+});
+
+app.get('/get-table-names', checkLoggedIn, (req, res) => {
+    db.query("SHOW TABLES LIKE 'bk_%'", (err, results) => {
+        if (err) throw err;
+
+        // Extract table names from the results
+        const tableNames = results.map(row => Object.values(row)[0]);
+
+        res.json(tableNames);
+    });
+});
+
+app.post('/restore-table', checkLoggedIn, (req, res) => {
+    const tableName = req.body.table;
+
+    // Drop the existing 'data' table
+    db.query('DROP TABLE IF EXISTS data', (err, result) => {
+        if (err) throw err;
+
+        // Create a new 'data' table and fill it with the data from the selected table
+        db.query(`CREATE TABLE data AS SELECT * FROM ${tableName}`, (err, result) => {
+            if (err) throw err;
+
+            res.json({ success: true });
+        });
+    });
+});
+
+app.post('/delete-table', checkLoggedIn, (req, res) => {
+    const tableName = req.body.table;
+
+    // Drop the selected table
+    db.query(`DROP TABLE ${tableName}`, (err, result) => {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
+app.post('/create-backup', checkLoggedIn, (req, res) => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, '0');
+    const backupTableName = `bk_data_${year}${month}${day}T${hours}${minutes}${seconds}${milliseconds}Z`;
+
+    // Create a new table and fill it with the data from the 'data' table
+    db.query(`CREATE TABLE ${backupTableName} AS SELECT * FROM data`, (err, result) => {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
+
 app.get('/api', (req, res) => {
   // Hier kannst du deinen serverseitigen Code einfügen
   res.send('Hello World!');
 });
 
-const fs = require('fs');
-
 const sqlite3 = require('sqlite3').verbose();
 
 // Create a new SQLite database connection
-const db = new sqlite3.Database('private/data/link_hits.db');
+const dbLinkHits = new sqlite3.Database('private/data/link_hits.db');
 
 // Create a table to store link hits
-db.run(`CREATE TABLE IF NOT EXISTS link_hits (
+dbLinkHits.run(`CREATE TABLE IF NOT EXISTS link_hits (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT,
   date TEXT,
@@ -545,7 +855,7 @@ app.get('/go/:casino', (req, res) => {
 });
 
 app.get('/api/link-hits', (req, res) => {
-  db.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
+  dbLinkHits.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
     if (err) {
       console.error(err);
       res.status(500).send('Error retrieving link hits from the database');
@@ -558,7 +868,7 @@ app.get('/api/link-hits', (req, res) => {
 
 // Close the database connection when the server is shut down
 process.on('SIGINT', () => {
-  db.close((err) => {
+  dbLinkHits.close((err) => {
     if (err) {
       console.error(err.message);
     }
