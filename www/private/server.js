@@ -55,6 +55,17 @@ db.connect((err) => {
     console.log('Connected to database');
 
     // Create table if it does not exist
+    const createRegistrationKeyTableQuery = `CREATE TABLE IF NOT EXISTS registration_keys (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      regkey VARCHAR(255) NOT NULL
+  )`;
+
+  db.query(createRegistrationKeyTableQuery, (err, result) => {
+      if (err) throw err;
+      console.log('Registration Key table created or already exists');
+  });
+
+    // Create table if it does not exist
     const createTableQuery = `CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255) NOT NULL,
@@ -112,6 +123,20 @@ db.connect((err) => {
             });
         }
     });
+
+        // Create faq table if it does not exist
+        const createFaqTableQuery = `CREATE TABLE IF NOT EXISTS faq (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          content TEXT NOT NULL
+      )`;
+  
+      db.query(createFaqTableQuery, (err, result) => {
+          if (err) throw err;
+          console.log('FAQ table created or already exists');
+      });
+
+    
 });
 
 app.get('/login', (req, res) => {
@@ -145,18 +170,32 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+  const username = req.body.username;
+  const password = req.body.password;
+  const registrationKey = req.body.registrationKey;
 
-    bcrypt.hash(password, 10, (err, hash) => {
-        if (err) throw err;
+  db.query('SELECT * FROM registration_keys WHERE regkey = ?', [registrationKey], (err, results) => {
+      if (err) throw err;
 
-        db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash], (err, result) => {
-            if (err) throw err;
+      if (results.length === 0) {
+          res.status(400).send('Ungültiger Registrierungsschlüssel');
+          return;
+      }
 
-            res.redirect('/login');
-        });
-    });
+      bcrypt.hash(password, 10, (err, hash) => {
+          if (err) throw err;
+
+          db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash], (err, result) => {
+              if (err) throw err;
+
+              db.query('DELETE FROM registration_keys WHERE regkey = ?', [registrationKey], (err, result) => {
+                  if (err) throw err;
+
+                  res.redirect('/login');
+              });
+          });
+      });
+  });
 });
 
 // Middleware to check if the user is logged in
@@ -170,11 +209,7 @@ function checkLoggedIn(req, res, next) {
 
 // Dashboard route
 app.get('/dashboard', checkLoggedIn, (req, res) => {
-    db.query('SELECT * FROM data', (err, results) => {
-        if (err) throw err;
-
-        res.render('dashboard', { data: results });
-    });
+  res.render('dashboard');
 });
 
 app.get('/get-data', checkLoggedIn, (req, res) => {
@@ -283,6 +318,46 @@ app.post('/load-data', checkLoggedIn, (req, res) => {
     });
 });
 
+app.get('/load-json-data', (req, res) => {
+  const path = require('path');
+  fs.readFile(path.join(__dirname, 'data/casinos.json'), 'utf8', (err, data) => {
+      if (err) {
+          console.error(err);
+          res.status(500).send('Server error');
+          return;
+      }
+
+      const jsonData = JSON.parse(data);
+
+      if (!Array.isArray(jsonData) || jsonData.length === 0) {
+          res.status(400).send('Invalid JSON data');
+          return;
+      }
+
+      const createTableQuery = `CREATE TABLE IF NOT EXISTS json_data (id INT AUTO_INCREMENT PRIMARY KEY)`;
+
+      db.query(createTableQuery, (err, result) => {
+          if (err) throw err;
+
+          const addColumnQuery = `ALTER TABLE json_data ADD COLUMN IF NOT EXISTS data TEXT`;
+
+          db.query(addColumnQuery, (err, result) => {
+              if (err) throw err;
+
+              jsonData.forEach(item => {
+                  const insertQuery = `INSERT INTO json_data (data) VALUES (?)`;
+                  db.query(insertQuery, [JSON.stringify(item)], (err, result) => {
+                      if (err) throw err;
+                  });
+              });
+
+              res.json({ success: true });
+          });
+      });
+  });
+});
+
+
 app.get('/get-table-names', checkLoggedIn, (req, res) => {
     db.query("SHOW TABLES LIKE 'bk_%'", (err, results) => {
         if (err) throw err;
@@ -319,6 +394,23 @@ app.post('/delete-table', checkLoggedIn, (req, res) => {
 
         res.json({ success: true });
     });
+});
+
+app.post('/show-table-data', checkLoggedIn, (req, res) => {
+  const tableName = req.body.table;
+
+  // Check if the table name starts with 'bk_data_'
+  if (!tableName.startsWith('bk_data_')) {
+      return res.status(400).json({ error: 'Ungültiger Tabellenname' });
+  }
+
+  // Query the database to get all data from the specified table
+  db.query(`SELECT * FROM ${tableName}`, (err, result) => {
+      if (err) throw err;
+
+      // Send the data as a response
+      res.json(result);
+  });
 });
 
 app.post('/create-backup', checkLoggedIn, (req, res) => {
