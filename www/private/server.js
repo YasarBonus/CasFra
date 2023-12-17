@@ -310,6 +310,11 @@ app.post('/api/auth/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
+  // End previous session if user is already logged in
+  if (req.session.user) {
+    req.session.destroy();
+  }
+
   db.query('SELECT * FROM users WHERE username = ?', [username], (err, result) => {
     if (err) {
       console.error(err);
