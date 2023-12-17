@@ -1,0 +1,47 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <div class="ui container">
+                        <h2>Mein Konto</h2>
+                        <form class="ui form" id="userForm">
+                          <div class="field">
+                            <label>Benutzername</label>
+                            <input type="text" name="userName" placeholder="Benutzername">
+                          </div>
+                          <div class="field">
+                            <label>Passwort</label>
+                            <input type="password" name="userPassword" placeholder="Passwort">
+                          </div>
+                          <div class="field">
+                            <label>E-Mail</label>
+                            <input type="text" name="userEmail" placeholder="E-Mail">
+                          </div>
+                          <input type="hidden" name="userId" value="IhrUserId">
+                          <button class="ui button" type="submit">Aktualisieren</button>
+                        </form>
+                      </div>
+                      
+                      <script>
+                        $('#userForm').submit(function(e) {
+                          e.preventDefault();
+                          $.post('/api/auth/user/edit', $(this).serialize())
+                            .done(function(data) {
+                              // Erfolgreiche Anfrage
+                            })
+                            .fail(function() {
+                              // Fehler bei der Anfrage
+                            });
+                        });
+                      </script>
+            <%- include('../partials/footer') %>
+        </body>
+</html>
+          
+

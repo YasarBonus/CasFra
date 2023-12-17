@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %>
+  <%- include('../partials/header') %>
+  <body class="bg-yasarred" >
+    <div class="ui container"style="margin-top: 100px !important; padding-bottom: 100px;">
+      <div class="ui segment" >
+        <h2>Register</h2>
+        <form class="ui form" action="/api/auth/register" method="post" onsubmit="return validateForm()">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br>
+            <label for="email">E-Mail:</label>
+            <input type="email" id="email" name="email" required><br>
+            <label for="registrationKey">Registration Key:</label><br>
+            <input type="text" id="registrationKey" name="registrationKey" required><br>
+            <input class="ui button" type="submit" value="Register">
+        </form>
+
+    <script>
+        function validateForm() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const registrationKey = document.getElementById('registrationKey').value;
+
+            if (username === '' || password === '' || email === '' || registrationKey === '') {
+                alert('Username, password, email and registration key cannot be empty');
+                return false;
+            }
+
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+      </div>
+    </div>
+
+   <%- include('../partials/footer') %>
+
+</body>
+</html>
+        

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %>
+  <%- include('../partials/header') %>
+  <body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+      <div class="ui segment">
+        <%- include('./partials/dashboard-menu') %>
+        <div class="ui segment">
+            <h2>Statistics</h2>
+            <div class="ui message">
+                <div class="header">
+                  Information
+                </div>
+                <ul class="list">
+                    <li>Links are built from the <b>name</b> and <b>url</b> of each Casino, resulting in <div class="ui label">jphev.dynv6.net/go/NAME</div></li>
+                    <li>All other links that exist (<b>/discord</b>, <b>/instagram</b>, etc.) are built from a seperated JSON file, I will add this to the database too (soon).</li>
+                  <li>Right now, link hits will be updated by the server every 60 seconds to avoid high load on low-performance devices.</li>
+                  <li>Every link hit is recorded with its timestamp to use this data later.</li>
+                    <li>No user data is being collected.</li>
+                </ul>
+            </div>
+            <button id="refreshButton" class="ui green button">Refresh</button>
+            <table class="ui celled table" id="statisticsTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Die Daten werden hier eingefügt -->
+              </tbody>
+            </table>
+          </div>
+          
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+          <script>
+            function refreshTable() {
+              $.get('/api/links/count', function(data) {
+                const tableBody = data.map(item => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.count}</td>
+                  </tr>
+                `).join('');
+          
+                $('#statisticsTable tbody').html(tableBody);
+              });
+            }
+          
+            $('#refreshButton').click(refreshTable);
+          
+            // Tabelle beim Laden der Seite aktualisieren
+            refreshTable();
+          </script>
+  </body>
+</html>

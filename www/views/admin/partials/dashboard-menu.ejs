@@ -1,0 +1,55 @@
+<div class="ui small menu">
+    <a class="item" href="/dashboard">
+      Dashboard
+    </a>
+    <a class="item" href="/dashboard/casinos">Casinos</a>
+
+      <a class="item" href="/dashboard/faq">FAQ</a>
+
+    <div class="ui dropdown item">
+        Links <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="disabled item">Manage</a>
+          <a href="/dashboard/links/statistics" class="item">Statistics</a>
+        </div>
+      </div>
+      <div class="ui dropdown item">
+        Media <i class="dropdown icon"></i>
+        <div class="menu">
+            <a href="/dashboard/media/casinos" class="item">Casinos</a>
+            <a href="/dashboard/media/provider" class="item">Provider</a>
+            <a href="/dashboard/media/paymentmethods" class="item">Payment Methods</a>
+
+        </div>
+      </div>
+      <a class="disabled item" href="/dashboard/provider">Provider</a>
+      <a class="disabled item" href="/dashboard/paymentmethods">Payment Methods</a>
+    <div class="right menu">
+        <div class="ui dropdown item">
+            Users <i class="dropdown icon"></i>
+            <div class="menu">
+                <a href="/dashboard/registrationkeys" class="item">Registration Keys</a>
+ 
+            </div>
+          </div>
+      <div class="item">
+        <div class="ui primary button" onclick="callLogoutAPI()">Logout</div>
+    </div>
+  </div>
+</div>
+  <script>
+
+    callLogoutAPI = () => {
+      $.ajax({
+        url: '/api/auth/logout',
+        type: 'POST',
+        success: function(result) {
+          window.location.href = '/login';
+        }
+      });
+    };
+
+    $('.ui.dropdown')
+      .dropdown()
+    ;
+    </script>

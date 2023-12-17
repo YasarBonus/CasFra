@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %>
+  <%- include('../partials/header') %>
+  <body class="bg-yasarred" >
+    <div class="ui container"style="margin-top: 100px !important; padding-bottom: 100px;">
+      <div class="ui segment" >
+  <%- include('./partials/dashboard-menu') %>
+  <div class="ui segment">
+    <h2>Casinos</h2>
+    <div class="ui message">
+    <div class="header">
+      Information
+    </div>
+    <ul class="list">
+      <li>This is a temporarily solution while I'm working on a proper interface to manage Casinos, Payment Methods, Providers and so on.</li>
+      <li>Data in every field needs to be <b>valid JSON</b> or things will break. Casinos with invalid JSON data will be skipped during the Deployment Process.</li>
+        <li>You may use some <a href="https://www.jsonformatter.io/validator/" target="_blank">JSON Validator tool</a> to verify the data integrity and make it more readable initially.</li>
+        <li>To deploy the changes to your website, use the <b>Deploy</b> button.</li>
+        <li>Backups are self-explaining.</li>
+        <li>Use <kbd class="ui label">CMD</kbd><kbd class="ui label">F</kbd> to search for casinos by their name.</li>
+    </ul>
+
+              </div>
+    <h3>Manage Casinos</h3>
+
+    <div class="ui tiny button" id="addCasinoButton">Add Casino</div>
+
+    <script>
+        $('#addCasinoButton').on('click', function() {
+            $('.ui.modal.casino').modal('show');
+        });
+    </script>
+
+    <div class="ui modal casino">
+        <i class="close icon"></i>
+        <div class="header">
+          Add new Casino
+        </div>
+        <div class="ui content">
+            <form class="ui form" id="addCasinoForm">         
+                <div class="field">
+                    <label>json Data</label>
+                    <textarea id="newCasinoJsonData"></textarea>
+                  </div>
+                  <div class="actions">
+                    <button type="submit" class="ui green right floating  button">
+                      Save
+                    </button>
+                  </div>
+            </form>
+            <script>
+                document.getElementById('addCasinoForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const jsondata = document.getElementById('newCasinoJsonData').value;
+
+                    $.ajax({
+                        url: '/api/casinos/add',
+                        type: 'POST',
+                        data: { json_data: jsondata},
+                        success: function(result) {
+                            // Do something with the result
+                            location.reload(); // Reload the page
+                        }
+                    });
+                });
+
+                document.getElementById('addCasinoForm').addEventListener('cancel', function(e) {
+                    e.preventDefault();
+
+                    $('.ui.modal.casino').modal('hide');
+                });
+            </script>
+        </div>
+        
+    </div>
+
+    <button class="ui tiny button" id="deployCasino">Deploy</button>
+
+    <script>
+        $('#deployCasino').on('click', function() {
+            $('.ui.modal.confirmation').modal('show');
+        });
+    </script>
+
+    <div class="ui modal confirmation">
+        <i class="close icon"></i>
+                <div class="header">
+                    Confirm Deployment
+                </div>
+                <div class="content">
+                    <p>Are you sure you want to deploy the Casinos?</p>
+                    <p>This action will overwrite any existing Casino data on your website!</p>
+                </div>
+                <div class="actions">
+                    <button class="ui negative button">Cancel</button>
+                    <button id="confirmDeploy" class="ui positive button">Deploy</button>
+                    <script>
+                        $('#confirmDeploy').on('click', function() {
+                            $.ajax({
+                                url: '/api/casinos/deploy',
+                                type: 'POST',
+                                success: function(result) {
+                                    location.reload(); // Reload the page
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="ui tiny button" id="addBackupsButton">Backups</div>
+
+            <script>
+                $('#addBackupsButton').on('click', function() {
+                    $('.ui.modal.backups').modal('show');
+                });
+            </script>
+
+        <div class="ui modal backups">
+            <i class="close icon"></i>
+            <div class="header">
+              Casino Backups
+            </div>
+            <div class="ui content">
+                <button class="ui tiny button" id="backupCasino">Create Backup</button>
+
+                <script>
+                $('#backupCasino').on('click', function() {
+                    $.ajax({
+                        url: '/api/casinos/backup/create',
+                        type: 'POST',
+                        success: function(result) {
+                            refreshTableData();
+                        }
+                    });
+                });
+                </script>
+
+
+
+
+        <div class="ui grid">
+            <div class="two column row">
+                <div class="column">
+                    <ul id="casinoBackupList"></ul>
+                </div>
+                <div class="column">
+                    <div id="casinoBackupsDataModal" class="modal" style="display: none;">
+                        <div class="ui segment">
+                            <button id="hideModalButton" class="ui tiny button">Close Backup Preview</button>
+                            <pre id="casinoBackupsModalData"></pre>
+                        </div>
+                    </div>    </div>        
+            </div>
+        </div>
+
+
+
+
+
+                <script>
+                    // ...
+
+                    // Add an event listener for the hide modal button
+                    $('#hideModalButton').on('click', function() {
+                            $('#casinoBackupsDataModal').hide();
+                    });
+
+                    // ...
+                </script>
+
+                <script>
+                // ...
+
+                // Get the table names when the page loads
+                    function refreshTableData() {
+                    $('#casinoBackupList').empty();
+                    $('#casinoBackupsDataModal').hide();
+                        $.ajax({
+                            url: '/api/casinos/backup/get',
+                            type: 'GET',
+                            success: function(result) {
+                                // Add a list item and restore and delete buttons for each table
+                                result.forEach(table => {
+                                    $('#casinoBackupList').append(`
+                                        <li>
+                                            <span style="font-size: 16px;">${table}</span>
+                                            <br>
+                                            <button class="ui tiny green button showCasinoBackupDataButton" data-table="${table}">Preview</button>
+                                            <button class="ui tiny blue button restoreCasinoBackupButton" data-table="${table}">Restore</button>
+                                            <button class="ui tiny red button deleteCasinoBackupButton" data-table="${table}">Delete</button>
+                                        </li>
+                                    `);
+                                });
+
+                                // Add an event listener for the restore buttons
+                                $('.restoreCasinoBackupButton').on('click', function() {
+                                    const table = $(this).data('table');
+
+                                    // Show a confirmation dialog
+                                    if (confirm('Are you sure you want to restore the Casino backup?')) {
+                                        $.ajax({
+                                            url: '/api/casinos/backup/restore',
+                                            type: 'POST',
+                                            data: { table: table },
+                                            success: function(result) {
+                                                // Do something with the result
+                                                alert('Casino Data restored!');
+                                                location.reload(); // Reload the page
+                                            }
+                                        });
+                                    }
+                                });
+
+                                // Add an event listener for the delete buttons
+                                $('.deleteCasinoBackupButton').on('click', function() {
+                                    const table = $(this).data('table');
+
+                                    // Show a confirmation dialog
+                                    if (confirm('Are you sure you want to delete the Casino backup?')) {
+                                        $.ajax({
+                                            url: '/api/casinos/backup/delete',
+                                            type: 'POST',
+                                            data: { table: table },
+                                            success: function(result) {
+                                                // Do something with the result
+                                                refreshTableData();
+                                            }
+                                        });
+                                    }
+                                });
+
+                                // Add an event listener for the show data buttons
+                                $('.showCasinoBackupDataButton').on('click', function() {
+                                    const table = $(this).data('table');
+
+                                    // Show the table name
+                                    $('#casinoBackupsModalData').html('<h5>Showing Backup: ' + table + '</h5>');
+
+                                    // Scroll to the table
+
+                                    $.ajax({
+                                        url: '/api/casinos/backup/show',
+                                        type: 'POST',
+                                        data: { table: table },
+                                        success: function(result) {
+                                            // Insert the data into the modal
+                                            $('#casinoBackupsModalData').append('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
+
+                                            // Open the modal
+                                            $('#casinoBackupsDataModal').show();
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    }
+
+                    // Call the function to refresh the table data initially
+                    refreshTableData();
+                </script>
+                </script>
+                
+                <script>
+                    
+
+                   
+                </script>
+            </div>
+            
+          </div>
+
+
+        <ul id="casinoList"></ul>
+
+        <script>
+
+        fetch('/api/casinos/get')
+        .then(response => response.json())
+        .then(data => {
+            data.sort((a, b) => a.sortingorder - b.sortingorder);
+            console.log(data);
+
+          const casinoList = document.getElementById('casinoList');
+
+          function displayData() {
+              casinoList.innerHTML = ''; // Clear the table
+
+            data.forEach(item => {
+            
+
+        const form = document.createElement('form');
+        form.classList.add('ui', 'form');
+        form.method = 'post';
+        form.action = '/api/casinos/update';
+
+        const casinoItem = document.createElement('div');
+        casinoItem.classList.add('inline', 'fields');
+        form.appendChild(casinoItem);
+
+        const inlineFields = document.createElement('div');
+        inlineFields.classList.add('inline', 'fields');
+        form.appendChild(inlineFields);
+
+        
+
+        const casinoJsonDataField = document.createElement('div');
+        casinoJsonDataField.classList.add('sixteen', 'wide', 'field');
+        form.appendChild(casinoJsonDataField);
+
+        const casinoJsonDataInputLabel = document.createElement('label');
+        casinoJsonDataInputLabel.textContent = 'json Data';
+        casinoJsonDataField.appendChild(casinoJsonDataInputLabel);
+
+        const casinoJsonDataInput = document.createElement('textarea');
+        casinoJsonDataInput.type = 'text';
+        casinoJsonDataInput.name = 'json_data';
+        casinoJsonDataInput.rows = 30;
+        casinoJsonDataInput.value = item.json_data;
+        casinoJsonDataField.appendChild(casinoJsonDataInput);
+
+        const saveButton = document.createElement('button');
+        saveButton.classList.add('ui', 'green', 'tiny', 'button');
+        saveButton.type = 'submit';
+        saveButton.textContent = 'Save';
+        saveButton.addEventListener('click', function() {
+            const casinoJsonData = casinoJsonDataInput.value;
+
+            $.ajax({
+                url: form.action,
+                type: form.method,
+                data: { id: item.id, json_data: casinoJsonData},
+                success: function(result) {
+                    // Do something with the result
+                    location.reload(); // Reload the page
+                }
+            });
+        });
+        form.appendChild(saveButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('ui', 'red', 'tiny', 'button');
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function() {
+            $.ajax({
+                url: '/api/casinos/delete',
+                type: 'POST',
+                data: { id: item.id },
+                success: function(result) {
+                    // Do something with the result
+                    location.reload(); // Reload the page
+                }
+            });
+        });
+        form.appendChild(deleteButton);
+
+
+
+        const divider = document.createElement('div');
+        divider.classList.add('ui', 'divider');
+        form.appendChild(divider);
+
+        casinoList.appendChild(form);
+
+
+        });
+          }
+
+          displayData();
+        })
+        .catch(error => console.error('Error:', error));
+
+        </script>
+
+
+
+          </div>
+            
+              </div>
+            </div>
+
+           <%- include('../partials/footer') %>
+
+        </body>
+        </html>
