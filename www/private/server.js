@@ -332,7 +332,7 @@ setInterval(() => {
   updateLinkHitsCount();
 }, 60000); // 10000 Millisekunden = 10 Sekunden
 
-app.post('/api/user/:userId/group/:groupId', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
+app.post(apiPath + '/user/:userId/group/:groupId', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
   const { userId, groupId } = req.params;
 
   const query = 'INSERT INTO user_groups (user_id, group_id) VALUES (?, ?)';
@@ -397,7 +397,7 @@ app.post(apiPath + '/auth/login', (req, res) => {
 });
 
 // Route, um die Sitzungsdaten abzurufen
-app.get('/api/sessions', checkPermissions('superAdmin'),(req, res) => {
+app.get(apiPath + '/sessions', checkPermissions('superAdmin'),(req, res) => {
   const query = 'SELECT * FROM sessions';
 
   db.query(query, (err, rows) => {
@@ -408,7 +408,7 @@ app.get('/api/sessions', checkPermissions('superAdmin'),(req, res) => {
 });
 
 // Route, um die Sitzung zu beenden
-app.post('/api/sessions/end', checkPermissions('superAdmin'),(req, res) => {
+app.post(apiPath + '/sessions/end', checkPermissions('superAdmin'),(req, res) => {
   const sessionId = req.body.sessionId;
   const query = 'DELETE FROM sessions WHERE sid = ?';
 
@@ -419,7 +419,7 @@ app.post('/api/sessions/end', checkPermissions('superAdmin'),(req, res) => {
   });
 });
 
-app.get('/api/users', (req, res) => {
+app.get(apiPath + '/users', (req, res) => {
   db.query('SELECT * FROM users', (err, results) => {
     if (err) throw err;
 
@@ -427,7 +427,7 @@ app.get('/api/users', (req, res) => {
   });
 });
 
-app.get('/api/auth/user/:userID/groups', checkPermissions('manageUsers'), (req, res) => {
+app.get(apiPath + '/auth/user/:userID/groups', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
 
   db.query('SELECT * FROM user_group_assignments WHERE user_id = ?', [userID], (err, results) => {
@@ -437,7 +437,7 @@ app.get('/api/auth/user/:userID/groups', checkPermissions('manageUsers'), (req, 
   });
 });
 
-app.get('/api/user/:userID/groups/available', checkPermissions('manageUsers'), (req, res) => {
+app.get(apiPath + '/user/:userID/groups/available', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
 
   db.query('SELECT * FROM user_group_permissions WHERE id NOT IN (SELECT group_id FROM user_group_assignments WHERE user_id = ?)', [userID], (err, results) => {
@@ -447,7 +447,7 @@ app.get('/api/user/:userID/groups/available', checkPermissions('manageUsers'), (
   });
 });
 
-app.post('/api/user/:userID/groups/add', checkPermissions('manageUsers'), (req, res) => {
+app.post(apiPath + '/user/:userID/groups/add', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
   const groupID = req.body.groupID;
 
@@ -458,13 +458,13 @@ app.post('/api/user/:userID/groups/add', checkPermissions('manageUsers'), (req, 
   });
 });
 
-app.get('/api/user', checkPermissions('manageAccount'), (req, res) => {
+app.get(apiPath + '/user', checkPermissions('manageAccount'), (req, res) => {
   const user = req.session.user;
   res.json(user);
   console.log('Session User Data:', req.session.user);
 });
 
-app.get('/api/user/personal', checkPermissions('manageAccount'), (req, res) => {
+app.get(apiPath + '/user/personal', checkPermissions('manageAccount'), (req, res) => {
   const userId = req.session.user.id;
   db.query('SELECT * FROM user_personal WHERE user_id = ?', [userId], (err, results) => {
     if (err) throw err;
@@ -477,7 +477,7 @@ app.get('/api/user/personal', checkPermissions('manageAccount'), (req, res) => {
 
 app.use(express.urlencoded({ extended: true })); // Middleware zum Parsen von URL-kodierten Formulardaten
 
-app.post('/api/user/edit', (req, res) => {
+app.post(apiPath + '/user/edit', (req, res) => {
   const userId = req.session.user.id;
   const userName = req.body.userName;
   const userEmail = req.body.userEmail;
@@ -497,7 +497,7 @@ app.post('/api/user/edit', (req, res) => {
   });
 });
 
-app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
+app.post(apiPath + '/user/delete', checkPermissions('manageAccount'), (req, res) => {
   const userId = req.body.userId;
 
   db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
@@ -507,7 +507,7 @@ app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
   });
 });
 
-app.post('/api/user/add', checkPermissions('manageUsers'), (req, res) => {
+app.post(apiPath + '/user/add', checkPermissions('manageUsers'), (req, res) => {
   const userName = req.body.userName;
   const userPassword = req.body.userPassword;
 
@@ -518,7 +518,7 @@ app.post('/api/user/add', checkPermissions('manageUsers'), (req, res) => {
   });
 });
 
-app.get('/api/user/groups', checkPermissions('manageUserGroups'), (req, res) => {
+app.get(apiPath + '/user/groups', checkPermissions('manageUserGroups'), (req, res) => {
   db.query('SELECT * FROM user_group_permissions', (err, results) => {
     if (err) throw err;
 
@@ -526,7 +526,7 @@ app.get('/api/user/groups', checkPermissions('manageUserGroups'), (req, res) => 
   });
 });
 
-app.post('/api/user/groups/add', checkPermissions('manageUserGroups'),(req, res) => {
+app.post(apiPath + '/user/groups/add', checkPermissions('manageUserGroups'),(req, res) => {
   const groupName = req.body.groupName;
   const groupPermissions = req.body.groupPermissions;
 
@@ -537,7 +537,7 @@ app.post('/api/user/groups/add', checkPermissions('manageUserGroups'),(req, res)
   });
 });
 
-app.post('/api/user/groups/edit', checkPermissions('manageUserGroups'),(req, res) => {
+app.post(apiPath + '/user/groups/edit', checkPermissions('manageUserGroups'),(req, res) => {
   const groupId = req.body.groupId;
   const groupName = req.body.groupName;
   const groupPermissions = req.body.groupPermissions;
@@ -549,7 +549,7 @@ app.post('/api/user/groups/edit', checkPermissions('manageUserGroups'),(req, res
   });
 });
 
-app.post('/api/user/groups/delete', checkPermissions('manageUserGroups'),(req, res) => {
+app.post(apiPath + '/user/groups/delete', checkPermissions('manageUserGroups'),(req, res) => {
   const groupId = req.body.groupId;
 
   db.query('DELETE FROM user_group_permissions WHERE id = ?', [groupId], (err, result) => {
@@ -559,7 +559,7 @@ app.post('/api/user/groups/delete', checkPermissions('manageUserGroups'),(req, r
   });
 });
 
-app.post('/api/auth/logout', checkLoggedIn, (req, res) => {
+app.post(apiPath + '/auth/logout', checkLoggedIn, (req, res) => {
     req.session.destroy(err => {
         if (err) throw err;
         console.log('Logged out');
@@ -570,7 +570,7 @@ app.post('/api/auth/logout', checkLoggedIn, (req, res) => {
 
 
 
-app.post('/api/auth/register', (req, res) => {
+app.post(apiPath + '/auth/register', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   const email = req.body.email;
@@ -620,7 +620,7 @@ app.post('/api/auth/register', (req, res) => {
   });
 });
 
-app.post('/api/auth/reset-password', (req, res) => {
+app.post(apiPath + '/auth/reset-password', (req, res) => {
   const email = req.body.email;
   const userID = req.body.userID;
   const username = req.body.username;
@@ -675,7 +675,7 @@ app.post('/api/auth/reset-password', (req, res) => {
   });
 });
 
-app.post('/api/auth/password/reset', (req, res) => {
+app.post(apiPath + '/auth/password/reset', (req, res) => {
   const userId = req.body.userId;
   const newPassword = req.body.newPassword;
 
@@ -698,7 +698,7 @@ app.post('/api/auth/password/reset', (req, res) => {
   });
 });
 
-app.get('/api/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.get(apiPath + '/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
   db.query('SELECT * FROM registration_keys', (err, results) => {
       if (err) throw err;
 
@@ -706,7 +706,7 @@ app.get('/api/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, r
   });
 });
 
-app.post('/api/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.post(apiPath + '/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = req.body.regkey;
 
   db.query('INSERT INTO registration_keys (regkey) VALUES (?)', [regkey], (err, result) => {
@@ -716,7 +716,7 @@ app.post('/api/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (r
   });
 });
 
-app.post('/api/auth/regkeys/generate',  checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.post(apiPath + '/auth/regkeys/generate',  checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = Math.random().toString(36).substr(2, 10);
 
   db.query('INSERT INTO registration_keys (regkey) VALUES (?)', [regkey], (err, result) => {
@@ -727,7 +727,7 @@ app.post('/api/auth/regkeys/generate',  checkPermissions('manageRegistrationKeys
   });
 });
 
-app.post('/api/auth/regkeys/delete',  checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.post(apiPath + '/auth/regkeys/delete',  checkPermissions('manageRegistrationKeys'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM registration_keys WHERE id = ?', [id], (err, result) => {
@@ -901,7 +901,7 @@ app.get('/dashboard/media/provider', checkPermissions('manageProvider'), checkLo
     next(err);
   }
 });
-app.get('/api/links/hits', checkPermissions('manageLinks'),(req, res) => {
+app.get(apiPath + '/links/hits', checkPermissions('manageLinks'),(req, res) => {
   db.query('SELECT * FROM link_hits', (err, results) => {
     if (err) throw err;
 
@@ -909,7 +909,7 @@ app.get('/api/links/hits', checkPermissions('manageLinks'),(req, res) => {
   });
 });
 
-app.get('/api/links/count', checkPermissions('manageLinks'), (req, res) => {
+app.get(apiPath + '/links/count', checkPermissions('manageLinks'), (req, res) => {
   db.query('SELECT * FROM link_hits_count', (err, results) => {
     if (err) throw err;
 
@@ -920,7 +920,7 @@ app.get('/api/links/count', checkPermissions('manageLinks'), (req, res) => {
 
 
 
-app.get('/api/media/casinos', checkPermissions('manageCasinos'), function(req, res) {
+app.get(apiPath + '/media/casinos', checkPermissions('manageCasinos'), function(req, res) {
   fs.readdir(path.join('public/img/casinos'), function(err, files) {
     if (err) {
       console.error(err);
@@ -953,7 +953,7 @@ const uploadCasinoImages = multer({
   }
 });
 
-app.post('/api/media/casinos/upload', checkPermissions('manageCasinos'), uploadCasinoImages.single('image'), function(req, res) {
+app.post(apiPath + '/media/casinos/upload', checkPermissions('manageCasinos'), uploadCasinoImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -963,7 +963,7 @@ app.post('/api/media/casinos/upload', checkPermissions('manageCasinos'), uploadC
   res.json({ success: true });
 });
 
-app.post('/api/media/casinos/delete', checkPermissions('manageCasinos'), function(req, res) {
+app.post(apiPath + '/media/casinos/delete', checkPermissions('manageCasinos'), function(req, res) {
   const imagePath = path.join('public/img/casinos', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -982,7 +982,7 @@ app.post('/api/media/casinos/delete', checkPermissions('manageCasinos'), functio
 
 
 
-app.get('/api/media/paymentmethods', checkPermissions('managePaymentMethods'), function(req, res) {
+app.get(apiPath + '/media/paymentmethods', checkPermissions('managePaymentMethods'), function(req, res) {
   fs.readdir(path.join('public/img/paymentmethods'), function(err, files) {
     if (err) {
       console.error(err);
@@ -1015,7 +1015,7 @@ const uploadPaymentmethodsImages = multer({
   }
 });
 
-app.post('/api/media/paymentmethods/upload', checkPermissions('managePaymentMethods'), uploadPaymentmethodsImages.single('image'), function(req, res) {
+app.post(apiPath + '/media/paymentmethods/upload', checkPermissions('managePaymentMethods'), uploadPaymentmethodsImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -1025,7 +1025,7 @@ app.post('/api/media/paymentmethods/upload', checkPermissions('managePaymentMeth
   res.json({ success: true });
 });
 
-app.post('/api/media/paymentmethods/delete', checkPermissions('managePaymentMethods'), function(req, res) {
+app.post(apiPath + '/media/paymentmethods/delete', checkPermissions('managePaymentMethods'), function(req, res) {
   const imagePath = path.join('public/img/paymentmethods', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -1043,7 +1043,7 @@ app.post('/api/media/paymentmethods/delete', checkPermissions('managePaymentMeth
 
 
 
-app.get('/api/media/provider', checkPermissions('manageProvider'), function(req, res) {
+app.get(apiPath + '/media/provider', checkPermissions('manageProvider'), function(req, res) {
   fs.readdir(path.join('public/img/provider'), function(err, files) {
     if (err) {
       console.error(err);
@@ -1076,7 +1076,7 @@ const uploadProviderImages = multer({
   }
 });
 
-app.post('/api/media/provider/upload', checkPermissions('manageProvider'), uploadProviderImages.single('image'), function(req, res) {
+app.post(apiPath + '/media/provider/upload', checkPermissions('manageProvider'), uploadProviderImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -1086,7 +1086,7 @@ app.post('/api/media/provider/upload', checkPermissions('manageProvider'), uploa
   res.json({ success: true });
 });
 
-app.post('/api/media/provider/delete', checkPermissions('manageProvider'), function(req, res) {
+app.post(apiPath + '/media/provider/delete', checkPermissions('manageProvider'), function(req, res) {
   const imagePath = path.join('public/img/provider', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -1100,7 +1100,7 @@ app.post('/api/media/provider/delete', checkPermissions('manageProvider'), funct
   });
 });
 
-app.get('/api/casinos/get', checkPermissions('manageCasinos'), (req, res) => {
+app.get(apiPath + '/casinos/get', checkPermissions('manageCasinos'), (req, res) => {
   db.query('SELECT * FROM casinos', (err, results) => {
       if (err) throw err;
 
@@ -1108,7 +1108,7 @@ app.get('/api/casinos/get', checkPermissions('manageCasinos'), (req, res) => {
   });
 });
 
-app.get('/api/casinos/get/:id', checkPermissions('manageCasinos'), (req, res) => {
+app.get(apiPath + '/casinos/get/:id', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.params.id;
 
   db.query('SELECT * FROM casinos WHERE id = ?', [id], (err, results) => {
@@ -1118,7 +1118,7 @@ app.get('/api/casinos/get/:id', checkPermissions('manageCasinos'), (req, res) =>
   });
 });
 
-app.post('/api/casinos/add', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/add', checkPermissions('manageCasinos'), (req, res) => {
   const json_data = req.body.json_data;
   console.log (json_data);
 
@@ -1132,7 +1132,7 @@ app.post('/api/casinos/add', checkPermissions('manageCasinos'), (req, res) => {
   });
 });
 
-app.post('/api/casinos/update', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/update', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.body.id;
   const json_data = req.body.json_data;
 
@@ -1143,7 +1143,7 @@ app.post('/api/casinos/update', checkPermissions('manageCasinos'), (req, res) =>
   });
 });
 
-app.post('/api/casinos/delete', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/delete', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM casinos WHERE id = ?', [id], (err, result) => {
@@ -1153,7 +1153,7 @@ app.post('/api/casinos/delete', checkPermissions('manageCasinos'), (req, res) =>
   });
 });
 
-app.post('/api/casinos/deploy', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/deploy', checkPermissions('manageCasinos'), (req, res) => {
   db.query('SELECT json_data FROM casinos', (err, results) => {
       if (err) throw err;
 
@@ -1176,7 +1176,7 @@ app.post('/api/casinos/deploy', checkPermissions('manageCasinos'), (req, res) =>
   });
 });
 
-app.post('/api/casinos/backup/create', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/backup/create', checkPermissions('manageCasinos'), (req, res) => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -1195,7 +1195,7 @@ app.post('/api/casinos/backup/create', checkPermissions('manageCasinos'), (req, 
   });
 });
 
-app.post('/api/casinos/backup/delete', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/backup/delete', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the selected table
@@ -1206,7 +1206,7 @@ app.post('/api/casinos/backup/delete', checkPermissions('manageCasinos'), (req, 
   });
 });
 
-app.post('/api/casinos/backup/show', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/backup/show', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Check if the table name starts with 'bk_casinos_'
@@ -1223,7 +1223,7 @@ app.post('/api/casinos/backup/show', checkPermissions('manageCasinos'), (req, re
   });
 });
 
-app.get('/api/casinos/backup/get', checkPermissions('manageCasinos'), (req, res) => {
+app.get(apiPath + '/casinos/backup/get', checkPermissions('manageCasinos'), (req, res) => {
   db.query("SHOW TABLES LIKE 'bk_casinos_%'", (err, results) => {
       if (err) throw err;
 
@@ -1234,7 +1234,7 @@ app.get('/api/casinos/backup/get', checkPermissions('manageCasinos'), (req, res)
   });
 });
 
-app.post('/api/casinos/backup/restore', checkPermissions('manageCasinos'), (req, res) => {
+app.post(apiPath + '/casinos/backup/restore', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the existing 'data' table
@@ -1279,7 +1279,7 @@ schedule.scheduleJob('0 0 * * *', () => {
 });
 
 
-app.get('/api/faq/get', checkPermissions('manageFaq'), (req, res) => {
+app.get(apiPath + '/faq/get', checkPermissions('manageFaq'), (req, res) => {
   db.query('SELECT * FROM faq', (err, results) => {
       if (err) throw err;
 
@@ -1287,7 +1287,7 @@ app.get('/api/faq/get', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.post('/api/faq/add', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/add', checkPermissions('manageFaq'), (req, res) => {
   const question = req.body.question;
   const answer = req.body.answer;
   const sortingorder = req.body.sortingorder;
@@ -1303,7 +1303,7 @@ app.post('/api/faq/add', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.post('/api/faq/deploy', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/deploy', checkPermissions('manageFaq'), (req, res) => {
   db.query('SELECT * FROM faq', (err, results) => {
       if (err) throw err;
 
@@ -1315,7 +1315,7 @@ app.post('/api/faq/deploy', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.post('/api/faq/update', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/update', checkPermissions('manageFaq'), (req, res) => {
   const id = req.body.id;
   const question = req.body.question;
   const answer = req.body.answer;
@@ -1328,7 +1328,7 @@ app.post('/api/faq/update', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.post('/api/faq/delete', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/delete', checkPermissions('manageFaq'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM faq WHERE id = ?', [id], (err, result) => {
@@ -1338,7 +1338,7 @@ app.post('/api/faq/delete', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.get('/api/faq/backup/get', checkPermissions('manageFaq'), (req, res) => {
+app.get(apiPath + '/faq/backup/get', checkPermissions('manageFaq'), (req, res) => {
   db.query("SHOW TABLES LIKE 'bk_faq_%'", (err, results) => {
       if (err) throw err;
 
@@ -1349,7 +1349,7 @@ app.get('/api/faq/backup/get', checkPermissions('manageFaq'), (req, res) => {
   });
 });
 
-app.post('/api/faq/backup/restore', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/backup/restore', checkPermissions('manageFaq'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the existing 'data' table
@@ -1371,7 +1371,7 @@ app.post('/api/faq/backup/restore', checkPermissions('manageFaq'), (req, res) =>
   });
 });
 
-app.post('/api/faq/backup/delete', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/backup/delete', checkPermissions('manageFaq'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the selected table
@@ -1382,7 +1382,7 @@ app.post('/api/faq/backup/delete', checkPermissions('manageFaq'), (req, res) => 
   });
 });
 
-app.post('/api/faq/backup/show', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/backup/show', checkPermissions('manageFaq'), (req, res) => {
 const tableName = req.body.table;
 
 // Check if the table name starts with 'bk_data_'
@@ -1399,7 +1399,7 @@ db.query(`SELECT * FROM ${tableName}`, (err, result) => {
 });
 });
 
-app.post('/api/faq/backup/create', checkPermissions('manageFaq'), (req, res) => {
+app.post(apiPath + '/faq/backup/create', checkPermissions('manageFaq'), (req, res) => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -1489,7 +1489,7 @@ app.get('/casino/:name', (req, res) => {
   });
 });
 
-app.get('/api/faq', (req, res) => {
+app.get(apiPath + '/faq', (req, res) => {
   fs.readFile('private/data/faq.json', 'utf8', (err, data) => {
     if (err) {
       console.error(err);
@@ -1503,7 +1503,7 @@ app.get('/api/faq', (req, res) => {
 // Rest of the code...
 
 // const fs = require('fs');
-app.get('/api/casinos/htmldiv', (req, res) => {
+app.get(apiPath + '/casinos/htmldiv', (req, res) => {
   fs.readFile('private/data/casinos.json', 'utf8', (err, data) => {
     // Error handling
     if (err) {
@@ -1825,7 +1825,7 @@ app.get('/api/casinos/htmldiv', (req, res) => {
 });
 
 // Read data from casinos.json using fs.readFile
-app.get('/api/casinos', (req, res) => {
+app.get(apiPath + '/casinos', (req, res) => {
   fs.readFile('private/data/casinos.json', 'utf8', (err, data) => {
     if (err) {
       console.error(err);
@@ -1913,7 +1913,7 @@ app.get('/go/:casino', (req, res) => {
   });
 });
 
-app.get('/api/link-hits', (req, res) => {
+app.get(apiPath + '/link-hits', (req, res) => {
   db.all('SELECT name, COUNT(*) AS hits FROM link_hits GROUP BY name', (err, rows) => {
     if (err) {
       console.error(err);
