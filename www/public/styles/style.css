@@ -2,6 +2,9 @@
   background-color: beige;
 }
 
+.ui.menu.fixed {
+  z-index: 1001;
+}
 
 #scroll {
   position:fixed;

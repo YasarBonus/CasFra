@@ -32,5 +32,142 @@
   </script>
   <noscript><p><img src="//analytics.yasarbonus.com/matomo.php?idsite=13&amp;rec=1" style="border:0;" alt="" /></p></noscript>
   <!-- End Matomo Code -->
+
+  <script>
+    
+    function showActionButton(button, status, title, message) {
+      var actionButton = document.getElementById(button);
+      actionButton.textContent = ''; // Clear the button content
+
+      var icon = document.createElement('i');
+      icon.classList.add('icon');
+
+      if (status === 'save') {
+          icon.classList.add('save');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Save';
+      } else if (status === 'register') {
+          icon.classList.add('user');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Register';
+      } else if (status === 'loading') {
+          icon.classList.add('loading', 'spinner');
+          actionButton.classList.replace('green', 'yellow');
+          actionButton.classList.add('disabled');
+          actionButton.textContent = 'loading';
+      } else if (status === 'success') {
+          icon.classList.remove('lock');
+          icon.classList.add('check');
+          actionButton.classList.add('green', 'disabled');
+          actionButton.textContent = 'Saved';
+          setTimeout(function() {
+              showActionButton(button, 'save');
+          }, 2000);
+          showToast(status, title, message);
+      } else if (status === 'error') {
+          icon.classList.add('close');
+          actionButton.classList.replace('yellow', 'red');
+          actionButton.classList.add('disabled');
+          actionButton.textContent = 'Error';
+          setTimeout(function() {
+              showActionButton(button, 'save');
+          }, 2000);
+          showToast(status, title, message);
+      } else if (status === 'logout') {
+          icon.classList.add('sign', 'out', 'alternate');
+          actionButton.classList.add('red');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Logout';
+      } else if (status === 'disabled') {
+          icon.classList.add('lock');
+          actionButton.classList.add('disabled');
+          actionButton.textContent = 'Disabled';
+      } else if (status === 'delete') {
+          icon.classList.add('trash');
+          actionButton.classList.add('red');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Delete';
+      }
+      actionButton.appendChild(icon);
+    }
+
+    function showToast(type, title, message) {
+      $.toast({
+        class: type,
+        title: title,
+        message: message,
+        displayTime: 'auto',
+        showProgress: 'top',
+        classProgress: 'blue',
+        className: {
+        toast: 'ui message'
+      }
+      });
+      }
+
+      function showLoader(div, status, title, message, icon) {
+      var loaderElement = document.getElementById(div);
+      loaderElement.textContent = ''; // Clear the loader content
+
+      var textLoader = document.createElement('div');
+
+      if (status === 'loading') {
+        textLoader.remove();
+        textLoader.classList.add('ui', 'text', 'loader');
+          loaderElement.classList.add('active');
+          textLoader.textContent = ''; // Clear the text content
+          textLoader.textContent = 'Loading';
+      } else if (status === 'success') {
+        textLoader.textContent = ''; // Clear the text content
+
+          loaderElement.classList.remove('active');
+      } else if (status === 'saving') {
+        textLoader.remove();
+
+        textLoader.classList.add('ui', 'text', 'loader');
+          loaderElement.classList.add('active');
+          textLoader.textContent = ''; // Clear the text content
+          textLoader.textContent = 'Requesting';
+      } else if (status === 'disabled') {
+        textLoader.remove();
+        textLoader.classList.add('ui', 'text');
+          loaderElement.classList.add('active');
+          textLoader.textContent = ''; // Clear the text content
+          textLoader.textContent = 'Disabled';
+      } else if (status === 'error') {
+        textLoader.remove();
+        textLoader.classList.add('ui', 'text', 'loader');
+          loaderElement.classList.add('active');
+          textLoader.textContent = ''; // Clear the text content
+          textLoader.textContent = 'Error';
+      }
+      loaderElement.appendChild(textLoader);
+    }
+
+  </script>
+  
+</head>
+
+      
+      var textLoader = document.createElement('div');
+      textLoader.classList.add('ui', 'text', 'loader');
+
+      if (status === 'loading') {
+          loaderElement.classList.add('active');
+          textLoader.innerText = 'hi';
+
+      } else if (status === 'success') {
+          loaderElement.classList.remove('active');
+      } else if (status === 'saving') {
+        console.log('saving');
+          loaderElement.classList.add('active');
+          textLoader.textContent = 'Saving...';
+      }
+      // loaderElement.appendChild(icon);
+    }
+
+  </script>
   
 </head>

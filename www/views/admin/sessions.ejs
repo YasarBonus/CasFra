@@ -1,0 +1,49 @@
+<!-- sessions.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                <div class="ui container">
+                    <h2>User Sessions</h2>
+                    <table class="ui celled table" id="sessionsTable">
+                        <thead>
+                            <tr>
+                                <th>Session</th>
+                                <th>Session ID</th>
+                                <th>Expires</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions"></tbody>
+                    </table>
+                </div>
+            </div>
+                
+                <script>
+                    $(document).ready(function() {
+                        $.get('/api/sessions', function(data) {
+                            data.forEach(function(session) {
+                                $('#sessions').append(`
+                                    <tr>
+                                        <td style="max-width:200px">${session.session}</td>
+                                        <td>${session.sid}</td>
+                                        <td>${session.expires}</td>
+                                        <td><button class="ui red button" onclick="endSession('${session.sid}')">End Session</button></td>
+                                    </tr>
+                                `);
+                            });
+                        });
+                    });
+                
+                    function endSession(sessionId) {
+                        $.post('/api/sessions/end', { sessionId: sessionId }, function() {
+                            location.reload();
+                        });
+                    }
+                </script>
+</html>

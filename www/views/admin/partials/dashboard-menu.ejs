@@ -1,45 +1,72 @@
 <div class="ui small menu">
-    <a class="item" href="/dashboard">
-      Dashboard
-    </a>
-    <a class="item" href="/dashboard/casinos">Casinos</a>
-
-      <a class="item" href="/dashboard/faq">FAQ</a>
-
-    <div class="ui dropdown item">
-        Links <i class="dropdown icon"></i>
-        <div class="menu">
-          <a class="disabled item">Manage</a>
-          <a href="/dashboard/links/statistics" class="item">Statistics</a>
-        </div>
-      </div>
-      <div class="ui dropdown item">
-        Media <i class="dropdown icon"></i>
-        <div class="menu">
-            <a href="/dashboard/media/casinos" class="item">Casinos</a>
-            <a href="/dashboard/media/provider" class="item">Provider</a>
-            <a href="/dashboard/media/paymentmethods" class="item">Payment Methods</a>
-
-        </div>
-      </div>
-      <a class="disabled item" href="/dashboard/provider">Provider</a>
-      <a class="disabled item" href="/dashboard/paymentmethods">Payment Methods</a>
-    <div class="right menu">
+    <% if (user.permissions.includes('viewDashboard')) { %>
+        <a class="item" href="/dashboard">Dashboard</a>
+    <% } %>
+    <% if (user.permissions.includes('manageCasinos')) { %>
+        <a class="item" href="/dashboard/casinos">Casinos</a>
+    <% } %>
+    <% if (user.permissions.includes('manageFaq')) { %>
+        <a class="item" href="/dashboard/faq">Faq</a>
+    <% } %>
+    <% if (user.permissions.includes('manageLinks')) { %>
         <div class="ui dropdown item">
-            Users <i class="dropdown icon"></i>
+            Links <i class="dropdown icon"></i>
             <div class="menu">
-                <a href="/dashboard/registrationkeys" class="item">Registration Keys</a>
+              <a class="disabled item">Manage</a>
+              <a href="/dashboard/links/statistics" class="item">Statistics</a>
+            </div>
+          </div>
+    <% } %>
+    <% if (user.permissions.includes('manageCasinos') || user.permissions.includes('manageProvider') || user.permissions.includes('managePaymentMethods')) { %>
+        <div class="ui dropdown item">
+            Media <i class="dropdown icon"></i>
+            <div class="menu">
+                <% if (user.permissions.includes('manageCasinos')) { %>
+                    <a class="item" href="/dashboard/media/casinos">Casinos</a>
+                <% } %>
+                <% if (user.permissions.includes('manageProvider')) { %>
+                    <a class="item" href="/dashboard/media/provider">Provider</a>
+                <% } %>
+                <% if (user.permissions.includes('managePaymentMethods')) { %>
+                    <a class="item" href="/dashboard/media/paymentmethods">Payment Methods</a>
+                <% } %>
+            </div>
+          </div>
+    <% } %>
+    
+    <div class="right menu">
+        <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
+            || user.permissions.includes('manageSessions')) { %>
+            <div class="ui dropdown item">
+                Super <i class="dropdown icon"></i>
+                <div class="menu">
+                    <% if (user.permissions.includes('manageRegistrationKeys')) { %>
+                        <a class="item" href="/dashboard/super/registrationkeys">Registration Keys</a>
+                    <% } %>
+                    <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
+                        <a class="item" href="/dashboard/super/sessions">User Sessions</a>
+                    <% } %>
+                </div>
+              </div>
+              
+        <% } %>
+        
+          <div class="ui dropdown item">
+            <i class="user icon"></i><%= user.username %> <i class="dropdown icon"></i>
+            <div class="menu">
+                <a href="/dashboard/account" class="item">Manage Account</a>
  
             </div>
           </div>
       <div class="item">
-        <div class="ui primary button" onclick="callLogoutAPI()">Logout</div>
+        <div id="logoutButton" class="ui right labeled icon button" onclick="callLogoutAPI()">Logout</div>
     </div>
   </div>
 </div>
   <script>
-
+showActionButton('logoutButton', 'logout'); 
     callLogoutAPI = () => {
+      showActionButton('logoutButton', 'loading'); 
       $.ajax({
         url: '/api/auth/logout',
         type: 'POST',

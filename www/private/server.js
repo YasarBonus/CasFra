@@ -4,13 +4,18 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const schedule = require('node-schedule');
+const fs = require('fs');
 const MySQLStore = require('connect-mysql')(session);
 const multer = require('multer');
 const path = require('path');
+const ejs = require('ejs');
+
+const sendPasswordResetEmail = require('./functions/emailService');
 
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static('public'));
@@ -112,12 +117,53 @@ db.connect((err) => {
         username VARCHAR(255) NOT NULL,
         password VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
+        language VARCHAR(255) NOT NULL,
         UNIQUE (username)
     )`;
 
     db.query(createUsersTableQuery, (err, result) => {
         if (err) throw err;
         console.log('Users table created or already exists');
+    });
+
+    const createUserPersonalTableQuery = `CREATE TABLE IF NOT EXISTS user_personal (
+      user_id INT AUTO_INCREMENT PRIMARY KEY,
+      firstname VARCHAR(255) NOT NULL,
+      middlename VARCHAR(255) NOT NULL,
+      lastname VARCHAR(255) NOT NULL,
+      nationality VARCHAR(255) NOT NULL,
+      street VARCHAR(255) NOT NULL,
+      housenumber VARCHAR(255) NOT NULL,
+      zipcode VARCHAR(255) NOT NULL,
+      city VARCHAR(255) NOT NULL,
+      country VARCHAR(255) NOT NULL,
+      phone VARCHAR(255) NOT NULL,
+      mobile VARCHAR(255) NOT NULL,
+      UNIQUE (mobile))`;
+
+      db.query(createUserPersonalTableQuery, (err, result) => {
+        if (err) throw err;
+        console.log('User Personal table created or already exists');
+    });
+
+    const createUserShippingTableQuery = `CREATE TABLE IF NOT EXISTS user_shipping (
+      user_id INT AUTO_INCREMENT PRIMARY KEY,
+      firstname VARCHAR(255) NOT NULL,
+      middlename VARCHAR(255) NOT NULL,
+      lastname VARCHAR(255) NOT NULL,
+      street VARCHAR(255) NOT NULL,
+      housenumber VARCHAR(255) NOT NULL,
+      addition VARCHAR(255) NOT NULL,
+      zipcode VARCHAR(255) NOT NULL,
+      city VARCHAR(255) NOT NULL,
+      country VARCHAR(255) NOT NULL,
+      phone VARCHAR(255) NOT NULL,
+      mobile VARCHAR(255) NOT NULL,
+      UNIQUE (mobile))`;
+
+      db.query(createUserShippingTableQuery, (err, result) => {
+        if (err) throw err;
+        console.log('User Shipping table created or already exists');
     });
 
     // Insert initial data if table is empty
@@ -298,22 +344,9 @@ app.post('/api/user/:userId/group/:groupId', checkLoggedIn, checkPermissions('ma
   });
 });
 
-app.get('/login', (req, res) => {
-  res.render('admin/login');
-});
-
-app.get('/dashboard/account', checkLoggedIn, (req, res) => {
-  res.render('admin/account');
-});
-
 app.post('/api/auth/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-
-  // End previous session if user is already logged in
-  if (req.session.user) {
-    req.session.destroy();
-  }
 
   db.query('SELECT * FROM users WHERE username = ?', [username], (err, result) => {
     if (err) {
@@ -331,8 +364,26 @@ app.post('/api/auth/login', (req, res) => {
         }
 
         if (response) {
-          req.session.user = result;
-          res.redirect('/dashboard');
+          req.session.user = {
+            id: result[0].id,
+            username: result[0].username,
+            email: result[0].email,
+            permissions: [] // Initialize permissions array
+          };
+
+          // Get user permissions
+          db.query('SELECT GROUP_CONCAT(permissions) AS permissions FROM user_group_permissions WHERE id IN (SELECT group_id FROM user_group_assignments WHERE user_id = ?)', [result[0].id], (err, permissionResults) => {
+            if (err) {
+              console.error(err);
+              res.status(500).send('Server error');
+              return;
+            }
+
+            req.session.user.permissions = permissionResults[0].permissions.split(',');
+            console.log('Logged in', req.session.user);
+            res.redirect('/dashboard');
+          });
+          
         } else {
           res.send('Incorrect username and/or password!');
         }
@@ -343,7 +394,30 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-app.get('/api/auth/users', (req, res) => {
+// Route, um die Sitzungsdaten abzurufen
+app.get('/api/sessions', checkPermissions('superAdmin'),(req, res) => {
+  const query = 'SELECT * FROM sessions';
+
+  db.query(query, (err, rows) => {
+    if (err) throw err;
+
+    res.json(rows);
+  });
+});
+
+// Route, um die Sitzung zu beenden
+app.post('/api/sessions/end', checkPermissions('superAdmin'),(req, res) => {
+  const sessionId = req.body.sessionId;
+  const query = 'DELETE FROM sessions WHERE sid = ?';
+
+  db.query(query, [sessionId], (err) => {
+    if (err) throw err;
+
+    res.json({ success: true });
+  });
+});
+
+app.get('/api/users', (req, res) => {
   db.query('SELECT * FROM users', (err, results) => {
     if (err) throw err;
 
@@ -351,7 +425,7 @@ app.get('/api/auth/users', (req, res) => {
   });
 });
 
-app.get('/api/auth/user/:userID/groups', (req, res) => {
+app.get('/api/auth/user/:userID/groups', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
 
   db.query('SELECT * FROM user_group_assignments WHERE user_id = ?', [userID], (err, results) => {
@@ -361,7 +435,7 @@ app.get('/api/auth/user/:userID/groups', (req, res) => {
   });
 });
 
-app.get('/api/auth/user/:userID/groups/available', (req, res) => {
+app.get('/api/user/:userID/groups/available', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
 
   db.query('SELECT * FROM user_group_permissions WHERE id NOT IN (SELECT group_id FROM user_group_assignments WHERE user_id = ?)', [userID], (err, results) => {
@@ -371,7 +445,7 @@ app.get('/api/auth/user/:userID/groups/available', (req, res) => {
   });
 });
 
-app.post('/api/auth/user/:userID/groups/add', (req, res) => {
+app.post('/api/user/:userID/groups/add', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
   const groupID = req.body.groupID;
 
@@ -382,25 +456,50 @@ app.post('/api/auth/user/:userID/groups/add', (req, res) => {
   });
 });
 
-app.get('/api/auth/user', (req, res) => {
+app.get('/api/user', checkPermissions('manageAccount'), (req, res) => {
   const user = req.session.user;
   res.json(user);
+  console.log('Session User Data:', req.session.user);
 });
 
-app.post('/api/auth/user/edit', (req, res) => {
-  const userId = req.body.userId;
-  const userName = req.body.userName;
-  const userPassword = req.body.userPassword;
-  const userEmail = req.body.userEmail;
+app.get('/api/user/personal', checkPermissions('manageAccount'), (req, res) => {
+  const userId = req.session.user.id;
+  db.query('SELECT * FROM user_personal WHERE user_id = ?', [userId], (err, results) => {
+    if (err) throw err;
 
-  db.query('UPDATE users SET username = ?, password = ? , email = ? WHERE id = ?', [userName, userPassword, userEmail, userId], (err, result) => {
-      if (err) throw err;
+    const data = results[0]; // Get the first result from the array
 
-      res.redirect('/dashboard');
+    res.json(data);
   });
 });
 
-app.post('/api/auth/user/delete', (req, res) => {
+app.use(express.urlencoded({ extended: true })); // Middleware zum Parsen von URL-kodierten Formulardaten
+
+app.post('/api/user/edit', (req, res) => {
+  const userId = req.session.user.id;
+  const userName = req.body.userName;
+  const userEmail = req.body.userEmail;
+  // const userLanguage = req.body.userLanguage;
+  const userLanguage = 'en';
+
+  const userQuery = 'UPDATE users SET username = ?, email = ?, language = ? WHERE id = ?';
+  db.query(userQuery, [userName, userEmail, userLanguage, userId], (error) => {
+    if (error) throw error;
+
+    // Update session information with new values
+    req.session.user.username = userName;
+    req.session.user.email = userEmail;
+    req.session.user.language = userLanguage;
+
+    res.json({ success: true });
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
   const userId = req.body.userId;
 
   db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
@@ -410,7 +509,7 @@ app.post('/api/auth/user/delete', (req, res) => {
   });
 });
 
-app.post('/api/auth/user/add', (req, res) => {
+app.post('/api/user/add', checkPermissions('manageUsers'), (req, res) => {
   const userName = req.body.userName;
   const userPassword = req.body.userPassword;
 
@@ -421,7 +520,7 @@ app.post('/api/auth/user/add', (req, res) => {
   });
 });
 
-app.get('/api/auth/groups', (req, res) => {
+app.get('/api/user/groups', checkPermissions('manageUserGroups'), (req, res) => {
   db.query('SELECT * FROM user_group_permissions', (err, results) => {
     if (err) throw err;
 
@@ -429,7 +528,7 @@ app.get('/api/auth/groups', (req, res) => {
   });
 });
 
-app.post('/api/auth/group/add', (req, res) => {
+app.post('/api/user/groups/add', checkPermissions('manageUserGroups'),(req, res) => {
   const groupName = req.body.groupName;
   const groupPermissions = req.body.groupPermissions;
 
@@ -440,7 +539,7 @@ app.post('/api/auth/group/add', (req, res) => {
   });
 });
 
-app.post('/api/auth/group/edit', (req, res) => {
+app.post('/api/user/groups/edit', checkPermissions('manageUserGroups'),(req, res) => {
   const groupId = req.body.groupId;
   const groupName = req.body.groupName;
   const groupPermissions = req.body.groupPermissions;
@@ -452,7 +551,7 @@ app.post('/api/auth/group/edit', (req, res) => {
   });
 });
 
-app.post('/api/auth/group/delete', (req, res) => {
+app.post('/api/user/groups/delete', checkPermissions('manageUserGroups'),(req, res) => {
   const groupId = req.body.groupId;
 
   db.query('DELETE FROM user_group_permissions WHERE id = ?', [groupId], (err, result) => {
@@ -462,7 +561,7 @@ app.post('/api/auth/group/delete', (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', checkLoggedIn, (req, res) => {
     req.session.destroy(err => {
         if (err) throw err;
         console.log('Logged out');
@@ -470,9 +569,8 @@ app.post('/api/auth/logout', (req, res) => {
     });
 });
 
-app.get('/register', (req, res) => {
-  res.render('admin/register');
-});
+
+
 
 app.post('/api/auth/register', (req, res) => {
   const username = req.body.username;
@@ -524,7 +622,85 @@ app.post('/api/auth/register', (req, res) => {
   });
 });
 
-app.get('/api/auth/regkeys', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
+app.post('/api/auth/reset-password', (req, res) => {
+  const email = req.body.email;
+  const userID = req.body.userID;
+  const username = req.body.username;
+
+  // Check if email, userID, or username is provided
+  if (!email && !userID && !username) {
+    res.status(400).send('Please provide email, userID, or username');
+    return;
+  }
+
+  let query;
+  let queryParams;
+
+  // Determine the query based on the provided parameter
+  if (email) {
+    query = 'SELECT * FROM users WHERE LOWER(email) = LOWER(?)';
+    queryParams = [email];
+  } else if (userID) {
+    query = 'SELECT * FROM users WHERE ID = ?';
+    queryParams = [userID];
+  } else {
+    query = 'SELECT * FROM users WHERE LOWER(username) = LOWER(?)';
+    queryParams = [username];
+  }
+
+  db.query(query, queryParams, (err, results) => {
+    if (err) throw err;
+
+    if (results.length === 0) {
+      res.status(400).send('User not found');
+      return;
+    }
+
+    const user = results[0];
+
+    // Generate a new password
+    const newPassword = Math.random().toString(36).substr(2, 10);
+
+    // Update the user's password in the database
+    bcrypt.hash(newPassword, 10, (err, hash) => {
+      if (err) throw err;
+      console.log ('New Password:', newPassword)
+      db.query('UPDATE users SET password = ? WHERE ID = ?', [hash, user.userID], (err, result) => {
+        if (err) throw err;
+
+        // Send the new password to the user's email address
+        sendPasswordResetEmail(user.email, newPassword);
+
+        res.status(200).send('Password reset successful');
+      });
+    });
+  });
+});
+
+app.post('/api/auth/password/reset', (req, res) => {
+  const userId = req.body.userId;
+  const newPassword = req.body.newPassword;
+
+  bcrypt.hash(newPassword, 10, (err, hash) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    db.query('UPDATE users SET password = ? WHERE id = ?', [hash, userId], (err, result) => {
+      if (err) {
+        console.error('Error updating password:', err);
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+      }
+
+      res.json({ success: true });
+    });
+  });
+});
+
+app.get('/api/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
   db.query('SELECT * FROM registration_keys', (err, results) => {
       if (err) throw err;
 
@@ -532,7 +708,7 @@ app.get('/api/auth/regkeys', checkLoggedIn, checkPermissions('manageUsers'), (re
   });
 });
 
-app.post('/api/auth/regkeys/add', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
+app.post('/api/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = req.body.regkey;
 
   db.query('INSERT INTO registration_keys (regkey) VALUES (?)', [regkey], (err, result) => {
@@ -542,7 +718,7 @@ app.post('/api/auth/regkeys/add', checkLoggedIn, checkPermissions('manageUsers')
   });
 });
 
-app.post('/api/auth/regkeys/generate', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
+app.post('/api/auth/regkeys/generate',  checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = Math.random().toString(36).substr(2, 10);
 
   db.query('INSERT INTO registration_keys (regkey) VALUES (?)', [regkey], (err, result) => {
@@ -553,7 +729,7 @@ app.post('/api/auth/regkeys/generate', checkLoggedIn, checkPermissions('manageUs
   });
 });
 
-app.post('/api/auth/regkeys/delete', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
+app.post('/api/auth/regkeys/delete',  checkPermissions('manageRegistrationKeys'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM registration_keys WHERE id = ?', [id], (err, result) => {
@@ -581,23 +757,20 @@ function checkLoggedIn(req, res, next) {
 function checkPermissions(requiredPermission) {
   return function(req, res, next) {
     if (!req.session.user) {
-      res.status(401).send('Unauthorized');
+      res.status(401).json({ error: 'Unauthorized' });
       return;
     }
     const user = req.session.user;
-    console.log(req.session.user.id);
-    console.log(user);
-    console.log(requiredPermission);
-    console.log(user.username);
+    const userId = req.session.user.id;
 
-    const getGroupIdQuery = 'SELECT group_id FROM user_group_assignments WHERE user_id = 2';
-    db.query(getGroupIdQuery, [user.id], (err, results) => {
+    const getGroupIdQuery = 'SELECT group_id FROM user_group_assignments WHERE user_id = ?';
+    db.query(getGroupIdQuery, [userId], (err, results) => {
       if (err) {
         console.error(err);
-        res.status(500).send('Server error');
+        res.status(500).json({ error: 'Server error' });
       } else {
         if (results.length === 0) {
-          res.status(403).send('Forbidden');
+          res.status(403).json({ error: 'Forbidden' });
           return;
         }
 
@@ -607,14 +780,14 @@ function checkPermissions(requiredPermission) {
         db.query(getPermissionsQuery, [groupId], (err, results) => {
           if (err) {
             console.error(err);
-            res.status(500).send('Server error');
+            res.status(500).json({ error: 'Server error' });
           } else {
             const permissions = results[0].permissions.split(',');
 
             if (permissions.includes(requiredPermission)) {
               next();
             } else {
-              res.status(403).send('Forbidden');
+              res.status(403).json({ error: 'Forbidden' });
             }
           }
         });
@@ -623,26 +796,114 @@ function checkPermissions(requiredPermission) {
   };
 }
 
-// Dashboard route
-app.get('/dashboard', checkLoggedIn, checkPermissions('dashboard'), (req, res) => {
-  console.log(req.session.user);
-  res.render('admin/dashboard');
+app.get('/login', (req, res) => {
+  res.render('admin/login');
 });
 
-// Dashboard route
-app.get('/dashboard/links/statistics', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-
-  res.render('admin/statistics');
+app.get('/register', (req, res) => {
+  res.render('admin/register');
 });
 
-app.get('/dashboard/registrationkeys', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
-  console.log(req.session.user);
-
-  res.render('admin/registration-keys');
+app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/dashboard', { user: user });
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get('/api/links/hits', checkLoggedIn, (req, res) => {
+app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/account', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/links/statistics', checkPermissions('manageLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/statistics', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/registration-keys', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/super/sessions', checkPermissions('superAdmin'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/sessions', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/faq', checkPermissions('manageFaq'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/faq', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/casinos', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/media/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/media_casinos', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/media/paymentmethods', checkPermissions('managePaymentMethods'), checkLoggedIn, (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/media_paymentmethods', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/media/provider', checkPermissions('manageProvider'), checkLoggedIn, (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/media_provider', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+app.get('/api/links/hits', checkPermissions('manageLinks'),(req, res) => {
   db.query('SELECT * FROM link_hits', (err, results) => {
     if (err) throw err;
 
@@ -650,7 +911,7 @@ app.get('/api/links/hits', checkLoggedIn, (req, res) => {
   });
 });
 
-app.get('/api/links/count', checkLoggedIn, (req, res) => {
+app.get('/api/links/count', checkPermissions('manageLinks'), (req, res) => {
   db.query('SELECT * FROM link_hits_count', (err, results) => {
     if (err) throw err;
 
@@ -658,28 +919,10 @@ app.get('/api/links/count', checkLoggedIn, (req, res) => {
   });
 });
 
-// Dashboard route
-app.get('/dashboard/faq', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-
-  res.render('admin/faq');
-});
-
-// Dashboard route
-app.get('/dashboard/casinos', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-
-  res.render('admin/casinos');
-});
-
-// Dashboard route
-app.get('/dashboard/media/casinos', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-  res.render('admin/media_casinos');
-});
 
 
-app.get('/api/media/casinos', function(req, res) {
+
+app.get('/api/media/casinos', checkPermissions('manageCasinos'), function(req, res) {
   fs.readdir(path.join('public/img/casinos'), function(err, files) {
     if (err) {
       console.error(err);
@@ -712,7 +955,7 @@ const uploadCasinoImages = multer({
   }
 });
 
-app.post('/api/media/casinos/upload', uploadCasinoImages.single('image'), function(req, res) {
+app.post('/api/media/casinos/upload', checkPermissions('manageCasinos'), uploadCasinoImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -722,7 +965,7 @@ app.post('/api/media/casinos/upload', uploadCasinoImages.single('image'), functi
   res.json({ success: true });
 });
 
-app.post('/api/media/casinos/delete', function(req, res) {
+app.post('/api/media/casinos/delete', checkPermissions('manageCasinos'), function(req, res) {
   const imagePath = path.join('public/img/casinos', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -738,13 +981,10 @@ app.post('/api/media/casinos/delete', function(req, res) {
 
 
 // Dashboard route
-app.get('/dashboard/media/paymentmethods', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-  res.render('admin/media_paymentmethods');
-});
 
 
-app.get('/api/media/paymentmethods', function(req, res) {
+
+app.get('/api/media/paymentmethods', checkPermissions('managePaymentMethods'), function(req, res) {
   fs.readdir(path.join('public/img/paymentmethods'), function(err, files) {
     if (err) {
       console.error(err);
@@ -777,7 +1017,7 @@ const uploadPaymentmethodsImages = multer({
   }
 });
 
-app.post('/api/media/paymentmethods/upload', uploadPaymentmethodsImages.single('image'), function(req, res) {
+app.post('/api/media/paymentmethods/upload', checkPermissions('managePaymentMethods'), uploadPaymentmethodsImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -787,7 +1027,7 @@ app.post('/api/media/paymentmethods/upload', uploadPaymentmethodsImages.single('
   res.json({ success: true });
 });
 
-app.post('/api/media/paymentmethods/delete', function(req, res) {
+app.post('/api/media/paymentmethods/delete', checkPermissions('managePaymentMethods'), function(req, res) {
   const imagePath = path.join('public/img/paymentmethods', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -802,13 +1042,10 @@ app.post('/api/media/paymentmethods/delete', function(req, res) {
 });
 
 // Dashboard route
-app.get('/dashboard/media/provider', checkLoggedIn, (req, res) => {
-  console.log(req.session.user);
-  res.render('admin/media_provider');
-});
 
 
-app.get('/api/media/provider', function(req, res) {
+
+app.get('/api/media/provider', checkPermissions('manageProvider'), function(req, res) {
   fs.readdir(path.join('public/img/provider'), function(err, files) {
     if (err) {
       console.error(err);
@@ -841,7 +1078,7 @@ const uploadProviderImages = multer({
   }
 });
 
-app.post('/api/media/provider/upload', uploadProviderImages.single('image'), function(req, res) {
+app.post('/api/media/provider/upload', checkPermissions('manageProvider'), uploadProviderImages.single('image'), function(req, res) {
   // Überprüfen Sie, ob ein Fehler aufgetreten ist
   if (req.fileValidationError) {
     return res.json({ error: req.fileValidationError });
@@ -851,7 +1088,7 @@ app.post('/api/media/provider/upload', uploadProviderImages.single('image'), fun
   res.json({ success: true });
 });
 
-app.post('/api/media/provider/delete', function(req, res) {
+app.post('/api/media/provider/delete', checkPermissions('manageProvider'), function(req, res) {
   const imagePath = path.join('public/img/provider', req.body.image);
 
   fs.unlink(imagePath, function(err) {
@@ -865,15 +1102,7 @@ app.post('/api/media/provider/delete', function(req, res) {
   });
 });
 
-app.get('/get-data', checkLoggedIn, (req, res) => {
-    db.query('SELECT * FROM data', (err, results) => {
-        if (err) throw err;
-
-        res.json(results);
-    });
-});
-
-app.get('/api/casinos/get', (req, res) => {
+app.get('/api/casinos/get', checkPermissions('manageCasinos'), (req, res) => {
   db.query('SELECT * FROM casinos', (err, results) => {
       if (err) throw err;
 
@@ -881,7 +1110,7 @@ app.get('/api/casinos/get', (req, res) => {
   });
 });
 
-app.get('/api/casinos/get/:id', (req, res) => {
+app.get('/api/casinos/get/:id', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.params.id;
 
   db.query('SELECT * FROM casinos WHERE id = ?', [id], (err, results) => {
@@ -891,7 +1120,7 @@ app.get('/api/casinos/get/:id', (req, res) => {
   });
 });
 
-app.post('/api/casinos/add', (req, res) => {
+app.post('/api/casinos/add', checkPermissions('manageCasinos'), (req, res) => {
   const json_data = req.body.json_data;
   console.log (json_data);
 
@@ -905,7 +1134,7 @@ app.post('/api/casinos/add', (req, res) => {
   });
 });
 
-app.post('/api/casinos/update', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/update', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.body.id;
   const json_data = req.body.json_data;
 
@@ -916,7 +1145,7 @@ app.post('/api/casinos/update', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/delete', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/delete', checkPermissions('manageCasinos'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM casinos WHERE id = ?', [id], (err, result) => {
@@ -926,7 +1155,7 @@ app.post('/api/casinos/delete', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/deploy', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/deploy', checkPermissions('manageCasinos'), (req, res) => {
   db.query('SELECT json_data FROM casinos', (err, results) => {
       if (err) throw err;
 
@@ -949,7 +1178,7 @@ app.post('/api/casinos/deploy', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/backup/create', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/backup/create', checkPermissions('manageCasinos'), (req, res) => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -968,7 +1197,7 @@ app.post('/api/casinos/backup/create', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/backup/delete', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/backup/delete', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the selected table
@@ -979,7 +1208,7 @@ app.post('/api/casinos/backup/delete', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/backup/show', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/backup/show', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Check if the table name starts with 'bk_casinos_'
@@ -996,7 +1225,7 @@ app.post('/api/casinos/backup/show', checkLoggedIn, (req, res) => {
   });
 });
 
-app.get('/api/casinos/backup/get', checkLoggedIn, (req, res) => {
+app.get('/api/casinos/backup/get', checkPermissions('manageCasinos'), (req, res) => {
   db.query("SHOW TABLES LIKE 'bk_casinos_%'", (err, results) => {
       if (err) throw err;
 
@@ -1007,7 +1236,7 @@ app.get('/api/casinos/backup/get', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/casinos/backup/restore', checkLoggedIn, (req, res) => {
+app.post('/api/casinos/backup/restore', checkPermissions('manageCasinos'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the existing 'data' table
@@ -1027,8 +1256,32 @@ app.post('/api/casinos/backup/restore', checkLoggedIn, (req, res) => {
   });
 });
 
+// Planen Sie eine Aufgabe, um ein Backup alle 24 Stunden zu erstellen
+schedule.scheduleJob('0 0 * * *', () => {
+  const currentDate = new Date();
+  const backupTableName = `bk_casinos_auto_${currentDate.toISOString().replace(/[-:.T]/g, '').slice(0, -5)}Z`;
 
-app.get('/api/faq/get', checkLoggedIn, (req, res) => {
+  db.query(`CREATE TABLE ${backupTableName} AS SELECT * FROM casinos`, (err, result) => {
+    if (err) throw err;
+
+    console.log(`Backup ${backupTableName} created`);
+  });
+});
+
+// Planen Sie eine Aufgabe, um Backups, die älter als 30 Tage sind, zu löschen
+schedule.scheduleJob('0 0 * * *', () => {
+  const date30DaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const oldestBackupTableName = `bk_casinos_auto_${date30DaysAgo.toISOString().replace(/[-:.T]/g, '').slice(0, -5)}Z`;
+
+  db.query(`DROP TABLE IF EXISTS ${oldestBackupTableName}`, (err, result) => {
+    if (err) throw err;
+
+    console.log(`Backup ${oldestBackupTableName} deleted`);
+  });
+});
+
+
+app.get('/api/faq/get', checkPermissions('manageFaq'), (req, res) => {
   db.query('SELECT * FROM faq', (err, results) => {
       if (err) throw err;
 
@@ -1036,7 +1289,7 @@ app.get('/api/faq/get', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/add', (req, res) => {
+app.post('/api/faq/add', checkPermissions('manageFaq'), (req, res) => {
   const question = req.body.question;
   const answer = req.body.answer;
   const sortingorder = req.body.sortingorder;
@@ -1052,7 +1305,7 @@ app.post('/api/faq/add', (req, res) => {
   });
 });
 
-app.post('/api/faq/deploy', checkLoggedIn, (req, res) => {
+app.post('/api/faq/deploy', checkPermissions('manageFaq'), (req, res) => {
   db.query('SELECT * FROM faq', (err, results) => {
       if (err) throw err;
 
@@ -1064,7 +1317,7 @@ app.post('/api/faq/deploy', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/update', checkLoggedIn, (req, res) => {
+app.post('/api/faq/update', checkPermissions('manageFaq'), (req, res) => {
   const id = req.body.id;
   const question = req.body.question;
   const answer = req.body.answer;
@@ -1077,7 +1330,7 @@ app.post('/api/faq/update', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/delete', checkLoggedIn, (req, res) => {
+app.post('/api/faq/delete', checkPermissions('manageFaq'), (req, res) => {
   const id = req.body.id;
 
   db.query('DELETE FROM faq WHERE id = ?', [id], (err, result) => {
@@ -1087,7 +1340,7 @@ app.post('/api/faq/delete', checkLoggedIn, (req, res) => {
   });
 });
 
-app.get('/api/faq/backup/get', checkLoggedIn, (req, res) => {
+app.get('/api/faq/backup/get', checkPermissions('manageFaq'), (req, res) => {
   db.query("SHOW TABLES LIKE 'bk_faq_%'", (err, results) => {
       if (err) throw err;
 
@@ -1098,7 +1351,7 @@ app.get('/api/faq/backup/get', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/backup/restore', checkLoggedIn, (req, res) => {
+app.post('/api/faq/backup/restore', checkPermissions('manageFaq'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the existing 'data' table
@@ -1120,7 +1373,7 @@ app.post('/api/faq/backup/restore', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/backup/delete', checkLoggedIn, (req, res) => {
+app.post('/api/faq/backup/delete', checkPermissions('manageFaq'), (req, res) => {
   const tableName = req.body.table;
 
   // Drop the selected table
@@ -1131,7 +1384,7 @@ app.post('/api/faq/backup/delete', checkLoggedIn, (req, res) => {
   });
 });
 
-app.post('/api/faq/backup/show', checkLoggedIn, (req, res) => {
+app.post('/api/faq/backup/show', checkPermissions('manageFaq'), (req, res) => {
 const tableName = req.body.table;
 
 // Check if the table name starts with 'bk_data_'
@@ -1148,7 +1401,7 @@ db.query(`SELECT * FROM ${tableName}`, (err, result) => {
 });
 });
 
-app.post('/api/faq/backup/create', checkLoggedIn, (req, res) => {
+app.post('/api/faq/backup/create', checkPermissions('manageFaq'), (req, res) => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -1166,215 +1419,6 @@ app.post('/api/faq/backup/create', checkLoggedIn, (req, res) => {
       res.json({ success: true });
   });
 });
-
-app.post('/add-data', (req, res) => {
-    const title = req.body.title;
-    const content = req.body.content;
-    console.log (title, content);
-
-    const bodyParser = require('body-parser');
-    app.use(bodyParser.json());
-
-    db.query('INSERT INTO data (title, content) VALUES (?, ?)', [title, content], (err, result) => {
-        if (err) throw err;
-
-        res.redirect('/dashboard');
-    });
-});
-
-app.post('/delete-data', checkLoggedIn, (req, res) => {
-    const id = req.body.id;
-
-    db.query('DELETE FROM data WHERE id = ?', [id], (err, result) => {
-        if (err) throw err;
-
-        res.json({ success: true });
-    });
-});
-
-app.post('/update-data', checkLoggedIn, (req, res) => {
-    const id = req.body.id;
-    const title = req.body.title;
-    const content = req.body.content;
-
-    db.query('UPDATE data SET title = ?, content = ? WHERE id = ?', [title, content, id], (err, result) => {
-        if (err) throw err;
-
-        res.json({ success: true });
-    });
-});
-
-const fs = require('fs');
-
-app.post('/save-data', checkLoggedIn, (req, res) => {
-    db.query('SELECT * FROM data', (err, results) => {
-        if (err) throw err;
-
-        fs.writeFile('data.json', JSON.stringify(results), (err) => {
-            if (err) throw err;
-
-            res.json({ success: true });
-        });
-    });
-});
-
-app.post('/load-data', checkLoggedIn, (req, res) => {
-    // ...
-    fs.readFile('data.json', 'utf8', (err, data) => {
-        if (err) throw err;
-
-        const jsonData = JSON.parse(data);
-
-        // Get all existing IDs from the database
-        db.query('SELECT id FROM data', (err, results) => {
-            if (err) throw err;
-
-            const existingIDs = results.map(result => result.id);
-
-            // Iterate through each item in the JSON data
-            jsonData.forEach(item => {
-                if (existingIDs.includes(item.id)) {
-                    // Entry with the same ID already exists, update it
-                    db.query('UPDATE data SET title = ?, content = ? WHERE id = ?', [item.title, item.content, item.id], (err, result) => {
-                        if (err) throw err;
-                    });
-                } else {
-                    // Entry with the same ID doesn't exist, insert it
-                    db.query('INSERT INTO data (id, title, content) VALUES (?, ?, ?)', [item.id, item.title, item.content], (err, result) => {
-                        if (err) throw err;
-                    });
-                }
-            });
-
-            // Delete entries with IDs not present in the JSON data
-            const jsonIDs = jsonData.map(item => item.id);
-            const deleteIDs = existingIDs.filter(id => !jsonIDs.includes(id));
-
-            if (deleteIDs.length > 0) {
-                db.query('DELETE FROM data WHERE id IN (?)', [deleteIDs], (err, result) => {
-                    if (err) throw err;
-                });
-            }
-
-            res.json({ success: true });
-        });
-    });
-});
-
-app.get('/load-json-data', (req, res) => {
-  const path = require('path');
-  fs.readFile(path.join(__dirname, 'data/casinos.json'), 'utf8', (err, data) => {
-      if (err) {
-          console.error(err);
-          res.status(500).send('Server error');
-          return;
-      }
-
-      const jsonData = JSON.parse(data);
-
-      if (!Array.isArray(jsonData) || jsonData.length === 0) {
-          res.status(400).send('Invalid JSON data');
-          return;
-      }
-
-      const createTableQuery = `CREATE TABLE IF NOT EXISTS json_data (id INT AUTO_INCREMENT PRIMARY KEY)`;
-
-      db.query(createTableQuery, (err, result) => {
-          if (err) throw err;
-
-          const addColumnQuery = `ALTER TABLE json_data ADD COLUMN IF NOT EXISTS data TEXT`;
-
-          db.query(addColumnQuery, (err, result) => {
-              if (err) throw err;
-
-              jsonData.forEach(item => {
-                  const insertQuery = `INSERT INTO json_data (data) VALUES (?)`;
-                  db.query(insertQuery, [JSON.stringify(item)], (err, result) => {
-                      if (err) throw err;
-                  });
-              });
-
-              res.json({ success: true });
-          });
-      });
-  });
-});
-
-
-app.get('/get-table-names', checkLoggedIn, (req, res) => {
-    db.query("SHOW TABLES LIKE 'bk_%'", (err, results) => {
-        if (err) throw err;
-
-        // Extract table names from the results
-        const tableNames = results.map(row => Object.values(row)[0]);
-
-        res.json(tableNames);
-    });
-});
-
-app.post('/restore-table', checkLoggedIn, (req, res) => {
-    const tableName = req.body.table;
-
-    // Drop the existing 'data' table
-    db.query('DROP TABLE IF EXISTS data', (err, result) => {
-        if (err) throw err;
-
-        // Create a new 'data' table and fill it with the data from the selected table
-        db.query(`CREATE TABLE data AS SELECT * FROM ${tableName}`, (err, result) => {
-            if (err) throw err;
-
-            res.json({ success: true });
-        });
-    });
-});
-
-app.post('/delete-table', checkLoggedIn, (req, res) => {
-    const tableName = req.body.table;
-
-    // Drop the selected table
-    db.query(`DROP TABLE ${tableName}`, (err, result) => {
-        if (err) throw err;
-
-        res.json({ success: true });
-    });
-});
-
-app.post('/show-table-data', checkLoggedIn, (req, res) => {
-  const tableName = req.body.table;
-
-  // Check if the table name starts with 'bk_data_'
-  if (!tableName.startsWith('bk_data_')) {
-      return res.status(400).json({ error: 'Ungültiger Tabellenname' });
-  }
-
-  // Query the database to get all data from the specified table
-  db.query(`SELECT * FROM ${tableName}`, (err, result) => {
-      if (err) throw err;
-
-      // Send the data as a response
-      res.json(result);
-  });
-});
-
-app.post('/create-backup', checkLoggedIn, (req, res) => {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    const hours = String(currentDate.getHours()).padStart(2, '0');
-    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, '0');
-    const backupTableName = `bk_data_${year}${month}${day}T${hours}${minutes}${seconds}${milliseconds}Z`;
-
-    // Create a new table and fill it with the data from the 'data' table
-    db.query(`CREATE TABLE ${backupTableName} AS SELECT * FROM data`, (err, result) => {
-        if (err) throw err;
-
-        res.json({ success: true });
-    });
-});
-
 
 app.get('/api', (req, res) => {
   // Hier kannst du deinen serverseitigen Code einfügen
@@ -1420,8 +1464,6 @@ app.get('/twitch-store', (req, res) => {
       user: user
   })
 });
-
-const ejs = require('ejs');
 
 app.get('/casino/:name', (req, res) => {
   const name = req.params.name.toLowerCase();
