@@ -17,6 +17,8 @@ const sendPasswordResetEmail = require('./functions/emailService');
 const app = express();
 const port = 3000;
 
+const apiPath = '/api';
+
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static('public'));
 app.set('view engine', 'ejs')
@@ -344,7 +346,7 @@ app.post('/api/user/:userId/group/:groupId', checkLoggedIn, checkPermissions('ma
   });
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post(apiPath + '/auth/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
