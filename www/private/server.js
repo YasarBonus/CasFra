@@ -15,7 +15,7 @@ const sendPasswordResetEmail = require('./functions/emailService');
 
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static('public'));
@@ -493,10 +493,6 @@ app.post('/api/user/edit', (req, res) => {
 
     res.json({ success: true });
   });
-});
-
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
 });
 
 app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
