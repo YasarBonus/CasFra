@@ -60,7 +60,7 @@
                                     url: '/api/user',
                                     type: 'GET',
                                     success: function(data) {
-                                        var userId = data.id; // Angenommen, die UserId wird als 'id' zurückgegeben
+                                        var userId = data.userId; // Angenommen, die UserId wird als 'id' zurückgegeben
 
                                         $.ajax({
                                             url: '/api/auth/password/reset',
@@ -92,7 +92,7 @@
                                 <h4 class="ui dividing header">Account Details  </h4>
                           <div class="field">
                             <label>Username</label>
-                            <input type="text" name="userName" placeholder="Benutzername">
+                            <input type="text" name="userUsername" placeholder="Benutzername">
                           </div>
                           <div class="field">
                             <label>E-Mail</label>
@@ -595,15 +595,17 @@
                             showLoader('formLoaderAccountDetails', 'saving');
 
                             showActionButton(button,'loading');
+
                             var formData = {
-                                userName: $('input[name="userName"]').val(),
+                                userId: '<%= user.userId %>',
+                                userUsername: $('input[name="userUsername"]').val(),
                                 userEmail: $('input[name="userEmail"]').val(),
                                 userLanguage: $('input[name="userLanguage"]').val()
                             };
-                            console.log(formData);
+                            console.log('form', formData);
                             $.ajax({
                                 type: 'POST',
-                                url: '/api/user/edit',
+                                url: '/api/user',
                                 data: formData,
                                 success: function(data) {
                                     console.log(data);
@@ -631,9 +633,9 @@
                             $(document).ready(function() {
                                 $.get('/api/user', function(data) {
                                     console.log(data);
-                                    $('input[name="userName"]').val(data.username);
-                                    $('input[name="userEmail"]').val(data.email);
-                                    $('input[name="userLanguage"]').val(data.language);
+                                    $('input[name="userUsername"]').val(data.userUsername);
+                                    $('input[name="userEmail"]').val(data.userEmail);
+                                    $('input[name="userLanguage"]').val(data.userLanguage);
 
                                     
                                     // Hide the dimmer loader

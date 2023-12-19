@@ -67,6 +67,31 @@ app.use(
 
 // Routen
 
+// ### /api/auth/login
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     description: Melden Sie sich mit Benutzername und Passwort an
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Erfolgreich angemeldet
+ *       400:
+ *         description: Ungültige Anmeldeinformationen
+ *       500:
+ *         description: Serverfehler
+ */
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -330,25 +355,12 @@ setInterval(() => {
   updateLinkHitsCount();
 }, 60000); // 10000 Millisekunden = 10 Sekunden
 
-app.post('/api/user/:userId/group/:groupId', checkLoggedIn, checkPermissions('manageUsers'), (req, res) => {
-  const { userId, groupId } = req.params;
-
-  const query = 'INSERT INTO user_groups (user_id, group_id) VALUES (?, ?)';
-  db.query(query, [userId, groupId], (err, result) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Server error');
-    } else {
-      res.send('User added to group');
-    }
-  });
-});
-
+// Login
 app.post('/api/auth/login', (req, res) => {
-  const username = req.body.username;
+  const userUsername = req.body.userUsername;
   const password = req.body.password;
 
-  db.query('SELECT * FROM users WHERE username = ?', [username], (err, result) => {
+  db.query('SELECT * FROM users WHERE username = ?', [userUsername], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send('Server error');
@@ -365,10 +377,10 @@ app.post('/api/auth/login', (req, res) => {
 
         if (response) {
           req.session.user = {
-            id: result[0].id,
-            username: result[0].username,
-            email: result[0].email,
-            permissions: [] // Initialize permissions array
+            userId: result[0].id,
+            userUsername: result[0].username,
+            userEmail: result[0].email,
+            userPermissions: [] // Initialize permissions array
           };
 
           // Get user permissions
@@ -379,7 +391,11 @@ app.post('/api/auth/login', (req, res) => {
               return;
             }
 
-            req.session.user.permissions = permissionResults[0].permissions.split(',');
+            if (permissionResults[0] && permissionResults[0].permissions) {
+              req.session.user.userPermissions = permissionResults[0].permissions.split(',');
+            } else {
+              req.session.user.userPermissions = [];
+            }
             console.log('Logged in', req.session.user);
             res.redirect('/dashboard');
           });
@@ -394,7 +410,16 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-// Route, um die Sitzungsdaten abzurufen
+// Logout
+app.post('/api/auth/logout', checkLoggedIn, (req, res) => {
+  req.session.destroy(err => {
+      if (err) throw err;
+      console.log('Logged out');
+      res.redirect('/login');
+  });
+});
+
+// Get all Sessions
 app.get('/api/sessions', checkPermissions('superAdmin'),(req, res) => {
   const query = 'SELECT * FROM sessions';
 
@@ -405,7 +430,7 @@ app.get('/api/sessions', checkPermissions('superAdmin'),(req, res) => {
   });
 });
 
-// Route, um die Sitzung zu beenden
+// End Session
 app.post('/api/sessions/end', checkPermissions('superAdmin'),(req, res) => {
   const sessionId = req.body.sessionId;
   const query = 'DELETE FROM sessions WHERE sid = ?';
@@ -417,7 +442,8 @@ app.post('/api/sessions/end', checkPermissions('superAdmin'),(req, res) => {
   });
 });
 
-app.get('/api/users', (req, res) => {
+// Get all users
+app.get('/api/users', checkPermissions('superAdmin'),(req, res) => {
   db.query('SELECT * FROM users', (err, results) => {
     if (err) throw err;
 
@@ -425,15 +451,81 @@ app.get('/api/users', (req, res) => {
   });
 });
 
-app.get('/api/auth/user/:userID/groups', checkPermissions('manageUsers'), (req, res) => {
-  const userID = req.params.userID;
+// Function to update user details
+function alterUser(req, res) {
+  const userId = req.body.userId;
+  const userUsername = req.body.userUsername;
+  const userEmail = req.body.userEmail;
+  const userPassword = req.body.userPassword;
+  const userLanguage = 'en';
+  if(req.session.user.userPermissions.includes('superAdmin') || userId === req.session.user.userId) {
+  if (!userId) {
+    const userPassword = req.body.userPassword;
 
-  db.query('SELECT * FROM user_group_assignments WHERE user_id = ?', [userID], (err, results) => {
-    if (err) throw err;
+    // Check if password is provided for new account
+    if (!userPassword) {
+      return res.status(400).json({ error: 'Password is required for new account' });
+    }
 
-    res.json(results);
-  });
-});
+    // Check if email is already in use
+    db.query('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [userEmail], (err, emailResults) => {
+      if (err) throw err;
+
+      if (emailResults.length > 0) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+
+      // Check if username is already in use
+      db.query('SELECT * FROM users WHERE LOWER(username) = LOWER(?)', [userUsername], (err, usernameResults) => {
+        if (err) throw err;
+
+        if (usernameResults.length > 0) {
+          return res.status(400).json({ error: 'Username already in use' });
+        }
+
+        // Insert new user into database
+        bcrypt.hash(userPassword, 10, (err, hash) => {
+          if (err) throw err;
+
+          db.query('INSERT INTO users (username, email, password, language) VALUES (?, ?, ?, ?)', [userUsername, userEmail, hash, userLanguage], (err, result) => {
+            if (err) throw err;
+
+            return res.json({ success: true });
+          });
+        });
+      });
+    });
+  } else {
+    // Update existing user
+    let updateQuery = 'UPDATE users SET username = ?, email = ? WHERE id = ?';
+    const updateQueryParams = [userUsername, userEmail, userId];
+
+    // Check if password is provided
+    if (userPassword) {
+      updateQuery = 'UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?';
+      bcrypt.hash(userPassword, 10, (err, hash) => {
+        if (err) throw err;
+
+        updateQueryParams.push(hash);
+
+        db.query(updateQuery, updateQueryParams, (err, result) => {
+          if (err) throw err;
+
+          return res.json({ success: true });
+        });
+      });
+    } else {
+      db.query(updateQuery, updateQueryParams, (err, result) => {
+        if (err) throw err;
+
+        return res.json({ success: true });
+      });
+    }
+  }}
+}
+
+app.post('/api/user', alterUser);
+
 
 app.get('/api/user/:userID/groups/available', checkPermissions('manageUsers'), (req, res) => {
   const userID = req.params.userID;
@@ -463,7 +555,7 @@ app.get('/api/user', checkPermissions('manageAccount'), (req, res) => {
 });
 
 app.get('/api/user/personal', checkPermissions('manageAccount'), (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.session.user.userId;
   db.query('SELECT * FROM user_personal WHERE user_id = ?', [userId], (err, results) => {
     if (err) throw err;
 
@@ -475,25 +567,9 @@ app.get('/api/user/personal', checkPermissions('manageAccount'), (req, res) => {
 
 app.use(express.urlencoded({ extended: true })); // Middleware zum Parsen von URL-kodierten Formulardaten
 
-app.post('/api/user/edit', (req, res) => {
-  const userId = req.session.user.id;
-  const userName = req.body.userName;
-  const userEmail = req.body.userEmail;
-  // const userLanguage = req.body.userLanguage;
-  const userLanguage = 'en';
 
-  const userQuery = 'UPDATE users SET username = ?, email = ?, language = ? WHERE id = ?';
-  db.query(userQuery, [userName, userEmail, userLanguage, userId], (error) => {
-    if (error) throw error;
 
-    // Update session information with new values
-    req.session.user.username = userName;
-    req.session.user.email = userEmail;
-    req.session.user.language = userLanguage;
 
-    res.json({ success: true });
-  });
-});
 
 app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
   const userId = req.body.userId;
@@ -506,10 +582,10 @@ app.post('/api/user/delete', checkPermissions('manageAccount'), (req, res) => {
 });
 
 app.post('/api/user/add', checkPermissions('manageUsers'), (req, res) => {
-  const userName = req.body.userName;
+  const userUsername = req.body.userUsername;
   const userPassword = req.body.userPassword;
 
-  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [userName, userPassword], (err, result) => {
+  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [userUsername, userPassword], (err, result) => {
       if (err) throw err;
 
       res.redirect('/dashboard');
@@ -557,71 +633,11 @@ app.post('/api/user/groups/delete', checkPermissions('manageUserGroups'),(req, r
   });
 });
 
-app.post('/api/auth/logout', checkLoggedIn, (req, res) => {
-    req.session.destroy(err => {
-        if (err) throw err;
-        console.log('Logged out');
-        res.redirect('/login');
-    });
-});
-
-
-
-
-app.post('/api/auth/register', (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  const email = req.body.email;
-  const registrationKey = req.body.registrationKey;
-
-  db.query('SELECT * FROM registration_keys WHERE regkey = ?', [registrationKey], (err, results) => {
-    if (err) throw err;
-
-    if (results.length === 0) {
-      res.status(400).send('Ungültiger Registrierungsschlüssel');
-      return;
-    }
-
-    // Check if email is already in use
-    db.query('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [email], (err, emailResults) => {
-      if (err) throw err;
-
-      if (emailResults.length > 0) {
-        res.status(400).send('Email bereits in Verwendung');
-        return;
-      }
-
-      // Check if username is already in use
-      db.query('SELECT * FROM users WHERE LOWER(username) = LOWER(?)', [username], (err, usernameResults) => {
-        if (err) throw err;
-
-        if (usernameResults.length > 0) {
-          res.status(400).send('Benutzername bereits in Verwendung');
-          return;
-        }
-
-        bcrypt.hash(password, 10, (err, hash) => {
-          if (err) throw err;
-
-          db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hash], (err, result) => {
-            if (err) throw err;
-
-            db.query('DELETE FROM registration_keys WHERE regkey = ?', [registrationKey], (err, result) => {
-              if (err) throw err;
-              console.log('Deleted registration key');
-              res.redirect('/login');
-            });
-          });
-        });
-      });
-    });
-  });
-});
 
 app.post('/api/auth/reset-password', (req, res) => {
   const email = req.body.email;
   const userID = req.body.userID;
-  const username = req.body.username;
+  const username = req.body.userUsername;
 
   // Check if email, userID, or username is provided
   if (!email && !userID && !username) {
@@ -757,7 +773,7 @@ function checkPermissions(requiredPermission) {
       return;
     }
     const user = req.session.user;
-    const userId = req.session.user.id;
+    const userId = req.session.user.userId;
 
     const getGroupIdQuery = 'SELECT group_id FROM user_group_assignments WHERE user_id = ?';
     db.query(getGroupIdQuery, [userId], (err, results) => {
@@ -802,7 +818,7 @@ app.get('/register', (req, res) => {
 
 app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/dashboard', { user: user });
   } catch (err) {
@@ -812,7 +828,7 @@ app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
 
 app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/account', { user: user });
   } catch (err) {
@@ -822,7 +838,7 @@ app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next
 
 app.get('/dashboard/links/statistics', checkPermissions('manageLinks'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/statistics', { user: user });
   } catch (err) {
@@ -832,7 +848,7 @@ app.get('/dashboard/links/statistics', checkPermissions('manageLinks'), (req, re
 
 app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/registration-keys', { user: user });
   } catch (err) {
@@ -842,7 +858,7 @@ app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistratio
 
 app.get('/dashboard/super/sessions', checkPermissions('superAdmin'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/sessions', { user: user });
   } catch (err) {
@@ -852,7 +868,7 @@ app.get('/dashboard/super/sessions', checkPermissions('superAdmin'), (req, res, 
 
 app.get('/dashboard/faq', checkPermissions('manageFaq'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/faq', { user: user });
   } catch (err) {
@@ -862,7 +878,7 @@ app.get('/dashboard/faq', checkPermissions('manageFaq'), (req, res, next) => {
 
 app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/casinos', { user: user });
   } catch (err) {
@@ -872,7 +888,7 @@ app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next
 
 app.get('/dashboard/media/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/media_casinos', { user: user });
   } catch (err) {
@@ -882,7 +898,7 @@ app.get('/dashboard/media/casinos', checkPermissions('manageCasinos'), (req, res
 
 app.get('/dashboard/media/paymentmethods', checkPermissions('managePaymentMethods'), checkLoggedIn, (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/media_paymentmethods', { user: user });
   } catch (err) {
@@ -892,7 +908,7 @@ app.get('/dashboard/media/paymentmethods', checkPermissions('managePaymentMethod
 
 app.get('/dashboard/media/provider', checkPermissions('manageProvider'), checkLoggedIn, (req, res, next) => {
   try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.id + ') accessed ' + req.url);
+    console.log('User ' + req.session.user.userUsername + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/media_provider', { user: user });
   } catch (err) {
