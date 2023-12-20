@@ -1,14 +1,14 @@
 <div class="ui small menu">
-    <% if (user.userPermissions.includes('viewDashboard')) { %>
+    <% if (user.permissions.includes('viewDashboard')) { %>
         <a class="item" href="/dashboard">Dashboard</a>
     <% } %>
-    <% if (user.userPermissions.includes('manageCasinos')) { %>
+    <% if (user.permissions.includes('manageCasinos')) { %>
         <a class="item" href="/dashboard/casinos">Casinos</a>
     <% } %>
-    <% if (user.userPermissions.includes('manageFaq')) { %>
+    <% if (user.permissions.includes('manageFaq')) { %>
         <a class="item" href="/dashboard/faq">Faq</a>
     <% } %>
-    <% if (user.userPermissions.includes('manageLinks')) { %>
+    <% if (user.permissions.includes('manageLinks')) { %>
         <div class="ui dropdown item">
             Links <i class="dropdown icon"></i>
             <div class="menu">
@@ -17,17 +17,17 @@
             </div>
           </div>
     <% } %>
-    <% if (user.userPermissions.includes('manageCasinos') || user.userPermissions.includes('manageProvider') || user.userPermissions.includes('managePaymentMethods')) { %>
+    <% if (user.permissions.includes('manageCasinos') || user.permissions.includes('manageProvider') || user.permissions.includes('managePaymentMethods')) { %>
         <div class="ui dropdown item">
             Media <i class="dropdown icon"></i>
             <div class="menu">
-                <% if (user.userPermissions.includes('manageCasinos')) { %>
+                <% if (user.permissions.includes('manageCasinos')) { %>
                     <a class="item" href="/dashboard/media/casinos">Casinos</a>
                 <% } %>
-                <% if (user.userPermissions.includes('manageProvider')) { %>
+                <% if (user.permissions.includes('manageProvider')) { %>
                     <a class="item" href="/dashboard/media/provider">Provider</a>
                 <% } %>
-                <% if (user.userPermissions.includes('managePaymentMethods')) { %>
+                <% if (user.permissions.includes('managePaymentMethods')) { %>
                     <a class="item" href="/dashboard/media/paymentmethods">Payment Methods</a>
                 <% } %>
             </div>
@@ -35,15 +35,15 @@
     <% } %>
     
     <div class="right menu">
-        <% if (user.userPermissions.includes('superAdmin') || user.userPermissions.includes('manageRegistrationKeys') 
-            || user.userPermissions.includes('manageSessions')) { %>
+        <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
+            || user.permissions.includes('manageSessions')) { %>
             <div class="ui dropdown item">
                 Super <i class="dropdown icon"></i>
                 <div class="menu">
-                    <% if (user.userPermissions.includes('manageRegistrationKeys')) { %>
+                    <% if (user.permissions.includes('manageRegistrationKeys')) { %>
                         <a class="item" href="/dashboard/super/registrationkeys">Registration Keys</a>
                     <% } %>
-                    <% if (user.userPermissions.includes('manageSessions') || user.userPermissions.includes('superAdmin')) { %>
+                    <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
                         <a class="item" href="/dashboard/super/sessions">User Sessions</a>
                     <% } %>
                 </div>

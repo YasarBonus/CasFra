@@ -15,24 +15,25 @@
                             <div class="ui blurring segment">
                                 <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
                                 <h4 class="ui dividing header">Account Details </h4>
-                                <div class="field">
-                                    <label>ID</label>
-                                    <input type="text" name="userUserId" placeholder="1">
                           <div class="field">
                             <label>Username</label>
-                            <input type="text" name="userUsername" placeholder="Username">
+                            <input type="text" name="username" placeholder="Username">
                           </div>
                           <div class="field">
                             <label>E-Mail</label>
-                            <input type="text" name="userEmail" placeholder="E-Mail">
+                            <input type="text" name="email" placeholder="E-Mail">
                           </div>
                           <div class="field">
                             <label>Password</label>
-                            <input type="password" name="userPassword" placeholder="Password">
+                            <input type="password" name="password" placeholder="Password">
                           </div>
                           <div class="field">
                             <label>Repeat Password</label>
-                            <input type="password" name="userPasswordRepeat" placeholder="Repeat password">
+                            <input type="password" name="passwordRepeat" placeholder="Repeat password">
+                          </div>
+                          <div class="field">
+                            <label>Registration Key</label>
+                            <input type="text" name="registrationKey" placeholder="HE8GH6">
                           </div>
                           <!-- div class="field">
                             <label>Language:</label>
@@ -74,18 +75,20 @@
 
                           showActionButton(button,'loading');
 
+
+
                           var formData = {
-                            userUserId: "1",
-                            userUsername: $('input[name="userUsername"]').val(),
-                            userEmail: $('input[name="userEmail"]').val(),
-                            userPassword: $('input[name="userPassword"]').val(),
-                            userPasswordRepeat: $('input[name="userPasswordRepeat"]').val(),
-                            userLanguage: "en"
+                            username: $('input[name="username"]').val(),
+                            email: $('input[name="email"]').val(),
+                            password: $('input[name="password"]').val(),
+                            passwordRepeat: $('input[name="passwordRepeat"]').val(),
+                            registrationKey: $('input[name="registrationKey"]').val(),
+                            language: "en"
                           };
                           console.log('form', formData);
                           $.ajax({
                             type: 'POST',
-                            url: '/api/user',
+                            url: '/api/user/register',
                             data: formData,
                             success: function(data) {
                               console.log(data);
