@@ -52,7 +52,17 @@
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Register';
-      } else if (status === 'loading') {
+      }  else if (status === 'registerError') {
+          icon.classList.add('close');
+          actionButton.classList.replace('yellow', 'red');
+          actionButton.classList.add('disabled');
+          actionButton.textContent = 'Error';
+          setTimeout(function() {
+              showActionButton(button, 'register');
+          }, 2000);
+          showToast(status, title, message);
+
+        }else if (status === 'loading') {
           icon.classList.add('loading', 'spinner');
           actionButton.classList.replace('green', 'yellow');
           actionButton.classList.add('disabled');
@@ -75,7 +85,7 @@
               showActionButton(button, 'save');
           }, 2000);
           showToast(status, title, message);
-      } else if (status === 'logout') {
+        } else if (status === 'logout') {
           icon.classList.add('sign', 'out', 'alternate');
           actionButton.classList.add('red');
           actionButton.classList.remove('disabled');

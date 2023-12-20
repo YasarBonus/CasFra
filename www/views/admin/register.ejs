@@ -103,7 +103,7 @@
                             },
                             error: function(xhr, status, error) {
                               var errorMessage = JSON.parse(xhr.responseText).error;
-                              showActionButton(button,'error', 'Error creating account', errorMessage);
+                              showActionButton(button,'registerError', 'Error creating account', errorMessage);
                               showLoader('formLoaderAccountDetails', 'success');
                             },
                             complete: function() {
