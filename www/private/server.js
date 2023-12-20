@@ -138,6 +138,12 @@ const userAdminGroup = new UserGroup({
   'manageSessions']
 });
 
+const userOperatorGroup = new UserGroup({
+  name: 'Operator',
+  permissions: ['viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider', 
+  'managePaymentMethods', 'manageAccount']
+});
+
 const userUserGroup = new UserGroup({
   name: 'User',
   permissions: ['viewDashboard', 'manageAccount']
@@ -149,6 +155,7 @@ const saveDefaultDatabaseData = async () => {
   try {
     const adminGroup = await UserGroup.findOne({ name: 'Admin' });
     const userGroup = await UserGroup.findOne({ name: 'User' });
+    const operatorGroup = await UserGroup.findOne({ name: 'Operator' });
 
     const promises = [];
 
@@ -159,6 +166,15 @@ const saveDefaultDatabaseData = async () => {
       adminGroup.permissions = userAdminGroup.permissions;
       promises.push(adminGroup.save());
       console.log('UserGroup "Admin" permissions updated:', userAdminGroup.permissions);
+    }
+
+    if (!operatorGroup) {
+      promises.push(userOperatorGroup.save());
+      console.log('UserGroup "Operator" saved with Permissions:', userOperatorGroup.permissions);
+    } else if (operatorGroup.permissions.toString() !== userOperatorGroup.permissions.toString()) {
+      operatorGroup.permissions = userOperatorGroup.permissions;
+      promises.push(operatorGroup.save());
+      console.log('UserGroup "Operator" permissions updated:', userOperatorGroup.permissions);
     }
 
     if (!userGroup) {
