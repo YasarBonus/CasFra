@@ -133,7 +133,9 @@ const registrationKeyEntries = [
 
 const userAdminGroup = new UserGroup({
   name: 'Admin',
-  permissions: ['viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos']
+  permissions: ['viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos', 
+  'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
+  'manageSessions']
 });
 
 const userUserGroup = new UserGroup({
