@@ -340,7 +340,7 @@ app.post('/api/user/register', (req, res) => {
 });
 
 // Reset user password in MongoDB
-app.post('/api/auth/password/reset', (req, res) => {
+app.post('/api/user/password/reset', (req, res) => {
   const { userId, newPassword } = req.body;
 
   bcrypt.hash(newPassword, 10, (err, hash) => {
@@ -431,6 +431,12 @@ app.get('/api/auth/session', (req, res) => {
   } else {
     res.status(401).json({ error: 'No session found' });
   }
+});
+
+// Logout user
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
 });
 
 
