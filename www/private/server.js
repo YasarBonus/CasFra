@@ -129,6 +129,7 @@ const casinoSchema = new mongoose.Schema({
   name: String,
   category: String,
   description: String,
+  priority: {type: Number, default: 0},
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -964,15 +965,29 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     });
 } );
 
+// Get data for a single casino
+app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
-  const { name,  } = req.body; // Get the name and location from the request body
+  const { name, priority } = req.body; // Get the name and location from the request body
   const { userId } = req.session.user; // Get the user ID from the session data
 
   // Create a new casino object
   const newCasino = new Casino({
     addedBy: userId,
-    name: name
+    name: name,
+    priority: priority
   });
 
   // Save the new casino to the database
@@ -986,6 +1001,65 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+// Swap the priority of two casinos by their ID
+app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, res) => {
+  const { id1, id2 } = req.body; // Get the IDs of the two casinos from the request body
+
+  console.log(id1 + ' ' + id2);
+
+  // Validate the IDs
+  if (!id1.match(/^[0-9a-fA-F]{24}$/) || !id2.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'Invalid ID format' });
+  }
+
+  // Find the two casinos by their IDs
+  Casino.find({ _id: { $in: [id1, id2] } })
+    .then((casinos) => {
+      if (casinos.length !== 2) {
+        throw new Error('Two casinos not found');
+      }
+      console.log('Found Casinos:')
+      // Swap the priorities of the two casinos
+      const priority1 = casinos[0].priority;
+      casinos[0].priority = casinos[1].priority;
+      casinos[1].priority = priority1;
+
+      // Save the updated casinos
+      return Promise.all([casinos[0].save(), casinos[1].save()]);
+    })
+    .then((updatedCasinos) => {
+      res.json(updatedCasinos);
+      console.log('Casinos priority swapped');
+    })
+    .catch((error) => {
+      console.error('Error swapping casinos priority:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Edit a casino
+app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const { userId } = req.session.user; // Get the user ID from the session data
+  const { id } = req.params; // Get the ID from the request params
+  const { name, description, categories } = req.body; // Get the updated name from the request body
+  console.log(id + ' ' + name);
+
+  Casino.findOneAndUpdate({ _id: id }, { name: name }, { modifiedBy: userId }, { modifiedDate: Date.now()}, { categories: categories }, { description: description})
+    .then((updatedCasino) => {
+      if (!updatedCasino) {
+        throw new Error('Casino not found');
+      }
+      res.json(updatedCasino);
+      console.log('Casino updated');
+    })
+    .catch((error) => {
+      console.error('Error updating casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
 
 // Delete a casino
 app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
