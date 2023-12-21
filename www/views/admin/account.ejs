@@ -92,11 +92,11 @@
                                 <h4 class="ui dividing header">Account Details  </h4>
                           <div class="field">
                             <label>Username</label>
-                            <input type="text" name="userUsername" placeholder="Benutzername">
+                            <input type="text" name="username" placeholder="Benutzername">
                           </div>
                           <div class="field">
                             <label>E-Mail</label>
-                            <input type="text" name="userEmail" placeholder="E-Mail">
+                            <input type="text" name="email" placeholder="E-Mail">
                           </div>
                           <!-- div class="field">
                             <label>Language:</label>
@@ -120,7 +120,7 @@
                         </div>
                         <div class="ui blurring segment">
                             <div id="formLoaderPersonalDetails" class="ui inverted dimmer"></div>
-<h4 class="ui dividing header">Personal Details</h4>
+<!-- h4 class="ui dividing header">Personal Details</h4>
   <div class="field">
     <label>Name</label>
     <div class="three fields">
@@ -409,7 +409,7 @@
       </div>
   </div>
   <div class="two fields">
-    <!-- div class="field">
+    <div class="field">
       <label>State</label>
       <select class="ui fluid dropdown">
         <option value="">State</option>
@@ -598,9 +598,9 @@
 
                             var formData = {
                                 userId: '<%= user.userId %>',
-                                userUsername: $('input[name="userUsername"]').val(),
-                                userEmail: $('input[name="userEmail"]').val(),
-                                userLanguage: $('input[name="userLanguage"]').val()
+                                username: $('input[name="username"]').val(),
+                                email: $('input[name="email"]').val(),
+                                language: $('input[name="language"]').val()
                             };
                             console.log('form', formData);
                             $.ajax({
@@ -633,9 +633,9 @@
                             $(document).ready(function() {
                                 $.get('/api/user', function(data) {
                                     console.log(data);
-                                    $('input[name="userUsername"]').val(data.userUsername);
-                                    $('input[name="userEmail"]').val(data.userEmail);
-                                    $('input[name="userLanguage"]').val(data.userLanguage);
+                                    $('input[name="username"]').val(data.username);
+                                    $('input[name="email"]').val(data.email);
+                                    $('input[name="language"]').val(data.language);
 
                                     
                                     // Hide the dimmer loader
@@ -669,7 +669,6 @@
 
                         populateUserData();
 
-                        populateUserPersonalData();
 
                       </script>
             <%- include('../partials/footer') %>

@@ -245,6 +245,100 @@ app.use(session({
   })
 }));
 
+// ############################## ROUTES ##############################
+
+// ############################## AUTH ##############################
+
+// Login user
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!password) {
+    res.status(400).json({ error: 'Password is required' });
+    return;
+  }
+
+  if (!username) {
+    res.status(400).json({ error: 'Username is required' });
+    return;
+  }
+
+  User.findOne({ username: username })
+    .then((user) => {
+      if (!user) {
+        res.status(401).json({ error: 'Invalid username or password' });
+        return;
+      }
+
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) {
+          console.error('Error comparing passwords:', err);
+          res.status(500).json({ error: 'Internal server error' });
+          return;
+        }
+
+        if (result) {
+          // Get user permissions
+          UserGroup.findOne({ _id: user.groupId })
+            .then((userGroup) => {
+              if (!userGroup) {
+                res.status(500).json({ error: 'User group not found' });
+                return;
+              }
+
+              // Add user permissions to session data
+              req.session.user = { 
+                userId: user._id, 
+                username: user.username, 
+                permissions: userGroup.permissions 
+              };
+
+              res.json({ success: true });
+            })
+            .catch((error) => {
+              console.error('Error retrieving user group:', error);
+              res.status(500).json({ error: 'Internal server error' });
+            });
+        } else {
+          res.status(401).json({ error: 'Invalid username or password' });
+        }
+      });
+    })
+    .catch((error) => {
+      console.error('Error retrieving user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Get current session details
+app.get('/api/auth/session', (req, res) => {
+  const sessionDetails = req.session.user;
+  
+  if (sessionDetails) {
+    res.json(sessionDetails);
+  } else {
+    res.status(401).json({ error: 'No session found' });
+  }
+});
+
+// Get all sessions from MongoDB
+app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
+  Session.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving sessions:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Logout user
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
+});
+
 // Insert user into MongoDB
 app.post('/api/user/register', (req, res) => {
   console.log(req.body);
@@ -389,95 +483,40 @@ app.post('/api/user/password/reset', (req, res) => {
   });
 });
 
-// Login user
-app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
+// Get user details of the current user
+app.get('/api/user', (req, res) => {
+  const { userId } = req.session.user;
 
-  if (!password) {
-    res.status(400).json({ error: 'Password is required' });
-    return;
-  }
-
-  if (!username) {
-    res.status(400).json({ error: 'Username is required' });
-    return;
-  }
-
-  User.findOne({ username: username })
+  User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(401).json({ error: 'Invalid username or password' });
+        res.status(404).json({ error: 'User not found' });
         return;
       }
 
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) {
-          console.error('Error comparing passwords:', err);
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-        }
-
-        if (result) {
-          // Get user permissions
-          UserGroup.findOne({ _id: user.groupId })
-            .then((userGroup) => {
-              if (!userGroup) {
-                res.status(500).json({ error: 'User group not found' });
-                return;
-              }
-
-              // Add user permissions to session data
-              req.session.user = { 
-                userId: user._id, 
-                username: user.username, 
-                permissions: userGroup.permissions 
-              };
-
-              res.json({ success: true });
-            })
-            .catch((error) => {
-              console.error('Error retrieving user group:', error);
-              res.status(500).json({ error: 'Internal server error' });
-            });
-        } else {
-          res.status(401).json({ error: 'Invalid username or password' });
-        }
-      });
+      res.json(user);
     })
     .catch((error) => {
-      console.error('Error retrieving user:', error);
+      console.error('Error retrieving user details:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });
 
-// Get current session details
-app.get('/api/auth/session', (req, res) => {
-  const sessionDetails = req.session.user;
-  
-  if (sessionDetails) {
-    res.json(sessionDetails);
-  } else {
-    res.status(401).json({ error: 'No session found' });
-  }
-});
+// Edit user details of the current user
+app.post('/api/user', (req, res) => {
+  const { userId } = req.session.user;
+  const { username, email } = req.body;
 
-// Get all sessions from MongoDB
-app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
-  Session.find()
-    .then((results) => {
-      res.json(results);
+  User.findByIdAndUpdate(userId, { username, email })
+    .then(() => {
+      res.json({ success: true });
     })
     .catch((error) => {
-      console.error('Error retrieving sessions:', error);
+      console.error('Error updating user details:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });
 
-// Logout user
-app.post('/api/auth/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ success: true });
-});
 
 
 // Get all registration keys from MongoDB
@@ -529,7 +568,6 @@ app.post('/api/users/regkeys/generate', checkPermissions('manageRegistrationKeys
 });
 
 // Delete registration key from MongoDB by ID
-
 app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const { id } = req.body.id;
   RegistrationKey.deleteOne({ _id: id })
