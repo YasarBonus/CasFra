@@ -19,6 +19,7 @@
                                     <th>Group</th>
                                     <th>Registration Date</th>
                                     <th>Active</th>
+                                    <th>Banned</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -70,6 +71,7 @@
                                 row.append($('<td>').text(user.groupId));
                                 row.append($('<td>').text(user.registrationDate));
                                 row.append($('<td>').text(user.active));
+                                row.append($('<td>').text(user.banned));
                                 var actions = $('<td>');
                                 var deleteButton = $('<div class="ui tiny red button">').text('Delete');
                                 // Add click event listener to delete button
