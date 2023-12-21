@@ -14,7 +14,7 @@
                         <thead>
                             <tr>
                                 <th>Session</th>
-                                <th>Session ID</th>
+                                <th>Created</th>
                                 <th>Expires</th>
                                 <th>Action</th>
                             </tr>
@@ -26,12 +26,12 @@
                 
                 <script>
                     $(document).ready(function() {
-                        $.get('/api/sessions', function(data) {
+                        $.get('/api/auth/sessions', function(data) {
                             data.forEach(function(session) {
                                 $('#sessions').append(`
                                     <tr>
                                         <td style="max-width:200px">${session.session}</td>
-                                        <td>${session.sid}</td>
+                                        <td>${session.timestamp}</td>
                                         <td>${session.expires}</td>
                                         <td><button class="ui red button" onclick="endSession('${session.sid}')">End Session</button></td>
                                     </tr>
@@ -41,7 +41,7 @@
                     });
                 
                     function endSession(sessionId) {
-                        $.post('/api/sessions/end', { sessionId: sessionId }, function() {
+                        $.post('/api/auth/sessions/end', { sessionId: sessionId }, function() {
                             location.reload();
                         });
                     }

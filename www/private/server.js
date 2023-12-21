@@ -113,7 +113,17 @@ const casinoSchema = new mongoose.Schema({
   url: String
 });
 
+const SessionSchema = new mongoose.Schema({
+  userId: String,
+  username: String,
+  ip: String,
+  userAgent: String,
+  timestamp: { type: Date, default: Date.now }
+});
+
+
 // Define models
+const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
@@ -451,6 +461,19 @@ app.get('/api/auth/session', (req, res) => {
   }
 });
 
+// Get all sessions from MongoDB
+app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
+  Session.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving sessions:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
 // Logout user
 app.post('/api/auth/logout', (req, res) => {
   req.session.destroy();
@@ -616,6 +639,16 @@ app.get('/dashboard/super/registrationkeys', (req, res, next) => {
     next(err);
   }
 });
+
+app.get('/dashboard/super/sessions', (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/sessions', { user: user });
+  } catch (err) {
+    next(err);
+  }
+} );
 
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {
