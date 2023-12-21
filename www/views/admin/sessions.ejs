@@ -33,7 +33,7 @@
                                         <td style="max-width:200px">${session.session}</td>
                                         <td>${session.timestamp}</td>
                                         <td>${session.expires}</td>
-                                        <td><button class="ui red button" onclick="endSession('${session.sid}')">End Session</button></td>
+                                        <td><button class="ui disabled red button" onclick="endSession('${session.sid}')">End Session</button></td>
                                     </tr>
                                 `);
                             });
@@ -41,7 +41,7 @@
                     });
                 
                     function endSession(sessionId) {
-                        $.post('/api/auth/sessions/end', { sessionId: sessionId }, function() {
+                        $.post('/api/auth/session/terminate', { sessionId: sessionId }, function() {
                             location.reload();
                         });
                     }
