@@ -10,81 +10,86 @@
                 <div class="ui segment">
                     <div class="ui container">
                         <h2>My Account</h2>
-                        <button class="ui button" id="resetPassword">Reset Password</button>
+                        <button class="ui blue button" id="resetPassword">Change Password</button>
                         <div class="ui small modal" id="passwordResetModal">
-                            <i class="close icon"></i>
-                            <div class="header">
-                                Reset Password
+                          <i class="close icon"></i>
+                          <div class="header">
+                            Change Password
+                          </div>
+                          <div class="content">
+                            <form class="ui form" id="passwordResetForm">
+                              <div class="field">
+                                <label>Current Password</label>
+                                <input type="password" name="currentPassword" placeholder="Current Password">
+                              </div>
+                              <div class="field">
+                                <label>New Password</label>
+                                <input type="password" name="newPassword" placeholder="New Password">
+                              </div>
+                              <div class="field">
+                                <label>Confirm New Password</label>
+                                <input type="password" name="confirmNewPassword" placeholder="Confirm New Password">
+                              </div>
+                            </form>
+                          </div>
+                          <div class="actions">
+                            <div class="ui black deny button">
+                              Cancel
                             </div>
-                            <div class="content">
-                                <form class="ui form" id="passwordResetForm">
-                                    <div class="field">
-                                        <label>New Password</label>
-                                        <input type="password" name="newPassword" placeholder="New Password">
-                                    </div>
-                                    <div class="field">
-                                        <label>Confirm New Password</label>
-                                        <input type="password" name="confirmNewPassword" placeholder="Confirm New Password">
-                                    </div>
-                                </form>
+                            <div class="ui positive right labeled icon button" id="submitPasswordReset">
+                              Reset
+                              <i class="checkmark icon"></i>
                             </div>
-                            <div class="actions">
-                                <div class="ui black deny button">
-                                    Cancel
-                                </div>
-                                <div class="ui positive right labeled icon button" id="submitPasswordReset">
-                                    Reset
-                                    <i class="checkmark icon"></i>
-                                </div>
-                            </div>
+                          </div>
                         </div>
-                        
+
                         <script>
-                            $('#resetPassword').click(function() {
+                          $('#resetPassword').click(function() {
+                            $('#passwordResetModal').modal('show');
+                            showActionButton('submitPasswordReset', 'changePassword')
+                          });
+
+                          $('#submitPasswordReset').click(function() {
+                            showActionButton('submitPasswordReset', 'loading')
+                            var currentPassword = $('#passwordResetForm input[name="currentPassword"]').val();
+                            var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
+                            var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
+
+
+                            if (newPassword !== confirmNewPassword) {
+                              showActionButton('submitPasswordReset', 'error', 'Passwords do not match.', 'The provided passwords do not match each other. Please try again.','changePassword');
+                              console.log('Passwords do not match');
+                              $('#passwordResetModal').modal('show');
+                              return;
+                            }
+                            var passwordFormData = {
+                              currentPassword: $('input[name="currentPassword"]').val(),
+                              newPassword: $('input[name="newPassword"]').val()
+                            };
+                            // AJAX function to POST the new password
+                            $.ajax({
+                              url: '/api/user/password',
+                              method: 'POST',
+                              data: {
+                                currentPassword: currentPassword,
+                                newPassword: newPassword
+                              },
+                              success: function(response) {
+                                // Handle success response
+                                console.log('Password reset successful');
+                                showToast('success', 'Password reset successful.', 'Your password has been reset successfully.');
+                              },
+                              error: function(error) {
+                                // Handle error response
+                                showActionButton('submitPasswordReset', 'error', 'Password reset failed.', 'The provided password is incorrect. Please try again.','changePassword')
+                                console.log('Password reset failed');
                                 $('#passwordResetModal').modal('show');
-                                showActionButton('submitPasswordReset', 'save')
+                              },
+                              complete: function() {
+                              }
                             });
-                        
-                            $('#submitPasswordReset').click(function() {
-                                showActionButton('submitPasswordReset', 'loading')
-                                var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
-                                var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
-
-                                if (newPassword !== confirmNewPassword) {
-                                    showActionButton('submitPasswordReset', 'error', 'Passwords do not match.', 'The provided passwords do not match each other. Please try again.')
-                                    console.log('Passwords do not match');
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: '/api/user',
-                                    type: 'GET',
-                                    success: function(data) {
-                                        var userId = data.userId; // Angenommen, die UserId wird als 'id' zurückgegeben
-
-                                        $.ajax({
-                                            url: '/api/auth/password/reset',
-                                            type: 'POST',
-                                            data: {
-                                                userId: userId,
-                                                newPassword: newPassword
-                                            },
-                                            success: function(data) {
-                                                console.log('Password reset successful');
-                                                $('#passwordResetModal').modal('hide');
-                                            },
-                                            error: function(xhr, status, error) {
-                                                console.log('Error resetting password:', error);
-                                            }
-                                        });
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.log('Error getting user:', error);
-                                    }
-                                });
-                            });
+                          });
                         </script>
-                        
                         <div class="ui divider"></div>                      
                         <form class="ui form" id="userForm">
                             <div class="ui blurring segment">
@@ -597,7 +602,6 @@
                             showActionButton(button,'loading');
 
                             var formData = {
-                                userId: '<%= user.userId %>',
                                 username: $('input[name="username"]').val(),
                                 email: $('input[name="email"]').val(),
                                 language: $('input[name="language"]').val()

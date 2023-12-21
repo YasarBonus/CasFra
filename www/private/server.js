@@ -77,7 +77,7 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
-  registrationDate: { type: Date, default: Date.now },
+  registrationDate: Date,
   registrationIp: String,
   registrationVerificationCode: String,
   registrationVerificationCodeExpiry: Date,
@@ -120,7 +120,6 @@ const SessionSchema = new mongoose.Schema({
   userAgent: String,
   timestamp: { type: Date, default: Date.now }
 });
-
 
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
@@ -233,6 +232,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const MongoStore = require('connect-mongo');
+
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
   resave: false,
@@ -461,28 +461,6 @@ app.post('/api/user/register', (req, res) => {
     });
 });
 
-// Reset user password in MongoDB
-app.post('/api/user/password/reset', (req, res) => {
-  const { userId, newPassword } = req.body;
-
-  bcrypt.hash(newPassword, 10, (err, hash) => {
-    if (err) {
-      console.error('Error hashing password:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-
-    User.findByIdAndUpdate(userId, { password: hash })
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch((error) => {
-        console.error('Error updating password:', error);
-        res.status(500).json({ error: 'Internal server error' });
-      });
-  });
-});
-
 // Get user details of the current user
 app.get('/api/user', (req, res) => {
   const { userId } = req.session.user;
@@ -516,6 +494,61 @@ app.post('/api/user', (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+// Change password of the current user
+app.post('/api/user/password', (req, res) => {
+  const { userId } = req.session.user;
+  const { currentPassword, newPassword } = req.body;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      console.log(user);
+      console.log(currentPassword  + ' ' + newPassword);
+      // Check if the current password matches
+      bcrypt.compare(currentPassword, user.password, (err, result) => {
+        if (err) {
+          console.error('Error comparing passwords:', err);
+          res.status(500).json({ error: 'Internal server error' });
+          return;
+        }
+
+        if (!result) {
+          res.status(400).json({ error: 'Current password is incorrect' });
+          return;
+        }
+
+        // Encrypt the new password
+        bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+          if (err) {
+            console.error('Error hashing password:', err);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+          }
+
+          // Update the password
+          user.password = hashedPassword;
+          user.save()
+            .then(() => {
+              console.log('Password updated:' + newPassword);
+              res.json({ success: true });
+            })
+            .catch((error) => {
+              console.error('Error updating password:', error);
+              res.status(500).json({ error: 'Internal server error' });
+            });
+        });
+      });
+    })
+    .catch((error) => {
+      console.error('Error retrieving user details:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 
 
 

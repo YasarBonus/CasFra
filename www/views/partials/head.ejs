@@ -67,6 +67,11 @@
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Register';
+      } else if (status === 'changePassword') {
+          icon.classList.add('lock');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Change Password';
       } else if (status === 'loading') {
           icon.classList.add('loading', 'spinner');
           actionButton.classList.replace('green', 'yellow');
