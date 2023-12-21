@@ -549,9 +549,6 @@ app.post('/api/user/password', (req, res) => {
     });
 });
 
-
-
-
 // Get all registration keys from MongoDB
 app.get('/api/users/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
   RegistrationKey.find()
@@ -616,6 +613,36 @@ app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (r
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+// Get all users from MongoDB
+app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
+  User.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving users:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Delete user from MongoDB by ID
+app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
+  const { id } = req.body; // Get the ID from the request body
+  User.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('User not found');
+      }
+      res.json({ success: true, id: id, status: 'deleted' });
+      console.log('User deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
@@ -719,6 +746,16 @@ app.get('/dashboard/super/sessions', (req, res, next) => {
     next(err);
   }
 } );
+
+app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/users', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {

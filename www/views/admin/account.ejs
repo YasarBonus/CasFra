@@ -62,10 +62,7 @@
                               $('#passwordResetModal').modal('show');
                               return;
                             }
-                            var passwordFormData = {
-                              currentPassword: $('input[name="currentPassword"]').val(),
-                              newPassword: $('input[name="newPassword"]').val()
-                            };
+
                             // AJAX function to POST the new password
                             $.ajax({
                               url: '/api/user/password',
