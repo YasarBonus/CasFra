@@ -97,7 +97,8 @@ const registrationKeySchema = new mongoose.Schema({
   created: { type: Date, default: Date.now },
   used: { type: Boolean, default: false },
   usedDate: Date,
-  userId: String
+  userId: String,
+  userIp: String
 });
 
 // Define LinkHit schema
@@ -148,8 +149,6 @@ const userUserGroup = new UserGroup({
   name: 'User',
   permissions: ['viewDashboard', 'manageAccount']
 });
-
-
 
 const saveDefaultDatabaseData = async () => {
   try {
@@ -331,6 +330,7 @@ app.post('/api/user/register', (req, res) => {
                     existingKey.used = true;
                     existingKey.usedDate = new Date();
                     existingKey.userId = user._id;
+                    existingKey.userIp = req.ip;
                     existingKey.save();
 
                     // Send the verification code by email to the user
@@ -506,13 +506,17 @@ app.post('/api/auth/regkeys/generate', checkPermissions('manageRegistrationKeys'
     });
 });
 
-// Delete registration key from MongoDB
-app.post('/api/auth/regkeys/delete', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const { id } = req.body;
+// Delete registration key from MongoDB by ID
 
-  RegistrationKey.findByIdAndDelete(id)
-    .then(() => {
+app.delete('/api/auth/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
+  const { id } = req.body.id;
+  RegistrationKey.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('Registration key not found');
+      }
       res.json({ success: true, id: id, status: 'deleted' });
+      console.log('Registration key deleted');
     })
     .catch((error) => {
       console.error('Error deleting registration key:', error);
@@ -593,7 +597,43 @@ app.get('/dashboard', (req, res, next) => {
   }
 });
 
-// ... Rest of the routes ...
+app.get('/dashboard/account', (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/account', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/super/registrationkeys', (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/registrationkeys', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Function to delete unused registration keys older than 1 hour
+function deleteUnusedRegistrationKeys() {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+
+  RegistrationKey.deleteMany({ used: false, created: { $lt: oneHourAgo } })
+    .then(() => {
+      const deletedKeys = RegistrationKey.deletedCount;
+      console.log('Deleted unused registration keys older than 1 hour:' + deletedKeys);
+    })
+    .catch((error) => {
+      console.error('Error deleting unused registration keys:', error);
+    });
+}
+
+// Run the function every minute
+setInterval(deleteUnusedRegistrationKeys, 1 * 60 * 1000);
+
 
 // Close the MongoDB connection when the server is shut down
 process.on('SIGINT', () => {

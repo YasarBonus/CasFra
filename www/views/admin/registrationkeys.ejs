@@ -1,0 +1,115 @@
+<!-- registration-keys.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <h2>Registration Keys</h2>
+                    <div class="ui negative message">
+                        <div class="header">
+                          Danger Zone!
+                        </div>
+                        <p>Anyone with a Registration Key can sign up!</p>
+                        <p>Unused Registration Keys will be removed 1 hour after creation.</p>
+                      </div>
+
+                    <!-- Button zum Generieren neuer Schlüssel -->
+                    <button id="generate-key-button" class="ui green button">Generate Key</button>
+
+                    <!-- Tabelle der Schlüssel -->
+                    <table id="keys-table" class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Created on</th>
+                                <th>Used</th>
+                                <th>Used by</th>
+                                <th>UserIp</th>
+                                <th>Used on</th>
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Die Schlüssel werden hier eingefügt -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%- include('../partials/footer') %>
+        </body>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+        <script>
+            // Function to load registration keys
+            function loadRegistrationKeys() {
+                $.ajax({
+                    url: '/api/auth/regkeys',
+                    type: 'GET',
+                    success: function(data) {
+                        // Clear existing rows
+                        $('#keys-table tbody').empty();
+
+                        // Add keys to the table
+                        data.forEach(function(item) {
+                            $('#keys-table tbody').append('<tr><td>' + item.regkey  + '</td><td>' + item.created  + '</td><td>' + item.used  + '</td><td>' + item.userId  + '</td><td>' + item.userIp  + '</td><td>' + item.usedDate  + '</td><td><button class="ui red small button delete-button" data-id="' + item.id + '">Delete</button></td></tr>');
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // Error handling
+                        console.error(textStatus, errorThrown);
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                // Load registration keys on page load
+                loadRegistrationKeys();
+
+                // Button to generate keys clicked
+                $('#generate-key-button').click(function() {
+                    $.ajax({
+                        url: '/api/auth/regkeys/generate',
+                        type: 'POST',
+                        success: function(data) {
+                            // Reload keys
+                            loadRegistrationKeys();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // Error handling
+                            console.error(textStatus, errorThrown);
+                        }
+                    });
+                });
+
+                // Delete key
+                $('#keys-table').on('click', '.delete-button', function() {
+                    // Get key ID from data attribute
+                    var id = $(this).data('id');
+
+                    // Delete key
+                    $.ajax({
+                        url: '/api/auth/regkeys',
+                        type: 'DELETE',
+                        data: {
+                            id: id
+                        },
+                        success: function(data) {
+                            // Reload keys
+                            loadRegistrationKeys();
+                            
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // Error handling
+                            console.error(textStatus, errorThrown);
+                        }
+                    });
+                });
+            });
+        </script>
+</html>
