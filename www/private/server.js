@@ -109,6 +109,21 @@ const linkHitSchema = new mongoose.Schema({
   timestamp: Date
 });
 
+const imagesSchema = new mongoose.Schema({
+  name: String,
+  uploadDate: { type: Date, default: Date.now },
+  uploadUser: String,
+  category: String,
+  description: String,
+  image: String
+});
+
+const imagesCategoriesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String
+});
+
 // Define Casino schema
 const casinoSchema = new mongoose.Schema({
   name: String,
@@ -213,6 +228,8 @@ const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
 const LinkHit = mongoose.model('LinkHit', linkHitSchema);
+const Images = mongoose.model('Images', imagesSchema);
+const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 const Casino = mongoose.model('Casino', casinoSchema);
 const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
 const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
@@ -251,6 +268,74 @@ const userUserGroup = new UserGroup({
   name: 'User',
   permissions: ['viewDashboard', 'manageAccount']
 });
+
+const saveDefaultUserDatabaseData = async () => {
+  try {
+    const adminGroup = await UserGroup.findOne({ name: 'Admin' });
+    const userGroup = await UserGroup.findOne({ name: 'User' });
+    const operatorGroup = await UserGroup.findOne({ name: 'Operator' });
+
+    const promises = [];
+
+    if (!adminGroup) {
+      promises.push(userAdminGroup.save());
+      console.log('UserGroup "Admin" saved with Permissions:', userAdminGroup.permissions);
+    } else if (adminGroup.permissions.toString() !== userAdminGroup.permissions.toString()) {
+      adminGroup.permissions = userAdminGroup.permissions;
+      promises.push(adminGroup.save());
+      console.log('UserGroup "Admin" permissions updated:', userAdminGroup.permissions);
+    }
+
+    if (!operatorGroup) {
+      promises.push(userOperatorGroup.save());
+      console.log('UserGroup "Operator" saved with Permissions:', userOperatorGroup.permissions);
+    } else if (operatorGroup.permissions.toString() !== userOperatorGroup.permissions.toString()) {
+      operatorGroup.permissions = userOperatorGroup.permissions;
+      promises.push(operatorGroup.save());
+      console.log('UserGroup "Operator" permissions updated:', userOperatorGroup.permissions);
+    }
+
+    if (!userGroup) {
+      promises.push(userUserGroup.save());
+      console.log('UserGroup "User" saved with Permissions:', userUserGroup.permissions);
+    } else if (userGroup.permissions.toString() !== userUserGroup.permissions.toString()) {
+      userGroup.permissions = userUserGroup.permissions;
+      promises.push(userGroup.save());
+      console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
+    }
+
+    for (const languageEntry of languageEntries) {
+      const existingLanguage = await Language.findOne({ name: languageEntry.name });
+
+      if (!existingLanguage) {
+        const newLanguage = new Language(languageEntry);
+        promises.push(newLanguage.save());
+        console.log('Language entry saved:', newLanguage);
+      } else if (existingLanguage.code !== languageEntry.code) {
+        existingLanguage.code = languageEntry.code;
+        promises.push(existingLanguage.save());
+        console.log('Language entry updated:', existingLanguage);
+      }
+    }
+
+    for (const registrationKeyEntry of registrationKeyEntries) {
+      const existingRegistrationKey = await RegistrationKey.findOne({ regkey: registrationKeyEntry.regkey });
+
+      if (!existingRegistrationKey) {
+        const newRegistrationKey = new RegistrationKey(registrationKeyEntry);
+        promises.push(newRegistrationKey.save());
+        console.log('Registration key entry saved:', newRegistrationKey);
+      }
+    }
+
+    await Promise.all(promises);
+    console.log('Default Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default Database Data:', error);
+  }
+};
+
+saveDefaultUserDatabaseData();
 
 const CasinoFeaturesEntries = [{
   name: 'Fast Verification',
@@ -405,63 +490,31 @@ const saveDefaultCasinoDatabaseData = async () => {
 
 saveDefaultCasinoDatabaseData();
 
+const ImagesCategoriesEntries = [{
+  name: 'Casino',
+  description: 'Casino Images',
+  image: 'https://www.casinofreak.com/images/categories/new.png'
+}, {
+  name: 'Provider',
+  description: 'Provider',
+  image: 'https://www.casinofreak.com/images/categories/live.png'
+}];
 
-const saveDefaultUserDatabaseData = async () => {
+const saveDefaultImagesDatabaseData = async () => {
   try {
-    const adminGroup = await UserGroup.findOne({ name: 'Admin' });
-    const userGroup = await UserGroup.findOne({ name: 'User' });
-    const operatorGroup = await UserGroup.findOne({ name: 'Operator' });
-
     const promises = [];
 
-    if (!adminGroup) {
-      promises.push(userAdminGroup.save());
-      console.log('UserGroup "Admin" saved with Permissions:', userAdminGroup.permissions);
-    } else if (adminGroup.permissions.toString() !== userAdminGroup.permissions.toString()) {
-      adminGroup.permissions = userAdminGroup.permissions;
-      promises.push(adminGroup.save());
-      console.log('UserGroup "Admin" permissions updated:', userAdminGroup.permissions);
-    }
+    for (const imagesCategoriesEntry of ImagesCategoriesEntries) {
+      const existingImagesCategories = await ImagesCategories.findOne({ name: imagesCategoriesEntry.name });
 
-    if (!operatorGroup) {
-      promises.push(userOperatorGroup.save());
-      console.log('UserGroup "Operator" saved with Permissions:', userOperatorGroup.permissions);
-    } else if (operatorGroup.permissions.toString() !== userOperatorGroup.permissions.toString()) {
-      operatorGroup.permissions = userOperatorGroup.permissions;
-      promises.push(operatorGroup.save());
-      console.log('UserGroup "Operator" permissions updated:', userOperatorGroup.permissions);
-    }
-
-    if (!userGroup) {
-      promises.push(userUserGroup.save());
-      console.log('UserGroup "User" saved with Permissions:', userUserGroup.permissions);
-    } else if (userGroup.permissions.toString() !== userUserGroup.permissions.toString()) {
-      userGroup.permissions = userUserGroup.permissions;
-      promises.push(userGroup.save());
-      console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
-    }
-
-    for (const languageEntry of languageEntries) {
-      const existingLanguage = await Language.findOne({ name: languageEntry.name });
-
-      if (!existingLanguage) {
-        const newLanguage = new Language(languageEntry);
-        promises.push(newLanguage.save());
-        console.log('Language entry saved:', newLanguage);
-      } else if (existingLanguage.code !== languageEntry.code) {
-        existingLanguage.code = languageEntry.code;
-        promises.push(existingLanguage.save());
-        console.log('Language entry updated:', existingLanguage);
-      }
-    }
-
-    for (const registrationKeyEntry of registrationKeyEntries) {
-      const existingRegistrationKey = await RegistrationKey.findOne({ regkey: registrationKeyEntry.regkey });
-
-      if (!existingRegistrationKey) {
-        const newRegistrationKey = new RegistrationKey(registrationKeyEntry);
-        promises.push(newRegistrationKey.save());
-        console.log('Registration key entry saved:', newRegistrationKey);
+      if (!existingImagesCategories) {
+        const newImagesCategories = new ImagesCategories(imagesCategoriesEntry);
+        promises.push(newImagesCategories.save());
+        console.log('ImagesCategories entry saved:', newImagesCategories);
+      } else if (existingImagesCategories.description !== imagesCategoriesEntry.description) {
+        existingImagesCategories.description = imagesCategoriesEntry.description;
+        promises.push(existingImagesCategories.save());
+        console.log('ImagesCategories entry updated:', existingImagesCategories);
       }
     }
 
@@ -472,7 +525,8 @@ const saveDefaultUserDatabaseData = async () => {
   }
 };
 
-saveDefaultUserDatabaseData();
+saveDefaultImagesDatabaseData();
+
 
   // Middleware
 app.use(express.json());
