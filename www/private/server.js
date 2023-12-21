@@ -777,6 +777,16 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
   }
 });
 
+app.get('/dashboard/casinos', (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/casinos', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
