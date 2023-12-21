@@ -138,9 +138,7 @@ const casinoSchema = new mongoose.Schema({
   label: String,
   labelLarge: String,
   boni: [String],
-  displayBonus: Number,
-  displayBonusFreespins: Number,
-  displayBonusMax: Number,
+  displayBonus: String,
   displayBonusSticky: { type: Boolean, default: true },
   maxBet: Number,
   maxCashout: Number,
@@ -954,6 +952,111 @@ app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
     });
 });
 
+// Get all casinos from MongoDB
+app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  Casino.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casinos:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Create a new casino
+app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  const { name,  } = req.body; // Get the name and location from the request body
+  const { userId } = req.session.user; // Get the user ID from the session data
+
+  // Create a new casino object
+  const newCasino = new Casino({
+    addedBy: userId,
+    name: name
+  });
+
+  // Save the new casino to the database
+  newCasino.save()
+    .then((result) => {
+      res.json(result);
+      console.log('New casino created');
+    })
+    .catch((error) => {
+      console.error('Error creating casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Delete a casino
+app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.body; // Get the ID from the request body
+  Casino.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('Casino not found');
+      }
+      res.json({ success: true, id: id, status: 'deleted' });
+      console.log('Casino deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Get all casino categories from MongoDB
+app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoCategories.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino categories:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Create a new casino category
+app.post('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
+  const { name, description, image } = req.body; // Get the name and location from the request body
+  const { userId } = req.session.user; // Get the user ID from the session data
+
+  // Create a new casino category object
+  const newCasinoCategory = new CasinoCategories({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image
+  });
+
+  // Save the new casino category to the database
+  newCasinoCategory.save()
+    .then((result) => {
+      res.json(result);
+      console.log('New casino category created');
+    })
+    .catch((error) => {
+      console.error('Error creating casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Delete a casino category
+app.delete('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.body; // Get the ID from the request body
+  CasinoCategories.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('Casino category not found');
+      }
+      res.json({ success: true, id: id, status: 'deleted' });
+      console.log('Casino category deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
 
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
