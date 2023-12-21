@@ -77,6 +77,7 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
+  active: { type: Boolean, default: false },
   registrationDate: Date,
   registrationIp: String,
   registrationVerificationCode: String,
@@ -267,6 +268,11 @@ app.post('/api/auth/login', (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(401).json({ error: 'Invalid username or password' });
+        return;
+      }
+
+      if (!user.active) {
+        res.status(401).json({ error: 'User is not active' });
         return;
       }
 
