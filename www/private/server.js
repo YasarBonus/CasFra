@@ -473,7 +473,6 @@ app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => 
     });
 });
 
-
 // Logout user
 app.post('/api/auth/logout', (req, res) => {
   req.session.destroy();
@@ -482,7 +481,7 @@ app.post('/api/auth/logout', (req, res) => {
 
 
 // Get all registration keys from MongoDB
-app.get('/api/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.get('/api/users/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
   RegistrationKey.find()
     .then((results) => {
       res.json(results);
@@ -494,7 +493,7 @@ app.get('/api/auth/regkeys', checkPermissions('manageRegistrationKeys'), (req, r
 });
 
 // Insert registration key into MongoDB
-app.post('/api/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.post('/api/users/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const { regkey } = req.body;
 
   const registrationKey = new RegistrationKey({
@@ -512,7 +511,7 @@ app.post('/api/auth/regkeys/add', checkPermissions('manageRegistrationKeys'), (r
 });
 
 // Generate and insert registration key into MongoDB
-app.post('/api/auth/regkeys/generate', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.post('/api/users/regkeys/generate', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = Math.random().toString(36).substr(2, 10);
 
   const registrationKey = new RegistrationKey({
@@ -531,7 +530,7 @@ app.post('/api/auth/regkeys/generate', checkPermissions('manageRegistrationKeys'
 
 // Delete registration key from MongoDB by ID
 
-app.delete('/api/auth/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
+app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const { id } = req.body.id;
   RegistrationKey.deleteOne({ _id: id })
     .then((result) => {
