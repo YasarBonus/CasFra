@@ -1,48 +1,117 @@
+<!-- media.ejs -->
 <!DOCTYPE html>
 <html>
-  <%- include('../partials/head') %>
-  <%- include('../partials/header') %>
-  <body class="bg-yasarred" >
-    <div class="ui container"style="margin-top: 100px !important; padding-bottom: 100px;">
-      <div class="ui segment" >
-        <h2>Register</h2>
-        <form class="ui form" action="/api/auth/register" method="post" onsubmit="return validateForm()">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" required><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" required><br>
-            <label for="email">E-Mail:</label>
-            <input type="email" id="email" name="email" required><br>
-            <label for="registrationKey">Registration Key:</label><br>
-            <input type="text" id="registrationKey" name="registrationKey" required><br>
-            <input class="ui button" type="submit" value="Register">
-        </form>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <div class="ui segment">
+                    <div class="ui container">
+                        <h2>Create Account</h2>
+                 
+                        <div class="ui divider"></div>                      
+                        <form class="ui form" id="userForm">
+                            <div class="ui blurring segment">
+                                <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+                                <h4 class="ui dividing header">Account Details </h4>
+                          <div class="field">
+                            <label>Username</label>
+                            <input type="text" name="username" placeholder="Username">
+                          </div>
+                          <div class="field">
+                            <label>E-Mail</label>
+                            <input type="text" name="email" placeholder="E-Mail">
+                          </div>
+                          <div class="field">
+                            <label>Password</label>
+                            <input type="password" name="password" placeholder="Password">
+                          </div>
+                          <div class="field">
+                            <label>Repeat Password</label>
+                            <input type="password" name="passwordRepeat" placeholder="Repeat password">
+                          </div>
+                          <div class="field">
+                            <label>Registration Key</label>
+                            <input type="text" name="registrationKey" placeholder="HE8GH6">
+                          </div>
+                          <!-- div class="field">
+                            <label>Language:</label>
+                            <div class="ui fluid multiple search selection dropdown">
+                              <input type="hidden" name="receipt">
+                              <i class="dropdown icon"></i>
+                              <div class="default text">Select Language</div>
+                              <div class="menu">
+                                <div class="item" data-value="en" data-text="English">
+                                  <img class="ui mini avatar image" src="/images/avatar/small/jenny.jpg">
+                                  Jenny Hess
+                                </div>
+                                <div class="item" data-value="de" data-text="German">
+                                  <img class="ui mini avatar image" src="/images/avatar/small/elliot.jpg">
+                                  Elliot Fu
+                                </div>
+                
+                              </div>
+                            </div>
+                          </div -->
+                        </div>
+                        
+                        </div>
+                          <button class="ui labeled icon button" id="saveButton">
+                          </button>
+                        </form>
+                      </div>
+                      
+                      <script>
+                        showActionButton('saveButton','save');
+                        // showLoader('formLoaderPersonalDetails', 'disabled');
+                        // showLoader('formLoaderPaymentInformation', 'disabled');
+                        // showLoader('formLoaderReceipt', 'disabled');
 
-    <script>
-        function validateForm() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const email = document.getElementById('email').value;
-            const registrationKey = document.getElementById('registrationKey').value;
+                        $('#userForm').submit(function(e) {
+                          const button = 'saveButton';
+                          e.preventDefault();
+                          showLoader('formLoaderAccountDetails', 'saving');
 
-            if (username === '' || password === '' || email === '' || registrationKey === '') {
-                alert('Username, password, email and registration key cannot be empty');
-                return false;
-            }
+                          showActionButton(button,'loading');
 
-            if (password.length < 8) {
-                alert('Password must be at least 8 characters long');
-                return false;
-            }
 
-            return true;
-        }
-    </script>
-      </div>
-    </div>
 
-   <%- include('../partials/footer') %>
+                          var formData = {
+                            username: $('input[name="username"]').val(),
+                            email: $('input[name="email"]').val(),
+                            password: $('input[name="password"]').val(),
+                            passwordRepeat: $('input[name="passwordRepeat"]').val(),
+                            registrationKey: $('input[name="registrationKey"]').val(),
+                            language: "en"
+                          };
+                          console.log('form', formData);
+                          $.ajax({
+                            type: 'POST',
+                            url: '/api/user/register',
+                            data: formData,
+                            success: function(data) {
+                              console.log(data);
+                              showLoader('formLoaderAccountDetails', 'success');
 
-</body>
-</html>
-        
+                              showActionButton(button,'success');
+                              showToast('success', 'Account created', 'Your account has been created successfully. Redirecting...');
+                              // Redirect to /login after 3 seconds
+                              setTimeout(function() {
+                                window.location.href = '/login';
+                              }, 3000);
+                            },
+                            error: function(xhr, status, error) {
+                              var errorMessage = JSON.parse(xhr.responseText).error;
+                              showActionButton(button,'error', 'Error creating account', errorMessage, 'register');
+                              showLoader('formLoaderAccountDetails', 'success');
+                            },
+                            complete: function() {
+
+                            }
+                          });
+                        });
+                      </script>
+                      <%- include('../partials/footer') %>
+                        </body>
+                    </html>

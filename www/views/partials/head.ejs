@@ -35,7 +35,7 @@
 
   <script>
     
-    function showActionButton(button, status, title, message) {
+    function showActionButton(button, status, title, message, after) {
       var actionButton = document.getElementById(button);
       actionButton.textContent = ''; // Clear the button content
 
@@ -47,11 +47,31 @@
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Save';
-      } else if (status === 'register') {
+      } else if (status === 'login') {
+          icon.classList.add('user');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Login';
+      } else if (status === 'loginError') {
+          icon.classList.add('close');
+          actionButton.classList.replace('yellow', 'red');
+          actionButton.classList.add('disabled');
+          actionButton.textContent = 'Error';
+          setTimeout(function() {
+              showActionButton(button, 'login');
+          }, 2000);
+          showToast(status, title, message);
+
+        }else if (status === 'register') {
           icon.classList.add('user');
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Register';
+      } else if (status === 'changePassword') {
+          icon.classList.add('lock');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Change Password';
       } else if (status === 'loading') {
           icon.classList.add('loading', 'spinner');
           actionButton.classList.replace('green', 'yellow');
@@ -65,17 +85,17 @@
           setTimeout(function() {
               showActionButton(button, 'save');
           }, 2000);
-          showToast(status, title, message);
+          showToast(status, title, message, after);
       } else if (status === 'error') {
           icon.classList.add('close');
           actionButton.classList.replace('yellow', 'red');
           actionButton.classList.add('disabled');
           actionButton.textContent = 'Error';
           setTimeout(function() {
-              showActionButton(button, 'save');
+              showActionButton(button, after);
           }, 2000);
           showToast(status, title, message);
-      } else if (status === 'logout') {
+        } else if (status === 'logout') {
           icon.classList.add('sign', 'out', 'alternate');
           actionButton.classList.add('red');
           actionButton.classList.remove('disabled');
