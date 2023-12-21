@@ -112,8 +112,91 @@ const linkHitSchema = new mongoose.Schema({
 // Define Casino schema
 const casinoSchema = new mongoose.Schema({
   name: String,
+  category: String,
+  description: String,
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+  active: { type: Boolean, default: false },
+  new: { type: Boolean, default: false },
+  label: String,
+  labelLarge: String,
+  boni: [String],
+  displayBonus: Number,
+  displayBonusFreespins: Number,
+  displayBonusMax: Number,
+  displayBonusSticky: { type: Boolean, default: true },
+  maxBet: Number,
+  maxCashout: Number,
+  wager: Number,
+  wagerType: String,
+  noDeposit: { type: Boolean, default: false },
+  prohibitedGamesProtection: { type: Boolean, default: true },
+  vpn: { type: Boolean, default: false },
+  features: [String],
+  providers: [String],
+  paymentMethods: [String],
+  review: String,
+  image: String,
   url: String
 });
+
+// Define Casino Review schema
+const casinoReviewSchema = new mongoose.Schema({
+  casinoId: String,
+  userId: String,
+  rating: Number,
+  review: String,
+  timestamp: { type: Date, default: Date.now }
+});
+
+// Define Casino features schema
+const casinoFeaturesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String
+});
+
+// Define Casino provider schema
+const casinoProviderSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String
+});
+
+// Define Casino payment methods schema
+const casinoPaymentMethodsSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String
+});
+
+// Define Casino wager types schema
+const casinoWagerTypesSchema = new mongoose.Schema({
+  name: String,
+  short: String,
+  description: String
+});
+
+// Define Casino boni schema
+const casinoBoniSchema = new mongoose.Schema({
+  name: String,
+  bonus: Number,
+  freespins: Number,
+  max: Number,
+  sticky: { type: Boolean, default: true },
+  description: String,
+  image: String
+});
+
+// Define Casino categories schema
+const casinoCategoriesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String
+});
+
 
 const SessionSchema = new mongoose.Schema({
   userId: String,
@@ -131,6 +214,14 @@ const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
 const LinkHit = mongoose.model('LinkHit', linkHitSchema);
 const Casino = mongoose.model('Casino', casinoSchema);
+const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
+const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
+const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
+const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
+const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
+const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
+const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
+
 
 const languageEntries = [
   { name: 'English', code: 'en' },
@@ -161,7 +252,161 @@ const userUserGroup = new UserGroup({
   permissions: ['viewDashboard', 'manageAccount']
 });
 
-const saveDefaultDatabaseData = async () => {
+const CasinoFeaturesEntries = [{
+  name: 'Fast Verification',
+  description: 'This casino offers fast verification of your account.',
+  image: 'https://www.casinofreak.com/images/icons/live-casino.png'
+}, {
+  name: 'Fast Withdrawals',
+  description: 'This casino offers fast withdrawals.',
+  image: 'https://www.casinofreak.com/images/icons/vip-casino.png'
+}];
+
+const CasinoProviderEntries = [{
+  name: 'NetEnt',
+  description: 'NetEnt is a leading provider of premium gaming solutions to the world’s most successful online casino operators. We have been a true pioneer in driving the market with our thrilling games powered by our cutting-edge platform.',
+  image: 'https://www.casinofreak.com/images/providers/netent.png'
+}, {
+  name: 'Microgaming',
+  description: 'Microgaming developed the first true online casino software over 15 years ago, and today its innovative and reliable software is licensed to over 400 online gaming brands worldwide. This unrivalled technology company offers over 600 unique game titles and more than 1,000 game variants, in 24 languages, across online, land-based, and mobile platforms.',
+  image: 'https://www.casinofreak.com/images/providers/microgaming.png'
+}];
+
+const CasinoPaymentMethodsEntries = [{
+  name: 'Visa',
+  description: 'Visa is a global payments technology company working to enable consumers, businesses, banks and governments to use digital currency.',
+  image: 'https://www.casinofreak.com/images/payment-methods/visa.png'
+}, {
+  name: 'Mastercard',
+  description: 'Mastercard is a global payments technology company working to enable consumers, businesses, banks and governments to use digital currency.',
+  image: 'https://www.casinofreak.com/images/payment-methods/mastercard.png'
+}];
+
+const CasinoWagerTypesEntries = [{
+  name: 'Deposit',
+  short: 'D',
+  description: 'A deposit bonus is a bonus that you receive when you make a deposit.',
+}, {
+  name: 'Bonus',
+  short: 'B',
+  description: 'A bonus is a bonus that you receive when you make a deposit.',
+}];
+
+const CasinoBoniEntries = [{
+  name: 'Welcome Bonus',
+  bonus: 100,
+  freespins: 0,
+  max: 100,
+  sticky: true,
+  description: 'Welcome Bonus',
+  image: 'https://www.casinofreak.com/images/bonuses/welcome-bonus.png'
+}, {
+  name: 'No Deposit Bonus',
+  bonus: 0,
+  freespins: 0,
+  max: 0,
+  sticky: true,
+  description: 'No Deposit Bonus',
+  image: 'https://www.casinofreak.com/images/bonuses/no-deposit-bonus.png'
+}];
+
+const CasinoCategoriesEntries = [{
+  name: 'New',
+  description: 'New Casinos',
+  image: 'https://www.casinofreak.com/images/categories/new.png'
+}, {
+  name: 'Live',
+  description: 'Live Casinos',
+  image: 'https://www.casinofreak.com/images/categories/live.png'
+}];
+
+const saveDefaultCasinoDatabaseData = async () => {
+  try {
+    const promises = [];
+
+    for (const casinoFeaturesEntry of CasinoFeaturesEntries) {
+      const existingCasinoFeatures = await CasinoFeatures.findOne({ name: casinoFeaturesEntry.name });
+
+      if (!existingCasinoFeatures) {
+        const newCasinoFeatures = new CasinoFeatures(casinoFeaturesEntry);
+        promises.push(newCasinoFeatures.save());
+        console.log('CasinoFeatures entry saved:', newCasinoFeatures);
+      } else if (existingCasinoFeatures.description !== casinoFeaturesEntry.description) {
+        existingCasinoFeatures.description = casinoFeaturesEntry.description;
+        promises.push(existingCasinoFeatures.save());
+        console.log('CasinoFeatures entry updated:', existingCasinoFeatures);
+      }
+    }
+
+    for (const casinoProviderEntry of CasinoProviderEntries) {
+      const existingCasinoProvider = await CasinoProvider.findOne({ name: casinoProviderEntry.name });
+
+      if (!existingCasinoProvider) {
+        const newCasinoProvider = new CasinoProvider(casinoProviderEntry);
+        promises.push(newCasinoProvider.save());
+        console.log('CasinoProvider entry saved:', newCasinoProvider);
+      } else if (existingCasinoProvider.description !== casinoProviderEntry.description) {
+        existingCasinoProvider.description = casinoProviderEntry.description;
+        promises.push(existingCasinoProvider.save());
+        console.log('CasinoProvider entry updated:', existingCasinoProvider);
+      }
+    }
+
+    for (const casinoPaymentMethodsEntry of CasinoPaymentMethodsEntries) {
+      const existingCasinoPaymentMethods = await CasinoPaymentMethods.findOne({ name: casinoPaymentMethodsEntry.name });
+
+      if (!existingCasinoPaymentMethods) {
+        const newCasinoPaymentMethods = new CasinoPaymentMethods(casinoPaymentMethodsEntry);
+        promises.push(newCasinoPaymentMethods.save());
+        console.log('CasinoPaymentMethods entry saved:', newCasinoPaymentMethods);
+      } else if (existingCasinoPaymentMethods.description !== casinoPaymentMethodsEntry.description) {
+        existingCasinoPaymentMethods.description = casinoPaymentMethodsEntry.description;
+        promises.push(existingCasinoPaymentMethods.save());
+        console.log('CasinoPaymentMethods entry updated:', existingCasinoPaymentMethods);
+      }
+    }
+
+    for (const casinoWagerTypesEntry of CasinoWagerTypesEntries) {
+      const existingCasinoWagerTypes = await CasinoWagerTypes.findOne({ name: casinoWagerTypesEntry.name });
+
+      if (!existingCasinoWagerTypes) {
+        const newCasino = new CasinoWagerTypes(casinoWagerTypesEntry);
+        promises.push(newCasino.save());
+        console.log('CasinoWagerTypes entry saved:', newCasino);
+      }
+    }
+
+    for (const casinoBoniEntry of CasinoBoniEntries) {
+      const existingCasinoBoni = await CasinoBoni.findOne({ name: casinoBoniEntry.name });
+
+      if (!existingCasinoBoni) {
+        const newCasinoBoni = new CasinoBoni(casinoBoniEntry);
+        promises.push(newCasinoBoni.save());
+        console.log('CasinoBoni entry saved:', newCasinoBoni);
+      }
+    }
+
+    for (const casinoCategoriesEntry of CasinoCategoriesEntries) {
+      const existingCasinoCategories = await CasinoCategories.findOne({ name: casinoCategoriesEntry.name });
+
+      if (!existingCasinoCategories) {
+        const newCasinoCategories = new CasinoCategories(casinoCategoriesEntry);
+        promises.push(newCasinoCategories.save());
+        console.log('CasinoCategories entry saved:', newCasinoCategories);
+      }
+    }
+
+    await Promise.all(promises);
+    console.log('Default Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default Database Data:', error);
+  }
+};
+
+saveDefaultCasinoDatabaseData();
+
+
+const saveDefaultUserDatabaseData = async () => {
   try {
     const adminGroup = await UserGroup.findOne({ name: 'Admin' });
     const userGroup = await UserGroup.findOne({ name: 'User' });
@@ -227,7 +472,7 @@ const saveDefaultDatabaseData = async () => {
   }
 };
 
-saveDefaultDatabaseData();
+saveDefaultUserDatabaseData();
 
   // Middleware
 app.use(express.json());
