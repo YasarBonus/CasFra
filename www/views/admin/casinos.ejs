@@ -48,9 +48,10 @@
                                             <div class="two fields">
                                                 <div class="field">
                                                     <label>Categories</label>
-                                                    <select name="categories" multiple="" class="ui dropdown" id="categoriesDropdown">
+                                                    <select name="categories" multiple class="ui fluid dropdown" id="categoriesDropdown">
 
                                                     </select>
+                                                    
                                                 </div>
                                             </div>
                                             <div class="field">
@@ -66,6 +67,7 @@
                                 `;
                                 document.body.appendChild(modal);
                                 $(modal).modal('show');
+                                $('.ui.dropdown').dropdown(); // Initialize the dropdown
                                 console.log('Edit button clicked for casino with ID:', casinoId);
 
                                 // Populate the categories dropdown with available categories
