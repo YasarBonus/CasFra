@@ -78,6 +78,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   language: String,
   active: { type: Boolean, default: false },
+  banned: { type: Boolean, default: false },
   registrationDate: Date,
   registrationIp: String,
   registrationVerificationCode: String,
@@ -273,6 +274,11 @@ app.post('/api/auth/login', (req, res) => {
 
       if (!user.active) {
         res.status(401).json({ error: 'User is not active' });
+        return;
+      }
+
+      if (user.banned) {
+        res.status(401).json({ error: 'User is banned' });
         return;
       }
 
