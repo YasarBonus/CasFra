@@ -711,6 +711,14 @@ function checkPermissions(requiredPermission) {
 }
 
 // Routes for rendering views
+app.get('/', (req, res) => {
+  res.render('pages/index');
+});
+
+app.get('/faq', (req, res) => {
+  res.render('pages/faq');
+});
+
 app.get('/login', (req, res) => {
   res.render('admin/login');
 });
