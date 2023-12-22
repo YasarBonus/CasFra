@@ -1047,6 +1047,46 @@ app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req,
     );
 });
 
+// Duplicate casino category
+app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const { userId } = req.session.user;
+  const { id } = req.params;
+
+  CasinoCategories.findOne({ _id: id })
+    .then((casinoCategories) => {
+      if (!casinoCategories) {
+        throw new Error('Casino category not found');
+      } else {
+        const newCasinoCategories = new CasinoCategories({
+          addedBy: userId,
+          name: casinoCategories.name + ' (Copy)',
+          description: casinoCategories.description,
+          image: casinoCategories.image,
+          priority: casinoCategories.priority,
+          active: casinoCategories.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoCategories.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          }
+          )
+          .catch((error) => {
+            console.error('Error inserting casino category:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          }
+          );
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+    );
+});
+
+
 // Edit casino category
 app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
   const { userId } = req.session.user;
@@ -1460,6 +1500,16 @@ app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/casinos', { user: user });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/casinocategories', { user: user });
   } catch (err) {
     next(err);
   }
