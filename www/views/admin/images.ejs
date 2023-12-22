@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred" >
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment" >
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <h2>Images</h2>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="ui action input">
+                            <input type="file" name="image" id="imageInput">
+                            <button class="ui primary button" type="submit">Upload</button>
+                        </div>
+                    </form>
+                    <table class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="imageTableBody">
+                            <!-- Images will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <%- include('../partials/footer') %>
+
+        <script>
+            // Function to fetch and display existing images
+            function fetchImages() {
+                fetch('/api/images')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear existing table rows
+                        document.getElementById('imageTableBody').innerHTML = '';
+
+                        // Add each image to the table
+                        data.forEach(image => {
+                            var imageRow = document.createElement('tr');
+                            var imageCell = document.createElement('td');
+                            var imageElement = document.createElement('img');
+                            imageElement.src = image.imageUrl;
+                            imageElement.style.maxWidth = '200px';
+                            imageCell.appendChild(imageElement);
+                            imageRow.appendChild(imageCell);
+
+                            var nameCell = document.createElement('td');
+                            var nameInput = document.createElement('input');
+                            nameInput.type = 'text';
+                            nameInput.value = image.name;
+                            nameCell.appendChild(nameInput);
+                            imageRow.appendChild(nameCell);
+
+                            var actionsCell = document.createElement('td');
+                            var saveButton = document.createElement('button');
+                            saveButton.textContent = 'Save';
+                            saveButton.addEventListener('click', function() {
+                                // Save the image name
+                                var newName = nameInput.value;
+                                // Send a request to update the image name
+                                fetch('/api/images/' + image._id, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ name: newName })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Handle response from the server
+                                    console.log(data);
+                                    // Update the image name in the table
+                                    image.name = newName;
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                            });
+                            actionsCell.appendChild(saveButton);
+
+                            var deleteButton = document.createElement('button');
+                            deleteButton.textContent = 'Delete';
+                            deleteButton.addEventListener('click', function() {
+                                // Send a request to delete the image
+                                fetch('/api/images/' + image._id, {
+                                    method: 'DELETE'
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Handle response from the server
+                                    console.log(data);
+                                    // Remove the image row from the table
+                                    imageRow.remove();
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                            });
+                            actionsCell.appendChild(deleteButton);
+
+                            imageRow.appendChild(actionsCell);
+
+                            document.getElementById('imageTableBody').appendChild(imageRow);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+            // AJAX form submission
+            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                fetch('/api/images', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle response from the server
+                    console.log(data);
+                    // Add the uploaded image to the table
+                    var imageRow = document.createElement('tr');
+                    var imageCell = document.createElement('td');
+                    var image = document.createElement('img');
+                    image.src = data.imageUrl;
+                    imageCell.appendChild(image);
+                    imageRow.appendChild(imageCell);
+
+                    var nameCell = document.createElement('td');
+                    var nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.value = '';
+                    nameCell.appendChild(nameInput);
+                    imageRow.appendChild(nameCell);
+
+                    var actionsCell = document.createElement('td');
+                    var saveButton = document.createElement('button');
+                    saveButton.textContent = 'Save';
+                    saveButton.addEventListener('click', function() {
+                        // Handle save button click
+                        console.log('Save button clicked');
+                    });
+                    actionsCell.appendChild(saveButton);
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.addEventListener('click', function() {
+                        // Handle delete button click
+                        console.log('Delete button clicked');
+                    });
+                    actionsCell.appendChild(deleteButton);
+
+                    imageRow.appendChild(actionsCell);
+
+                    document.getElementById('imageTableBody').appendChild(imageRow);
+                    fetchImages();
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+
+            // Fetch and display existing images on page load
+            fetchImages();
+        </script>
+    </body>
+</html>
