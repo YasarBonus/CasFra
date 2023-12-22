@@ -10,7 +10,7 @@
                     <h2>Casinos</h2>
                     <h3>Manage Casinos</h3>
                     <div class="ui primary button" onclick="openAddModal()">Add new Casino</div>
-                    <div id="casinos-container" class="ui four cards"></div>
+                    <div id="casinos-container" class="ui items"></div>
                 </div>
             </div>
         </div>
@@ -98,22 +98,22 @@
 
                                             <div class="four fields">
                                                 <div class="field">
-                                                    <label>Categories</label>
+                                                    <label>Categories (<a href="casinos/categories">manage</a>)</label>
                                                     <select name="categories" multiple class="ui fluid dropdown" id="categoriesDropdown">
                                                     </select>
                                                 </div>
                                                 <div class="field">
-                                                    <label>Features</label>
+                                                    <label>Features (<a href="casinos/features">manage</a>)</label>
                                                     <select name="features" multiple class="ui fluid dropdown" id="featuresDropdown">
                                                     </select>
                                                 </div>
                                                 <div class="field">
-                                                    <label>Providers</label>
+                                                    <label>Providers (<a href="casinos/providers">manage</a>)</label>
                                                     <select name="providers" multiple class="ui fluid dropdown" id="providersDropdown">
                                                     </select>
                                                 </div>
                                                 <div class="field">
-                                                    <label>Payment Methods</label>
+                                                    <label>Payment Methods (<a href="casinos/paymentmethods">manage</a>)</label>
                                                     <select name="paymentMethods" multiple class="ui fluid dropdown" id="paymentMethodsDropdown">
                                                     </select>
                                                 </div>
@@ -289,212 +289,261 @@
                 const paymentMethodsSelect = document.querySelector('select[name="paymentMethods"]');
                 const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(option => option.value);
 
-                const reviewTitle = document.querySelector('input[name="reviewTitle"]').value;
-                const review = document.querySelector('textarea[name="review"]').value;
+                                const reviewTitle = document.querySelector('input[name="reviewTitle"]').value;
+                                const review = document.querySelector('textarea[name="review"]').value;
 
-                const imageUrl = document.querySelector('input[name="imageUrl"]').value;
-                const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
-                const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
-                //#endregion
-                
+                                const imageUrl = document.querySelector('input[name="imageUrl"]').value;
+                                const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
+                                const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
+                                //#endregion
+                                
 
-                
-                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'ImageUrl:', imageUrl, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
+                                
+                                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'ImageUrl:', imageUrl, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
 
-                
-                // Send a PUT request to the API with the updated casino data
-                fetch(`/api/casinos/${casinoId}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageUrl, affiliateLink, affiliateShortlink }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('Casino updated:', result);
-                        // Close the modal and fetch the updated casinos
-                        $('.ui.modal').modal('hide');
-                        fetchCasinos();
-                    })
-                    .catch(error => {
-                        console.error('Error updating casino:', error);
-                    });
-            }
+                                
+                                // Send a PUT request to the API with the updated casino data
+                                fetch(`/api/casinos/${casinoId}`, {
+                                    method: 'PUT',
+                                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageUrl, affiliateLink, affiliateShortlink }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Casino updated:', result);
+                                        // Close the modal and fetch the updated casinos
+                                        $('.ui.modal').modal('hide');
+                                        fetchCasinos();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error updating casino:', error);
+                                    });
+                            }
 
-            function openAddModal() {
-                const modal = document.createElement('div');
-                modal.classList.add('ui', 'modal');
-                modal.innerHTML = `
-                    <div class="header">Add Casino</div>
-                    <div class="content">
-                        <form class="ui form">
-                            <div class="field">
-                                <label>Name</label>
-                                <input type="text" name="name" placeholder="Enter the casino name">
-                            </div>
-                            <div class="field">
-                                <label>Location</label>
-                                <input type="text" name="location" placeholder="Enter the casino location">
-                            </div>
-                            <div class="field">
-                                <label>Description</label>
-                                <textarea name="description" placeholder="Enter the casino description"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="actions">
-                        <div class="ui button">Cancel</div>
-                        <div class="ui primary button" onclick="saveNewCasino()">Save</div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-                $(modal).modal('show');
-            }
+                            function openAddModal() {
+                                const modal = document.createElement('div');
+                                modal.classList.add('ui', 'modal');
+                                modal.innerHTML = `
+                                    <div class="header">Add Casino</div>
+                                    <div class="content">
+                                        <form class="ui form">
+                                            <div class="field">
+                                                <label>Name</label>
+                                                <input type="text" name="name" placeholder="Enter the casino name">
+                                            </div>
+                                            <div class="field">
+                                                <label>Location</label>
+                                                <input type="text" name="location" placeholder="Enter the casino location">
+                                            </div>
+                                            <div class="field">
+                                                <label>Description</label>
+                                                <textarea name="description" placeholder="Enter the casino description"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="actions">
+                                        <div class="ui button">Cancel</div>
+                                        <div class="ui primary button" onclick="saveNewCasino()">Save</div>
+                                    </div>
+                                `;
+                                document.body.appendChild(modal);
+                                $(modal).modal('show');
+                            }
 
-            function saveNewCasino() {
-                // Get the new casino data from the form
-                const name = document.querySelector('input[name="name"]').value;
-                const location = document.querySelector('input[name="location"]').value;
-                const description = document.querySelector('textarea[name="description"]').value;
+                            function saveNewCasino() {
+                                // Get the new casino data from the form
+                                const name = document.querySelector('input[name="name"]').value;
+                                const location = document.querySelector('input[name="location"]').value;
+                                const description = document.querySelector('textarea[name="description"]').value;
 
-                // Send a POST request to the API to add the new casino
-                fetch('/api/casinos', {
-                    method: 'POST',
-                    body: JSON.stringify({ name, location, description }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('New casino added:', result);
-                        // Close the modal and fetch the updated casinos
-                        $('.ui.modal').modal('hide');
-                        fetchCasinos();
-                    })
-                    .catch(error => {
-                        console.error('Error adding new casino:', error);
-                    });
-            }
+                                // Send a POST request to the API to add the new casino
+                                fetch('/api/casinos', {
+                                    method: 'POST',
+                                    body: JSON.stringify({ name, location, description }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('New casino added:', result);
+                                        // Close the modal and fetch the updated casinos
+                                        $('.ui.modal').modal('hide');
+                                        fetchCasinos();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error adding new casino:', error);
+                                    });
+                            }
 
-            function fetchCasinos() {
-                fetch('/api/casinos')
-                    .then(response => response.json())
-                    .then(casinos => {
-                        // Sort the casinos by priority
-                        casinos.sort((a, b) => a.priority - b.priority);
+                            function fetchCasinos() {
+                                fetch('/api/casinos')
+                                    .then(response => response.json())
+                                    .then(casinos => {
+                                        // Sort the casinos by priority
+                                        casinos.sort((a, b) => a.priority - b.priority);
 
-                        const casinosContainer = document.getElementById('casinos-container');
-                        casinosContainer.innerHTML = ''; // Remove existing cards
+                                        const casinosContainer = document.getElementById('casinos-container');
+                                        casinosContainer.innerHTML = ''; // Remove existing items
 
-                        casinos.forEach(casino => {
-                            // Create a Fomantic UI card for each casino
-                            const card = document.createElement('div');
-                            card.classList.add('ui', 'card');
-                            card.id = casino._id;
-                            card.draggable = true; // Enable drag and drop
-                            card.addEventListener('dragstart', handleDragStart);
-                            card.addEventListener('dragover', handleDragOver);
-                            card.addEventListener('drop', handleDrop);
-                            card.innerHTML = `
-                                <div class="content">
-                                    <img class="right floated mini ui image" src="${casino.image}">
-                                    <div class="ui ${casino.active ? 'green' : 'red'} right floated label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
-                                    <div style="font-size:10px" class="meta" id="casinoId">${casino._id}</div>
-                                    <div class="header">${casino.name}</div>
-                                    <div class="meta">${casino.label}</div>
-                                    <div class="description">${casino.description}</div>
-                                </div>
-                                <div class="extra content">
-                                    <button class="ui tiny button" onclick="openEditModal('${casino._id}')">Edit</button>
-                                    <button class="ui tiny red button" onclick="deleteCasino('${casino._id}')">Delete</button>
-                                </div>
-                            `;
-                            casinosContainer.appendChild(card);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching casinos:', error);
-                    });
-            }
+                                        casinos.forEach(casino => {
+                                            // Create a Fomantic UI item for each casino
+                                            const item = document.createElement('div');
+                                            item.classList.add('item');
+                                            item.style.backgroundColor = casino.active ? '#fff' : '#eee';
+                                            item.id = casino._id;
+                                            item.draggable = true; // Enable drag and drop
+                                            item.addEventListener('dragstart', handleDragStart);
+                                            item.addEventListener('dragover', handleDragOver);
+                                            item.addEventListener('drop', handleDrop);
+                                            item.innerHTML = `
+                                            <div class="image">
+                                                <div class="ui ${casino.active ? 'green' : 'red'} label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
+                                            <img style="max-width: 100px" src="${casino.imageUrl}">
+                                            </div>
+                                            <div class="content">
+                                            <a class="header">${casino.name}</a>
+                                            <div class="meta">
+                                                <span>${casino.label} (${casino.labelLarge})</span>
+                                            </div>
+                                            <div class="description">
+                                                <p>${casino.description}</p>
+                                            </div>
+                                            <div class="extra">
+                                                <div class="ui right floated primary button" onclick="openEditModal('${casino._id}')">
+                                                    Edit
+                                                </div>
+                                                <div class="ui right floated primary button" onclick="duplicateCasino('${casino._id}')">
+                                                    Duplicate
+                                                </div>
+                                                <div class="ui right floated red button" onclick="confirmDeleteCasino('${casino._id}')">
+                                                    Delete
+                                                </div>
+                                                <div class="ui label">Limited</div>
+                                            </div>
+                                            </div>
+                                            `;
+                                            casinosContainer.appendChild(item);
+                                        });
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching casinos:', error);
+                                    });
+                            }
 
-            function handleDragStart(event) {
-                event.dataTransfer.setData('text/plain', event.target.id);
-            }
+                            function handleDragStart(event) {
+                                event.dataTransfer.setData('text/plain', event.target.id);
+                            }
 
-            function handleDragOver(event) {
-                event.preventDefault();
-            }
+                            function handleDragOver(event) {
+                                event.preventDefault();
+                            }
 
-            function handleDrop(event) {
-                event.preventDefault();
-                const id1 = event.dataTransfer.getData('text/plain');
-                const cardElement = event.target.closest('[id]');
-                const id2 = cardElement ? cardElement.id : null;
-                console.log('ID1:' + id1);
-                console.log('ID2:' + id2);
+                            function handleDrop(event) {
+                                event.preventDefault();
+                                const id1 = event.dataTransfer.getData('text/plain');
+                                const cardElement = event.target.closest('[id]');
+                                const id2 = cardElement ? cardElement.id : null;
+                                console.log('ID1:' + id1);
+                                console.log('ID2:' + id2);
 
-                // Send a POST request to swap the priorities
-                fetch('/api/casinos/priority/swap', {
-                    method: 'PUT',
-                    body: JSON.stringify({ id1, id2 }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('Priorities swapped:', result);
-                        fetchCasinos(); // Fetch the updated casinos
-                    })
-                    .catch(error => {
-                        console.error('Error swapping priorities:', error);
-                    });
-            }
+                                // Send a POST request to swap the priorities
+                                fetch('/api/casinos/priority/swap', {
+                                    method: 'PUT',
+                                    body: JSON.stringify({ id1, id2 }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Priorities swapped:', result);
+                                        fetchCasinos(); // Fetch the updated casinos
+                                    })
+                                    .catch(error => {
+                                        console.error('Error swapping priorities:', error);
+                                    });
+                            }
 
-            function deleteCasino(casinoId) {
-                // Send a DELETE request to the API
-                fetch(`/api/casinos`, {
-                    method: 'DELETE',
-                    body: JSON.stringify({ id: casinoId }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('Casino deleted:', result);
-                        // Remove the deleted casino card from the UI
-                        fetchCasinos();
-                    })
-                    .catch(error => {
-                        console.error('Error deleting casino:', error);
-                    });
-            }
+                            function duplicateCasino(casinoId) {
+                                // Send a POST request to duplicate the casino
+                                fetch(`/api/casinos/${casinoId}/duplicate`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Casino duplicated:', result);
+                                        fetchCasinos(); // Fetch the updated casinos
+                                    })
+                                    .catch(error => {
+                                        console.error('Error duplicating casino:', error);
+                                    });
+                            }
 
-            function toggleActive(casinoId, active) {
-                // Send a PUT request to the API to toggle the active state
-                fetch(`/api/casinos/${casinoId}/toggleActive`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ active: !active }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        console.log('Casino active state updated:', result);
-                        // Fetch the updated casinos
-                        fetchCasinos();
-                    })
-                    .catch(error => {
-                        console.error('Error updating casino active state:', error);
-                    });
-            }
+                            function confirmDeleteCasino(casinoId) {
+                                // Create a Fomantic UI mini dialog for confirmation
+                                const dialog = document.createElement('div');
+                                dialog.classList.add('ui', 'mini', 'modal');
+                                dialog.innerHTML = `
+                                    <div class="header">Delete Casino</div>
+                                    <div class="content">
+                                        <p>Are you sure you want to delete this casino?</p>
+                                    </div>
+                                    <div class="actions">
+                                        <div class="ui button">Cancel</div>
+                                        <div class="ui red button" onclick="deleteCasino('${casinoId}')">Delete</div>
+                                    </div>
+                                `;
+                                document.body.appendChild(dialog);
+                                $(dialog).modal('show');
+                            }
 
-            fetchCasinos();
-        </script>
-    </body>
-</html>
-           
+                            function deleteCasino(casinoId) {
+                                // Send a DELETE request to the API
+                                fetch(`/api/casinos`, {
+                                    method: 'DELETE',
+                                    body: JSON.stringify({ id: casinoId }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Casino deleted:', result);
+                                        // Remove the deleted casino card from the UI
+                                        fetchCasinos();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error deleting casino:', error);
+                                    });
+                            }
+
+                            function toggleActive(casinoId, active) {
+                                // Send a PUT request to the API to toggle the active state
+                                fetch(`/api/casinos/${casinoId}/toggleActive`, {
+                                    method: 'PUT',
+                                    body: JSON.stringify({ active: !active }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Casino active state updated:', result);
+                                        // Fetch the updated casinos
+                                        fetchCasinos();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error updating casino active state:', error);
+                                    });
+                            }
+
+                            fetchCasinos();
+                        </script>
+                    </body>
+                </html>

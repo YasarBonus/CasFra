@@ -1104,12 +1104,12 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
 app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
   const { userId } = req.session.user; // Get the user ID from the session data
   const { id } = req.params; // Get the ID from the request params
-  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, image, url } = req.body; // Get the updated values from the request body
+  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
   console.log(req.body);
   console.log(active);
   Casino.findOneAndUpdate(
     { _id: id },
-    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, image, url },
+    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink },
     { modifiedBy: userId, modifiedDate: Date.now() }
   )
     .then((updatedCasino) => {
@@ -1141,6 +1141,8 @@ app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+
 
 // Get all available categories from the database
 app.get('/api/casinos/categories/all', checkPermissions('manageCasinos'), (req, res) => {
