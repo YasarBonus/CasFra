@@ -35,7 +35,7 @@
                                     <div class="header">Edit Casino</div>
                                     <div class="content">
                                         <form class="ui form">
-                                            <div class="two fields">
+                                            <div class="three fields">
                                                 <div class="field">
                                                     <label>Name</label>
                                                     <input type="text" name="name" placeholder="Enter the casino name" value="${casino.name}">
@@ -44,20 +44,102 @@
                                                     <label>Label</label>
                                                     <input type="text" name="label" placeholder="Enter the casino label" value="${casino.label}">
                                                 </div>
+                                                <div class="field">
+                                                    <label>Large Label</label>
+                                                    <input type="text" name="labelLarge" placeholder="Enter the casino label" value="${casino.labelLarge}">
+                                                </div>
                                             </div>
-                                            <div class="two fields">
+                                            <div class="fields">
+                                                <div class="four wide field">
+                                                    <label>Shortlink</label>
+                                                    <input type="text" name="image" placeholder="Enter the casino image URL" value="${casino.image}">
+                                                </div>
+                                                <div class="twelve wide field">
+                                                    <label>Affiliate Link</label>
+                                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.background}">
+                                                </div>
+                                            </div>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui toggle checkbox">
+                                                        <input type="checkbox" name="active" ${casino.active ? 'checked' : ''}>
+                                                        <label>Active</label>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui toggle checkbox">
+                                                        <input type="checkbox" name="isNew" ${casino.isNew ? 'checked' : ''}>
+                                                        <label>New</label>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui toggle checkbox">
+                                                        <input type="checkbox" name="vpn" ${casino.vpn ? 'checked' : ''}>
+                                                        <label>VPN allowed</label>
+                                                    </div>
+                                                </div>
+                                        
+                                            </div>
+
+                                            <div class="three fields">
                                                 <div class="field">
                                                     <label>Categories</label>
                                                     <select name="categories" multiple class="ui fluid dropdown" id="categoriesDropdown">
-
                                                     </select>
-                                                    
+                                                </div>
+                                                <div class="field">
+                                                    <label>Features</label>
+                                                    <select name="features" multiple class="ui fluid dropdown" id="featuresDropdown">
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Providers</label>
+                                                    <select name="providers" multiple class="ui fluid dropdown" id="providersDropdown">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="six fields">
+                                                <div class="field">
+                                                    <label>Boni</label>
+                                                    <select name="boni" multiple class="ui fluid dropdown" id="categoriesDropdown">
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Display Bonus</label>
+                                                    <select name="displayBonus" class="ui fluid dropdown" id="categoriesDropdown">
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Max Bet</label>
+                                                    <input type="text" name="maxBet" placeholder="Enter the casino background URL" value="${casino.maxBet}">
+                                                </div>
+                                                <div class="field">
+                                                    <label>Max Cashout</label>
+                                                    <input type="text" name="maxCashout" placeholder="Enter the casino background URL" value="${casino.maxCashout}">
+                                                </div>
+                                                <div class="field">
+                                                    <label>Wager</label>
+                                                    <input type="text" name="wager" placeholder="Enter the casino background URL" value="${casino.wager}">
+                                                </div>
+                                                <div class="field">
+                                                    <label>Wager Type</label>
+                                                    <select name="wagerType" multiple class="ui fluid dropdown" id="wagerTypeDropdown">
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="field">
                                                 <label>Description</label>
                                                 <textarea name="description" placeholder="Enter the casino description">${casino.description}</textarea>
                                             </div>
+                                            <div class="field">
+                                                <label>Review Title</label>
+                                                <input type="text" name="reviewTitle" placeholder="Enter the casino background URL" value="${casino.reviewTitle}">
+                                            </div>
+                                            <div class="field">
+                                                <label>Review</label>
+                                                <textarea name="review" placeholder="Enter the casino description">${casino.review}</textarea>
+                                            </div>
+
                                         </form>
                                     </div>
                                     <div class="actions">
@@ -112,10 +194,12 @@
                 const name = document.querySelector('input[name="name"]').value;
                 const label = document.querySelector('input[name="label"]').value;
                 const description = document.querySelector('textarea[name="description"]').value;
+                const active = document.querySelector('input[name="active"]').checked;
                 const categoriesSelect = document.querySelector('select[name="categories"]');
                 const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
-                console.log('Update Data:' + name + label + description + categories);
+                console.log('Update Data:' + name + label + description + categories + active);
 
+                
                 // Send a PUT request to the API with the updated casino data
                 fetch(`/api/casinos/${casinoId}`, {
                     method: 'PUT',

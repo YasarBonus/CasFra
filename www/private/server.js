@@ -140,7 +140,6 @@ const casinoSchema = new mongoose.Schema({
   labelLarge: String,
   boni: [String],
   displayBonus: String,
-  displayBonusSticky: { type: Boolean, default: true },
   maxBet: Number,
   maxCashout: Number,
   wager: Number,
@@ -151,9 +150,10 @@ const casinoSchema = new mongoose.Schema({
   features: [String],
   providers: [String],
   paymentMethods: [String],
+  reviewTitle: String,
   review: String,
   image: String,
-  url: String
+  affiliateLink: String
 });
 
 // Define Casino Review schema
@@ -1087,20 +1087,20 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
 app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
   const { userId } = req.session.user; // Get the user ID from the session data
   const { id } = req.params; // Get the ID from the request params
-  const { name, label, description, categories, isNew } = req.body; // Get the updated name from the request body
-  console.log(id + ' ' + name + ' ' + label + ' ' + description + ' ' + categories + ' ' + isNew);
-
+  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, image, url } = req.body; // Get the updated values from the request body
+  console.log(req.body);
+  console.log(active);
   Casino.findOneAndUpdate(
     { _id: id },
-    { name: name, label: label, description: description, modifiedBy: userId, modifiedDate: Date.now(), categories: categories },
-    { isNew: isNew }
+    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, image, url },
+    { modifiedBy: userId, modifiedDate: Date.now() }
   )
     .then((updatedCasino) => {
       if (!updatedCasino) {
         throw new Error('Casino not found');
       }
       res.json(updatedCasino);
-      console.log('Casino updated: ' + updatedCasino);
+      console.log('Casino updated: ' + updatedCasino.name);
     })
     .catch((error) => {
       console.error('Error updating casino:', error);
