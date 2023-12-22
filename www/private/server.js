@@ -1233,8 +1233,44 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
     });
 });
 
+// Edit image
+app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
+  const { userId } = req.session.user;
+  const { id } = req.params;
+  const { name, description, priority, active, category } = req.body;
 
-// Delete image from MongoDB and folder by ID
+  Images.findOne({ _id: id })
+    .then((image) => {
+      if (!image) {
+        res.status(404).json({ error: 'Image not found' });
+      } else {
+        image.name = name;
+        image.description = description;
+        image.priority = priority;
+        image.active = active;
+        image.modifiedDate = Date.now();
+        image.modifiedBy = userId;
+        image.category = category;
+
+        image.save()
+          .then(() => {
+            res.status(200).json({ message: 'Image edited successfully' });
+          })
+          .catch((error) => {
+            console.error('Error editing image:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error editing image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
+
+// Delete image from MongoDB and from the file system by ID
 app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   const imageId = req.params.id;
 
@@ -1244,21 +1280,18 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
         return res.status(404).json({ error: 'Image not found' });
       }
 
-      // Delete image file from folder
-      const imagePath = path.join('uploads', deletedImage.filename);
-      fs.unlink(imagePath, (error) => {
-        if (error) {
-          console.error('Error deleting image file:', error);
-        }
-      });
+      // Delete the image from the file system
+      fs.unlinkSync(`public/img/images/${deletedImage.filename}`);
 
       res.json({ message: 'Image deleted successfully' });
-    })
+    }
+    )
     .catch((error) => {
       console.error('Error deleting image:', error);
       res.status(500).json({ error: 'Internal server error' });
-    });
-});
+    }
+    );
+} );
 
 //#endregion Media Images
 
