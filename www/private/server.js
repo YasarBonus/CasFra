@@ -124,7 +124,13 @@ const imagesSchema = new mongoose.Schema({
 const imagesCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino schema
@@ -174,28 +180,52 @@ const casinoReviewSchema = new mongoose.Schema({
 const casinoFeaturesSchema = new mongoose.Schema({
   name: String,
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
   name: String,
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino payment methods schema
 const casinoPaymentMethodsSchema = new mongoose.Schema({
   name: String,
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino wager types schema
 const casinoWagerTypesSchema = new mongoose.Schema({
   name: String,
   short: String,
-  description: String
+  description: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino boni schema
@@ -206,14 +236,26 @@ const casinoBoniSchema = new mongoose.Schema({
   max: Number,
   sticky: { type: Boolean, default: true },
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 // Define Casino categories schema
 const casinoCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
-  image: String
+  image: String,
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
 });
 
 
@@ -964,6 +1006,91 @@ app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (r
 });
 //#endregion Registration Keys
 
+//#region Casino Categories
+
+// Get all casino categories from MongoDB
+app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoCategories.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino categories:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Insert casino category into MongoDB
+app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req, res) => {
+  const { name, description, image, priority, active } = req.body;
+  const { userId } = req.session.user;
+
+  const casinoCategories = new CasinoCategories({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoCategories.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    }
+    )
+    .catch((error) => {
+      console.error('Error inserting casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+    );
+});
+
+// Edit casino category
+app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const { userId } = req.session.user;
+  const { id } = req.params;
+  const { name, description, image, priority, active } = req.body;
+
+  CasinoCategories.findOneAndUpdate(
+    { _id: id },
+    { name, description, image, priority, active },
+    { modifiedBy: userId, modifiedDate: Date.now() }
+  )
+    .then((updatedCasinoCategories) => {
+      if (!updatedCasinoCategories) {
+        throw new Error('Casino category not found');
+      }
+      res.json(updatedCasinoCategories);
+      console.log('Casino category updated: ' + updatedCasinoCategories.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Delete casino category
+app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params;
+
+  CasinoCategories.findOneAndDelete({ _id: id })
+    .then((deletedCasinoCategory) => {
+      if (!deletedCasinoCategory) {
+        throw new Error('Casino category not found');
+      }
+      res.json(deletedCasinoCategory);
+      console.log('Casino category deleted: ' + deletedCasinoCategory.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+//#endregion Casino Categories
+
 //#region Casinos
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
@@ -1202,76 +1329,9 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
     });
 } );
 
-// Get all available categories from the database
-app.get('/api/casinos/categories/all', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoCategories.find()
-    .then((results) => {
-      res.json(results);
-      console.log('All categories retrieved');
-    })
-    .catch((error) => {
-      console.error('Error retrieving categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-// Get all CasinoWagerTypes from the database
-app.get('/api/casinos/wagertypes/all', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoWagerTypes.find()
-    .then((results) => {
-      res.json(results);
-      console.log('All CasinoWagerTypes retrieved');
-    })
-    .catch((error) => {
-      console.error('Error retrieving CasinoWagerTypes:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
 //#endregion Casinos
 
-//#region Casino Categories
-// Create a new casino category
-app.post('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { name, description, image } = req.body; // Get the name and location from the request body
-  const { userId } = req.session.user; // Get the user ID from the session data
 
-  // Create a new casino category object
-  const newCasinoCategory = new CasinoCategories({
-    addedBy: userId,
-    name: name,
-    description: description,
-    image: image
-  });
-
-  // Save the new casino category to the database
-  newCasinoCategory.save()
-    .then((result) => {
-      res.json(result);
-      console.log('New casino category created');
-    })
-    .catch((error) => {
-      console.error('Error creating casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-} );
-
-// Delete a casino category
-app.delete('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.body; // Get the ID from the request body
-  CasinoCategories.deleteOne({ _id: id })
-    .then((result) => {
-      if (result.deletedCount === 0) {
-        throw new Error('Casino category not found');
-      }
-      res.json({ success: true, id: id, status: 'deleted' });
-      console.log('Casino category deleted');
-    })
-    .catch((error) => {
-      console.error('Error deleting casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-} );
-//#endregion Casino Categories
 
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
