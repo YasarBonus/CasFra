@@ -144,7 +144,7 @@ const casinoSchema = new mongoose.Schema({
   maxBet: Number,
   maxCashout: Number,
   wager: Number,
-  wagerType: String,
+  wagerType: [String],
   noDeposit: { type: Boolean, default: false },
   prohibitedGamesProtection: { type: Boolean, default: true },
   vpn: { type: Boolean, default: false },
@@ -995,6 +995,19 @@ app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, 
     });
 });
 
+// Get wagerTypes of a specific casino by ID
+app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.wagerType);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino wagerTypes:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const { name, priority } = req.body; // Get the name and location from the request body
@@ -1141,6 +1154,20 @@ app.get('/api/casinos/categories/all', checkPermissions('manageCasinos'), (req, 
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+// Get all CasinoWagerTypes from the database
+app.get('/api/casinos/wagertypes/all', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoWagerTypes.find()
+    .then((results) => {
+      res.json(results);
+      console.log('All CasinoWagerTypes retrieved');
+    })
+    .catch((error) => {
+      console.error('Error retrieving CasinoWagerTypes:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 
 
 // Create a new casino category

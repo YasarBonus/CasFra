@@ -84,13 +84,19 @@
                                                 </div>
                                                 <div class="field">
                                                     <div class="ui toggle checkbox">
+                                                        <input type="checkbox" name="noDeposit" ${casino.noDeposit ? 'checked' : ''}>
+                                                        <label>No Deposit</label>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui toggle checkbox">
                                                         <input type="checkbox" name="prohibitedGamesProtection" ${casino.prohibitedGamesProtection ? 'checked' : ''}>
                                                         <label>Prohibited Games Protection</label>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="three fields">
+                                            <div class="four fields">
                                                 <div class="field">
                                                     <label>Categories</label>
                                                     <select name="categories" multiple class="ui fluid dropdown" id="categoriesDropdown">
@@ -104,6 +110,11 @@
                                                 <div class="field">
                                                     <label>Providers</label>
                                                     <select name="providers" multiple class="ui fluid dropdown" id="providersDropdown">
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Payment Methods</label>
+                                                    <select name="paymentMethods" multiple class="ui fluid dropdown" id="paymentMethodsDropdown">
                                                     </select>
                                                 </div>
                                             </div>
@@ -166,6 +177,18 @@
 
                                 // Populate the categories dropdown with available categories
                                 getAvailableCategories(selectedCategories);
+                                // Populate the wagerType dropdown with available wagerTypes
+
+                                fetch(`/api/casinos/${casinoId}/wagertypes`)
+                                    .then(response => response.json())
+                                    .then(selectedWagerTypes => {
+                                        console.log('Selected wager types:', selectedWagerTypes);
+                                        getAvailableWagerTypes(selectedWagerTypes);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching selected categories:', error);
+                                    });
+                                getAvailableWagerTypes(selectedWagerTypes);
                             })
                             .catch(error => {
                                 console.error('Error fetching selected categories:', error);
@@ -200,9 +223,34 @@
                     });
             }
 
+            function getAvailableWagerTypes(selectedWagerTypes) {
+                fetch('/api/casinos/wagertypes/all')
+                    .then(response => response.json())
+                    .then(wagerTypes => {
+                        const wagerTypeDropdown = document.getElementById('wagerTypeDropdown');
+                        console.log('Wager Type Dropdown:', wagerTypeDropdown);
+                        console.log('Wager Types:', wagerTypes);
+                        wagerTypeDropdown.innerHTML = ''; // Remove existing options
+
+                        wagerTypes.forEach(wagerType => {
+                            const option = document.createElement('option');
+                            option.value = wagerType._id;
+                            option.innerText = wagerType.name;
+                            if (selectedWagerTypes.includes(wagerType._id)) {
+                                option.selected = true; // Select the option if it is in the selected wagerTypes
+                            }
+                            wagerTypeDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching wager types:', error);
+                    });
+            }
+
 
             function saveCasino(casinoId) {
-                // Get the updated casino data from the form
+               
+                //#region Get the updated casino data from the form
                 const name = document.querySelector('input[name="name"]').value;
 
                 const categoriesSelect = document.querySelector('select[name="categories"]');
@@ -215,16 +263,18 @@
                 const label = document.querySelector('input[name="label"]').value;
                 const labelLarge = document.querySelector('input[name="labelLarge"]').value;
 
-                const boniSelect = document.querySelector('select[name="boni"]');
-                const boni = Array.from(boniSelect.selectedBoni).map(option => option.value);
+                // const boniSelect = document.querySelector('select[name="boni"]').value;
+                // const boni = Array.from(boniSelect.selectedOptions).map(option => option.value);
 
-                const displayBonusSelect = document.querySelector('select[name="displayBonus"]');
-                const displayBonus = Array.from(displayBonusSelect.selectedOptions).map(option => option.value);
+                const displayBonus = document.querySelector('select[name="displayBonus"]').value;
 
                 const maxBet = document.querySelector('input[name="maxBet"]').value;
                 const maxCashout = document.querySelector('input[name="maxCashout"]').value;
+                
                 const wager = document.querySelector('input[name="wager"]').value;
-                const wagerType = document.querySelector('input[name="wagerType"]').value;
+
+                const wagerTypeSelect = document.querySelector('select[name="wagerType"]');
+                const wagerType = Array.from(wagerTypeSelect.selectedOptions).map(option => option.value);
 
                 const noDeposit = document.querySelector('input[name="noDeposit"]').checked;
                 const prohibitedGamesProtection = document.querySelector('input[name="prohibitedGamesProtection"]').checked;
@@ -245,17 +295,17 @@
                 const imageUrl = document.querySelector('input[name="imageUrl"]').value;
                 const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
                 const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
-
+                //#endregion
                 
 
                 
-                console.log('Update Data:' + name + label + description + categories + active);
+                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'ImageUrl:', imageUrl, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
 
                 
                 // Send a PUT request to the API with the updated casino data
                 fetch(`/api/casinos/${casinoId}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name, label, description, categories }),
+                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageUrl, affiliateLink, affiliateShortlink }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
