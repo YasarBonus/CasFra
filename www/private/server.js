@@ -1854,23 +1854,42 @@ async function setCasinoImageUrl(casinoId = null) {
     } else {
       casinos = await Casino.find();
     }
-    console.log('Setting casino image URLs');
     for (const casino of casinos) {
-      console.log(casino.name);
       if (casino.imageId) {
-        console.log('Image ID: ' + casino.imageId);
         const image = await Images.findOne({ _id: casino.imageId });
-        console.log('Image: ' + image);
         if (image) {
           casino.imageUrl = `/img/images/${image.filename}`;
-          console.log('Image URL: ' + casino.imageUrl);
           await casino.save();
-          console.log('Casino image URL saved');
+          console.log('Image URL for Casino ' + casino.name + '(' + casino._id + ') (' + casino.imageUrl + ') saved');
         }
       }
     }
   } catch (error) {
     console.error('Error retrieving casinos:', error);
+  }
+}
+
+async function setImageUrl(imageId = null) {
+  try {
+    let images;
+    if (imageId) {
+      images = await Images.findOne({ _id: imageId });
+      images = [images]; // Convert single object to array
+    } else {
+      images = await Images.find();
+    }
+    for (const image of images) {
+      if (image.filename) {
+        const foundImage = await Images.findOne({ _id: image._id });
+        if (foundImage) {
+          foundImage.imageUrl = `/img/images/${foundImage.filename}`;
+          await foundImage.save();
+          console.log('Image URL for Image ' + foundImage.name + '(' + foundImage._id + ') (' + foundImage.imageUrl + ') saved');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error retrieving images:', error);
   }
 }
 
@@ -1880,6 +1899,9 @@ setInterval(deleteUnusedRegistrationKeys, 60 * 60 * 1000);
 
 setCasinoImageUrl();
 setInterval(setCasinoImageUrl, 60 * 60 * 1000);
+
+setImageUrl();
+setInterval(setImageUrl, 60 * 60 * 1000);
 
 
 // Close the MongoDB connection when the server is shut down
