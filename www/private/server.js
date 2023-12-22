@@ -169,7 +169,7 @@ const casinoSchema = new mongoose.Schema({
   paymentMethods: [String],
   reviewTitle: String,
   review: String,
-  image: String,
+  imageId: String,
   imageUrl: String,
   affiliateLink: String,
   affiliateShirtlink: String
@@ -1433,7 +1433,8 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
       console.error('Error retrieving casinos:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
-} );
+});
+
 
 // Get data for a single casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -1474,14 +1475,14 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
 
 // Edit a casino
 app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user; // Get the user ID from the session data
-  const { id } = req.params; // Get the ID from the request params
-  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
+  const { userId } = req.session.user; 
+  const { id } = req.params; 
+  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageId, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
   console.log(req.body);
   console.log(active);
   Casino.findOneAndUpdate(
     { _id: id },
-    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink },
+    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageId, affiliateUrl, affiliateShortlink },
     { modifiedBy: userId, modifiedDate: Date.now() }
   )
     .then((updatedCasino) => {
@@ -1490,6 +1491,9 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
       }
       res.json(updatedCasino);
       console.log('Casino updated: ' + updatedCasino.name);
+
+      // Call setCasinoImageUrl(ID) function here
+      setCasinoImageUrl(updatedCasino._id);
     })
     .catch((error) => {
       console.error('Error updating casino:', error);
@@ -1841,9 +1845,41 @@ function deleteUnusedRegistrationKeys() {
     });
 }
 
+async function setCasinoImageUrl(casinoId = null) {
+  try {
+    let casinos;
+    if (casinoId) {
+      casinos = await Casino.findOne({ _id: casinoId });
+      casinos = [casinos]; // Convert single object to array
+    } else {
+      casinos = await Casino.find();
+    }
+    console.log('Setting casino image URLs');
+    for (const casino of casinos) {
+      console.log(casino.name);
+      if (casino.imageId) {
+        console.log('Image ID: ' + casino.imageId);
+        const image = await Images.findOne({ _id: casino.imageId });
+        console.log('Image: ' + image);
+        if (image) {
+          casino.imageUrl = `/img/images/${image.filename}`;
+          console.log('Image URL: ' + casino.imageUrl);
+          await casino.save();
+          console.log('Casino image URL saved');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error retrieving casinos:', error);
+  }
+}
+
 // Run the function on startup, then every hour
 deleteUnusedRegistrationKeys();
 setInterval(deleteUnusedRegistrationKeys, 60 * 60 * 1000);
+
+setCasinoImageUrl();
+setInterval(setCasinoImageUrl, 60 * 60 * 1000);
 
 
 // Close the MongoDB connection when the server is shut down
