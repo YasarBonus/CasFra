@@ -79,6 +79,7 @@ const userSchema = new mongoose.Schema({
   language: String,
   active: { type: Boolean, default: false },
   banned: { type: Boolean, default: false },
+  registrationKey: String,
   registrationDate: Date,
   registrationIp: String,
   registrationVerificationCode: String,
@@ -735,7 +736,8 @@ app.post('/api/user/register', (req, res) => {
                   registrationIp: req.ip, // Save the registration IP
                   registrationVerificationCode: registrationVerificationCode,
                   registrationVerificationCodeExpiry: registrationVerificationCodeExpiry,
-                  registrationDate: registrationDate // Save the registration date
+                  registrationDate: registrationDate, // Save the registration date
+                  registrationKey: existingKey._id // Save the registrationKey ID to the user
                 });
 
                 user.save()
