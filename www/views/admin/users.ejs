@@ -34,23 +34,31 @@
             $(document).ready(function() {
                 // Function to handle delete button click
                 function deleteUser(userId) {
-                    $.ajax({
-                        url: '/api/users/',
-                        method: 'DELETE',
-                        data: {
-                            id: userId
-                        },
-                        success: function(response) {
-                            console.log('User deleted successfully');
-                            showToast('success', 'User deleted successfully', 'The user was successfully deleted.');
-                            // Refresh the table after deletion
-                            getUsers();
-                        },
-                        error: function(error) {
-                            console.log('Error deleting user:', error);
-                            showToast('error', 'Error deleting user', 'There was an error deleting the user. Please try again. This incident has been logged.');
-                        }
-                    });
+                    // Show confirmation dialog
+                    $('.mini.modal')
+                        .modal({
+                            onApprove: function() {
+                                // Proceed with deletion
+                                $.ajax({
+                                    url: '/api/users/',
+                                    method: 'DELETE',
+                                    data: {
+                                        id: userId
+                                    },
+                                    success: function(response) {
+                                        console.log('User deleted successfully');
+                                        showToast('success', 'User deleted successfully', 'The user was successfully deleted.');
+                                        // Refresh the table after deletion
+                                        getUsers();
+                                    },
+                                    error: function(error) {
+                                        console.log('Error deleting user:', error);
+                                        showToast('error', 'Error deleting user', 'There was an error deleting the user. Please try again. This incident has been logged.');
+                                    }
+                                });
+                            }
+                        })
+                        .modal('show');
                 }
 
                 // Function to get users and populate the table
@@ -93,5 +101,16 @@
                 getUsers();
             });
         </script>
+        <!-- Confirmation dialog -->
+        <div class="ui mini modal">
+            <div class="header">Delete User</div>
+            <div class="content">
+                <p>Are you sure you want to delete this user?</p>
+            </div>
+            <div class="actions">
+                <div class="ui negative button">Cancel</div>
+                <div class="ui positive button">Delete</div>
+            </div>
+        </div>
     </body>
 </html>
