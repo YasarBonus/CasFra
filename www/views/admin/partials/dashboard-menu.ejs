@@ -5,6 +5,9 @@
     <% if (user.permissions.includes('manageCasinos')) { %>
         <a class="item" href="/dashboard/casinos">Casinos</a>
     <% } %>
+    <% if (user.permissions.includes('manageCasinos')) { %>
+      <a class="item" href="/dashboard/casinos/categories">Categories</a>
+  <% } %>
     <% if (user.permissions.includes('manageFaq')) { %>
         <a class="item" href="/dashboard/faq">Faq</a>
     <% } %>
