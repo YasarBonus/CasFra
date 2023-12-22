@@ -154,7 +154,9 @@ const casinoSchema = new mongoose.Schema({
   reviewTitle: String,
   review: String,
   image: String,
-  affiliateLink: String
+  imageUrl: String,
+  affiliateLink: String,
+  affiliateShirtlink: String
 });
 
 // Define Casino Review schema
