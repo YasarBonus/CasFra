@@ -48,18 +48,22 @@
                                                     <label>Large Label</label>
                                                     <input type="text" name="labelLarge" placeholder="Enter the casino label" value="${casino.labelLarge}">
                                                 </div>
+                                                <div class="field">
+                                                    <label>Priority</label>
+                                                    <input type="text" name="priority" placeholder="Enter the casino label" value="${casino.priority}">
+                                                </div>
                                             </div>
                                             <div class="fields">
                                                 <div class="four wide field">
                                                     <label>Shortlink</label>
-                                                    <input type="text" name="image" placeholder="Enter the casino image URL" value="${casino.image}">
+                                                    <input type="text" name="affiliateShortlink" placeholder="Enter the casino image URL" value="${casino.image}">
                                                 </div>
                                                 <div class="twelve wide field">
                                                     <label>Affiliate Link</label>
-                                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.background}">
+                                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.affiliateLink}">
                                                 </div>
                                             </div>
-                                            <div class="three fields">
+                                            <div class="four fields">
                                                 <div class="field">
                                                     <div class="ui toggle checkbox">
                                                         <input type="checkbox" name="active" ${casino.active ? 'checked' : ''}>
@@ -78,7 +82,12 @@
                                                         <label>VPN allowed</label>
                                                     </div>
                                                 </div>
-                                        
+                                                <div class="field">
+                                                    <div class="ui toggle checkbox">
+                                                        <input type="checkbox" name="prohibitedGamesProtection" ${casino.prohibitedGamesProtection ? 'checked' : ''}>
+                                                        <label>Prohibited Games Protection</label>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="three fields">
@@ -101,12 +110,12 @@
                                             <div class="six fields">
                                                 <div class="field">
                                                     <label>Boni</label>
-                                                    <select name="boni" multiple class="ui fluid dropdown" id="categoriesDropdown">
+                                                    <select name="boni" multiple class="ui fluid dropdown" id="boniDropdown">
                                                     </select>
                                                 </div>
                                                 <div class="field">
                                                     <label>Display Bonus</label>
-                                                    <select name="displayBonus" class="ui fluid dropdown" id="categoriesDropdown">
+                                                    <select name="displayBonus" class="ui fluid dropdown" id="displayBonusDropdown">
                                                     </select>
                                                 </div>
                                                 <div class="field">
@@ -139,7 +148,10 @@
                                                 <label>Review</label>
                                                 <textarea name="review" placeholder="Enter the casino description">${casino.review}</textarea>
                                             </div>
-
+                                            <div class="field">
+                                                <label>Image URL</label>
+                                                <input type="text" name="imageUrl" placeholder="Enter the casino background URL" value="${casino.imageUrl}">
+                                            </div>
                                         </form>
                                     </div>
                                     <div class="actions">
@@ -192,11 +204,51 @@
             function saveCasino(casinoId) {
                 // Get the updated casino data from the form
                 const name = document.querySelector('input[name="name"]').value;
-                const label = document.querySelector('input[name="label"]').value;
-                const description = document.querySelector('textarea[name="description"]').value;
-                const active = document.querySelector('input[name="active"]').checked;
+
                 const categoriesSelect = document.querySelector('select[name="categories"]');
                 const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
+
+                const description = document.querySelector('textarea[name="description"]').value;
+                const priority = document.querySelector('input[name="priority"]').value;
+                const active = document.querySelector('input[name="active"]').checked;
+                const isNew = document.querySelector('input[name="isNew"]').checked;
+                const label = document.querySelector('input[name="label"]').value;
+                const labelLarge = document.querySelector('input[name="labelLarge"]').value;
+
+                const boniSelect = document.querySelector('select[name="boni"]');
+                const boni = Array.from(boniSelect.selectedBoni).map(option => option.value);
+
+                const displayBonusSelect = document.querySelector('select[name="displayBonus"]');
+                const displayBonus = Array.from(displayBonusSelect.selectedOptions).map(option => option.value);
+
+                const maxBet = document.querySelector('input[name="maxBet"]').value;
+                const maxCashout = document.querySelector('input[name="maxCashout"]').value;
+                const wager = document.querySelector('input[name="wager"]').value;
+                const wagerType = document.querySelector('input[name="wagerType"]').value;
+
+                const noDeposit = document.querySelector('input[name="noDeposit"]').checked;
+                const prohibitedGamesProtection = document.querySelector('input[name="prohibitedGamesProtection"]').checked;
+                const vpn = document.querySelector('input[name="vpn"]').checked;
+
+                const featuresSelect = document.querySelector('select[name="features"]');
+                const features = Array.from(featuresSelect.selectedOptions).map(option => option.value);
+
+                const providersSelect = document.querySelector('select[name="providers"]');
+                const providers = Array.from(providersSelect.selectedOptions).map(option => option.value);
+
+                const paymentMethodsSelect = document.querySelector('select[name="paymentMethods"]');
+                const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(option => option.value);
+
+                const reviewTitle = document.querySelector('input[name="reviewTitle"]').value;
+                const review = document.querySelector('textarea[name="review"]').value;
+
+                const imageUrl = document.querySelector('input[name="imageUrl"]').value;
+                const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
+                const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
+
+                
+
+                
                 console.log('Update Data:' + name + label + description + categories + active);
 
                 
