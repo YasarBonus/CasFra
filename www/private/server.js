@@ -54,6 +54,8 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join('public')));
 
+
+//#region MongoDB
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casfra', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -528,9 +530,9 @@ const saveDefaultImagesDatabaseData = async () => {
 };
 
 saveDefaultImagesDatabaseData();
+//#endregion MongoDB
 
-
-  // Middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -548,9 +550,7 @@ app.use(session({
   })
 }));
 
-// ############################## ROUTES ##############################
-
-// ############################## AUTH ##############################
+//#region Auth 
 
 // Login user
 app.post('/api/auth/login', (req, res) => {
@@ -652,6 +652,9 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
   res.json({ success: true });
 });
 
+//#endregion Auth
+
+//#region User
 // Insert user into MongoDB
 app.post('/api/user/register', (req, res) => {
   console.log(req.body);
@@ -863,6 +866,38 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
     });
 });
 
+// Get all users from MongoDB
+app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
+  User.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving users:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Delete user from MongoDB by ID
+app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
+  const { id } = req.body; // Get the ID from the request body
+  User.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('User not found');
+      }
+      res.json({ success: true, id: id, status: 'deleted' });
+      console.log('User deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+//#endregion User
+
+//#region Registration Keys
 // Get all registration keys from MongoDB
 app.get('/api/users/regkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
   RegistrationKey.find()
@@ -927,36 +962,9 @@ app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (r
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+//#endregion Registration Keys
 
-// Get all users from MongoDB
-app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
-  User.find()
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((error) => {
-      console.error('Error retrieving users:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-} );
-
-// Delete user from MongoDB by ID
-app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
-  const { id } = req.body; // Get the ID from the request body
-  User.deleteOne({ _id: id })
-    .then((result) => {
-      if (result.deletedCount === 0) {
-        throw new Error('User not found');
-      }
-      res.json({ success: true, id: id, status: 'deleted' });
-      console.log('User deleted');
-    })
-    .catch((error) => {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
+//#region Casinos
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   Casino.find()
@@ -982,32 +990,6 @@ app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     });
 });
 
-// Get categories of a specific casino by ID
-app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
-    .then((result) => {
-      res.json(result.categories);
-    })
-    .catch((error) => {
-      console.error('Error retrieving casino categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-// Get wagerTypes of a specific casino by ID
-app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
-    .then((result) => {
-      res.json(result.wagerType);
-    })
-    .catch((error) => {
-      console.error('Error retrieving casino wagerTypes:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const { name, priority } = req.body; // Get the name and location from the request body
@@ -1028,6 +1010,48 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error creating casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Edit a casino
+app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const { userId } = req.session.user; // Get the user ID from the session data
+  const { id } = req.params; // Get the ID from the request params
+  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
+  console.log(req.body);
+  console.log(active);
+  Casino.findOneAndUpdate(
+    { _id: id },
+    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink },
+    { modifiedBy: userId, modifiedDate: Date.now() }
+  )
+    .then((updatedCasino) => {
+      if (!updatedCasino) {
+        throw new Error('Casino not found');
+      }
+      res.json(updatedCasino);
+      console.log('Casino updated: ' + updatedCasino.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Delete a casino
+app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.body; // Get the ID from the request body
+  Casino.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        throw new Error('Casino not found');
+      }
+      res.json({ success: true, id: id, status: 'deleted' });
+      console.log('Casino deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting casino:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });
@@ -1100,49 +1124,83 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
     });
 });
 
-// Edit a casino
-app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user; // Get the user ID from the session data
+// Get categories of a specific casino by ID
+app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
   const { id } = req.params; // Get the ID from the request params
-  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
-  console.log(req.body);
-  console.log(active);
-  Casino.findOneAndUpdate(
-    { _id: id },
-    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageUrl, affiliateUrl, affiliateShortlink },
-    { modifiedBy: userId, modifiedDate: Date.now() }
-  )
-    .then((updatedCasino) => {
-      if (!updatedCasino) {
-        throw new Error('Casino not found');
-      }
-      res.json(updatedCasino);
-      console.log('Casino updated: ' + updatedCasino.name);
-    })
-    .catch((error) => {
-      console.error('Error updating casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
-});
-
-// Delete a casino
-app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.body; // Get the ID from the request body
-  Casino.deleteOne({ _id: id })
+  Casino.findOne({ _id: id })
     .then((result) => {
-      if (result.deletedCount === 0) {
-        throw new Error('Casino not found');
-      }
-      res.json({ success: true, id: id, status: 'deleted' });
-      console.log('Casino deleted');
+      res.json(result.categories);
     })
     .catch((error) => {
-      console.error('Error deleting casino:', error);
+      console.error('Error retrieving casino categories:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 });
 
+// Get wagerTypes of a specific casino by ID
+app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.wagerType);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino wagerTypes:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
 
+// Get boni of a specific casino by ID
+app.get('/api/casinos/:id/boni', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.boni);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino boni:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Get features of a specific casino by ID
+app.get('/api/casinos/:id/features', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.features);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino features:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Get providers of a specific casino by ID
+app.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.providers);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino providers:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
+// Get paymentMethods of a specific casino by ID
+app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.paymentMethods);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino paymentMethods:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
 
 // Get all available categories from the database
 app.get('/api/casinos/categories/all', checkPermissions('manageCasinos'), (req, res) => {
@@ -1169,9 +1227,9 @@ app.get('/api/casinos/wagertypes/all', checkPermissions('manageCasinos'), (req, 
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+//#endregion Casinos
 
-
-
+//#region Casino Categories
 // Create a new casino category
 app.post('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
   const { name, description, image } = req.body; // Get the name and location from the request body
@@ -1213,6 +1271,7 @@ app.delete('/api/casinos/categories', checkPermissions('manageCasinos'), (req, r
       res.status(500).json({ error: 'Internal server error' });
     });
 } );
+//#endregion Casino Categories
 
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
@@ -1268,6 +1327,7 @@ function checkPermissions(requiredPermission) {
   };
 }
 
+//#region Routes
 // Routes for rendering views
 app.get('/', (req, res) => {
   res.render('pages/index');
@@ -1344,6 +1404,7 @@ app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next
     next(err);
   }
 });
+//#endregion Routes
 
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {
