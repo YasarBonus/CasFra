@@ -252,14 +252,14 @@ const registrationKeyEntries = [
 
 const userAdminGroup = new UserGroup({
   name: 'Admin',
-  permissions: ['viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos', 
+  permissions: ['authenticate', 'viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos', 
   'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
   'manageSessions']
 });
 
 const userOperatorGroup = new UserGroup({
   name: 'Operator',
-  permissions: ['viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider', 
+  permissions: ['authenticate', 'viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider', 
   'managePaymentMethods', 'manageAccount']
 });
 
@@ -621,7 +621,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // Get current session details
-app.get('/api/auth/session', (req, res) => {
+app.get('/api/auth/session', checkPermissions('authenticate'), (req, res) => {
   const sessionDetails = req.session.user;
   
   if (sessionDetails) {
@@ -644,7 +644,7 @@ app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => 
 });
 
 // Logout user
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
   req.session.destroy();
   res.json({ success: true });
 });
@@ -772,7 +772,7 @@ app.post('/api/user/register', (req, res) => {
 });
 
 // Get user details of the current user
-app.get('/api/user', (req, res) => {
+app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
   const { userId } = req.session.user;
 
   User.findById(userId)
@@ -806,7 +806,7 @@ app.post('/api/user', (req, res) => {
 });
 
 // Change password of the current user
-app.post('/api/user/password', (req, res) => {
+app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => {
   const { userId } = req.session.user;
   const { currentPassword, newPassword } = req.body;
 
@@ -1252,7 +1252,7 @@ app.get('/register', (req, res) => {
   res.render('admin/register');
 });
 
-app.get('/dashboard', (req, res, next) => {
+app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
@@ -1262,7 +1262,7 @@ app.get('/dashboard', (req, res, next) => {
   }
 });
 
-app.get('/dashboard/account', (req, res, next) => {
+app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
@@ -1272,7 +1272,7 @@ app.get('/dashboard/account', (req, res, next) => {
   }
 });
 
-app.get('/dashboard/super/registrationkeys', (req, res, next) => {
+app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
@@ -1282,7 +1282,7 @@ app.get('/dashboard/super/registrationkeys', (req, res, next) => {
   }
 });
 
-app.get('/dashboard/super/sessions', (req, res, next) => {
+app.get('/dashboard/super/sessions', checkPermissions('manageSessions'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
@@ -1302,7 +1302,7 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
   }
 });
 
-app.get('/dashboard/casinos', (req, res, next) => {
+app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
