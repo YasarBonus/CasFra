@@ -114,11 +114,19 @@ const linkHitSchema = new mongoose.Schema({
 
 const imagesSchema = new mongoose.Schema({
   name: String,
-  uploadDate: { type: Date, default: Date.now },
-  uploadUser: String,
+  filename: String,
+  originalname: String,
+  size: Number,
+  mimetype: String,
+  description: String,
+  addedDate: { type: Date, default: Date.now },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedUser: String,
   category: String,
   description: String,
-  image: String
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
 });
 
 const imagesCategoriesSchema = new mongoose.Schema({
@@ -301,7 +309,7 @@ const userAdminGroup = new UserGroup({
   name: 'Admin',
   permissions: ['authenticate', 'viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos', 
   'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-  'manageSessions']
+  'manageSessions', 'manageImages', 'manageImagesCategories']
 });
 
 const userOperatorGroup = new UserGroup({
@@ -579,7 +587,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const MongoStore = require('connect-mongo');
-
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
   resave: false,
@@ -1005,6 +1012,257 @@ app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (r
     });
 });
 //#endregion Registration Keys
+
+//#region Images
+
+//#region Image Categories
+
+// Get all images categories from MongoDB
+app.get('/api/images/categories', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
+  ImagesCategories.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving images categories:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+    );
+});
+
+// Insert image category into MongoDB
+app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'), (req, res) => {
+  const { name, description, image, priority, active } = req.body;
+  const { userId } = req.session.user;
+  
+  const imagesCategories = new ImagesCategories({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  imagesCategories.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    }
+    )
+    .catch((error) => {
+      console.error('Error inserting image category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+    );
+});
+
+// Duplicate image category
+app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesCategories'), (req, res) => {
+  const { userId } = req.session.user;
+  const { id } = req.params;
+
+  ImagesCategories.findOne({ _id: id })
+    .then((imagesCategories) => {
+      if (!imagesCategories) {
+        throw new Error('Image category not found');
+      } else {
+        const newImagesCategories = new ImagesCategories({
+          addedBy: userId,
+          name: imagesCategories.name + ' (Copy)',
+          description: imagesCategories.description,
+          image: imagesCategories.image,
+          priority: imagesCategories.priority,
+          active: imagesCategories.active,
+          addedDate: Date.now(),
+        });
+
+        newImagesCategories.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          }
+          )
+          .catch((error) => {
+            console.error('Error duplicating image category:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          }
+          );
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating image category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+}
+);
+
+// Edit image category
+app.post('/api/images/categories/:id/edit', checkPermissions('manageImagesCategories'), (req, res) => {
+  const { userId } = req.session.user;
+  const { id } = req.params;
+  const { name, description, image, priority, active } = req.body;
+
+  ImagesCategories.findOne({ _id: id })
+    .then((imagesCategories) => {
+      if (!imagesCategories) {
+        throw new Error('Image category not found');
+      } else {
+        imagesCategories.name = name;
+        imagesCategories.description = description;
+        imagesCategories.image = image;
+        imagesCategories.priority = priority;
+        imagesCategories.active = active;
+        imagesCategories.modifiedDate = Date.now();
+        imagesCategories.modifiedBy = userId;
+
+        imagesCategories.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          }
+          )
+          .catch((error) => {
+            console.error('Error editing image category:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          }
+          );
+      }
+    })
+    .catch((error) => {
+      console.error('Error editing image category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+}
+);
+
+// Delete image category from MongoDB by ID
+app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
+  const imageCategoryId = req.params.id;
+
+  ImagesCategories.findByIdAndDelete(imageCategoryId)
+    .then((deletedImageCategory) => {
+      if (!deletedImageCategory) {
+        return res.status(404).json({ error: 'Image category not found' });
+      }
+
+      res.json({ message: 'Image category deleted successfully' });
+    }
+    )
+    .catch((error) => {
+      console.error('Error deleting image category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+    );
+} );
+
+//#endregion Image Categories
+
+//#region Images Images 
+
+// Get all images from MongoDB
+app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
+  Images.find()
+    .then((results) => {
+      const updatedResults = results.map((image) => {
+        return {
+          ...image._doc,
+          imageUrl: `/img/images/${image.filename}`
+        };
+      });
+      res.json(updatedResults);
+    })
+    .catch((error) => {
+      console.error('Error retrieving images:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// Get all images categories from MongoDB
+app.get('/api/images/categories', checkPermissions('manageImages'), (req, res) => {
+  ImagesCategories.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving images categories:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
+// Set up multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/images'); // Set the destination folder for uploaded images
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop()); // Set the filename for the uploaded image
+  }
+});
+
+// Create multer upload instance
+const upload = multer({ storage: storage });
+
+// Upload image and save it to the database
+app.post('/api/images', checkPermissions('manageImages'), upload.single('image'), (req, res) => {
+  const image = req.file;
+
+  if (!image) {
+    return res.status(400).json({ error: 'No image file provided' });
+  }
+
+  // Save the image details to the database
+  const newImage = new Images({
+    filename: image.filename,
+    originalname: image.originalname,
+    name: image.originalname,
+    mimetype: image.mimetype,
+    size: image.size,
+    addedDate: Date.now(),
+    categoryId: req.body.categoryId,
+    addedBy: req.session.user.userId
+  });
+
+  newImage.save()
+    .then((savedImage) => {
+      res.json({ message: 'Image uploaded and saved successfully', image: savedImage });
+    })
+    .catch((error) => {
+      console.error('Error saving image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
+// Delete image from MongoDB and folder by ID
+app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
+  const imageId = req.params.id;
+
+  Images.findByIdAndDelete(imageId)
+    .then((deletedImage) => {
+      if (!deletedImage) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+
+      // Delete image file from folder
+      const imagePath = path.join('uploads', deletedImage.filename);
+      fs.unlink(imagePath, (error) => {
+        if (error) {
+          console.error('Error deleting image file:', error);
+        }
+      });
+
+      res.json({ message: 'Image deleted successfully' });
+    })
+    .catch((error) => {
+      console.error('Error deleting image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+//#endregion Media Images
+
+//#endregion Images
 
 //#region Casino Categories
 
@@ -1514,6 +1772,26 @@ app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req
     next(err);
   }
 });
+
+app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/images', { user: user });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/images_categories', { user: user });
+  } catch (err) {
+    next(err);
+  }
+} );
 //#endregion Routes
 
 // Function to delete unused registration keys older than 1 hour
