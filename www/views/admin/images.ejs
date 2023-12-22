@@ -14,18 +14,7 @@
                             <button class="ui primary button" type="submit">Upload</button>
                         </div>
                     </form>
-                    <table class="ui celled table">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="imageTableBody">
-                            <!-- Images will be dynamically added here -->
-                        </tbody>
-                    </table>
+                    <div id="imageCards" class="ui cards"></div>
                 </div>
             </div>
         </div>
@@ -37,28 +26,34 @@
                 fetch('/api/images')
                     .then(response => response.json())
                     .then(data => {
-                        // Clear existing table rows
-                        document.getElementById('imageTableBody').innerHTML = '';
+                        // Clear existing cards
+                        document.getElementById('imageCards').innerHTML = '';
 
-                        // Add each image to the table
+                        // Add each image as a card
                         data.forEach(image => {
-                            var imageRow = document.createElement('tr');
-                            var imageCell = document.createElement('td');
+                            var card = document.createElement('div');
+                            card.className = 'ui card';
+
                             var imageElement = document.createElement('img');
                             imageElement.src = image.imageUrl;
                             imageElement.style.maxWidth = '200px';
-                            imageCell.appendChild(imageElement);
-                            imageRow.appendChild(imageCell);
+                            card.appendChild(imageElement);
 
-                            var nameCell = document.createElement('td');
+                            var content = document.createElement('div');
+                            content.className = 'content';
+                            card.appendChild(content);
+
                             var nameInput = document.createElement('input');
                             nameInput.type = 'text';
                             nameInput.value = image.name;
-                            nameCell.appendChild(nameInput);
-                            imageRow.appendChild(nameCell);
+                            content.appendChild(nameInput);
 
-                            var actionsCell = document.createElement('td');
+                            var actions = document.createElement('div');
+                            actions.className = 'extra content';
+                            card.appendChild(actions);
+
                             var saveButton = document.createElement('button');
+                            saveButton.className = 'ui primary button';
                             saveButton.textContent = 'Save';
                             saveButton.addEventListener('click', function() {
                                 // Save the image name
@@ -75,16 +70,17 @@
                                 .then(data => {
                                     // Handle response from the server
                                     console.log(data);
-                                    // Update the image name in the table
+                                    // Update the image name in the card
                                     image.name = newName;
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
                                 });
                             });
-                            actionsCell.appendChild(saveButton);
+                            actions.appendChild(saveButton);
 
                             var deleteButton = document.createElement('button');
+                            deleteButton.className = 'ui red button';
                             deleteButton.textContent = 'Delete';
                             deleteButton.addEventListener('click', function() {
                                 // Send a request to delete the image
@@ -95,18 +91,16 @@
                                 .then(data => {
                                     // Handle response from the server
                                     console.log(data);
-                                    // Remove the image row from the table
-                                    imageRow.remove();
+                                    // Remove the card from the container
+                                    card.remove();
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
                                 });
                             });
-                            actionsCell.appendChild(deleteButton);
+                            actions.appendChild(deleteButton);
 
-                            imageRow.appendChild(actionsCell);
-
-                            document.getElementById('imageTableBody').appendChild(imageRow);
+                            document.getElementById('imageCards').appendChild(card);
                         });
                     })
                     .catch(error => {
