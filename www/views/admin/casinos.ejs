@@ -160,8 +160,8 @@ fetch(`/api/casinos/${casinoId}`)
                                 <textarea name="review" placeholder="Enter the casino description">${casino.review}</textarea>
                             </div>
                             <div class="field">
-                                <label>Image URL</label>
-                                <input type="text" name="imageUrl" placeholder="Enter the casino background URL" value="${casino.imageUrl}">
+                                <label>Image ID</label>
+                                <input type="text" name="imageId" placeholder="Enter the casino background URL" value="${casino.imageId}">
                             </div>
                         </form>
                     </div>
@@ -414,20 +414,20 @@ const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(opti
                 const reviewTitle = document.querySelector('input[name="reviewTitle"]').value;
                 const review = document.querySelector('textarea[name="review"]').value;
 
-                const imageUrl = document.querySelector('input[name="imageUrl"]').value;
+                const imageId = document.querySelector('input[name="imageId"]').value;
                 const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
                 const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
                 //#endregion
                 
 
                 
-                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'ImageUrl:', imageUrl, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
+                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'imageId:', imageId, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
 
                 
                 // Send a PUT request to the API with the updated casino data
                 fetch(`/api/casinos/${casinoId}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageUrl, affiliateLink, affiliateShortlink }),
+                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageId, affiliateLink, affiliateShortlink }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -443,6 +443,9 @@ const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(opti
                         console.error('Error updating casino:', error);
                     });
             }
+
+
+            
 
             function openAddModal() {
                 const modal = document.createElement('div');
