@@ -1326,8 +1326,9 @@ function deleteUnusedRegistrationKeys() {
     });
 }
 
-// Run the function every minute
-setInterval(deleteUnusedRegistrationKeys, 1 * 60 * 1000);
+// Run the function on startup, then every hour
+deleteUnusedRegistrationKeys();
+setInterval(deleteUnusedRegistrationKeys, 60 * 60 * 1000);
 
 
 // Close the MongoDB connection when the server is shut down
