@@ -8,11 +8,12 @@
                 <%- include('./partials/dashboard-menu') %>
                 <div class="ui segment">
                     <h2>Images</h2>
-                    <form id="uploadForm" enctype="multipart/form-data">
-                        <div class="ui action input">
+                    <form id="uploadForm" enctype="multipart/form-data" class="ui form">
+                        <div class="field">
+                            <label for="imageInput">Choose an image:</label>
                             <input type="file" name="image" id="imageInput">
-                            <button class="ui primary button" type="submit">Upload</button>
                         </div>
+                        <button class="ui primary button" type="submit">Upload</button>
                     </form>
                     <div id="imageCards" class="ui cards"></div>
                 </div>
@@ -47,6 +48,30 @@
                             nameInput.type = 'text';
                             nameInput.value = image.name;
                             content.appendChild(nameInput);
+
+                            var imageId = document.createElement('div');
+                            imageId.classList = 'ui label';
+                            imageId.textContent = image._id;
+                            content.appendChild(imageId);
+
+                            // Add click event listener to copy image ID to clipboard
+                            imageId.addEventListener('click', function() {
+                                // Create a temporary input element
+                                var tempInput = document.createElement('input');
+                                tempInput.value = image._id;
+                                document.body.appendChild(tempInput);
+
+                                // Copy the value to clipboard
+                                tempInput.select();
+                                document.execCommand('copy');
+
+                                // Remove the temporary input element
+                                document.body.removeChild(tempInput);
+
+                                // Show a notification or perform any other action to indicate successful copy
+                                console.log('Image ID copied to clipboard: ' + image._id);
+                                showToast('success', 'Image ID copied to clipboard: ', image._id);
+                            });
 
                             var actions = document.createElement('div');
                             actions.className = 'extra content';
@@ -120,41 +145,6 @@
                 .then(data => {
                     // Handle response from the server
                     console.log(data);
-                    // Add the uploaded image to the table
-                    var imageRow = document.createElement('tr');
-                    var imageCell = document.createElement('td');
-                    var image = document.createElement('img');
-                    image.src = data.imageUrl;
-                    imageCell.appendChild(image);
-                    imageRow.appendChild(imageCell);
-
-                    var nameCell = document.createElement('td');
-                    var nameInput = document.createElement('input');
-                    nameInput.type = 'text';
-                    nameInput.value = '';
-                    nameCell.appendChild(nameInput);
-                    imageRow.appendChild(nameCell);
-
-                    var actionsCell = document.createElement('td');
-                    var saveButton = document.createElement('button');
-                    saveButton.textContent = 'Save';
-                    saveButton.addEventListener('click', function() {
-                        // Handle save button click
-                        console.log('Save button clicked');
-                    });
-                    actionsCell.appendChild(saveButton);
-
-                    var deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
-                    deleteButton.addEventListener('click', function() {
-                        // Handle delete button click
-                        console.log('Delete button clicked');
-                    });
-                    actionsCell.appendChild(deleteButton);
-
-                    imageRow.appendChild(actionsCell);
-
-                    document.getElementById('imageTableBody').appendChild(imageRow);
                     fetchImages();
 
                 })
