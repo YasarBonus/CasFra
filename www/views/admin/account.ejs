@@ -100,6 +100,10 @@
                 <input type="text" name="username" placeholder="Benutzername">
               </div>
               <div class="field">
+                <label>Nickname (other Users may see this Name)</label>
+                <input type="text" name="nickname" placeholder="Nickname">
+              </div>
+              <div class="field">
                 <label>E-Mail</label>
                 <input type="text" name="email" placeholder="E-Mail">
               </div>
@@ -602,6 +606,7 @@
 
         var formData = {
           username: $('input[name="username"]').val(),
+          nickname: $('input[name="nickname"]').val(),
           email: $('input[name="email"]').val(),
           language: $('input[name="language"]').val()
         };
@@ -637,6 +642,7 @@
           $.get('/api/user', function (data) {
             console.log(data);
             $('input[name="username"]').val(data.username);
+            $('input[name="nickname"]').val(data.nickname);
             $('input[name="email"]').val(data.email);
             $('input[name="language"]').val(data.language);
 
