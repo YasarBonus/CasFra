@@ -2495,7 +2495,7 @@ app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/casinocategories', {
+    res.render('admin/casinos_categories', {
       user: user
     });
   } catch (err) {
