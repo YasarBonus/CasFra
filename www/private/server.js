@@ -2937,6 +2937,59 @@ app.get('/dashboard/casinos/features', checkPermissions('manageCasinos'), (req, 
   }
 } );
 
+app.get('/dashboard/casinos/providers', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed providers');
+    const user = req.session.user;
+
+    res.render('admin/casinos_providers', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed paymentmethods');
+    const user = req.session.user;
+
+    res.render('admin/casinos_paymentmethods', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') wagertypes');
+    const user = req.session.user;
+
+    res.render('admin/casinos_wagertypes', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/casinos/boni', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') boni');
+    const user = req.session.user;
+
+    res.render('admin/casinos_boni', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+
 app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
