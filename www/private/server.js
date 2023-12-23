@@ -2119,6 +2119,173 @@ app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (re
 
 //#endregion Casino Categories
 
+//#region Casino Features
+
+// Get all casino features from MongoDB
+app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoFeatures.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino features:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Insert casino feature into MongoDB
+app.post('/api/casinos/features/add', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoFeatures = new CasinoFeatures({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoFeatures.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino feature:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Duplicate casino feature
+app.post('/api/casinos/features/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoFeatures.findOne({
+      _id: id
+    })
+    .then((casinoFeatures) => {
+      if (!casinoFeatures) {
+        throw new Error('Casino feature not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoFeatures = new CasinoFeatures({
+          addedBy: userId,
+          name: casinoFeatures.name + ' (Copy)',
+          description: casinoFeatures.description,
+          image: casinoFeatures.image,
+          priority: newPriority,
+          active: casinoFeatures.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoFeatures.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino feature:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino feature:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit casino feature
+app.put('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoFeatures.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoFeatures) => {
+      if (!updatedCasinoFeatures) {
+        throw new Error('Casino feature not found');
+      }
+      res.json(updatedCasinoFeatures);
+      console.log('Casino feature updated: ' + updatedCasinoFeatures.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino feature:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete casino feature
+app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoFeatures.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoFeature) => {
+      if (!deletedCasinoFeature) {
+        throw new Error('Casino feature not found');
+      }
+      res.json(deletedCasinoFeature);
+      console.log('Casino feature deleted: ' + deletedCasinoFeature.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino feature:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+//#endregion Casino Features
+
 //#region Casinos
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
