@@ -116,6 +116,7 @@ const imagesSchema = new mongoose.Schema({
   name: String,
   filename: String,
   originalname: String,
+  imageUrl: String,
   size: Number,
   mimetype: String,
   description: String,
@@ -1207,6 +1208,28 @@ app.get('/api/images/categories', checkPermissions('manageImages'), (req, res) =
       res.status(500).json({ error: 'Internal server error' });
     });
 });
+
+// Get all images of a specific category
+app.get('/api/images/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
+  const categoryId = req.params.categoryId;
+
+  Images.find({ category: categoryId })
+    .then((results) => {
+      const updatedResults = results.map((image) => {
+        return {
+          _id: image._id,
+          name: image.name,
+          imageUrl: `/img/images/${image.filename}`
+        };
+      });
+      res.json(updatedResults);
+    })
+    .catch((error) => {
+      console.error('Error retrieving images of category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 
 
 // Set up multer storage
