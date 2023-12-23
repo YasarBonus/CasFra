@@ -2138,6 +2138,72 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     });
 });
 
+// Duplicate a casino
+app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  Casino.findOne({
+      _id: id
+    })
+    .then((casino) => {
+      if (!casino) {
+        throw new Error('Casino not found');
+      } else {
+        const newPriority = generateRandomPriority();
+        const newCasino = new Casino({
+          addedBy: userId,
+          name: casino.name + ' (Copy)',
+          categories: casino.categories,
+          description: casino.description,
+          priority: newPriority,
+          active: casino.active,
+          isNew: casino.isNew,
+          label: casino.label,
+          labelLarge: casino.labelLarge,
+          boni: casino.boni,
+          displayBonus: casino.displayBonus,
+          maxBet: casino.maxBet,
+          maxCashout: casino.maxCashout,
+          wager: casino.wager,
+          wagerType: casino.wagerType,
+          noDeposit: casino.noDeposit,
+          prohibitedGamesProtection: casino.prohibitedGamesProtection,
+          vpn: casino.vpn,
+          features: casino.features,
+          providers: casino.providers,
+          paymentMethods: casino.paymentMethods,
+          review: casino.review,
+          reviewTitle: casino.reviewTitle,
+          image: casino.image,
+          affiliateUrl: casino.affiliateUrl,
+          affiliateShortlink: casino.affiliateShortlink,
+          addedDate: Date.now(),
+        });
+      
+        newCasino.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
 
 // Get data for a single casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
