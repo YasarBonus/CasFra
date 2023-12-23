@@ -1640,6 +1640,19 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
     });
 });
 
+// Get image of a specific casino by ID
+app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) => {
+  const { id } = req.params; // Get the ID from the request params
+  Casino.findOne({ _id: id })
+    .then((result) => {
+      res.json(result.image);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+} );
+
 // Get categories of a specific casino by ID
 app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
   const { id } = req.params; // Get the ID from the request params
