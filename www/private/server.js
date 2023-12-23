@@ -1098,7 +1098,7 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
 );
 
 // Edit image category
-app.post('/api/images/categories/:id/edit', checkPermissions('manageImagesCategories'), (req, res) => {
+app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
   const { userId } = req.session.user;
   const { id } = req.params;
   const { name, description, image, priority, active } = req.body;
@@ -1118,22 +1118,19 @@ app.post('/api/images/categories/:id/edit', checkPermissions('manageImagesCatego
 
         imagesCategories.save()
           .then(() => {
-            res.redirect('/dashboard');
-          }
-          )
+            res.status(200).json({ success: 'Image Categorie updated' }); 
+          })
           .catch((error) => {
             console.error('Error editing image category:', error);
             res.status(500).json({ error: 'Internal server error' });
-          }
-          );
+          });
       }
     })
     .catch((error) => {
       console.error('Error editing image category:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
-}
-);
+});
 
 // Delete image category from MongoDB by ID
 app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
@@ -1283,6 +1280,7 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   const { userId } = req.session.user;
   const { id } = req.params;
   const { name, description, priority, active, category } = req.body;
+  console.log(req.body);
 
   Images.findOne({ _id: id })
     .then((image) => {
