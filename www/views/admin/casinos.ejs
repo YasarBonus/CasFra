@@ -745,7 +745,10 @@
                 .then(response => response.json())
                 .then(result => {
                     console.log('Casino deleted:', result);
-                    // Remove the deleted casino card from the UI
+                    // hide the confirmation dialog
+                    $('.ui.modal').modal('hide');
+                    // delete the modal element from the DOM
+                    document.querySelector('.ui.modal').remove();
                     fetchCasinos();
                 })
                 .catch(error => {
