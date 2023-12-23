@@ -117,6 +117,7 @@ const imagesSchema = new mongoose.Schema({
   filename: String,
   originalname: String,
   imageUrl: String,
+  priority: { type: Number, default: 0 },
   size: Number,
   mimetype: String,
   description: String,
