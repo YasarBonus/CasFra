@@ -503,9 +503,9 @@ const saveDefaultTenancieDatabaseData = async () => {
     }
 
     await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
+    console.log('Default Tenancies Database Data successfully saved.');
   } catch (error) {
-    console.error('Error saving Default Database Data:', error);
+    console.error('Error saving Default Tenancies Database Data:', error);
   }
 };
 
@@ -607,9 +607,9 @@ const saveDefaultUserDatabaseData = async () => {
     }
 
     await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
+    console.log('Default UserGroups and RegistrationKeys Database Data successfully saved.');
   } catch (error) {
-    console.error('Error saving Default Database Data:', error);
+    console.error('Error saving Default UserGroups and RegistrationKeys Database Data:', error);
   }
 };
 
@@ -790,7 +790,7 @@ const imagesCategoriesEntry = {
   addedBy: 'System',
 };
 
-const saveDefaultImagesDatabaseData = async () => {
+const saveDefaultImagesCategoriesDatabaseData = async () => {
   try {
     const promises = [];
 
@@ -805,13 +805,13 @@ const saveDefaultImagesDatabaseData = async () => {
     }
 
     await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
+    console.log('Default Image Categories Database Data successfully saved.');
   } catch (error) {
-    console.error('Error saving Default Database Data:', error);
+    console.error('Error saving Default Image Categories Database Data:', error);
   }
 };
 
-saveDefaultImagesDatabaseData();
+saveDefaultImagesCategoriesDatabaseData();
 
 //#endregion MongoDB
 
