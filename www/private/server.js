@@ -99,6 +99,7 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
+  nickname: String,
   priority: {
     type: Number,
     default: generateRandomPriority()
@@ -1124,6 +1125,7 @@ app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res)
 //#endregion Tenancies
 
 //#region User
+
 // Insert user into MongoDB
 app.post('/api/users/register', (req, res) => {
   console.log(req.body);
@@ -1319,32 +1321,26 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     });
 });
 
-// Edit user details of the current user
-app.post('/api/user', (req, res) => {
-  const {
-    userId
-  } = req.session.user;
-  const {
-    username,
-    email
-  } = req.body;
+// Reusable function to edit user details
+const editUserDetails = (req, res) => {
+  const { userId } = req.session.user;
+  const { username, nickname, email } = req.body;
 
-  User.findByIdAndUpdate(userId, {
-      username,
-      email
-    })
+  User.findByIdAndUpdate(userId, { username, nickname, email })
     .then(() => {
-      res.json({
-        success: true
-      });
+      res.json({ success: true });
     })
     .catch((error) => {
       console.error('Error updating user details:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
-});
+};
+
+// Edit user details of the current user
+app.post('/api/user', editUserDetails);
+
+// Edit user details of the current user
+app.put('/api/user', editUserDetails);
 
 // Change password of the current user
 app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => {
