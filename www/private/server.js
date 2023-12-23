@@ -181,7 +181,7 @@ const casinoSchema = new mongoose.Schema({
   paymentMethods: [String],
   reviewTitle: String,
   review: String,
-  imageId: String,
+  image: String,
   imageUrl: String,
   affiliateLink: String,
   affiliateShirtlink: String
@@ -1166,9 +1166,9 @@ app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategorie
 
 // Get the category of an image by ID
 app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res) => {
-  const imageId = req.params.id;
+  const id = req.params.id;
 
-  Images.findById(imageId)
+  Images.findById(id)
     .populate('category')
     .then((image) => {
       if (!image) {
@@ -1325,9 +1325,9 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 // Delete image from MongoDB and from the file system by ID
 app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
-  const imageId = req.params.id;
+  const id = req.params.id;
 
-  Images.findByIdAndDelete(imageId)
+  Images.findByIdAndDelete(id)
     .then((deletedImage) => {
       if (!deletedImage) {
         return res.status(404).json({ error: 'Image not found' });
@@ -1531,12 +1531,12 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
 app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
   const { userId } = req.session.user; 
   const { id } = req.params; 
-  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageId, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
+  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, image, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
   console.log(req.body);
   console.log(active);
   Casino.findOneAndUpdate(
     { _id: id },
-    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, imageId, affiliateUrl, affiliateShortlink },
+    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, image, affiliateUrl, affiliateShortlink },
     { modifiedBy: userId, modifiedDate: Date.now() }
   )
     .then((updatedCasino) => {
@@ -1645,6 +1645,7 @@ app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) 
   const { id } = req.params; // Get the ID from the request params
   Casino.findOne({ _id: id })
     .then((result) => {
+      console.log(result);
       res.json(result.image);
     })
     .catch((error) => {
@@ -1924,8 +1925,8 @@ async function setCasinoImageUrl(casinoId = null) {
       casinos = await Casino.find();
     }
     for (const casino of casinos) {
-      if (casino.imageId) {
-        const image = await Images.findOne({ _id: casino.imageId });
+      if (casino.image) {
+        const image = await Images.findOne({ _id: casino.image });
         if (image) {
           casino.imageUrl = `/img/images/${image.filename}`;
           await casino.save();
@@ -1938,11 +1939,11 @@ async function setCasinoImageUrl(casinoId = null) {
   }
 }
 
-async function setImageUrl(imageId = null) {
+async function setImageUrl(id = null) {
   try {
     let images;
-    if (imageId) {
-      images = await Images.findOne({ _id: imageId });
+    if (id) {
+      images = await Images.findOne({ _id: id });
       images = [images]; // Convert single object to array
     } else {
       images = await Images.find();
