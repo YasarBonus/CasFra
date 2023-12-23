@@ -13,10 +13,6 @@
                             <label for="imageInput">Choose an image:</label>
                             <input type="file" name="image" id="imageInput">
                         </div>
-                        <div class="field">
-                            <label for="categoryDropdown">Category:</label>
-                            <select id="categoryDropdown" name="category"></select>
-                        </div>
                         <button class="ui primary button" type="submit">Upload</button>
                     </form>
                     <div id="imageCards" class="ui four cards"></div>
@@ -75,6 +71,11 @@
                                         option.value = category._id;
                                         option.text = category.name;
                                         categoryDropdown.appendChild(option);
+
+                                        // Pre-select category based on _id from /api/images/:id/category
+                                        if (category._id === image.category) {
+                                            option.selected = true;
+                                        }
                                     });
                                 });
 
@@ -131,7 +132,8 @@
                                     .then(response => response.json())
                                     .then(updatedImage => {
                                         // Handle the response
-                                        console.log(updatedImage);
+                                        console.log('Image Updated:', updatedImage);
+                                        showToast('success', 'Image updated: ', updatedImage.message);
                                     });
                             });
 
