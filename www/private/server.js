@@ -1154,6 +1154,26 @@ app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategorie
     );
 } );
 
+// Get the category of an image by ID
+app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res) => {
+  const imageId = req.params.id;
+
+  Images.findById(imageId)
+    .populate('category')
+    .then((image) => {
+      if (!image) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+
+      res.json(image.category);
+    })
+    .catch((error) => {
+      console.error('Error retrieving image category:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
 //#endregion Image Categories
 
 //#region Images Images 
@@ -1254,7 +1274,7 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
         image.save()
           .then(() => {
-            res.status(200).json({ message: 'Image edited successfully' });
+            res.status(200).json({ message: 'Image ' + image.name + ' edited successfully' });
           })
           .catch((error) => {
             console.error('Error editing image:', error);
@@ -1267,8 +1287,6 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     });
 });
-
-
 
 // Delete image from MongoDB and from the file system by ID
 app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
@@ -1810,6 +1828,16 @@ app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req
   }
 });
 
+app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+    res.render('admin/images_categories', { user: user });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
@@ -1820,15 +1848,7 @@ app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) 
   }
 } );
 
-app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
-  try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
-    const user = req.session.user;
-    res.render('admin/images_categories', { user: user });
-  } catch (err) {
-    next(err);
-  }
-} );
+
 //#endregion Routes
 
 // Function to delete unused registration keys older than 1 hour
