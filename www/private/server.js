@@ -561,6 +561,37 @@ const saveDefaultCasinoDatabaseData = async () => {
 
 saveDefaultCasinoDatabaseData();
 
+const imagesCategoriesEntry = {
+  name: 'Default',
+  description: 'Default images category',
+  image: 'https://www.casinofreak.com/images/categories/new.png',
+  active: true,
+  priority: 1,
+  addedDate: new Date(),
+  addedBy: 'System',  
+};
+
+const saveDefaultImagesDatabaseData = async () => {
+  try {
+    const promises = [];
+
+    const existingImagesCategories = await ImagesCategories.findOne({ name: imagesCategoriesEntry.name });
+
+    if (!existingImagesCategories) {
+      const newImagesCategories = new ImagesCategories(imagesCategoriesEntry);
+      promises.push(newImagesCategories.save());
+      console.log('ImagesCategories entry saved:', newImagesCategories);
+    }
+
+    await Promise.all(promises);
+    console.log('Default Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default Database Data:', error);
+  }
+};
+
+saveDefaultImagesDatabaseData();
+
 //#endregion MongoDB
 
 // Middleware
