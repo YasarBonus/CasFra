@@ -41,6 +41,11 @@
                 url: '/api/images/categories',
                 method: 'GET',
                 success: function(data) {
+                    // Sort the categories by priority
+                    data.sort(function(a, b) {
+                        return a.priority - b.priority;
+                    });
+
                     // Populate the table with data
                     data.forEach(function(category) {
                         var row = '<tr id="' + category._id + '">' +
@@ -141,6 +146,7 @@
                 var categoryId = $(this).attr('id');
                 saveCategory(categoryId);
             });
+            loadInitialData();
         }
     });
 </script>
