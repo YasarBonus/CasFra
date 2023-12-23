@@ -2310,7 +2310,7 @@ app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req,
 
 // Get all casino providers from MongoDB
 app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoProviders.find()
+  CasinoProvider.find()
     .then((results) => {
       res.json(results);
     })
@@ -2335,7 +2335,7 @@ app.post('/api/casinos/providers/add', checkPermissions('manageCasinos'), (req, 
     userId
   } = req.session.user;
 
-  const casinoProviders = new CasinoProviders({
+  const casinoProvider = new CasinoProviders({
     addedBy: userId,
     name: name,
     description: description,
@@ -2345,7 +2345,7 @@ app.post('/api/casinos/providers/add', checkPermissions('manageCasinos'), (req, 
     addedDate: Date.now(),
   });
 
-  casinoProviders.save()
+  casinoProvider.save()
     .then(() => {
       res.redirect('/dashboard');
     })
@@ -2366,7 +2366,7 @@ app.post('/api/casinos/providers/:id/duplicate', checkPermissions('manageCasinos
     id
   } = req.params;
 
-  CasinoProviders.findOne({
+  CasinoProvider.findOne({
       _id: id
     })
     .then((casinoProviders) => {
@@ -2420,7 +2420,7 @@ app.put('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, r
     active
   } = req.body;
 
-  CasinoProviders.findOneAndUpdate({
+  CasinoProvider.findOneAndUpdate({
       _id: id
     }, {
       name,
