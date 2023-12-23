@@ -33,6 +33,9 @@ fetch(`/api/casinos/${casinoId}`)
                     .then(response => response.json())
                     .then(selectedImage => {
                 // Open the modal for editing the casino data
+                if (document.querySelector('.ui.modal')) {
+                    document.querySelector('.ui.modal').remove(); // Remove the existing modal if it exists
+                }
                 const modal = document.createElement('div');
                 modal.classList.add('ui', 'modal');
                 modal.innerHTML = `
