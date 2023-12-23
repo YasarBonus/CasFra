@@ -13,6 +13,10 @@
                             <label for="imageInput">Choose an image:</label>
                             <input type="file" name="image" id="imageInput">
                         </div>
+                        <div class="field">
+                            <label for="categoryDropdown">Category:</label>
+                            <select id="categoryDropdown" name="category"></select>
+                        </div>
                         <button class="ui primary button" type="submit">Upload</button>
                     </form>
                     <div id="imageCards" class="ui four cards"></div>
@@ -57,7 +61,22 @@
                             nameInput.value = image.name;
                             meta.appendChild(nameInput);
 
-                            
+                            // Dropdown for category
+                            var categoryDropdown = document.createElement('select');
+                            categoryDropdown.id = 'categoryDropdown';
+                            meta.appendChild(categoryDropdown);
+
+                            // Fetch dropdown data from /api/images/categories
+                            fetch('/api/images/categories')
+                                .then(response => response.json())
+                                .then(categories => {
+                                    categories.forEach(category => {
+                                        var option = document.createElement('option');
+                                        option.value = category._id;
+                                        option.text = category.name;
+                                        categoryDropdown.appendChild(option);
+                                    });
+                                });
 
                             var actions = document.createElement('div');
                             actions.className = 'extra content';
@@ -96,78 +115,35 @@
                             saveButton.addEventListener('click', function() {
                                 // Save the image name
                                 var newName = nameInput.value;
-                                // Send a request to update the image name
+                                // Save the category
+                                var newCategory = categoryDropdown.value;
+                                // Send a request to update the image name and category
                                 fetch('/api/images/' + image._id, {
                                     method: 'PUT',
                                     headers: {
                                         'Content-Type': 'application/json'
                                     },
-                                    body: JSON.stringify({ name: newName })
+                                    body: JSON.stringify({
+                                        name: newName,
+                                        category: newCategory
+                                    })
                                 })
-                                .then(response => response.json())
-                                .then(data => {
-                                    // Handle response from the server
-                                    console.log(data);
-                                    // Update the image name in the card
-                                    image.name = newName;
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
+                                    .then(response => response.json())
+                                    .then(updatedImage => {
+                                        // Handle the response
+                                        console.log(updatedImage);
+                                    });
                             });
-                            actions.appendChild(saveButton);
 
-                            var deleteButton = document.createElement('button');
-                            deleteButton.className = 'ui red button';
-                            deleteButton.textContent = 'Delete';
-                            deleteButton.addEventListener('click', function() {
-                                // Send a request to delete the image
-                                fetch('/api/images/' + image._id, {
-                                    method: 'DELETE'
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    // Handle response from the server
-                                    console.log(data);
-                                    // Remove the card from the container
-                                    card.remove();
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
-                            });
-                            actions.appendChild(deleteButton);
+                            actions.appendChild(saveButton);
 
                             document.getElementById('imageCards').appendChild(card);
                         });
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
                     });
             }
 
-            // AJAX form submission
-            document.getElementById('uploadForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                var formData = new FormData(this);
-                fetch('/api/images', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle response from the server
-                    console.log(data);
-                    fetchImages();
-
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            });
-
-            // Fetch and display existing images on page load
             fetchImages();
         </script>
+
     </body>
 </html>
