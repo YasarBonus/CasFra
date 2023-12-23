@@ -324,6 +324,7 @@ const casinoProviderSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
+  imageUrl: String,
   active: {
     type: Boolean,
     default: true
@@ -1763,7 +1764,6 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
     });
 });
 
-
 //#endregion Image Categories
 
 //#region Images Images 
@@ -1987,6 +1987,30 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
     });
 });
 
+// Get details of a specific casino category
+app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoCategories.findById(id)
+    .then((casinoCategory) => {
+      if (!casinoCategory) {
+        return res.status(404).json({
+          error: 'Casino category not found'
+        });
+      }
+
+      res.json(casinoCategory);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino category:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
 // Insert casino category into MongoDB
 app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2069,7 +2093,6 @@ app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasino
     });
 });
 
-
 // Edit casino category
 app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2149,6 +2172,30 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
     })
     .catch((error) => {
       console.error('Error retrieving casino features:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get details of a specific casino feature
+app.get('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoFeatures.findById(id)
+    .then((casinoFeatures) => {
+      if (!casinoFeatures) {
+        return res.status(404).json({
+          error: 'Casino feature not found'
+        });
+      }
+
+      res.json(casinoFeatures);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino feature:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
@@ -2322,6 +2369,30 @@ app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) 
     });
 });
 
+// Get details of a specific casino provider
+app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoProvider.findById(id)
+    .then((casinoProvider) => {
+      if (!casinoProvider) {
+        return res.status(404).json({
+          error: 'Casino provider not found'
+        });
+      }
+
+      res.json(casinoProvider);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino provider:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Insert casino provider into MongoDB
 app.post('/api/casinos/providers/add', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2335,7 +2406,7 @@ app.post('/api/casinos/providers/add', checkPermissions('manageCasinos'), (req, 
     userId
   } = req.session.user;
 
-  const casinoProvider = new CasinoProviders({
+  const casinoProvider = new CasinoProvider({
     addedBy: userId,
     name: name,
     description: description,
@@ -2374,7 +2445,7 @@ app.post('/api/casinos/providers/:id/duplicate', checkPermissions('manageCasinos
         throw new Error('Casino provider not found');
       } else {
         newPriority = generateRandomPriority();
-        const newCasinoProviders = new CasinoProviders({
+        const newCasinoProviders = new CasinoProvider({
           addedBy: userId,
           name: casinoProviders.name + ' (Copy)',
           description: casinoProviders.description,
@@ -2453,7 +2524,7 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
     id
   } = req.params;
 
-  CasinoProviders.findOneAndDelete({
+  CasinoProvider.findOneAndDelete({
       _id: id
     })
     .then((deletedCasinoProvider) => {
