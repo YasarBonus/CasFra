@@ -1284,7 +1284,11 @@ app.get('/api/registrationkeys', checkPermissions('manageRegistrationKeys'), (re
 });
 
 // Insert registration key into MongoDB
+<<<<<<< HEAD
 app.post('/api/registrationkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
+=======
+app.post('/api/users/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
+>>>>>>> 47ab656ab63dba27fcafcda533ae6f9648d4821f
   const {
     regkey
   } = req.body;
@@ -1329,10 +1333,17 @@ app.post('/api/registrationkeys/generate', checkPermissions('manageRegistrationK
 });
 
 // Delete registration key from MongoDB by ID
+<<<<<<< HEAD
 app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const {
     id
   } = req.params.id;
+=======
+app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
+  const {
+    id
+  } = req.body.id;
+>>>>>>> 47ab656ab63dba27fcafcda533ae6f9648d4821f
   RegistrationKey.deleteOne({
       _id: id
     })
