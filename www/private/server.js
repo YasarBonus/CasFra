@@ -1263,7 +1263,8 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
     size: image.size,
     addedDate: Date.now(),
     categoryId: req.body.categoryId,
-    addedBy: req.session.user.userId
+    addedBy: req.session.user.userId,
+    category: req.body.categoryId,
   });
 
   newImage.save()
