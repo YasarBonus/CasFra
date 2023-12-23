@@ -8,15 +8,21 @@
                 <%- include('./partials/dashboard-menu') %>
                 <div class="ui segment">
                     <h2>Images</h2>
+                    <h3>Upload Image</h3>
+                    
                     <form id="uploadForm" enctype="multipart/form-data" class="ui form">
                         <div class="field">
                             <label for="imageInput">Choose an image:</label>
-                            <input type="file" name="image" id="imageInput">
+                            <div class="ui action input">
+                                <input type="file" name="image" id="imageInput">
+                                <button class="ui primary button" type="submit">Upload</button>
+                            </div>
                         </div>
-                        <button class="ui primary button" type="submit">Upload</button>
                     </form>
-                    <div id="imageCards" class="ui four cards"></div>
                 </div>
+                <div class="ui segment">
+                    <h3>Manage Images</h3>
+                    <div id="imageCards" class="ui cards"></div>
             </div>
         </div>
         <%- include('../partials/footer') %>
@@ -134,15 +140,59 @@
                                         // Handle the response
                                         console.log('Image Updated:', updatedImage);
                                         showToast('success', 'Image updated: ', updatedImage.message);
+                                        // Navigate back to the images page
+                                        fetchImages();
                                     });
                             });
 
                             actions.appendChild(saveButton);
 
+                            var deleteButton = document.createElement('button');
+                            deleteButton.className = 'ui button';
+                            deleteButton.textContent = 'Delete';
+                            deleteButton.addEventListener('click', function() {
+                                // Send a request to delete the image
+                                fetch('/api/images/' + image._id, {
+                                    method: 'DELETE'
+                                })
+                                    .then(response => response.json())
+                                    .then(deletedImage => {
+                                        // Handle the response
+                                        console.log('Image Deleted:', deletedImage);
+                                        showToast('success', 'Image deleted: ', deletedImage.message);
+                                        // Navigate back to the images page
+                                        fetchImages();
+                                    });
+                            });
+
+                            actions.appendChild(deleteButton);
+
                             document.getElementById('imageCards').appendChild(card);
                         });
                     });
             }
+
+            // Function to handle form submission
+            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = new FormData(this); // Create a new FormData object
+
+                fetch('/api/images', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(newImage => {
+                        // Handle the response
+                        console.log('Image Uploaded:', newImage);
+                        showToast('success', 'Image uploaded: ', newImage.message);
+                        // Clear the form
+                        document.getElementById('uploadForm').reset();
+                        // Fetch and display the updated images
+                        fetchImages();
+                    });
+            });
 
             fetchImages();
         </script>
