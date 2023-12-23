@@ -118,7 +118,8 @@ const userSchema = new mongoose.Schema({
   registrationVerificationCode: String,
   registrationVerificationCodeExpiry: Date,
   lastLoginDate: Date,
-  lastLoginIp: String
+  lastLoginIp: String,
+  tenancies: [String],
 });
 
 // Define UserGroup schema
