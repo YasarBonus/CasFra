@@ -66,6 +66,13 @@ mongoose.connect('mongodb://localhost:27017/casfra', { useNewUrlParser: true, us
   });
 
 
+// Function to generate a random priority
+function generateRandomPriority() {
+  const random = Math.floor(Math.random() * 100000000000000000000);
+  console.log(random);
+  return random;
+}
+
 // Define Language schema
 const languageSchema = new mongoose.Schema({
   name: String,
@@ -117,7 +124,7 @@ const imagesSchema = new mongoose.Schema({
   filename: String,
   originalname: String,
   imageUrl: String,
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   size: Number,
   mimetype: String,
   description: String,
@@ -136,11 +143,11 @@ const imagesCategoriesSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
-  modifiedBy: String
+  modifiedBy: String,
 });
 
 // Define Casino schema
