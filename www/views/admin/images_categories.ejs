@@ -78,7 +78,7 @@
         // Event listener for delete button
         $(document).on('click', '.delete-btn', function() {
             var categoryId = $(this).closest('tr').attr('id');
-            deleteCategory(categoryId);
+            showDeleteConfirmation(categoryId);
         });
 
         // Event listener for save all button
@@ -91,20 +91,6 @@
             $.ajax({
                 url: '/api/images/categories/' + categoryId + '/duplicate',
                 method: 'POST',
-                success: function(data) {
-                    loadInitialData();
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Function to delete a category
-        function deleteCategory(categoryId) {
-            $.ajax({
-                url: '/api/images/categories/' + categoryId,
-                method: 'DELETE',
                 success: function(data) {
                     loadInitialData();
                 },
@@ -141,5 +127,66 @@
             });
             loadInitialData();
         }
+
+        // Function to show delete confirmation dialog
+        function showDeleteConfirmation(categoryId) {
+            $.ajax({
+                url: '/api/images/categories/' + categoryId + '/images',
+                method: 'GET',
+                success: function(images) {
+                    var dialogExists = $('.ui.modal.confirmDelete').length;
+                    if (dialogExists) {
+                        $('.ui.modal.confirmDelete').remove();
+                    }
+                    var dialogContent = '<div class="ui small modal confirmDelete">' +
+                        '<div class="header">Delete Confirmation</div>' +
+                        '<div class="content">' +
+                        '<p>Are you sure you want to delete the category <b>' + $('#' + categoryId + ' td:nth-child(1)').text() + '</b>?</p>' +
+                        '<p>This is potentially a destructive operation and cannot be undone.</p>' +
+                        '<p>Images in this category will no longer have a category assigned:</p>' +
+                        '<ul>';
+                    images.forEach(function(image) {
+                        dialogContent += '<li>' + image.name + '</li>';
+                    });
+                    dialogContent += '</ul>' +
+                        '</div>' +
+                        '<div class="actions">' +
+                        '<div class="ui red button">Cancel</div>' +
+                        '<div class="ui green button deleteBtn" data-category-id="' + categoryId + '">Delete</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('body').append(dialogContent);
+                    $('.ui.modal.confirmDelete').modal('show');
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        // Event listener for delete button
+        $(document).on('click', '.deleteBtn', function() {
+            var categoryId = $(this).data('category-id');
+            deleteCategory(categoryId);
+            $('.ui.modal.confirmDelete').modal('hide');
+        });
+
+        // Function to delete a category
+        function deleteCategory(categoryId) {
+            $.ajax({
+                url: '/api/images/categories/' + categoryId,
+                method: 'DELETE',
+                success: function(data) {
+                    console.log('Category deleted successfully');
+                    showToast('success', 'Category deleted successfully');
+                    loadInitialData();
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
     });
 </script>
