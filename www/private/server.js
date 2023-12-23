@@ -1219,7 +1219,7 @@ app.get('/api/images/categories/:categoryId/images', checkPermissions('manageIma
         return {
           _id: image._id,
           name: image.name,
-          imageUrl: `/img/images/${image.filename}`
+          imageUrl: image.imageUrl,
         };
       });
       res.json(updatedResults);
@@ -1268,6 +1268,7 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
 
   newImage.save()
     .then((savedImage) => {
+      setImageUrl(savedImage._id);
       res.json({ message: 'Image uploaded and saved successfully', image: savedImage });
     })
     .catch((error) => {
