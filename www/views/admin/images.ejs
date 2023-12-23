@@ -90,9 +90,14 @@
                             card.appendChild(actions);
 
                             var imageId = document.createElement('div');
-                            imageId.classList = 'ui tiny label';
-                            imageId.textContent = image._id;
+                            imageId.classList = 'ui tiny blue label';
+                            imageId.textContent = 'ID: ' + image._id;
                             actions.appendChild(imageId);
+
+                            var filesize = document.createElement('div');
+                            filesize.classList = 'ui tiny orange label';
+                            filesize.textContent = (image.size / 1024).toFixed(2) + ' KB';
+                            actions.appendChild(filesize);
 
                             var seperator = document.createElement('div');
                             seperator.className = 'ui divider';
@@ -117,7 +122,7 @@
                             });
 
                             var saveButton = document.createElement('button');
-                            saveButton.className = 'ui primary button';
+                            saveButton.className = 'ui green button';
                             saveButton.textContent = 'Save';
                             saveButton.addEventListener('click', function() {
                                 // Save the image name
@@ -148,7 +153,7 @@
                             actions.appendChild(saveButton);
 
                             var deleteButton = document.createElement('button');
-                            deleteButton.className = 'ui button';
+                            deleteButton.className = 'ui red button';
                             deleteButton.textContent = 'Delete';
                             deleteButton.addEventListener('click', function() {
                                 // Send a request to delete the image
