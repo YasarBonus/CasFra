@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred" >
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment" >
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <h2>Images</h2>
+                    <h3>Upload Image</h3>
+                    
+                    <form id="uploadForm" enctype="multipart/form-data" class="ui form">
+                        <div class="field">
+                            <label for="imageInput">Choose an image:</label>
+                            <div class="ui action input">
+                                <input type="file" name="image" id="imageInput">
+                                <button class="ui primary button" type="submit">Upload</button>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="categoryDropdown">Select a category:</label>
+                            <select id="categoryDropdown" name="category">
+                                <option value="" disabled selected>Select a category</option>
+                                <!-- Fetch dropdown data from /api/images/categories -->
+                                                                <script>
+                                                                    fetch('/api/images/categories')
+                                                                        .then(response => response.json())
+                                                                        .then(categories => {
+                                                                            categories.forEach(category => {
+                                                                                var option = document.createElement('option');
+                                                                                option.value = category._id;
+                                                                                option.text = category.name;
+                                                                                document.getElementById('categoryDropdown').appendChild(option);
+                                                                            });
+                                                                        });
+                                                                </script>
+                                                            </select>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="ui segment">
+                                                    <h3>Manage Images</h3>
+                                                    <div id="imageCards" class="ui cards"></div>
+                                            </div>
+                                        </div>
+                                        <%- include('../partials/footer') %>
+
+                                        <script>
+                                            // Function to fetch and display existing images
+                                            function fetchImages() {
+                                                fetch('/api/images')
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        // Clear existing cards
+                                                        document.getElementById('imageCards').innerHTML = '';
+
+                                                        // Add each image as a card
+                                                        data.forEach(image => {
+                                                            var card = document.createElement('div');
+                                                            card.className = 'ui card';
+
+                                                            var imageElement = document.createElement('div');
+                                                            imageElement.className = 'image';
+                                                            card.appendChild(imageElement);
+
+                                                            var img = document.createElement('img');
+                                                            img.src = image.imageUrl;
+                                                            img.style.maxWidth = '200px';
+                                                            imageElement.appendChild(img);
+
+                                                            var content = document.createElement('div');
+                                                            content.className = 'content';
+                                                            card.appendChild(content);
+
+                                                            var meta = document.createElement('div');
+                                                            meta.className = 'meta';
+                                                            content.appendChild(meta);
+
+                                                            var nameInput = document.createElement('input');
+                                                            nameInput.type = 'text';
+                                                            nameInput.value = image.name;
+                                                            meta.appendChild(nameInput);
+
+                                                            // Dropdown for category
+                                                            var categoryDropdown = document.createElement('select');
+                                                            categoryDropdown.id = 'categoryDropdown';
+                                                            meta.appendChild(categoryDropdown);
+
+                                                            // Fetch dropdown data from /api/images/categories
+                                                            fetch('/api/images/categories')
+                                                                .then(response => response.json())
+                                                                .then(categories => {
+                                                                    // Add a placeholder option
+                                                                    var placeholderOption = document.createElement('option');
+                                                                    placeholderOption.value = '';
+                                                                    placeholderOption.text = 'Select a category';
+                                                                    placeholderOption.disabled = true;
+                                                                    placeholderOption.selected = true;
+                                                                    categoryDropdown.appendChild(placeholderOption);
+
+                                                                    categories.forEach(category => {
+                                                                        var option = document.createElement('option');
+                                                                        option.value = category._id;
+                                                                        option.text = category.name;
+                                                                        categoryDropdown.appendChild(option);
+
+                                                                        // Pre-select category based on _id from /api/images/:id/category
+                                                                        if (category._id === image.category) {
+                                                                            option.selected = true;
+                                                                        }
+                                                                    });
+                                                                });
+                                                                
+
+                                                            var actions = document.createElement('div');
+                                                            actions.className = 'extra content';
+                                                            card.appendChild(actions);
+
+                                                            var imageId = document.createElement('div');
+                                                            imageId.classList = 'ui tiny blue label';
+                                                            imageId.textContent = 'ID: ' + image._id;
+                                                            actions.appendChild(imageId);
+
+                                                            var filesize = document.createElement('div');
+                                                            filesize.classList = 'ui tiny orange label';
+                                                            filesize.textContent = (image.size / 1024).toFixed(2) + ' KB';
+                                                            actions.appendChild(filesize);
+
+                                                            var seperator = document.createElement('div');
+                                                            seperator.className = 'ui divider';
+                                                            actions.appendChild(seperator);
+
+                                                            // Add click event listener to copy image ID to clipboard
+                                                            imageId.addEventListener('click', function() {
+                                                                // Create a temporary input element
+                                                                var tempInput = document.createElement('input');
+                                                                tempInput.value = image._id;
+                                                                document.body.appendChild(tempInput);
+
+                                                                // Copy the value to clipboard
+                                                                tempInput.select();
+                                                                document.execCommand('copy');
+
+                                                                // Remove the temporary input element
+                                                                document.body.removeChild(tempInput);
+
+                                                                // Show a notification or perform any other action to indicate successful copy
+                                                                showToast('success', 'Image ID copied to clipboard: ', image._id);
+                                                            });
+
+                                                            var saveButton = document.createElement('button');
+                                                            saveButton.className = 'ui green button';
+                                                            saveButton.textContent = 'Save';
+                                                            saveButton.addEventListener('click', function() {
+                                                                // Save the image name
+                                                                var newName = nameInput.value;
+                                                                // Save the category
+                                                                var newCategory = categoryDropdown.value;
+                                                                // Send a request to update the image name and category
+                                                                fetch('/api/images/' + image._id, {
+                                                                    method: 'PUT',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json'
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        name: newName,
+                                                                        category: newCategory
+                                                                    })
+                                                                })
+                                                                    .then(response => response.json())
+                                                                    .then(updatedImage => {
+                                                                        // Handle the response
+                                                                        console.log('Image Updated:', updatedImage);
+                                                                        showToast('success', 'Image updated: ', updatedImage.message);
+                                                                        // Navigate back to the images page
+                                                                        fetchImages();
+                                                                    });
+                                                            });
+
+                                                            actions.appendChild(saveButton);
+
+                                                            var deleteButton = document.createElement('button');
+                                                            deleteButton.className = 'ui red button';
+                                                            deleteButton.textContent = 'Delete';
+                                                            deleteButton.addEventListener('click', function() {
+                                                            // Show a confirm dialog before deleting the image
+                                                            if (confirm('Are you sure you want to delete this image?')) {
+                                                                            // Send a request to delete the image
+                                                                            fetch('/api/images/' + image._id, {
+                                                                                method: 'DELETE'
+                                                                            })
+                                                                                .then(response => response.json())
+                                                                                .then(deletedImage => {
+                                                                                    // Handle the response
+                                                                                    console.log('Image Deleted:', deletedImage);
+                                                                                    showToast('success', 'Image deleted: ', deletedImage.message);
+                                                                                    // Navigate back to the images page
+                                                                                    fetchImages();
+                                                                                });
+                                                                        }
+                                                            });
+
+                                                            actions.appendChild(deleteButton);
+
+                                                            document.getElementById('imageCards').appendChild(card);
+                                                        });
+                                                    });
+                                            }
+
+                                            // Function to handle form submission
+                                            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                                                event.preventDefault(); // Prevent the default form submission
+
+                                                var formData = new FormData(this); // Create a new FormData object
+
+                                                // Get the category value from the dropdown
+                                                var category = document.getElementById('categoryDropdown').value;
+                                                console.log('Category:', category);
+
+                                                // Append the category to the formData object
+                                                formData.append('categoryId', category);
+
+                                                fetch('/api/images', {
+                                                    method: 'POST',
+                                                    body: formData
+                                                })
+                                                    .then(response => response.json())
+                                                    .then(newImage => {
+                                                        // Handle the response
+                                                        console.log('Image Uploaded:', newImage);
+                                                        showToast('success', 'Image uploaded: ', newImage.message);
+                                                        // Clear the form
+                                                        document.getElementById('uploadForm').reset();
+                                                        // Fetch and display the updated images
+                                                        fetchImages();
+                                                    });
+                                            });
+
+                                            fetchImages();
+                                        </script>
+
+                                    </body>
+                                </html>

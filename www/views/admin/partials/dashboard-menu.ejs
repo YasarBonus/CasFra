@@ -20,19 +20,16 @@
             </div>
           </div>
     <% } %>
-    <% if (user.permissions.includes('manageCasinos') || user.permissions.includes('manageProvider') || user.permissions.includes('managePaymentMethods')) { %>
+    <% if (user.permissions.includes('manageImages') || user.permissions.includes('manageImagesCategories')) { %>
         <div class="ui dropdown item">
-            Media <i class="dropdown icon"></i>
+            Images <i class="dropdown icon"></i>
             <div class="menu">
-                <% if (user.permissions.includes('manageCasinos')) { %>
-                    <a class="item" href="/dashboard/media/casinos">Casinos</a>
+                <% if (user.permissions.includes('manageImages')) { %>
+                    <a class="item" href="/dashboard/images">Images</a>
                 <% } %>
-                <% if (user.permissions.includes('manageProvider')) { %>
-                    <a class="item" href="/dashboard/media/provider">Provider</a>
-                <% } %>
-                <% if (user.permissions.includes('managePaymentMethods')) { %>
-                    <a class="item" href="/dashboard/media/paymentmethods">Payment Methods</a>
-                <% } %>
+                <% if (user.permissions.includes('manageImagesCategories')) { %>
+                  <a class="item" href="/dashboard/images/categories">Image Categories</a>
+              <% } %>
             </div>
           </div>
     <% } %>

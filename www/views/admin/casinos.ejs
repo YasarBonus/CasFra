@@ -28,7 +28,14 @@ fetch(`/api/casinos/${casinoId}`)
         fetch(`/api/casinos/${casinoId}/categories`)
             .then(response => response.json())
             .then(selectedCategories => {
+                // Fetch the selected image for the casino
+                fetch(`/api/casinos/${casinoId}/image`)
+                    .then(response => response.json())
+                    .then(selectedImage => {
                 // Open the modal for editing the casino data
+                if (document.querySelector('.ui.modal')) {
+                    document.querySelector('.ui.modal').remove(); // Remove the existing modal if it exists
+                }
                 const modal = document.createElement('div');
                 modal.classList.add('ui', 'modal');
                 modal.innerHTML = `
@@ -95,26 +102,25 @@ fetch(`/api/casinos/${casinoId}`)
                                     </div>
                                 </div>
                             </div>
-
                             <div class="four fields">
                                 <div class="field">
                                     <label>Categories (<a href="casinos/categories">manage</a>)</label>
-                                    <select name="categories" multiple class="ui fluid dropdown" id="categoriesDropdown">
+                                    <select name="categories" multiple class="ui fluid search dropdown" id="categoriesDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
                                     <label>Features (<a href="casinos/features">manage</a>)</label>
-                                    <select name="features" multiple class="ui fluid dropdown" id="featuresDropdown">
+                                    <select name="features" multiple class="ui fluid search dropdown" id="featuresDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
                                     <label>Providers (<a href="casinos/providers">manage</a>)</label>
-                                    <select name="providers" multiple class="ui fluid dropdown" id="providersDropdown">
+                                    <select name="providers" multiple class="ui fluid search dropdown" id="providersDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
                                     <label>Payment Methods (<a href="casinos/paymentmethods">manage</a>)</label>
-                                    <select name="paymentMethods" multiple class="ui fluid dropdown" id="paymentMethodsDropdown">
+                                    <select name="paymentMethods" multiple class="ui fluid search dropdown" id="paymentMethodsDropdown">
                                     </select>
                                 </div>
                             </div>
@@ -160,9 +166,10 @@ fetch(`/api/casinos/${casinoId}`)
                                 <textarea name="review" placeholder="Enter the casino description">${casino.review}</textarea>
                             </div>
                             <div class="field">
-                                <label>Image URL</label>
-                                <input type="text" name="imageUrl" placeholder="Enter the casino background URL" value="${casino.imageUrl}">
-                            </div>
+                                    <label>Image (<a href="images">manage</a>)</label>
+                                    <select name="image" class="ui fluid search selection dropdown" id="imageDropdown">
+                                    </select>
+                                </div>
                         </form>
                     </div>
                     <div class="actions">
@@ -177,7 +184,7 @@ fetch(`/api/casinos/${casinoId}`)
 
                 // Populate the categories dropdown with available categories
                 getAvailableCategories(selectedCategories);
-                // Populate the wagerType dropdown with available wagerTypes
+                getAvailableImages(selectedImage);
 
                 fetch(`/api/casinos/${casinoId}/wagertypes`)
                     .then(response => response.json())
@@ -239,6 +246,16 @@ fetch(`/api/casinos/${casinoId}`)
                         console.error('Error fetching selected categories:', error);
                     });
 
+                    fetch(`/api/casinos/${casinoId}/image`)
+                    .then(response => response.json())
+                    .then(selectedImage => {
+                        console.log('Selected image:', selectedImage);
+                        getAvailableImages(selectedImage);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching selected categories:', error);
+                    });
+
 
             })
             .catch(error => {
@@ -247,8 +264,47 @@ fetch(`/api/casinos/${casinoId}`)
     })
     .catch(error => {
         console.error('Error fetching casino details:', error);
-    });
+    })
+})
+.catch(error => {
+    console.error('Error fetching casino details:', error);
+});
+
 }
+
+function getAvailableImages(selectedImage) {
+                fetch('/api/images')
+                    .then(response => response.json())
+                    .then(images => {
+                        const imageDropdown = document.getElementById('imageDropdown');
+                        console.log('Image Dropdown:', imageDropdown);
+                        console.log('Images:', images);
+                        imageDropdown.innerHTML = ''; // Remove existing options
+
+                        images.forEach(image => {
+                            const option = document.createElement('option');
+                            option.value = image._id;
+                            option.innerText = image.name;
+
+                            // Create an image element and set its source to image.imageUrl
+                            const img = document.createElement('img');
+                            img.src = image.imageUrl;
+                            img.alt = image.name;
+                            img.style.width = '50px'; // Set the width of the image (adjust as needed)
+
+                            // Append the image element to the option
+                            option.appendChild(img);
+
+                            if (selectedImage == image._id) {
+                                option.selected = true; // Select the option if it is in the selected images
+                            }
+                            imageDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching images:', error);
+                    });
+                }
 
             function getAvailableCategories(selectedCategories) {
 fetch('/api/casinos/categories')
@@ -273,6 +329,7 @@ fetch('/api/casinos/categories')
         console.error('Error fetching categories:', error);
     });
 }
+
 
             function getAvailableWagerTypes(selectedWagerTypes) {
                 fetch('/api/casinos/wagertypes')
@@ -414,20 +471,23 @@ const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(opti
                 const reviewTitle = document.querySelector('input[name="reviewTitle"]').value;
                 const review = document.querySelector('textarea[name="review"]').value;
 
-                const imageUrl = document.querySelector('input[name="imageUrl"]').value;
+                const imageDropdown = document.querySelector('select[name="image"]');
+                const image = imageDropdown.value;
+
                 const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
+
                 const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
                 //#endregion
                 
 
                 
-                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'ImageUrl:', imageUrl, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
+                console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories, 'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:', label, 'LabelLarge:', labelLarge,  'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:', maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit, 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:', review, 'image:', image, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
 
                 
                 // Send a PUT request to the API with the updated casino data
                 fetch(`/api/casinos/${casinoId}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, imageUrl, affiliateLink, affiliateShortlink }),
+                    body: JSON.stringify({ name, categories, description, priority, active, isNew, label, labelLarge, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, reviewTitle, review, image, affiliateLink, affiliateShortlink }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -443,6 +503,9 @@ const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(opti
                         console.error('Error updating casino:', error);
                     });
             }
+
+
+            
 
             function openAddModal() {
                 const modal = document.createElement('div');
