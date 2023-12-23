@@ -2306,6 +2306,173 @@ app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req,
 
 //#endregion Casino Features
 
+//#region Casino Providers
+
+// Get all casino providers from MongoDB
+app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoProviders.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino providers:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Insert casino provider into MongoDB
+app.post('/api/casinos/providers/add', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoProviders = new CasinoProviders({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoProviders.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino provider:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Duplicate casino provider
+app.post('/api/casinos/providers/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoProviders.findOne({
+      _id: id
+    })
+    .then((casinoProviders) => {
+      if (!casinoProviders) {
+        throw new Error('Casino provider not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoProviders = new CasinoProviders({
+          addedBy: userId,
+          name: casinoProviders.name + ' (Copy)',
+          description: casinoProviders.description,
+          image: casinoProviders.image,
+          priority: newPriority,
+          active: casinoProviders.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoProviders.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino provider:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino provider:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit casino provider
+app.put('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoProviders.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoProviders) => {
+      if (!updatedCasinoProviders) {
+        throw new Error('Casino provider not found');
+      }
+      res.json(updatedCasinoProviders);
+      console.log('Casino provider updated: ' + updatedCasinoProviders.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino provider:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Delete casino provider
+app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoProviders.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoProvider) => {
+      if (!deletedCasinoProvider) {
+        throw new Error('Casino provider not found');
+      }
+      res.json(deletedCasinoProvider);
+      console.log('Casino provider deleted: ' + deletedCasinoProvider.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino provider:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Casino Providers
+
 //#region Casinos
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
