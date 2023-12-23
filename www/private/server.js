@@ -57,7 +57,10 @@ app.use(express.static(path.join('public')));
 
 //#region MongoDB
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/casfra', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/casfra', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -86,9 +89,18 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
-  priority: { type: Number, default: generateRandomPriority() },
-  active: { type: Boolean, default: false },
-  banned: { type: Boolean, default: false },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  active: {
+    type: Boolean,
+    default: false
+  },
+  banned: {
+    type: Boolean,
+    default: false
+  },
   registrationKey: String,
   registrationDate: Date,
   registrationIp: String,
@@ -102,18 +114,30 @@ const userSchema = new mongoose.Schema({
 const userGroupSchema = new mongoose.Schema({
   name: String,
   permissions: [String],
-  priority: { type: Number, default: generateRandomPriority() }
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  }
 });
 
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
   regkey: String,
-  created: { type: Date, default: Date.now },
-  used: { type: Boolean, default: false },
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  used: {
+    type: Boolean,
+    default: false
+  },
   usedDate: Date,
   userId: String,
   userIp: String,
-  priority: { type: Number, default: generateRandomPriority() }
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  }
 });
 
 // Define LinkHit schema
@@ -127,27 +151,48 @@ const imagesSchema = new mongoose.Schema({
   filename: String,
   originalname: String,
   imageUrl: String,
-  priority: { type: Number, default: generateRandomPriority() },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
   size: Number,
   mimetype: String,
   description: String,
-  addedDate: { type: Date, default: Date.now },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedUser: String,
   category: String,
   description: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: 0
+  },
 });
 
 const imagesCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String,
@@ -158,13 +203,25 @@ const casinoSchema = new mongoose.Schema({
   name: String,
   categories: [String],
   description: String,
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String,
-  active: { type: Boolean, default: false },
-  isNew: { type: Boolean, default: false },
+  active: {
+    type: Boolean,
+    default: false
+  },
+  isNew: {
+    type: Boolean,
+    default: false
+  },
   label: String,
   labelLarge: String,
   boni: [String],
@@ -173,9 +230,18 @@ const casinoSchema = new mongoose.Schema({
   maxCashout: Number,
   wager: Number,
   wagerType: [String],
-  noDeposit: { type: Boolean, default: false },
-  prohibitedGamesProtection: { type: Boolean, default: true },
-  vpn: { type: Boolean, default: false },
+  noDeposit: {
+    type: Boolean,
+    default: false
+  },
+  prohibitedGamesProtection: {
+    type: Boolean,
+    default: true
+  },
+  vpn: {
+    type: Boolean,
+    default: false
+  },
   features: [String],
   providers: [String],
   paymentMethods: [String],
@@ -191,14 +257,26 @@ const casinoSchema = new mongoose.Schema({
 const casinoReviewSchema = new mongoose.Schema({
   casinoId: String,
   addedBy: String,
-  addedDate: { type: Date, default: Date.now },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   modifiedBy: String,
   modifiedDate: Date,
   rating: Number,
   review: String,
-  timestamp: { type: Date, default: Date.now },
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() }
+  timestamp: {
+    type: Date,
+    default: Date.now
+  },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  }
 });
 
 // Define Casino features schema
@@ -206,9 +284,18 @@ const casinoFeaturesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -219,9 +306,18 @@ const casinoProviderSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -232,9 +328,18 @@ const casinoPaymentMethodsSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -245,9 +350,18 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   name: String,
   short: String,
   description: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -259,12 +373,24 @@ const casinoBoniSchema = new mongoose.Schema({
   bonus: Number,
   freespins: Number,
   max: Number,
-  sticky: { type: Boolean, default: true },
+  sticky: {
+    type: Boolean,
+    default: true
+  },
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -275,9 +401,18 @@ const casinoCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  active: { type: Boolean, default: true },
-  priority: { type: Number, default: generateRandomPriority() },
-  addedDate: { type: Date, default: Date.now },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String
@@ -289,7 +424,10 @@ const SessionSchema = new mongoose.Schema({
   username: String,
   ip: String,
   userAgent: String,
-  timestamp: { type: Date, default: Date.now }
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Define models
@@ -311,28 +449,43 @@ const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 
 
-const languageEntries = [
-  { name: 'English', code: 'en' },
-  { name: 'French', code: 'fr' },
-  { name: 'Spanish', code: 'es' },
-  { name: 'German', code: 'de' },
+const languageEntries = [{
+    name: 'English',
+    code: 'en'
+  },
+  {
+    name: 'French',
+    code: 'fr'
+  },
+  {
+    name: 'Spanish',
+    code: 'es'
+  },
+  {
+    name: 'German',
+    code: 'de'
+  },
 ];
 
-const registrationKeyEntries = [
-  { regkey: 'admin', created: new Date(), used: false }
-];
+const registrationKeyEntries = [{
+  regkey: 'admin',
+  created: new Date(),
+  used: false
+}];
 
 const userAdminGroup = new UserGroup({
   name: 'Admin',
-  permissions: ['authenticate', 'viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos', 
-  'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-  'manageSessions', 'manageImages', 'manageImagesCategories']
+  permissions: ['authenticate', 'viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos',
+    'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
+    'manageSessions', 'manageImages', 'manageImagesCategories'
+  ]
 });
 
 const userOperatorGroup = new UserGroup({
   name: 'Operator',
-  permissions: ['authenticate', 'viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider', 
-  'managePaymentMethods', 'manageAccount']
+  permissions: ['authenticate', 'viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider',
+    'managePaymentMethods', 'manageAccount'
+  ]
 });
 
 const userUserGroup = new UserGroup({
@@ -342,9 +495,15 @@ const userUserGroup = new UserGroup({
 
 const saveDefaultUserDatabaseData = async () => {
   try {
-    const adminGroup = await UserGroup.findOne({ name: 'Admin' });
-    const userGroup = await UserGroup.findOne({ name: 'User' });
-    const operatorGroup = await UserGroup.findOne({ name: 'Operator' });
+    const adminGroup = await UserGroup.findOne({
+      name: 'Admin'
+    });
+    const userGroup = await UserGroup.findOne({
+      name: 'User'
+    });
+    const operatorGroup = await UserGroup.findOne({
+      name: 'Operator'
+    });
 
     const promises = [];
 
@@ -376,7 +535,9 @@ const saveDefaultUserDatabaseData = async () => {
     }
 
     for (const languageEntry of languageEntries) {
-      const existingLanguage = await Language.findOne({ name: languageEntry.name });
+      const existingLanguage = await Language.findOne({
+        name: languageEntry.name
+      });
 
       if (!existingLanguage) {
         const newLanguage = new Language(languageEntry);
@@ -390,7 +551,9 @@ const saveDefaultUserDatabaseData = async () => {
     }
 
     for (const registrationKeyEntry of registrationKeyEntries) {
-      const existingRegistrationKey = await RegistrationKey.findOne({ regkey: registrationKeyEntry.regkey });
+      const existingRegistrationKey = await RegistrationKey.findOne({
+        regkey: registrationKeyEntry.regkey
+      });
 
       if (!existingRegistrationKey) {
         const newRegistrationKey = new RegistrationKey(registrationKeyEntry);
@@ -481,7 +644,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     const promises = [];
 
     for (const casinoFeaturesEntry of CasinoFeaturesEntries) {
-      const existingCasinoFeatures = await CasinoFeatures.findOne({ name: casinoFeaturesEntry.name });
+      const existingCasinoFeatures = await CasinoFeatures.findOne({
+        name: casinoFeaturesEntry.name
+      });
 
       if (!existingCasinoFeatures) {
         const newCasinoFeatures = new CasinoFeatures(casinoFeaturesEntry);
@@ -495,7 +660,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     }
 
     for (const casinoProviderEntry of CasinoProviderEntries) {
-      const existingCasinoProvider = await CasinoProvider.findOne({ name: casinoProviderEntry.name });
+      const existingCasinoProvider = await CasinoProvider.findOne({
+        name: casinoProviderEntry.name
+      });
 
       if (!existingCasinoProvider) {
         const newCasinoProvider = new CasinoProvider(casinoProviderEntry);
@@ -509,7 +676,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     }
 
     for (const casinoPaymentMethodsEntry of CasinoPaymentMethodsEntries) {
-      const existingCasinoPaymentMethods = await CasinoPaymentMethods.findOne({ name: casinoPaymentMethodsEntry.name });
+      const existingCasinoPaymentMethods = await CasinoPaymentMethods.findOne({
+        name: casinoPaymentMethodsEntry.name
+      });
 
       if (!existingCasinoPaymentMethods) {
         const newCasinoPaymentMethods = new CasinoPaymentMethods(casinoPaymentMethodsEntry);
@@ -523,7 +692,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     }
 
     for (const casinoWagerTypesEntry of CasinoWagerTypesEntries) {
-      const existingCasinoWagerTypes = await CasinoWagerTypes.findOne({ name: casinoWagerTypesEntry.name });
+      const existingCasinoWagerTypes = await CasinoWagerTypes.findOne({
+        name: casinoWagerTypesEntry.name
+      });
 
       if (!existingCasinoWagerTypes) {
         const newCasino = new CasinoWagerTypes(casinoWagerTypesEntry);
@@ -533,7 +704,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     }
 
     for (const casinoBoniEntry of CasinoBoniEntries) {
-      const existingCasinoBoni = await CasinoBoni.findOne({ name: casinoBoniEntry.name });
+      const existingCasinoBoni = await CasinoBoni.findOne({
+        name: casinoBoniEntry.name
+      });
 
       if (!existingCasinoBoni) {
         const newCasinoBoni = new CasinoBoni(casinoBoniEntry);
@@ -543,7 +716,9 @@ const saveDefaultCasinoDatabaseData = async () => {
     }
 
     for (const casinoCategoriesEntry of CasinoCategoriesEntries) {
-      const existingCasinoCategories = await CasinoCategories.findOne({ name: casinoCategoriesEntry.name });
+      const existingCasinoCategories = await CasinoCategories.findOne({
+        name: casinoCategoriesEntry.name
+      });
 
       if (!existingCasinoCategories) {
         const newCasinoCategories = new CasinoCategories(casinoCategoriesEntry);
@@ -568,14 +743,16 @@ const imagesCategoriesEntry = {
   active: true,
   priority: 1,
   addedDate: new Date(),
-  addedBy: 'System',  
+  addedBy: 'System',
 };
 
 const saveDefaultImagesDatabaseData = async () => {
   try {
     const promises = [];
 
-    const existingImagesCategories = await ImagesCategories.findOne({ name: imagesCategoriesEntry.name });
+    const existingImagesCategories = await ImagesCategories.findOne({
+      name: imagesCategoriesEntry.name
+    });
 
     if (!existingImagesCategories) {
       const newImagesCategories = new ImagesCategories(imagesCategoriesEntry);
@@ -596,7 +773,9 @@ saveDefaultImagesDatabaseData();
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true
+}));
 
 const MongoStore = require('connect-mongo');
 app.use(session({
@@ -606,8 +785,8 @@ app.use(session({
   cookie: {
     maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
   },
-  store: MongoStore.create({ 
-    mongoUrl: 'mongodb://localhost:27017/casfra' 
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://localhost:27017/casfra'
   })
 }));
 
@@ -615,83 +794,114 @@ app.use(session({
 
 // Login user
 app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
+  const {
+    username,
+    password
+  } = req.body;
 
   if (!password) {
-    res.status(400).json({ error: 'Password is required' });
+    res.status(400).json({
+      error: 'Password is required'
+    });
     return;
   }
 
   if (!username) {
-    res.status(400).json({ error: 'Username is required' });
+    res.status(400).json({
+      error: 'Username is required'
+    });
     return;
   }
 
-  User.findOne({ username: username })
+  User.findOne({
+      username: username
+    })
     .then((user) => {
       if (!user) {
-        res.status(401).json({ error: 'Invalid username or password' });
+        res.status(401).json({
+          error: 'Invalid username or password'
+        });
         return;
       }
 
       if (!user.active) {
-        res.status(401).json({ error: 'User is not active' });
+        res.status(401).json({
+          error: 'User is not active'
+        });
         return;
       }
 
       if (user.banned) {
-        res.status(401).json({ error: 'User is banned' });
+        res.status(401).json({
+          error: 'User is banned'
+        });
         return;
       }
 
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) {
           console.error('Error comparing passwords:', err);
-          res.status(500).json({ error: 'Internal server error' });
+          res.status(500).json({
+            error: 'Internal server error'
+          });
           return;
         }
 
         if (result) {
           // Get user permissions
-          UserGroup.findOne({ _id: user.groupId })
+          UserGroup.findOne({
+              _id: user.groupId
+            })
             .then((userGroup) => {
               if (!userGroup) {
-                res.status(500).json({ error: 'User group not found' });
+                res.status(500).json({
+                  error: 'User group not found'
+                });
                 return;
               }
 
               // Add user permissions to session data
-              req.session.user = { 
-                userId: user._id, 
-                username: user.username, 
-                permissions: userGroup.permissions 
+              req.session.user = {
+                userId: user._id,
+                username: user.username,
+                permissions: userGroup.permissions
               };
 
-              res.json({ success: true });
+              res.json({
+                success: true
+              });
             })
             .catch((error) => {
               console.error('Error retrieving user group:', error);
-              res.status(500).json({ error: 'Internal server error' });
+              res.status(500).json({
+                error: 'Internal server error'
+              });
             });
         } else {
-          res.status(401).json({ error: 'Invalid username or password' });
+          res.status(401).json({
+            error: 'Invalid username or password'
+          });
         }
       });
     })
     .catch((error) => {
       console.error('Error retrieving user:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get current session details
 app.get('/api/auth/session', checkPermissions('authenticate'), (req, res) => {
   const sessionDetails = req.session.user;
-  
+
   if (sessionDetails) {
     res.json(sessionDetails);
   } else {
-    res.status(401).json({ error: 'No session found' });
+    res.status(401).json({
+      error: 'No session found'
+    });
   }
 });
 
@@ -703,14 +913,18 @@ app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => 
     })
     .catch((error) => {
       console.error('Error retrieving sessions:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Logout user
 app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
   req.session.destroy();
-  res.json({ success: true });
+  res.json({
+    success: true
+  });
 });
 
 //#endregion Auth
@@ -719,67 +933,106 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
 // Insert user into MongoDB
 app.post('/api/user/register', (req, res) => {
   console.log(req.body);
-  const { username, password, passwordRepeat, email, language, registrationKey } = req.body;
+  const {
+    username,
+    password,
+    passwordRepeat,
+    email,
+    language,
+    registrationKey
+  } = req.body;
 
   if (!username) {
-    res.status(400).json({ error: 'Username is required' });
+    res.status(400).json({
+      error: 'Username is required'
+    });
     return;
   }
 
   if (!email) {
-    res.status(400).json({ error: 'Email is required' });
+    res.status(400).json({
+      error: 'Email is required'
+    });
     return;
   }
 
   if (!registrationKey) {
-    res.status(400).json({ error: 'Registration key is required' });
+    res.status(400).json({
+      error: 'Registration key is required'
+    });
     return;
   }
 
   // Validate username format
   const usernameRegex = /^[a-zA-Z0-9]{3,10}$/;
   if (!usernameRegex.test(username)) {
-    res.status(400).json({ error: 'Username must contain only numbers and letters, with a length between 3 and 10 characters' });
+    res.status(400).json({
+      error: 'Username must contain only numbers and letters, with a length between 3 and 10 characters'
+    });
     return;
   }
 
   // Validate E-Mail format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    res.status(400).json({ error: 'Invalid email format' });
+    res.status(400).json({
+      error: 'Invalid email format'
+    });
     return;
   }
 
-  RegistrationKey.findOne({ regkey: registrationKey })
+  RegistrationKey.findOne({
+      regkey: registrationKey
+    })
     .then((existingKey) => {
       if (!existingKey) {
-        res.status(400).json({ error: 'Invalid registration key' });
+        res.status(400).json({
+          error: 'Invalid registration key'
+        });
       } else if (existingKey.used) {
-        res.status(400).json({ error: 'Registration key already used' });
+        res.status(400).json({
+          error: 'Registration key already used'
+        });
       } else {
-        User.findOne({ $or: [{ username: username }, { email: email }] })
+        User.findOne({
+            $or: [{
+              username: username
+            }, {
+              email: email
+            }]
+          })
           .then((existingUser) => {
             if (existingUser) {
               if (existingUser.username === username) {
-                res.status(400).json({ error: 'Username already exists' });
+                res.status(400).json({
+                  error: 'Username already exists'
+                });
               } else {
-                res.status(400).json({ error: 'Email already exists' });
+                res.status(400).json({
+                  error: 'Email already exists'
+                });
               }
             } else {
               if (!password) {
-                res.status(400).json({ error: 'Password is required' });
+                res.status(400).json({
+                  error: 'Password is required'
+                });
                 return;
               }
 
               if (password !== passwordRepeat) {
-                res.status(400).json({ error: 'Passwords do not match' });
+                res.status(400).json({
+                  error: 'Passwords do not match'
+                });
                 return;
               }
 
               bcrypt.hash(password, 10, (err, hash) => {
                 if (err) {
                   console.error('Error hashing password:', err);
-                  res.status(500).json({ error: 'Internal server error' });
+                  res.status(500).json({
+                    error: 'Internal server error'
+                  });
                   return;
                 }
 
@@ -818,35 +1071,47 @@ app.post('/api/user/register', (req, res) => {
                     // Send the verification code by email to the user
                     // sendVerificationCodeByEmail(user.email, registrationVerificationCode);
 
-                    res.status(201).json({ success: true });
+                    res.status(201).json({
+                      success: true
+                    });
                   })
                   .catch((error) => {
                     console.error('Error inserting user:', error);
-                    res.status(500).json({ error: 'Internal server error' });
+                    res.status(500).json({
+                      error: 'Internal server error'
+                    });
                   });
               });
             }
           })
           .catch((error) => {
             console.error('Error checking existing user:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       }
     })
     .catch((error) => {
       console.error('Error checking registration key:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get user details of the current user
 app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
-  const { userId } = req.session.user;
+  const {
+    userId
+  } = req.session.user;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          error: 'User not found'
+        });
         return;
       }
 
@@ -854,48 +1119,73 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error retrieving user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit user details of the current user
 app.post('/api/user', (req, res) => {
-  const { userId } = req.session.user;
-  const { username, email } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    username,
+    email
+  } = req.body;
 
-  User.findByIdAndUpdate(userId, { username, email })
+  User.findByIdAndUpdate(userId, {
+      username,
+      email
+    })
     .then(() => {
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error updating user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Change password of the current user
 app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => {
-  const { userId } = req.session.user;
-  const { currentPassword, newPassword } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    currentPassword,
+    newPassword
+  } = req.body;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          error: 'User not found'
+        });
         return;
       }
       console.log(user);
-      console.log(currentPassword  + ' ' + newPassword);
+      console.log(currentPassword + ' ' + newPassword);
       // Check if the current password matches
       bcrypt.compare(currentPassword, user.password, (err, result) => {
         if (err) {
           console.error('Error comparing passwords:', err);
-          res.status(500).json({ error: 'Internal server error' });
+          res.status(500).json({
+            error: 'Internal server error'
+          });
           return;
         }
 
         if (!result) {
-          res.status(400).json({ error: 'Current password is incorrect' });
+          res.status(400).json({
+            error: 'Current password is incorrect'
+          });
           return;
         }
 
@@ -903,7 +1193,9 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
         bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
           if (err) {
             console.error('Error hashing password:', err);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
             return;
           }
 
@@ -912,18 +1204,24 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
           user.save()
             .then(() => {
               console.log('Password updated:' + newPassword);
-              res.json({ success: true });
+              res.json({
+                success: true
+              });
             })
             .catch((error) => {
               console.error('Error updating password:', error);
-              res.status(500).json({ error: 'Internal server error' });
+              res.status(500).json({
+                error: 'Internal server error'
+              });
             });
         });
       });
     })
     .catch((error) => {
       console.error('Error retrieving user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -935,24 +1233,36 @@ app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error retrieving users:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 // Delete user from MongoDB by ID
 app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
-  const { id } = req.body; // Get the ID from the request body
-  User.deleteOne({ _id: id })
+  const {
+    id
+  } = req.body; // Get the ID from the request body
+  User.deleteOne({
+      _id: id
+    })
     .then((result) => {
       if (result.deletedCount === 0) {
         throw new Error('User not found');
       }
-      res.json({ success: true, id: id, status: 'deleted' });
+      res.json({
+        success: true,
+        id: id,
+        status: 'deleted'
+      });
       console.log('User deleted');
     })
     .catch((error) => {
       console.error('Error deleting user:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -967,13 +1277,17 @@ app.get('/api/users/regkeys', checkPermissions('manageRegistrationKeys'), (req, 
     })
     .catch((error) => {
       console.error('Error retrieving registration keys:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Insert registration key into MongoDB
 app.post('/api/users/regkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const { regkey } = req.body;
+  const {
+    regkey
+  } = req.body;
 
   const registrationKey = new RegistrationKey({
     regkey: regkey
@@ -985,7 +1299,9 @@ app.post('/api/users/regkeys/add', checkPermissions('manageRegistrationKeys'), (
     })
     .catch((error) => {
       console.error('Error inserting registration key:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -999,28 +1315,43 @@ app.post('/api/users/regkeys/generate', checkPermissions('manageRegistrationKeys
 
   registrationKey.save()
     .then((result) => {
-      res.json({ id: result._id, regkey: regkey });
+      res.json({
+        id: result._id,
+        regkey: regkey
+      });
     })
     .catch((error) => {
       console.error('Error generating registration key:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Delete registration key from MongoDB by ID
 app.delete('/api/users/regkeys/', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const { id } = req.body.id;
-  RegistrationKey.deleteOne({ _id: id })
+  const {
+    id
+  } = req.body.id;
+  RegistrationKey.deleteOne({
+      _id: id
+    })
     .then((result) => {
       if (result.deletedCount === 0) {
         throw new Error('Registration key not found');
       }
-      res.json({ success: true, id: id, status: 'deleted' });
+      res.json({
+        success: true,
+        id: id,
+        status: 'deleted'
+      });
       console.log('Registration key deleted');
     })
     .catch((error) => {
       console.error('Error deleting registration key:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 //#endregion Registration Keys
@@ -1037,16 +1368,25 @@ app.get('/api/images/categories', checkPermissions('manageImages' || 'manageImag
     })
     .catch((error) => {
       console.error('Error retrieving images categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
 });
 
 // Insert image category into MongoDB
 app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'), (req, res) => {
-  const { name, description, image, priority, active } = req.body;
-  const { userId } = req.session.user;
-  
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
   const imagesCategories = new ImagesCategories({
     addedBy: userId,
     name: name,
@@ -1060,21 +1400,27 @@ app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'
   imagesCategories.save()
     .then(() => {
       res.redirect('/dashboard');
-    }
-    )
+    })
     .catch((error) => {
       console.error('Error inserting image category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
 });
 
 // Duplicate image category
 app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesCategories'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
 
-  ImagesCategories.findOne({ _id: id })
+  ImagesCategories.findOne({
+      _id: id
+    })
     .then((imagesCategories) => {
       if (!imagesCategories) {
         throw new Error('Image category not found');
@@ -1093,29 +1439,42 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
         newImagesCategories.save()
           .then(() => {
             res.redirect('/dashboard');
-          }
-          )
+          })
           .catch((error) => {
             console.error('Error duplicating image category:', error);
-            res.status(500).json({ error: 'Internal server error' });
-          }
-          );
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
       }
     })
     .catch((error) => {
       console.error('Error duplicating image category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-}
-);
+});
 
 // Edit image category
 app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, image, priority, active } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
 
-  ImagesCategories.findOne({ _id: id })
+  ImagesCategories.findOne({
+      _id: id
+    })
     .then((imagesCategories) => {
       if (!imagesCategories) {
         throw new Error('Image category not found');
@@ -1130,17 +1489,23 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
 
         imagesCategories.save()
           .then(() => {
-            res.status(200).json({ success: 'Image Categorie updated' }); 
+            res.status(200).json({
+              success: 'Image Categorie updated'
+            });
           })
           .catch((error) => {
             console.error('Error editing image category:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       }
     })
     .catch((error) => {
       console.error('Error editing image category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1151,18 +1516,22 @@ app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategorie
   ImagesCategories.findByIdAndDelete(imageCategoryId)
     .then((deletedImageCategory) => {
       if (!deletedImageCategory) {
-        return res.status(404).json({ error: 'Image category not found' });
+        return res.status(404).json({
+          error: 'Image category not found'
+        });
       }
 
-      res.json({ message: 'Image category deleted successfully' });
-    }
-    )
+      res.json({
+        message: 'Image category deleted successfully'
+      });
+    })
     .catch((error) => {
       console.error('Error deleting image category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
-} );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
 
 // Get the category of an image by ID
 app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res) => {
@@ -1172,14 +1541,18 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
     .populate('category')
     .then((image) => {
       if (!image) {
-        return res.status(404).json({ error: 'Image not found' });
+        return res.status(404).json({
+          error: 'Image not found'
+        });
       }
 
       res.json(image.category);
     })
     .catch((error) => {
       console.error('Error retrieving image category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1202,7 +1575,9 @@ app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error retrieving images:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1214,7 +1589,9 @@ app.get('/api/images/categories', checkPermissions('manageImages'), (req, res) =
     })
     .catch((error) => {
       console.error('Error retrieving images categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1222,7 +1599,9 @@ app.get('/api/images/categories', checkPermissions('manageImages'), (req, res) =
 app.get('/api/images/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
   const categoryId = req.params.categoryId;
 
-  Images.find({ category: categoryId })
+  Images.find({
+      category: categoryId
+    })
     .then((results) => {
       const updatedResults = results.map((image) => {
         return {
@@ -1235,7 +1614,9 @@ app.get('/api/images/categories/:categoryId/images', checkPermissions('manageIma
     })
     .catch((error) => {
       console.error('Error retrieving images of category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1253,14 +1634,18 @@ const storage = multer.diskStorage({
 });
 
 // Create multer upload instance
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage
+});
 
 // Upload image and save it to the database
 app.post('/api/images', checkPermissions('manageImages'), upload.single('image'), (req, res) => {
   const image = req.file;
 
   if (!image) {
-    return res.status(400).json({ error: 'No image file provided' });
+    return res.status(400).json({
+      error: 'No image file provided'
+    });
   }
 
   // Save the image details to the database
@@ -1279,25 +1664,44 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
   newImage.save()
     .then((savedImage) => {
       setImageUrl(savedImage._id);
-      res.json({ message: 'Image uploaded and saved successfully', image: savedImage });
+      res.json({
+        message: 'Image uploaded and saved successfully',
+        image: savedImage
+      });
     })
     .catch((error) => {
       console.error('Error saving image:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit image
 app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, priority, active, category } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    priority,
+    active,
+    category
+  } = req.body;
   console.log(req.body);
 
-  Images.findOne({ _id: id })
+  Images.findOne({
+      _id: id
+    })
     .then((image) => {
       if (!image) {
-        res.status(404).json({ error: 'Image not found' });
+        res.status(404).json({
+          error: 'Image not found'
+        });
       } else {
         image.name = name;
         image.description = description;
@@ -1309,17 +1713,23 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
         image.save()
           .then(() => {
-            res.status(200).json({ message: 'Image ' + image.name + ' edited successfully' });
+            res.status(200).json({
+              message: 'Image ' + image.name + ' edited successfully'
+            });
           })
           .catch((error) => {
             console.error('Error editing image:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       }
     })
     .catch((error) => {
       console.error('Error editing image:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1330,21 +1740,25 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   Images.findByIdAndDelete(id)
     .then((deletedImage) => {
       if (!deletedImage) {
-        return res.status(404).json({ error: 'Image not found' });
+        return res.status(404).json({
+          error: 'Image not found'
+        });
       }
 
       // Delete the image from the file system
       fs.unlinkSync(`public/img/images/${deletedImage.filename}`);
 
-      res.json({ message: 'Image deleted successfully' });
-    }
-    )
+      res.json({
+        message: 'Image deleted successfully'
+      });
+    })
     .catch((error) => {
       console.error('Error deleting image:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
-} );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
 
 //#endregion Media Images
 
@@ -1360,14 +1774,24 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
     })
     .catch((error) => {
       console.error('Error retrieving casino categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Insert casino category into MongoDB
 app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req, res) => {
-  const { name, description, image, priority, active } = req.body;
-  const { userId } = req.session.user;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
 
   const casinoCategories = new CasinoCategories({
     addedBy: userId,
@@ -1382,21 +1806,27 @@ app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req,
   casinoCategories.save()
     .then(() => {
       res.redirect('/dashboard');
-    }
-    )
+    })
     .catch((error) => {
       console.error('Error inserting casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
 });
 
 // Duplicate casino category
 app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
 
-  CasinoCategories.findOne({ _id: id })
+  CasinoCategories.findOne({
+      _id: id
+    })
     .then((casinoCategories) => {
       if (!casinoCategories) {
         throw new Error('Casino category not found');
@@ -1415,34 +1845,52 @@ app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasino
         newCasinoCategories.save()
           .then(() => {
             res.redirect('/dashboard');
-          }
-          )
+          })
           .catch((error) => {
             console.error('Error inserting casino category:', error);
-            res.status(500).json({ error: 'Internal server error' });
-          }
-          );
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
       }
     })
     .catch((error) => {
       console.error('Error duplicating casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-    );
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
 });
 
 
 // Edit casino category
 app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, image, priority, active } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
 
-  CasinoCategories.findOneAndUpdate(
-    { _id: id },
-    { name, description, image, priority, active },
-    { modifiedBy: userId, modifiedDate: Date.now() }
-  )
+  CasinoCategories.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
     .then((updatedCasinoCategories) => {
       if (!updatedCasinoCategories) {
         throw new Error('Casino category not found');
@@ -1452,15 +1900,21 @@ app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, 
     })
     .catch((error) => {
       console.error('Error updating casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Delete casino category
 app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
-  CasinoCategories.findOneAndDelete({ _id: id })
+  CasinoCategories.findOneAndDelete({
+      _id: id
+    })
     .then((deletedCasinoCategory) => {
       if (!deletedCasinoCategory) {
         throw new Error('Casino category not found');
@@ -1470,7 +1924,9 @@ app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (re
     })
     .catch((error) => {
       console.error('Error deleting casino category:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -1485,28 +1941,41 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error retrieving casinos:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 
 // Get data for a single casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result);
     })
     .catch((error) => {
       console.error('Error retrieving casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
-  const { name, priority } = req.body; // Get the name and location from the request body
-  const { userId } = req.session.user; // Get the user ID from the session data
+  const {
+    name,
+    priority
+  } = req.body; // Get the name and location from the request body
+  const {
+    userId
+  } = req.session.user; // Get the user ID from the session data
 
   // Create a new casino object
   const newCasino = new Casino({
@@ -1523,22 +1992,81 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error creating casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit a casino
 app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user; 
-  const { id } = req.params; 
-  const { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, image, affiliateUrl, affiliateShortlink } = req.body; // Get the updated values from the request body
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    categories,
+    description,
+    priority,
+    active,
+    isNew,
+    label,
+    labelLarge,
+    boni,
+    displayBonus,
+    maxBet,
+    maxCashout,
+    wager,
+    wagerType,
+    noDeposit,
+    prohibitedGamesProtection,
+    vpn,
+    features,
+    providers,
+    paymentMethods,
+    review,
+    reviewTitle,
+    image,
+    affiliateUrl,
+    affiliateShortlink
+  } = req.body; // Get the updated values from the request body
   console.log(req.body);
   console.log(active);
-  Casino.findOneAndUpdate(
-    { _id: id },
-    { name, categories, description, priority, active, isNew, label, labelLarge, boni, displayBonus, maxBet, maxCashout, wager, wagerType, noDeposit, prohibitedGamesProtection, vpn, features, providers, paymentMethods, review, reviewTitle, image, affiliateUrl, affiliateShortlink },
-    { modifiedBy: userId, modifiedDate: Date.now() }
-  )
+  Casino.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      categories,
+      description,
+      priority,
+      active,
+      isNew,
+      label,
+      labelLarge,
+      boni,
+      displayBonus,
+      maxBet,
+      maxCashout,
+      wager,
+      wagerType,
+      noDeposit,
+      prohibitedGamesProtection,
+      vpn,
+      features,
+      providers,
+      paymentMethods,
+      review,
+      reviewTitle,
+      image,
+      affiliateUrl,
+      affiliateShortlink
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
     .then((updatedCasino) => {
       if (!updatedCasino) {
         throw new Error('Casino not found');
@@ -1551,34 +2079,50 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error updating casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Delete a casino
 app.delete('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.body; // Get the ID from the request body
-  Casino.deleteOne({ _id: id })
+  const {
+    id
+  } = req.body; // Get the ID from the request body
+  Casino.deleteOne({
+      _id: id
+    })
     .then((result) => {
       if (result.deletedCount === 0) {
         throw new Error('Casino not found');
       }
-      res.json({ success: true, id: id, status: 'deleted' });
+      res.json({
+        success: true,
+        id: id,
+        status: 'deleted'
+      });
       console.log('Casino deleted');
     })
     .catch((error) => {
       console.error('Error deleting casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Toggle the active status of a casino by its ID
 app.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID of the casino from the request params
+  const {
+    id
+  } = req.params; // Get the ID of the casino from the request params
 
   // Validate the ID
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ error: 'Invalid ID format' });
+    return res.status(400).json({
+      error: 'Invalid ID format'
+    });
   }
 
   // Find the casino by its ID
@@ -1600,23 +2144,34 @@ app.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req
     })
     .catch((error) => {
       console.error('Error toggling casino active status:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Swap the priority of two casinos by their ID
 app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, res) => {
-  const { id1, id2 } = req.body; // Get the IDs of the two casinos from the request body
+  const {
+    id1,
+    id2
+  } = req.body; // Get the IDs of the two casinos from the request body
 
   console.log(id1 + ' ' + id2);
 
   // Validate the IDs
   if (!id1.match(/^[0-9a-fA-F]{24}$/) || !id2.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ error: 'Invalid ID format' });
+    return res.status(400).json({
+      error: 'Invalid ID format'
+    });
   }
 
   // Find the two casinos by their IDs
-  Casino.find({ _id: { $in: [id1, id2] } })
+  Casino.find({
+      _id: {
+        $in: [id1, id2]
+      }
+    })
     .then((casinos) => {
       if (casinos.length !== 2) {
         throw new Error('Two casinos not found');
@@ -1636,101 +2191,145 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
     })
     .catch((error) => {
       console.error('Error swapping casinos priority:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get image of a specific casino by ID
 app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       console.log(result);
       res.json(result.image);
     })
     .catch((error) => {
       console.error('Error retrieving casino image:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 // Get categories of a specific casino by ID
 app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.categories);
     })
     .catch((error) => {
       console.error('Error retrieving casino categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get wagerTypes of a specific casino by ID
 app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.wagerType);
     })
     .catch((error) => {
       console.error('Error retrieving casino wagerTypes:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get boni of a specific casino by ID
 app.get('/api/casinos/:id/boni', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.boni);
     })
     .catch((error) => {
       console.error('Error retrieving casino boni:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 // Get features of a specific casino by ID
 app.get('/api/casinos/:id/features', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.features);
     })
     .catch((error) => {
       console.error('Error retrieving casino features:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 // Get providers of a specific casino by ID
 app.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.providers);
     })
     .catch((error) => {
       console.error('Error retrieving casino providers:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 // Get paymentMethods of a specific casino by ID
 app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id })
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
     .then((result) => {
       res.json(result.paymentMethods);
     })
     .catch((error) => {
       console.error('Error retrieving casino paymentMethods:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
-} );
+});
 
 //#endregion Casinos
 
@@ -1749,7 +2348,9 @@ function checkLoggedIn(req, res, next) {
 function checkPermissions(requiredPermission) {
   return function (req, res, next) {
     if (!req.session.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({
+        error: 'Unauthorized'
+      });
       return;
     }
     const userId = req.session.user.userId;
@@ -1757,7 +2358,9 @@ function checkPermissions(requiredPermission) {
     User.findById(userId)
       .then((user) => {
         if (!user) {
-          res.status(403).json({ error: 'Forbidden' });
+          res.status(403).json({
+            error: 'Forbidden'
+          });
           return;
         }
 
@@ -1766,7 +2369,9 @@ function checkPermissions(requiredPermission) {
         UserGroup.findById(groupId)
           .then((userGroup) => {
             if (!userGroup) {
-              res.status(403).json({ error: 'Forbidden' });
+              res.status(403).json({
+                error: 'Forbidden'
+              });
               return;
             }
 
@@ -1775,17 +2380,23 @@ function checkPermissions(requiredPermission) {
             if (permissions.includes(requiredPermission)) {
               next();
             } else {
-              res.status(403).json({ error: 'Forbidden' });
+              res.status(403).json({
+                error: 'Forbidden'
+              });
             }
           })
           .catch((error) => {
             console.error('Error retrieving user group:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       })
       .catch((error) => {
         console.error('Error retrieving user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({
+          error: 'Internal server error'
+        });
       });
   };
 }
@@ -1812,7 +2423,9 @@ app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/dashboard', { user: user });
+    res.render('admin/dashboard', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1822,7 +2435,9 @@ app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/account', { user: user });
+    res.render('admin/account', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1832,7 +2447,9 @@ app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistratio
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/registrationkeys', { user: user });
+    res.render('admin/registrationkeys', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1842,17 +2459,21 @@ app.get('/dashboard/super/sessions', checkPermissions('manageSessions'), (req, r
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/sessions', { user: user });
+    res.render('admin/sessions', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/users', { user: user });
+    res.render('admin/users', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1862,7 +2483,9 @@ app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/casinos', { user: user });
+    res.render('admin/casinos', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1872,7 +2495,9 @@ app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/casinocategories', { user: user });
+    res.render('admin/casinos_categories', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
@@ -1882,21 +2507,25 @@ app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/images_categories', { user: user });
+    res.render('admin/images_categories', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/images', { user: user });
+    res.render('admin/images', {
+      user: user
+    });
   } catch (err) {
     next(err);
   }
-} );
+});
 
 
 //#endregion Routes
@@ -1905,7 +2534,12 @@ app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) 
 function deleteUnusedRegistrationKeys() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
 
-  RegistrationKey.deleteMany({ used: false, created: { $lt: oneHourAgo } })
+  RegistrationKey.deleteMany({
+      used: false,
+      created: {
+        $lt: oneHourAgo
+      }
+    })
     .then(() => {
       const deletedKeys = RegistrationKey.deletedCount;
       console.log('Deleted unused registration keys older than 1 hour:' + deletedKeys);
@@ -1919,14 +2553,18 @@ async function setCasinoImageUrl(casinoId = null) {
   try {
     let casinos;
     if (casinoId) {
-      casinos = await Casino.findOne({ _id: casinoId });
+      casinos = await Casino.findOne({
+        _id: casinoId
+      });
       casinos = [casinos]; // Convert single object to array
     } else {
       casinos = await Casino.find();
     }
     for (const casino of casinos) {
       if (casino.image) {
-        const image = await Images.findOne({ _id: casino.image });
+        const image = await Images.findOne({
+          _id: casino.image
+        });
         if (image) {
           casino.imageUrl = `/img/images/${image.filename}`;
           await casino.save();
@@ -1943,14 +2581,18 @@ async function setImageUrl(id = null) {
   try {
     let images;
     if (id) {
-      images = await Images.findOne({ _id: id });
+      images = await Images.findOne({
+        _id: id
+      });
       images = [images]; // Convert single object to array
     } else {
       images = await Images.find();
     }
     for (const image of images) {
       if (image.filename) {
-        const foundImage = await Images.findOne({ _id: image._id });
+        const foundImage = await Images.findOne({
+          _id: image._id
+        });
         if (foundImage) {
           foundImage.imageUrl = `/img/images/${foundImage.filename}`;
           await foundImage.save();
