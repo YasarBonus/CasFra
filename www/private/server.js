@@ -2924,6 +2924,19 @@ app.get('/dashboard/casinos/categories', checkPermissions('manageCasinos'), (req
   }
 });
 
+app.get('/dashboard/casinos/features', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
+    const user = req.session.user;
+
+    res.render('admin/casinos_features', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
