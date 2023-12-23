@@ -973,6 +973,156 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
 
 //#endregion Auth
 
+//#region Tenancies
+
+// Get all tenancies from MongoDB
+app.get('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
+  Tenancie.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving tenancies:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get tenancie by ID from MongoDB
+app.get('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  Tenancie.findById(id)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({
+          error: 'Tenancie not found'
+        });
+        return;
+      }
+
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Add tenancie to MongoDB
+app.post('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  } = req.body;
+
+  if (!name) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  const tenancie = new Tenancie({
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  });
+
+  tenancie.save()
+    .then(() => {
+      res.status(201).json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error inserting tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Edit tenancie in MongoDB
+app.put('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  } = req.body;
+
+  if (!name) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  Tenancie.findByIdAndUpdate(id, {
+      name,
+      notes,
+      createdBy,
+      createdDate,
+      modifiedBy,
+      modifiedDate,
+      image
+    })
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error updating tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete tenancie from MongoDB
+app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  Tenancie.findByIdAndDelete(id)
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error deleting tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Tenancies
+
 //#region User
 // Insert user into MongoDB
 app.post('/api/user/register', (req, res) => {
