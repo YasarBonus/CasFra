@@ -82,6 +82,16 @@ const languageSchema = new mongoose.Schema({
   code: String
 });
 
+const tenanciesSchema = new mongoose.Schema ({
+  name: String,
+  notes:  String,
+  createdBy: {type: String, default: "System"},
+  createdDate: {type: Date, default: Date.now},
+  modifiedBy: String,
+  modifiedDate: Date,
+  image: String,
+})
+
 // Define User schema
 const userSchema = new mongoose.Schema({
   username: String,
@@ -433,6 +443,7 @@ const SessionSchema = new mongoose.Schema({
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
+const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
@@ -466,6 +477,39 @@ const languageEntries = [{
     code: 'de'
   },
 ];
+
+const tenancieEntries = [{
+  name: 'Treudler',
+}]
+
+const saveDefaultTenancieDatabaseData = async () => {
+  try {
+    const promises = [];
+
+    for (const tenancieEntry of tenancieEntries) {
+      const existingTenancie = await Tenancie.findOne({
+        name: tenancieEntry.name
+      });
+
+      if (!existingTenancie) {
+        const newTenancie = new Tenancie(tenancieEntry);
+        promises.push(newTenancie.save());
+        console.log('Tenancie entry saved:', newTenancie);
+      } else if (existingTenancie.description !== tenancieEntry.description) {
+        existingTenancie.description = tenancieEntry.description;
+        promises.push(existingTenancie.save());
+        console.log('Tenancie entry updated:', existingTenancie);
+      }
+    }
+
+    await Promise.all(promises);
+    console.log('Default Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default Database Data:', error);
+  }
+};
+
+saveDefaultTenancieDatabaseData();
 
 const registrationKeyEntries = [{
   regkey: 'admin',
