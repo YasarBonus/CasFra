@@ -676,13 +676,9 @@ const CasinoBoniEntries = [{
 }];
 
 const CasinoCategoriesEntries = [{
-  name: 'New',
-  description: 'New Casinos',
-  image: 'https://www.casinofreak.com/images/categories/new.png'
-}, {
-  name: 'Live',
-  description: 'Live Casinos',
-  image: 'https://www.casinofreak.com/images/categories/live.png'
+  name: 'Default',
+  description: 'Default Casino Category',
+  image: ''
 }];
 
 const saveDefaultCasinoDatabaseData = async () => {
