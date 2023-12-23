@@ -1125,7 +1125,7 @@ app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res)
 
 //#region User
 // Insert user into MongoDB
-app.post('/api/user/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
   console.log(req.body);
   const {
     username,
