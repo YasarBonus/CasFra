@@ -2187,6 +2187,7 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, 
       
         newCasino.save()
           .then(() => {
+            setCasinoImageUrl(newCasino._id); // Call setCasinoImageUrl function
             res.status(200).json({ message: 'Casino duplicated' });
           })
           .catch((error) => {
