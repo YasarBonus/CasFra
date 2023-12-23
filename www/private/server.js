@@ -86,6 +86,7 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
+  priority: { type: Number, default: generateRandomPriority() },
   active: { type: Boolean, default: false },
   banned: { type: Boolean, default: false },
   registrationKey: String,
@@ -100,7 +101,8 @@ const userSchema = new mongoose.Schema({
 // Define UserGroup schema
 const userGroupSchema = new mongoose.Schema({
   name: String,
-  permissions: [String]
+  permissions: [String],
+  priority: { type: Number, default: generateRandomPriority() }
 });
 
 // Define RegistrationKey schema
@@ -110,7 +112,8 @@ const registrationKeySchema = new mongoose.Schema({
   used: { type: Boolean, default: false },
   usedDate: Date,
   userId: String,
-  userIp: String
+  userIp: String,
+  priority: { type: Number, default: generateRandomPriority() }
 });
 
 // Define LinkHit schema
@@ -155,7 +158,7 @@ const casinoSchema = new mongoose.Schema({
   name: String,
   categories: [String],
   description: String,
-  priority: {type: Number, default: 0},
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -187,10 +190,15 @@ const casinoSchema = new mongoose.Schema({
 // Define Casino Review schema
 const casinoReviewSchema = new mongoose.Schema({
   casinoId: String,
-  userId: String,
+  addedBy: String,
+  addedDate: { type: Date, default: Date.now },
+  modifiedBy: String,
+  modifiedDate: Date,
   rating: Number,
   review: String,
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
+  active: { type: Boolean, default: true },
+  priority: { type: Number, default: generateRandomPriority() }
 });
 
 // Define Casino features schema
@@ -199,7 +207,7 @@ const casinoFeaturesSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -212,7 +220,7 @@ const casinoProviderSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -225,7 +233,7 @@ const casinoPaymentMethodsSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -238,7 +246,7 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   short: String,
   description: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -255,7 +263,7 @@ const casinoBoniSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
@@ -268,7 +276,7 @@ const casinoCategoriesSchema = new mongoose.Schema({
   description: String,
   image: String,
   active: { type: Boolean, default: true },
-  priority: { type: Number, default: 0 },
+  priority: { type: Number, default: generateRandomPriority() },
   addedDate: { type: Date, default: Date.now },
   addedBy: String,
   modifiedDate: Date,
