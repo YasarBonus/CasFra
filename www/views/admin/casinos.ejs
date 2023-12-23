@@ -36,7 +36,7 @@
                                     // Open the modal for editing the casino data
                                     if (document.querySelector('.ui.modal')) {
                                         document.querySelector('.ui.modal')
-                                    .remove(); // Remove the existing modal if it exists
+                                            .remove(); // Remove the existing modal if it exists
                                     }
                                     const modal = document.createElement('div');
                                     modal.classList.add('ui', 'modal');
@@ -243,7 +243,7 @@
                                         .then(response => response.json())
                                         .then(selectedDisplayBonus => {
                                             console.log('Selected display bonus:',
-                                            selectedDisplayBonus);
+                                                selectedDisplayBonus);
                                             getAvailableDisplayBonus(selectedDisplayBonus);
                                         })
                                         .catch(error => {
@@ -422,7 +422,7 @@
                         option.innerText = paymentMethod.name;
                         if (selectedPaymentMethods.includes(paymentMethod._id)) {
                             option.selected =
-                            true; // Select the option if it is in the selected paymentMethods
+                                true; // Select the option if it is in the selected paymentMethods
                         }
                         paymentMethodsDropdown.appendChild(option);
                     });
