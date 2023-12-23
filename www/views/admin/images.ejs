@@ -15,7 +15,7 @@
                         </div>
                         <button class="ui primary button" type="submit">Upload</button>
                     </form>
-                    <div id="imageCards" class="ui cards"></div>
+                    <div id="imageCards" class="ui four cards"></div>
                 </div>
             </div>
         </div>
@@ -35,24 +35,42 @@
                             var card = document.createElement('div');
                             card.className = 'ui card';
 
-                            var imageElement = document.createElement('img');
-                            imageElement.src = image.imageUrl;
-                            imageElement.style.maxWidth = '200px';
+                            var imageElement = document.createElement('div');
+                            imageElement.className = 'image';
                             card.appendChild(imageElement);
+
+                            var img = document.createElement('img');
+                            img.src = image.imageUrl;
+                            img.style.maxWidth = '200px';
+                            imageElement.appendChild(img);
 
                             var content = document.createElement('div');
                             content.className = 'content';
                             card.appendChild(content);
 
+                            var meta = document.createElement('div');
+                            meta.className = 'meta';
+                            content.appendChild(meta);
+
                             var nameInput = document.createElement('input');
                             nameInput.type = 'text';
                             nameInput.value = image.name;
-                            content.appendChild(nameInput);
+                            meta.appendChild(nameInput);
+
+                            
+
+                            var actions = document.createElement('div');
+                            actions.className = 'extra content';
+                            card.appendChild(actions);
 
                             var imageId = document.createElement('div');
-                            imageId.classList = 'ui label';
+                            imageId.classList = 'ui tiny label';
                             imageId.textContent = image._id;
-                            content.appendChild(imageId);
+                            actions.appendChild(imageId);
+
+                            var seperator = document.createElement('div');
+                            seperator.className = 'ui divider';
+                            actions.appendChild(seperator);
 
                             // Add click event listener to copy image ID to clipboard
                             imageId.addEventListener('click', function() {
@@ -69,13 +87,8 @@
                                 document.body.removeChild(tempInput);
 
                                 // Show a notification or perform any other action to indicate successful copy
-                                console.log('Image ID copied to clipboard: ' + image._id);
                                 showToast('success', 'Image ID copied to clipboard: ', image._id);
                             });
-
-                            var actions = document.createElement('div');
-                            actions.className = 'extra content';
-                            card.appendChild(actions);
 
                             var saveButton = document.createElement('button');
                             saveButton.className = 'ui primary button';
