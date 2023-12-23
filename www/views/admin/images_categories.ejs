@@ -20,6 +20,7 @@
                                 <!-- Table rows will be dynamically added here -->
                             </tbody>
                         </table>
+                        <div class="ui green button" id="saveAllBtn">Save All</div>
                     </div>
                 </div>
             </div>
@@ -80,6 +81,11 @@
             saveCategory(categoryId);
         });
 
+        // Event listener for save all button
+        $(document).on('click', '#saveAllBtn', function() {
+            saveAllCategories();
+        });
+
         // Function to duplicate a category
         function duplicateCategory(categoryId) {
             $.ajax({
@@ -123,6 +129,14 @@
                 error: function(error) {
                     console.log('Error:', error);
                 }
+            });
+        }
+
+        // Function to save all categories
+        function saveAllCategories() {
+            $('#imageCategoriesTable tbody tr').each(function() {
+                var categoryId = $(this).attr('id');
+                saveCategory(categoryId);
             });
         }
     });
