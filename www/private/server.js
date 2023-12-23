@@ -1040,12 +1040,13 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
       if (!imagesCategories) {
         throw new Error('Image category not found');
       } else {
+        const newPriority = generateRandomPriority();
         const newImagesCategories = new ImagesCategories({
           addedBy: userId,
           name: imagesCategories.name + ' (Copy)',
           description: imagesCategories.description,
           image: imagesCategories.image,
-          priority: imagesCategories.priority,
+          priority: newPriority,
           active: imagesCategories.active,
           addedDate: Date.now(),
         });
