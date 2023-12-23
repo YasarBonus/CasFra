@@ -1,106 +1,109 @@
 <!-- media.ejs -->
 <!DOCTYPE html>
 <html>
-    <%- include('../partials/head') %>
-    <%- include('../partials/header') %>
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
-            <div class="ui segment">
-                <%- include('./partials/dashboard-menu') %>
-                <div class="ui segment">
-                    <div class="ui container">
-                        <h2>My Account</h2>
-                        <button class="ui blue button" id="resetPassword">Change Password</button>
-                        <div class="ui small modal" id="passwordResetModal">
-                          <i class="close icon"></i>
-                          <div class="header">
-                            Change Password
-                          </div>
-                          <div class="content">
-                            <form class="ui form" id="passwordResetForm">
-                              <div class="field">
-                                <label>Current Password</label>
-                                <input type="password" name="currentPassword" placeholder="Current Password">
-                              </div>
-                              <div class="field">
-                                <label>New Password</label>
-                                <input type="password" name="newPassword" placeholder="New Password">
-                              </div>
-                              <div class="field">
-                                <label>Confirm New Password</label>
-                                <input type="password" name="confirmNewPassword" placeholder="Confirm New Password">
-                              </div>
-                            </form>
-                          </div>
-                          <div class="actions">
-                            <div class="ui black deny button">
-                              Cancel
-                            </div>
-                            <div class="ui positive right labeled icon button" id="submitPasswordReset">
-                              Reset
-                              <i class="checkmark icon"></i>
-                            </div>
-                          </div>
-                        </div>
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
 
-                        <script>
-                          $('#resetPassword').click(function() {
-                            $('#passwordResetModal').modal('show');
-                            showActionButton('submitPasswordReset', 'changePassword')
-                          });
+<body class="bg-yasarred">
+  <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+    <div class="ui segment">
+      <%- include('./partials/dashboard-menu') %>
+      <div class="ui segment">
+        <div class="ui container">
+          <h2>My Account</h2>
+          <button class="ui blue button" id="resetPassword">Change Password</button>
+          <div class="ui small modal" id="passwordResetModal">
+            <i class="close icon"></i>
+            <div class="header">
+              Change Password
+            </div>
+            <div class="content">
+              <form class="ui form" id="passwordResetForm">
+                <div class="field">
+                  <label>Current Password</label>
+                  <input type="password" name="currentPassword" placeholder="Current Password">
+                </div>
+                <div class="field">
+                  <label>New Password</label>
+                  <input type="password" name="newPassword" placeholder="New Password">
+                </div>
+                <div class="field">
+                  <label>Confirm New Password</label>
+                  <input type="password" name="confirmNewPassword" placeholder="Confirm New Password">
+                </div>
+              </form>
+            </div>
+            <div class="actions">
+              <div class="ui black deny button">
+                Cancel
+              </div>
+              <div class="ui positive right labeled icon button" id="submitPasswordReset">
+                Reset
+                <i class="checkmark icon"></i>
+              </div>
+            </div>
+          </div>
 
-                          $('#submitPasswordReset').click(function() {
-                            showActionButton('submitPasswordReset', 'loading')
-                            var currentPassword = $('#passwordResetForm input[name="currentPassword"]').val();
-                            var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
-                            var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
+          <script>
+            $('#resetPassword').click(function () {
+              $('#passwordResetModal').modal('show');
+              showActionButton('submitPasswordReset', 'changePassword')
+            });
+
+            $('#submitPasswordReset').click(function () {
+              showActionButton('submitPasswordReset', 'loading')
+              var currentPassword = $('#passwordResetForm input[name="currentPassword"]').val();
+              var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
+              var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
 
 
-                            if (newPassword !== confirmNewPassword) {
-                              showActionButton('submitPasswordReset', 'error', 'Passwords do not match.', 'The provided passwords do not match each other. Please try again.','changePassword');
-                              console.log('Passwords do not match');
-                              $('#passwordResetModal').modal('show');
-                              return;
-                            }
+              if (newPassword !== confirmNewPassword) {
+                showActionButton('submitPasswordReset', 'error', 'Passwords do not match.',
+                  'The provided passwords do not match each other. Please try again.', 'changePassword');
+                console.log('Passwords do not match');
+                $('#passwordResetModal').modal('show');
+                return;
+              }
 
-                            // AJAX function to POST the new password
-                            $.ajax({
-                              url: '/api/user/password',
-                              method: 'POST',
-                              data: {
-                                currentPassword: currentPassword,
-                                newPassword: newPassword
-                              },
-                              success: function(response) {
-                                // Handle success response
-                                console.log('Password reset successful');
-                                showToast('success', 'Password reset successful.', 'Your password has been reset successfully.');
-                              },
-                              error: function(error) {
-                                // Handle error response
-                                showActionButton('submitPasswordReset', 'error', 'Password reset failed.', 'The provided password is incorrect. Please try again.','changePassword')
-                                console.log('Password reset failed');
-                                $('#passwordResetModal').modal('show');
-                              },
-                              complete: function() {
-                              }
-                            });
-                          });
-                        </script>
-                        <div class="ui divider"></div>                      
-                        <form class="ui form" id="userForm">
-                            <div class="ui blurring segment">
-                                <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
-                                <h4 class="ui dividing header">Account Details  </h4>
-                          <div class="field">
-                            <label>Username</label>
-                            <input type="text" name="username" placeholder="Benutzername">
-                          </div>
-                          <div class="field">
-                            <label>E-Mail</label>
-                            <input type="text" name="email" placeholder="E-Mail">
-                          </div>
-                          <!-- div class="field">
+              // AJAX function to POST the new password
+              $.ajax({
+                url: '/api/user/password',
+                method: 'POST',
+                data: {
+                  currentPassword: currentPassword,
+                  newPassword: newPassword
+                },
+                success: function (response) {
+                  // Handle success response
+                  console.log('Password reset successful');
+                  showToast('success', 'Password reset successful.',
+                    'Your password has been reset successfully.');
+                },
+                error: function (error) {
+                  // Handle error response
+                  showActionButton('submitPasswordReset', 'error', 'Password reset failed.',
+                    'The provided password is incorrect. Please try again.', 'changePassword')
+                  console.log('Password reset failed');
+                  $('#passwordResetModal').modal('show');
+                },
+                complete: function () {}
+              });
+            });
+          </script>
+          <div class="ui divider"></div>
+          <form class="ui form" id="userForm">
+            <div class="ui blurring segment">
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+              <h4 class="ui dividing header">Account Details </h4>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Benutzername">
+              </div>
+              <div class="field">
+                <label>E-Mail</label>
+                <input type="text" name="email" placeholder="E-Mail">
+              </div>
+              <!-- div class="field">
                             <label>Language:</label>
                             <div class="ui fluid multiple search selection dropdown">
                               <input type="hidden" name="receipt">
@@ -119,10 +122,10 @@
                               </div>
                             </div>
                           </div -->
-                        </div>
-                        <div class="ui blurring segment">
-                            <div id="formLoaderPersonalDetails" class="ui inverted dimmer"></div>
-<!-- h4 class="ui dividing header">Personal Details</h4>
+            </div>
+            <div class="ui blurring segment">
+              <div id="formLoaderPersonalDetails" class="ui inverted dimmer"></div>
+              <!-- h4 class="ui dividing header">Personal Details</h4>
   <div class="field">
     <label>Name</label>
     <div class="three fields">
@@ -468,10 +471,10 @@
     <option value="WY">Wyoming</option>
       </select>
     </div -->
-    
-  </div>
-                        </div>
-                        <!-- div class="ui blurring segment">
+
+            </div>
+        </div>
+        <!-- div class="ui blurring segment">
                             <div id="formLoaderPaymentInformation" class="ui inverted dimmer"></div>
   <h4 class="ui dividing header">Billing Information</h4>
   <div class="field">
@@ -578,99 +581,98 @@
     </div>
   </div>
                         </div -->
-                        </div>
-                          <button class="ui labeled icon button" id="saveButton">
-                          </button>
-                        </form>
-                      </div>
-                      
-                      <script>
-                        
-                        showActionButton('saveButton','save');
-                        // showLoader('formLoaderPersonalDetails', 'disabled');
-                        // showLoader('formLoaderPaymentInformation', 'disabled');
-                        // showLoader('formLoaderReceipt', 'disabled');
-                        
-                        $('#userForm').submit(function(e) {
-                            const button = 'saveButton';
-                            e.preventDefault();
-                            showLoader('formLoaderAccountDetails', 'saving');
+      </div>
+      <button class="ui labeled icon button" id="saveButton">
+      </button>
+      </form>
+    </div>
 
-                            showActionButton(button,'loading');
+    <script>
+      showActionButton('saveButton', 'save');
+      // showLoader('formLoaderPersonalDetails', 'disabled');
+      // showLoader('formLoaderPaymentInformation', 'disabled');
+      // showLoader('formLoaderReceipt', 'disabled');
 
-                            var formData = {
-                                username: $('input[name="username"]').val(),
-                                email: $('input[name="email"]').val(),
-                                language: $('input[name="language"]').val()
-                            };
-                            console.log('form', formData);
-                            $.ajax({
-                                type: 'POST',
-                                url: '/api/user',
-                                data: formData,
-                                success: function(data) {
-                                    console.log(data);
-                                    showLoader('formLoaderAccountDetails', 'success');
+      $('#userForm').submit(function (e) {
+        const button = 'saveButton';
+        e.preventDefault();
+        showLoader('formLoaderAccountDetails', 'saving');
 
-                                    populateUserData();
-                                    showActionButton(button,'success');
-                                    showToast('success', 'User data updated', 'User data has been successfully updated');
-                                },
-                                error: function(xhr, status, error) {
-                                    var errorMessage = JSON.parse(xhr.responseText).error;
-                                    showActionButton(button,'error', 'Error updating user data', errorMessage);
-                                    showLoader('formLoaderAccountDetails', 'success');
-                                },
-                                complete: function() {
-                                    
-                                }
-                            });
-                        });
-            
-                        function populateUserData() {
-                            // Show the dimmer loader
-                            showLoader('formLoaderAccountDetails', 'loading');
-                            
-                            $(document).ready(function() {
-                                $.get('/api/user', function(data) {
-                                    console.log(data);
-                                    $('input[name="username"]').val(data.username);
-                                    $('input[name="email"]').val(data.email);
-                                    $('input[name="language"]').val(data.language);
+        showActionButton(button, 'loading');
 
-                                    
-                                    // Hide the dimmer loader
-                                    showLoader('formLoaderAccountDetails', 'success');
-                                });
-                            });
-                        }
+        var formData = {
+          username: $('input[name="username"]').val(),
+          email: $('input[name="email"]').val(),
+          language: $('input[name="language"]').val()
+        };
+        console.log('form', formData);
+        $.ajax({
+          type: 'POST',
+          url: '/api/user',
+          data: formData,
+          success: function (data) {
+            console.log(data);
+            showLoader('formLoaderAccountDetails', 'success');
 
-                        function populateUserPersonalData() {
-                            // Show the dimmer loader
-                            showLoader('formLoaderPersonalDetails', 'loading');
+            populateUserData();
+            showActionButton(button, 'success');
+            showToast('success', 'User data updated', 'User data has been successfully updated');
+          },
+          error: function (xhr, status, error) {
+            var errorMessage = JSON.parse(xhr.responseText).error;
+            showActionButton(button, 'error', 'Error updating user data', errorMessage);
+            showLoader('formLoaderAccountDetails', 'success');
+          },
+          complete: function () {
 
-                            $(document).ready(function() {
-                                $.get('/api/user/personal', function(data) {
-                                    console.log(data);
-                                    $('input[name="personalFirstname"]').val(data.firstname);
-                                    $('input[name="personalMiddlename"]').val(data.middlename);
-                                    $('input[name="personalLastname"]').val(data.lastname);
-                                    $('input[name="personalStreet"]').val(data.street);
-                                    $('input[name="personalHousenumber"]').val(data.housenumber);
-                                    $('input[name="personalAddition"]').val(data.addition);
-                                    $('input[name="personalZipcode"]').val(data.zipcode);
-                                    $('input[name="personalCity"]').val(data.city);
+          }
+        });
+      });
 
-                                    
-                                    // Hide the dimmer loader
-                                    showLoader('formLoaderPersonalDetails', 'success');
-                                });
-                            });
-                        }
+      function populateUserData() {
+        // Show the dimmer loader
+        showLoader('formLoaderAccountDetails', 'loading');
 
-                        populateUserData();
+        $(document).ready(function () {
+          $.get('/api/user', function (data) {
+            console.log(data);
+            $('input[name="username"]').val(data.username);
+            $('input[name="email"]').val(data.email);
+            $('input[name="language"]').val(data.language);
 
-                      </script>
-            <%- include('../partials/footer') %>
-        </body>
+
+            // Hide the dimmer loader
+            showLoader('formLoaderAccountDetails', 'success');
+          });
+        });
+      }
+
+      function populateUserPersonalData() {
+        // Show the dimmer loader
+        showLoader('formLoaderPersonalDetails', 'loading');
+
+        $(document).ready(function () {
+          $.get('/api/user/personal', function (data) {
+            console.log(data);
+            $('input[name="personalFirstname"]').val(data.firstname);
+            $('input[name="personalMiddlename"]').val(data.middlename);
+            $('input[name="personalLastname"]').val(data.lastname);
+            $('input[name="personalStreet"]').val(data.street);
+            $('input[name="personalHousenumber"]').val(data.housenumber);
+            $('input[name="personalAddition"]').val(data.addition);
+            $('input[name="personalZipcode"]').val(data.zipcode);
+            $('input[name="personalCity"]').val(data.city);
+
+
+            // Hide the dimmer loader
+            showLoader('formLoaderPersonalDetails', 'success');
+          });
+        });
+      }
+
+      populateUserData();
+    </script>
+    <%- include('../partials/footer') %>
+</body>
+
 </html>
