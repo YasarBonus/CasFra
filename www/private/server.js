@@ -2187,7 +2187,7 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, 
       
         newCasino.save()
           .then(() => {
-            res.redirect('/dashboard');
+            res.status(200).json({ message: 'Casino duplicated' });
           })
           .catch((error) => {
             console.error('Error duplicating casino:', error);
