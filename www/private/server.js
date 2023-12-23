@@ -82,11 +82,17 @@ const languageSchema = new mongoose.Schema({
   code: String
 });
 
-const tenanciesSchema = new mongoose.Schema ({
+const tenanciesSchema = new mongoose.Schema({
   name: String,
-  notes:  String,
-  createdBy: {type: String, default: "System"},
-  createdDate: {type: Date, default: Date.now},
+  notes: String,
+  createdBy: {
+    type: String,
+    default: "System"
+  },
+  createdDate: {
+    type: Date,
+    default: Date.now
+  },
   modifiedBy: String,
   modifiedDate: Date,
   image: String,
@@ -1097,7 +1103,7 @@ app.put('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete tenancie from MongoDB
 app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
@@ -1320,16 +1326,30 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
 
 // Reusable function to edit user details
 const editUserDetails = (req, res) => {
-  const { userId } = req.session.user;
-  const { username, nickname, email } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    username,
+    nickname,
+    email
+  } = req.body;
 
-  User.findByIdAndUpdate(userId, { username, nickname, email })
+  User.findByIdAndUpdate(userId, {
+      username,
+      nickname,
+      email
+    })
     .then(() => {
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error updating user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 };
 
@@ -2133,7 +2153,7 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Insert casino feature into MongoDB
 app.post('/api/casinos/features/add', checkPermissions('manageCasinos'), (req, res) => {
@@ -2168,7 +2188,7 @@ app.post('/api/casinos/features/add', checkPermissions('manageCasinos'), (req, r
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Duplicate casino feature
 app.post('/api/casinos/features/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
@@ -2215,7 +2235,7 @@ app.post('/api/casinos/features/:id/duplicate', checkPermissions('manageCasinos'
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Edit casino feature
 app.put('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -2258,7 +2278,7 @@ app.put('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, re
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete casino feature
 app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -2282,7 +2302,7 @@ app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req,
         error: 'Internal server error'
       });
     });
-} );
+});
 
 //#endregion Casino Features
 
@@ -2347,11 +2367,13 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, 
           affiliateShortlink: casino.affiliateShortlink,
           addedDate: Date.now(),
         });
-      
+
         newCasino.save()
           .then(() => {
             setCasinoImageUrl(newCasino._id); // Call setCasinoImageUrl function
-            res.status(200).json({ message: 'Casino duplicated' });
+            res.status(200).json({
+              message: 'Casino duplicated'
+            });
           })
           .catch((error) => {
             console.error('Error duplicating casino:', error);
@@ -2935,7 +2957,7 @@ app.get('/dashboard/casinos/features', checkPermissions('manageCasinos'), (req, 
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/casinos/providers', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
@@ -2948,7 +2970,7 @@ app.get('/dashboard/casinos/providers', checkPermissions('manageCasinos'), (req,
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
@@ -2961,7 +2983,7 @@ app.get('/dashboard/casinos/paymentmethods', checkPermissions('manageCasinos'), 
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
@@ -2974,7 +2996,7 @@ app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/casinos/boni', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
@@ -2987,7 +3009,7 @@ app.get('/dashboard/casinos/boni', checkPermissions('manageCasinos'), (req, res,
   } catch (err) {
     next(err);
   }
-} );
+});
 
 
 app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
