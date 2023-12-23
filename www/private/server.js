@@ -1361,12 +1361,13 @@ app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasino
       if (!casinoCategories) {
         throw new Error('Casino category not found');
       } else {
+        newPriority = generateRandomPriority();
         const newCasinoCategories = new CasinoCategories({
           addedBy: userId,
           name: casinoCategories.name + ' (Copy)',
           description: casinoCategories.description,
           image: casinoCategories.image,
-          priority: casinoCategories.priority,
+          priority: newPriority,
           active: casinoCategories.active,
           addedDate: Date.now(),
         });
