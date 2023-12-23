@@ -5,12 +5,14 @@
     <% if (user.permissions.includes('manageCasinos')) { %>
         <a class="item" href="/dashboard/casinos">Casinos</a>
     <% } %>
-    <% if (user.permissions.includes('manageCasinos')) { %>
-      <a class="item" href="/dashboard/casinos/categories">Categories</a>
-  <% } %>
-    <% if (user.permissions.includes('manageFaq')) { %>
-        <a class="item" href="/dashboard/faq">Faq</a>
-    <% } %>
+
+      <div class="ui dropdown item">
+          Tenancy <i class="dropdown icon"></i>
+          <div class="menu">
+            <a href="/dashboard/casinos/categories" class="item">Casino Categories</a>
+          </div>
+        </div>
+        
     <% if (user.permissions.includes('manageLinks')) { %>
         <div class="ui dropdown item">
             Links <i class="dropdown icon"></i>

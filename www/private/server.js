@@ -82,6 +82,16 @@ const languageSchema = new mongoose.Schema({
   code: String
 });
 
+const tenanciesSchema = new mongoose.Schema ({
+  name: String,
+  notes:  String,
+  createdBy: {type: String, default: "System"},
+  createdDate: {type: Date, default: Date.now},
+  modifiedBy: String,
+  modifiedDate: Date,
+  image: String,
+})
+
 // Define User schema
 const userSchema = new mongoose.Schema({
   username: String,
@@ -89,6 +99,7 @@ const userSchema = new mongoose.Schema({
   groupId: String,
   email: String,
   language: String,
+  nickname: String,
   priority: {
     type: Number,
     default: generateRandomPriority()
@@ -107,7 +118,8 @@ const userSchema = new mongoose.Schema({
   registrationVerificationCode: String,
   registrationVerificationCodeExpiry: Date,
   lastLoginDate: Date,
-  lastLoginIp: String
+  lastLoginIp: String,
+  tenancies: [String],
 });
 
 // Define UserGroup schema
@@ -433,6 +445,7 @@ const SessionSchema = new mongoose.Schema({
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
+const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
@@ -467,6 +480,39 @@ const languageEntries = [{
   },
 ];
 
+const tenancieEntries = [{
+  name: 'Treudler',
+}]
+
+const saveDefaultTenancieDatabaseData = async () => {
+  try {
+    const promises = [];
+
+    for (const tenancieEntry of tenancieEntries) {
+      const existingTenancie = await Tenancie.findOne({
+        name: tenancieEntry.name
+      });
+
+      if (!existingTenancie) {
+        const newTenancie = new Tenancie(tenancieEntry);
+        promises.push(newTenancie.save());
+        console.log('Tenancie entry saved:', newTenancie);
+      } else if (existingTenancie.description !== tenancieEntry.description) {
+        existingTenancie.description = tenancieEntry.description;
+        promises.push(existingTenancie.save());
+        console.log('Tenancie entry updated:', existingTenancie);
+      }
+    }
+
+    await Promise.all(promises);
+    console.log('Default Tenancies Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default Tenancies Database Data:', error);
+  }
+};
+
+saveDefaultTenancieDatabaseData();
+
 const registrationKeyEntries = [{
   regkey: 'admin',
   created: new Date(),
@@ -475,7 +521,7 @@ const registrationKeyEntries = [{
 
 const userAdminGroup = new UserGroup({
   name: 'Admin',
-  permissions: ['authenticate', 'viewDashboard', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos',
+  permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos',
     'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
     'manageSessions', 'manageImages', 'manageImagesCategories'
   ]
@@ -563,9 +609,9 @@ const saveDefaultUserDatabaseData = async () => {
     }
 
     await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
+    console.log('Default UserGroups and RegistrationKeys Database Data successfully saved.');
   } catch (error) {
-    console.error('Error saving Default Database Data:', error);
+    console.error('Error saving Default UserGroups and RegistrationKeys Database Data:', error);
   }
 };
 
@@ -630,13 +676,9 @@ const CasinoBoniEntries = [{
 }];
 
 const CasinoCategoriesEntries = [{
-  name: 'New',
-  description: 'New Casinos',
-  image: 'https://www.casinofreak.com/images/categories/new.png'
-}, {
-  name: 'Live',
-  description: 'Live Casinos',
-  image: 'https://www.casinofreak.com/images/categories/live.png'
+  name: 'Default',
+  description: 'Default Casino Category',
+  image: ''
 }];
 
 const saveDefaultCasinoDatabaseData = async () => {
@@ -746,7 +788,7 @@ const imagesCategoriesEntry = {
   addedBy: 'System',
 };
 
-const saveDefaultImagesDatabaseData = async () => {
+const saveDefaultImagesCategoriesDatabaseData = async () => {
   try {
     const promises = [];
 
@@ -761,13 +803,13 @@ const saveDefaultImagesDatabaseData = async () => {
     }
 
     await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
+    console.log('Default Image Categories Database Data successfully saved.');
   } catch (error) {
-    console.error('Error saving Default Database Data:', error);
+    console.error('Error saving Default Image Categories Database Data:', error);
   }
 };
 
-saveDefaultImagesDatabaseData();
+saveDefaultImagesCategoriesDatabaseData();
 
 //#endregion MongoDB
 
@@ -929,9 +971,160 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
 
 //#endregion Auth
 
+//#region Tenancies
+
+// Get all tenancies from MongoDB
+app.get('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
+  Tenancie.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving tenancies:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get tenancie by ID from MongoDB
+app.get('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  Tenancie.findById(id)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({
+          error: 'Tenancie not found'
+        });
+        return;
+      }
+
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Add tenancie to MongoDB
+app.post('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  } = req.body;
+
+  if (!name) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  const tenancie = new Tenancie({
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  });
+
+  tenancie.save()
+    .then(() => {
+      res.status(201).json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error inserting tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Edit tenancie in MongoDB
+app.put('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    notes,
+    createdBy,
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    image
+  } = req.body;
+
+  if (!name) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  Tenancie.findByIdAndUpdate(id, {
+      name,
+      notes,
+      createdBy,
+      createdDate,
+      modifiedBy,
+      modifiedDate,
+      image
+    })
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error updating tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete tenancie from MongoDB
+app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  Tenancie.findByIdAndDelete(id)
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error deleting tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Tenancies
+
 //#region User
+
 // Insert user into MongoDB
-app.post('/api/user/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
   console.log(req.body);
   const {
     username,
@@ -1125,32 +1318,26 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     });
 });
 
-// Edit user details of the current user
-app.post('/api/user', (req, res) => {
-  const {
-    userId
-  } = req.session.user;
-  const {
-    username,
-    email
-  } = req.body;
+// Reusable function to edit user details
+const editUserDetails = (req, res) => {
+  const { userId } = req.session.user;
+  const { username, nickname, email } = req.body;
 
-  User.findByIdAndUpdate(userId, {
-      username,
-      email
-    })
+  User.findByIdAndUpdate(userId, { username, nickname, email })
     .then(() => {
-      res.json({
-        success: true
-      });
+      res.json({ success: true });
     })
     .catch((error) => {
       console.error('Error updating user details:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
-});
+};
+
+// Edit user details of the current user
+app.post('/api/user', editUserDetails);
+
+// Edit user details of the current user
+app.put('/api/user', editUserDetails);
 
 // Change password of the current user
 app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => {
@@ -1947,6 +2134,73 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     });
 });
 
+// Duplicate a casino
+app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  Casino.findOne({
+      _id: id
+    })
+    .then((casino) => {
+      if (!casino) {
+        throw new Error('Casino not found');
+      } else {
+        const newPriority = generateRandomPriority();
+        const newCasino = new Casino({
+          addedBy: userId,
+          name: casino.name + ' (Copy)',
+          categories: casino.categories,
+          description: casino.description,
+          priority: newPriority,
+          active: casino.active,
+          isNew: casino.isNew,
+          label: casino.label,
+          labelLarge: casino.labelLarge,
+          boni: casino.boni,
+          displayBonus: casino.displayBonus,
+          maxBet: casino.maxBet,
+          maxCashout: casino.maxCashout,
+          wager: casino.wager,
+          wagerType: casino.wagerType,
+          noDeposit: casino.noDeposit,
+          prohibitedGamesProtection: casino.prohibitedGamesProtection,
+          vpn: casino.vpn,
+          features: casino.features,
+          providers: casino.providers,
+          paymentMethods: casino.paymentMethods,
+          review: casino.review,
+          reviewTitle: casino.reviewTitle,
+          image: casino.image,
+          affiliateUrl: casino.affiliateUrl,
+          affiliateShortlink: casino.affiliateShortlink,
+          addedDate: Date.now(),
+        });
+      
+        newCasino.save()
+          .then(() => {
+            setCasinoImageUrl(newCasino._id); // Call setCasinoImageUrl function
+            res.status(200).json({ message: 'Casino duplicated' });
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
 
 // Get data for a single casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {

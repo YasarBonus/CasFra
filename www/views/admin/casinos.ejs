@@ -40,6 +40,7 @@
                                     }
                                     const modal = document.createElement('div');
                                     modal.classList.add('ui', 'modal');
+
                                     modal.innerHTML = `
                     <div class="header">Edit Casino</div>
                     <div class="content">
@@ -57,9 +58,10 @@
                                     <label>Large Label</label>
                                     <input type="text" name="labelLarge" placeholder="Enter the casino label" value="${casino.labelLarge}">
                                 </div>
-                                <div class="field">
-                                    <label>Priority</label>
-                                    <input type="text" name="priority" placeholder="Enter the casino label" value="${casino.priority}">
+                                    <div class="field">
+                                    <label>Image (<a href="images">manage</a>)</label>
+                                    <select name="image" class="ui fluid search selection dropdown" id="imageDropdown">
+                                    </select>
                                 </div>
                             </div>
                             <div class="fields">
@@ -150,28 +152,29 @@
                                     <input type="text" name="wager" placeholder="Enter the casino background URL" value="${casino.wager}">
                                 </div>
                                 <div class="field">
-                                    <label>Wager Type</label>
+                                    <label>Wager Type (<a href="casinos/wagertypes">manage</a>)</label>
                                     <select name="wagerType" multiple class="ui fluid dropdown" id="wagerTypeDropdown">
                                     </select>
                                 </div>
                             </div>
-                            <div class="field">
-                                <label>Description</label>
-                                <textarea name="description" placeholder="Enter the casino description">${casino.description}</textarea>
-                            </div>
-                            <div class="field">
-                                <label>Review Title</label>
-                                <input type="text" name="reviewTitle" placeholder="Enter the casino background URL" value="${casino.reviewTitle}">
-                            </div>
-                            <div class="field">
-                                <label>Review</label>
-                                <textarea name="review" placeholder="Enter the casino description">${casino.review}</textarea>
-                            </div>
-                            <div class="field">
-                                    <label>Image (<a href="images">manage</a>)</label>
-                                    <select name="image" class="ui fluid search selection dropdown" id="imageDropdown">
-                                    </select>
+                            <div class="ui grid">
+                                <div class="eight wide column">
+                                    <div class="field">
+                                        <label>Description</label>
+                                        <textarea name="description" rows="10" placeholder="Enter the casino description">${casino.description}</textarea>
+                                    </div>
                                 </div>
+                                <div class="eight wide column">
+                                    <div class="field">
+                                        <label>Review Title</label>
+                                        <input type="text" name="reviewTitle" placeholder="Enter the casino background URL" value="${casino.reviewTitle}">
+                                    </div>
+                                    <div class="field">
+                                        <label>Review</label>
+                                        <textarea name="review" rows="6" placeholder="Enter the casino description">${casino.review}</textarea>
+                                    </div>
+                            </div>
+                            
                         </form>
                     </div>
                     <div class="actions">
@@ -745,7 +748,10 @@
                 .then(response => response.json())
                 .then(result => {
                     console.log('Casino deleted:', result);
-                    // Remove the deleted casino card from the UI
+                    // hide the confirmation dialog
+                    $('.ui.modal').modal('hide');
+                    // delete the modal element from the DOM
+                    document.querySelector('.ui.modal').remove();
                     fetchCasinos();
                 })
                 .catch(error => {
