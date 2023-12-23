@@ -546,42 +546,6 @@ const saveDefaultCasinoDatabaseData = async () => {
 
 saveDefaultCasinoDatabaseData();
 
-const ImagesCategoriesEntries = [{
-  name: 'Casino',
-  description: 'Casino Images',
-  image: 'https://www.casinofreak.com/images/categories/new.png'
-}, {
-  name: 'Provider',
-  description: 'Provider',
-  image: 'https://www.casinofreak.com/images/categories/live.png'
-}];
-
-const saveDefaultImagesDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const imagesCategoriesEntry of ImagesCategoriesEntries) {
-      const existingImagesCategories = await ImagesCategories.findOne({ name: imagesCategoriesEntry.name });
-
-      if (!existingImagesCategories) {
-        const newImagesCategories = new ImagesCategories(imagesCategoriesEntry);
-        promises.push(newImagesCategories.save());
-        console.log('ImagesCategories entry saved:', newImagesCategories);
-      } else if (existingImagesCategories.description !== imagesCategoriesEntry.description) {
-        existingImagesCategories.description = imagesCategoriesEntry.description;
-        promises.push(existingImagesCategories.save());
-        console.log('ImagesCategories entry updated:', existingImagesCategories);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default Database Data:', error);
-  }
-};
-
-saveDefaultImagesDatabaseData();
 //#endregion MongoDB
 
 // Middleware
