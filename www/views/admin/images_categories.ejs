@@ -55,7 +55,6 @@
                             '<td>' +
                             '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                             '<button class="ui small red button delete-btn">Delete</button>' +
-                            '<button class="ui small green button save-btn">Save</button>' +
                             '</td>' +
                             '</tr>';
                         $('#imageCategoriesTable tbody').append(row);
@@ -80,12 +79,6 @@
         $(document).on('click', '.delete-btn', function() {
             var categoryId = $(this).closest('tr').attr('id');
             deleteCategory(categoryId);
-        });
-
-        // Event listener for save button
-        $(document).on('click', '.save-btn', function() {
-            var categoryId = $(this).closest('tr').attr('id');
-            saveCategory(categoryId);
         });
 
         // Event listener for save all button
