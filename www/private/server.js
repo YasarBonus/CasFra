@@ -3392,6 +3392,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
 
       // Call setCasinoImageUrl(ID) function here
       setCasinoImageUrl(updatedCasino._id);
+      createShortLinks(updatedCasino._id);
     })
     .catch((error) => {
       console.error('Error updating casino:', error);
