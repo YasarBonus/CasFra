@@ -224,6 +224,17 @@
                     // Populate the features dropdown with available features
                     getAvailableFeatures(selectedFeatures);
                     getAvailableIndividualFeatures(casinoId, selectedIndividualFeatures);
+
+                    // Populate the providers dropdown with available providers
+                    getAvailableProviders(selectedProviders);
+
+                    // Populate the payment methods dropdown with available payment methods
+                    getAvailablePaymentMethods(selectedPaymentMethods);
+
+
+                    // Populate the wager types dropdown with available wager types
+                    getAvailableWagerTypes(selectedWagerTypes);
+
                 })
 
         }
@@ -865,12 +876,6 @@
 
     fetchCasinos();
 </script>
-</body>
-
-</html>
-
-        fetchCasinos();
-    </script>
 </body>
 
 </html>
