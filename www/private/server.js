@@ -2544,6 +2544,197 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
 
 //#endregion Casino Providers
 
+//#region Casino Payment Methods
+
+// Get all casino payment methods from MongoDB
+app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoPaymentMethods.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino payment methods:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get details of a specific casino payment method
+app.get('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoPaymentMethods.findById(id)
+    .then((casinoPaymentMethods) => {
+      if (!casinoPaymentMethods) {
+        return res.status(404).json({
+          error: 'Casino payment method not found'
+        });
+      }
+
+      res.json(casinoPaymentMethods);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino payment method:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Insert casino payment method into MongoDB
+app.post('/api/casinos/paymentmethods/add', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoPaymentMethods = new CasinoPaymentMethods({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoPaymentMethods.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino payment method:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Duplicate casino payment method
+app.post('/api/casinos/paymentmethods/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoPaymentMethods.findOne({
+      _id: id
+    })
+    .then((casinoPaymentMethods) => {
+      if (!casinoPaymentMethods) {
+        throw new Error('Casino payment method not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoPaymentMethods = new CasinoPaymentMethods({
+          addedBy: userId,
+          name: casinoPaymentMethods.name + ' (Copy)',
+          description: casinoPaymentMethods.description,
+          image: casinoPaymentMethods.image,
+          priority: newPriority,
+          active: casinoPaymentMethods.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoPaymentMethods.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino payment method:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino payment method:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+}); 
+
+// Edit casino payment method
+app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoPaymentMethods.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoPaymentMethods) => {
+      if (!updatedCasinoPaymentMethods) {
+        throw new Error('Casino payment method not found');
+      }
+      res.json(updatedCasinoPaymentMethods);
+      console.log('Casino payment method updated: ' + updatedCasinoPaymentMethods.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino payment method:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Delete casino payment method
+app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoPaymentMethods.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoPaymentMethods) => {
+      if (!deletedCasinoPaymentMethods) {
+        throw new Error('Casino payment method not found');
+      }
+      res.json(deletedCasinoPaymentMethods);
+      console.log('Casino payment method deleted: ' + deletedCasinoPaymentMethods.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino payment method:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Casino Payment Methods
+
 //#region Casinos
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
