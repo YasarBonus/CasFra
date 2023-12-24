@@ -2112,6 +2112,44 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
     });
 } );
 
+// Edit multiple short links in MongoDB
+app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    shortLinks
+  } = req.body;
+
+  if (!shortLinks) {
+    res.status(400).json({
+      error: 'Short links are required'
+    });
+    return;
+  }
+
+  shortLinks.forEach((shortLink) => {
+    ShortLinks.findByIdAndUpdate(shortLink._id, {
+        description: shortLink.description,
+        url: shortLink.url,
+        shortUrl: shortLink.shortUrl,
+        modifiedBy: userId,
+        modifiedDate: Date.now()
+      })
+      .then(() => {
+        res.json({
+          success: true
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating short link:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  });
+} );
+
 // Edit short link in MongoDB
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
   const {
