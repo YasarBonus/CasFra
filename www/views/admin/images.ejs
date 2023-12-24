@@ -12,32 +12,33 @@
                 <h3>Upload Image</h3>
 
                 <form id="uploadForm" enctype="multipart/form-data" class="ui form">
-                    <div class="field">
-                        <label for="imageInput">Choose an image:</label>
-                        <div class="ui action input">
-                            <input type="file" name="image" id="imageInput">
-                            <button class="ui primary button" type="submit">Upload</button>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label for="categoryDropdown">Select a category:</label>
-                        <select id="categoryDropdown" name="category">
-                            <option value="" disabled selected>Select a category</option>
-                            <!-- Fetch dropdown data from /api/images/categories -->
-                            <script>
-                                fetch('/api/images/categories')
-                                    .then(response => response.json())
-                                    .then(categories => {
-                                        categories.forEach(category => {
-                                            var option = document.createElement('option');
-                                            option.value = category._id;
-                                            option.text = category.name;
-                                            document.getElementById('categoryDropdown').appendChild(option);
+                    <div class="two fields">
+                        <div class="six wide field">
+                            <label for="categoryDropdown">Select a category:</label>
+                            <select id="categoryDropdown" name="category">
+                                <option value="" disabled selected>Select a category</option>
+                                <!-- Fetch dropdown data from /api/images/categories -->
+                                <script>
+                                    fetch('/api/images/categories')
+                                        .then(response => response.json())
+                                        .then(categories => {
+                                            categories.forEach(category => {
+                                                var option = document.createElement('option');
+                                                option.value = category._id;
+                                                option.text = category.name;
+                                                document.getElementById('categoryDropdown').appendChild(option);
+                                            });
                                         });
-                                    });
-                            </script>
-                        </select>
+                                </script>
+                            </select>
+                        </div>
+                        <div class="ten wide field">
+                            <label for="imageInput">Choose an image:</label>
+                            <div class="ui action input">
+                                <input type="file" name="image" id="imageInput">
+                                <button class="ui primary button" type="submit">Upload</button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
