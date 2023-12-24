@@ -41,7 +41,6 @@ const sendPasswordResetEmail = (email, resetToken) => {
 
 // Use the sendPasswordResetEmail function
 
-
 const app = express();
 const port = 3000;
 
@@ -500,6 +499,25 @@ const shortLinksHitsSchema = new mongoose.Schema({
   }
 });
 
+// Define shortLinksStatistics Schema
+const shortLinksStatisticsSchema = new mongoose.Schema({
+  shortLink: String,
+  hits: Number,
+  uniqueHits: Number,
+  last1hour: Number,
+  last3hours: Number,
+  last6hours: Number,
+  last12hours: Number,
+  last24hours: Number,
+  last7days: Number,
+  last30days: Number,
+  last12months: Number,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
@@ -520,6 +538,7 @@ const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
+const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
 
 
 const languageEntries = [{
