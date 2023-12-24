@@ -11,10 +11,10 @@
                         <table id="casinoProvidersTable" class="ui celled table">
                             <thead>
                                 <tr>
+                                    <th>Image</th>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Priority (Sorting)</th>
-                                    <th>Image</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -62,9 +62,6 @@
                     // Populate the table with data
                     data.forEach(function(provider) {
                         var row = '<tr id="' + provider._id + '">' +
-                            '<td contenteditable="true">' + provider.name + '</td>' +
-                            '<td contenteditable="true">' + provider.description + '</td>' +
-                            '<td contenteditable="true">' + provider.priority + '</td>' +
                             '<td>' +
                             '<div class="ui fluid search selection dropdown image-dropdown">' +
                             '<input type="hidden" name="image">' +
@@ -79,7 +76,7 @@
                             success: function(images) {
                                 // Add options to the dropdown
                                 images.forEach(function(image) {
-                                    var option = '<div class="item" data-value="' + image._id + '">' + image.name + '</div>';
+                                    var option = '<div class="item" data-value="' + image._id + '"><img class="ui image" src="' + image.imageUrl + '">' + image.name + '</div>';
                                     row += option;
                                 });
 
@@ -87,6 +84,9 @@
                                 row += '</div>' +
                                     '</div>' +
                                     '</td>' +
+                                    '<td contenteditable="true">' + provider.name + '</td>' +
+                                    '<td contenteditable="true">' + provider.description + '</td>' +
+                                    '<td contenteditable="true">' + provider.priority + '</td>' +
                                     '<td>' +
                                     '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                                     '<button class="ui small red button delete-btn">Delete</button>' +
@@ -156,9 +156,9 @@
                 url: '/api/casinos/providers/' + providerId,
                 method: 'PUT',
                 data: {
-                    name: $('#' + providerId + ' td:nth-child(1)').text(),
-                    description: $('#' + providerId + ' td:nth-child(2)').text(),
-                    priority: $('#' + providerId + ' td:nth-child(3)').text(),
+                    name: $('#' + providerId + ' td:nth-child(2)').text(),
+                    description: $('#' + providerId + ' td:nth-child(3)').text(),
+                    priority: $('#' + providerId + ' td:nth-child(4)').text(),
                     image: $('#' + providerId + ' .image-dropdown').dropdown('get value')
                 },
                 success: function(data) {
