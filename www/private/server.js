@@ -2199,6 +2199,73 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 
 } );
 
+// Get all short link hits from MongoDB
+// This table contains all hits of all short links and this is a very large table.
+// Therefore, it is not recommended to use this endpoint.
+// Instead, use the endpoint below to get the hits of a specific short link.
+
+app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  ShortLinksHits.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link hits:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Get short link hits by short link ID from MongoDB
+app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinksHits.find({
+      id: id
+    })
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link hits:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Get short link hits by short link ID from MongoDB with pagination
+app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    page,
+    limit
+  } = req.query;
+
+  ShortLinksHits.find({
+      id: id
+    })
+    .sort({
+      timestamp: -1
+    })
+    .skip(parseInt(page) * parseInt(limit))
+    .limit(parseInt(limit))
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link hits:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
   const {
@@ -2223,6 +2290,8 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
     }
   );
 } );
+
+
 
 //#endregion ShortLinks
 
