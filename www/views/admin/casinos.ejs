@@ -48,10 +48,12 @@
                     <div class="header">Edit Casino</div>
                     <div class="content">
                         <form class="ui form">
+                            <div class="ui segment">
+                            <div class="ui header">General</div>
                             <div class="three fields">
                                 <div class="field">
                                     <label>Name</label>
-                                    <input type="text" name="name" placeholder="Enter the casino name" value="${casino.name}">
+                                    <input type="text" name="casinoName" placeholder="Enter the casino name" value="${casino.name}">
                                 </div>
                                 <div class="field">
                                     <label>Label</label>
@@ -76,6 +78,7 @@
                                     <label>Affiliate Link</label>
                                     <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.affiliateLink}">
                                 </div>
+                            </div>
                             </div>
                             <div class="four fields">
                                 <div class="field">
@@ -390,7 +393,7 @@
         function saveCasino(casinoId) {
 
             //#region Get the updated casino data from the form
-            const name = document.querySelector('input[name="name"]').value;
+            const name = document.querySelector('input[name="casinoName"]').value;
 
             const categoriesSelect = document.querySelector('select[name="categories"]');
             const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
