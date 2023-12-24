@@ -25,14 +25,15 @@
             fetch(`/api/casinos/${casinoId}`)
                 .then(response => response.json())
                 .then(casino => {
-                    // Fetch the selected categories for the casino
-                    fetch(`/api/casinos/${casinoId}/categories`)
-                        .then(response => response.json())
-                        .then(selectedCategories => {
-                            // Fetch the selected image for the casino
-                            fetch(`/api/casinos/${casinoId}/image`)
-                                .then(response => response.json())
-                                .then(selectedImage => {
+                    const selectedCategories = casino.categories;
+                    const selectedFeatures = casino.features;
+                    const selectedProviders = casino.providers;
+                    const selectedPaymentMethods = casino.paymentMethods;
+                    const selectedBoni = casino.boni;
+                    const selectedDisplayBonus = casino.displayBonus;
+                    const selectedWagerTypes = casino.wagerType;
+                    const selectedImage = casino.image;
+
                                     // Open the modal for editing the casino data
                                     if (document.querySelector('.ui.modal')) {
                                         document.querySelector('.ui.modal')
@@ -115,6 +116,11 @@
                                 <div class="field">
                                     <label>Features (<a href="casinos/features">manage</a>)</label>
                                     <select name="features" multiple class="ui fluid search dropdown" id="featuresDropdown">
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Individual Features (<a href="casinos/${casino._id}/individualfeatures">manage</a>)</label>
+                                    <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
@@ -265,17 +271,6 @@
 
 
                                 })
-                                .catch(error => {
-                                    console.error('Error fetching selected categories:', error);
-                                });
-                        })
-                        .catch(error => {
-                            console.error('Error fetching casino details:', error);
-                        })
-                })
-                .catch(error => {
-                    console.error('Error fetching casino details:', error);
-                });
 
         }
 
