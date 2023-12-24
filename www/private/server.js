@@ -2028,7 +2028,7 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 // Get all short links from MongoDB
 app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  shortLinks.find()
+  ShortLinks.find()
     .then((results) => {
       res.json(results);
     })
@@ -2046,7 +2046,7 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     id
   } = req.params;
 
-  shortLinks.findById(id)
+  ShortLinks.findById(id)
     .then((result) => {
       if (!result) {
         res.status(404).json({
@@ -2064,6 +2064,131 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
       });
     });
 } );
+
+// Add short link to MongoDB
+app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  if (!shortUrl) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  if (!url) {
+    res.status(400).json({
+      error: 'URL is required'
+    });
+    return;
+  }
+
+  const shortLink = new ShortLinks({
+    description,
+    url,
+    shortUrl,
+    addedBy: userId,
+    addedDate: Date.now()
+  });
+
+  shortLink.save()
+    .then(() => {
+      res.status(201).json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error inserting short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit short link in MongoDB
+app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  
+  if (!shortUrl) {
+    res.status(400).json({
+      error: 'shortUrl is required'
+    });
+    return;
+  }
+  
+  if (!url) {
+    res.status(400).json({
+      error: 'URL is required'
+    });
+    return;
+  } 
+  
+  ShortLinks.findByIdAndUpdate(id, {
+      description,
+      url,
+      shortUrl,
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error updating short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+
+} );
+
+// Delete short link from MongoDB
+app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinks.findByIdAndDelete(id)
+    .then((result) => {
+      if (!result) {
+        throw new Error('Short link not found');
+      }
+      res.json({
+        success: true
+      });
+      console.log('Short link deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    }
+  );
+} );
+
+//#endregion ShortLinks
+
+
 
 
 
