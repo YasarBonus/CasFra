@@ -20,7 +20,6 @@
 
     <script>
         function openEditModal(casinoId) {
-            console.log('Edit button clicked for casino with ID:', casinoId);
             // Fetch the casino details from the API
             fetch(`/api/casinos/${casinoId}`)
                 .then(response => response.json())
@@ -28,7 +27,6 @@
                     const selectedCategories = casino.categories;
                     const selectedFeatures = casino.features;
                     const selectedIndividualFeatures = casino.individualFeatures;
-                    console.log('Selected Individual Features:', selectedIndividualFeatures);
                     const selectedProviders = casino.providers;
                     const selectedPaymentMethods = casino.paymentMethods;
                     const selectedBoni = casino.boni;
@@ -129,7 +127,7 @@
                                     </select>
                                 </div>
                                 <div class="eight wide field">
-                                    <label>Individual Features (<a href="casinos/${casino._id}/individualfeatures">manage</a>)</label>
+                                    <label>Individual Features <div class="ui mini primary button" onclick="showEditableIndividualFeatures('${casino._id}')">manage</div></label>
                                     <div class="ui action input">
                                         <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
                                         </select>
@@ -759,6 +757,117 @@
                     console.error('Error updating casino active state:', error);
                 });
         }
+
+    function showEditableIndividualFeatures(casinoId) {
+        // Create a Fomantic UI modal to display the editable individual features table
+        const modal = document.createElement('div');
+        modal.classList.add('ui', 'modal');
+        modal.innerHTML = `
+            <div class="header">Individual Features</div>
+            <div class="content">
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <div class="ui button">Close</div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        $(modal).modal('show');
+
+
+        // Fetch individual features for the specific casino
+        fetch(`/api/casinos/${casinoId}/individualfeatures`)
+            .then(response => response.json())
+            .then(features => {
+                const tbody = modal.querySelector('tbody');
+                tbody.innerHTML = features.map(feature => `
+                    <tr data-feature-id="${feature._id}">
+                        <td contenteditable="true">${feature.name}</td>
+                        <td contenteditable="true">${feature.description}</td>
+                        <td>
+                            <button class="ui primary button save-button">Save</button>
+                            <button class="ui red button delete-button">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Add event listeners to save buttons
+                const saveButtons = modal.querySelectorAll('.save-button');
+                saveButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tr = button.closest('tr');
+                        const featureId = tr.dataset.featureId;
+                        const name = tr.querySelector('td:nth-child(1)').textContent;
+                        const description = tr.querySelector('td:nth-child(2)').textContent;
+
+                        // Send a PUT request to update the individual feature
+                        fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                            method: 'PUT',
+                            body: JSON.stringify({
+                                name: name,
+                                description: description
+                            }),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Individual feature updated:', result);
+                            location.reload();
+                        })
+                        .catch(error => {
+                            console.error('Error updating individual feature:', error);
+                        });
+                    });
+                });
+
+                // Add event listeners to delete buttons
+                const deleteButtons = modal.querySelectorAll('.delete-button');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tr = button.closest('tr');
+                        const featureId = tr.dataset.featureId;
+
+                        // Send a DELETE request to delete the individual feature
+                        fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Individual feature deleted:', result);
+                            tr.remove();
+                        })
+                        .catch(error => {
+                            console.error('Error deleting individual feature:', error);
+                        });
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching individual features:', error);
+            });
+    }
+
+    
+
+    fetchCasinos();
+</script>
+</body>
+
+</html>
 
         fetchCasinos();
     </script>
