@@ -2024,6 +2024,51 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 //#endregion Images
 
+//#region ShortLinks
+
+// Get all short links from MongoDB
+app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  shortLinks.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short links:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get short link by ID from MongoDB
+app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  shortLinks.findById(id)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({
+          error: 'Short link not found'
+        });
+        return;
+      }
+
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+
+
+
+
 //#region Casino Categories
 
 // Get all casino categories from MongoDB
