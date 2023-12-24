@@ -3988,9 +3988,15 @@ async function setImageUrl(id = null) {
   }
 }
 
-async function createShortLinks() {
+async function createShortLinks(casinoId = null) {
   try {
-    const casinos = await Casino.find();
+    let casinos;
+    if (casinoId) {
+      casinos = await Casino.findOne({ _id: casinoId });
+      casinos = [casinos]; // Convert single object to array
+    } else {
+      casinos = await Casino.find();
+    }
     for (const casino of casinos) {
       if (casino.affiliateUrl && casino.affiliateShortlink) {
         const existingShortLink = await ShortLinks.findOne({ attachedTo: casino._id });
