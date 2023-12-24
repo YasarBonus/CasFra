@@ -82,6 +82,17 @@ const languageSchema = new mongoose.Schema({
   code: String
 });
 
+const SessionSchema = new mongoose.Schema({
+  userId: String,
+  username: String,
+  ip: String,
+  userAgent: String,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const tenanciesSchema = new mongoose.Schema({
   name: String,
   notes: String,
@@ -156,12 +167,6 @@ const registrationKeySchema = new mongoose.Schema({
     type: Number,
     default: generateRandomPriority()
   }
-});
-
-// Define LinkHit schema
-const linkHitSchema = new mongoose.Schema({
-  name: String,
-  timestamp: Date
 });
 
 const imagesSchema = new mongoose.Schema({
@@ -461,15 +466,25 @@ const casinoCategoriesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
-
-const SessionSchema = new mongoose.Schema({
-  userId: String,
-  username: String,
-  ip: String,
-  userAgent: String,
-  timestamp: {
+// Define urlShortener schema
+const shortLinksSchema = new mongoose.Schema({
+  url: String,
+  shortUrl: String,
+  description: String,
+  addedDate: {
     type: Date,
     default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
   }
 });
 
@@ -480,7 +495,6 @@ const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
-const LinkHit = mongoose.model('LinkHit', linkHitSchema);
 const Images = mongoose.model('Images', imagesSchema);
 const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 const Casino = mongoose.model('Casino', casinoSchema);
@@ -492,6 +506,7 @@ const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymen
 const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
 const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
+const shortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 
 
 const languageEntries = [{
