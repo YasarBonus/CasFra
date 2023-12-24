@@ -10,9 +10,93 @@
                 <div class="ui segment">
                 <div class="ui container">
                     <h2>ShortLinks</h2>
-                    
+                    <table id="shortlinksTable" class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>ShortUrl</th>
+                                <th>Url</th>
+                                <th>Description</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows will be dynamically added here -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 </html>
+
+<script>
+
+    function loadInitialData() {
+        // Clear the table
+        $('#shortlinksTable tbody').empty();
+
+        $.ajax({
+            url: '/api/shortlinks',
+            method: 'GET',
+            success: function(data) {
+                // Sort the links by created date
+                data.sort(function(a, b) {
+                    return new Date(b.created) - new Date(a.created);
+                });
+
+                // Populate the table with data
+                data.forEach(function(link) {
+                    var row = '<tr id="' + link._id + '">' +
+                        '<td contenteditable="true">' + link.shortUrl + '</td>' +
+                        '<td contenteditable="true">' + link.url + '</td>' +
+                        '<td contenteditable="true">' + link.description + '</td>' +
+                        '<td>' + link.created + '</td>' +
+                        '<td>' +
+                        '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
+                        '<button class="ui small red button delete-btn">Delete</button>' +
+                        '<button class="ui small green button save-btn">Save</button>' +
+                        '</td>' +
+                        '</tr>';
+                    $('#shortlinksTable tbody').append(row);
+                });
+            }
+        });
+    } 
+
+    // Event listener for save button
+    $('#shortlinksTable').on('click', '.save-btn', function() {
+        var id = $(this).closest('tr').attr('id');
+        var shortUrl = $(this).closest('tr').find('td:nth-child(1)').text();
+        var url = $(this).closest('tr').find('td:nth-child(2)').text();
+        var description = $(this).closest('tr').find('td:nth-child(3)').text();
+
+        saveLink(id, shortUrl, url, description);
+    });
+
+    // Function to save a link
+    function saveLink(id, shortUrl, url, description) {
+        $.ajax({
+            url: '/api/shortlinks/' + id,
+            method: 'PUT',
+            data: {
+                shortUrl: shortUrl,
+                url: url,
+                description: description
+            },
+            success: function(data) {
+                console.log('Success:', data);
+                showToast('success', 'Link saved successfully');
+                loadInitialData();
+            },
+            error: function(error) {
+                console.log('Error:', error);
+                showToast('error', 'Error saving link');
+                loadInitialData();
+                document.querySelector('.ui.modal').scrollTop = 0;
+            }
+        });
+    }
+
+    loadInitialData();
+
+</script>
