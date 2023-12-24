@@ -4074,6 +4074,9 @@ app.get('/:shortUrl', async (req, res) => {
   const { shortUrl } = req.params;
   const url = await ShortLinks.findOne({ shortUrl });
   if (url) {
+    // Record link hit to shortLinksHits table
+    await ShortLinksHits.create({ shortLink: url._id, timestamp: new Date(), ip: req.ip, userAgent: req.get('User-Agent') });
+
     res.redirect(url.url);
   } else {
     res.status(404).send({ error: 'Url not found' });
