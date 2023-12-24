@@ -4057,6 +4057,17 @@ process.on('SIGINT', () => {
   });
 });
 
+// Route zum Umleiten von kurzen URLs
+app.get('/:shortUrl', async (req, res) => {
+  const { shortUrl } = req.params;
+  const url = await ShortLinks.findOne({ shortUrl });
+  if (url) {
+    res.redirect(url.url);
+  } else {
+    res.status(404).send({ error: 'Url not found' });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
