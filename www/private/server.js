@@ -2456,7 +2456,7 @@ app.post('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos'
 
   casinoIndividualFeatures.save()
     .then(() => {
-      res.redirect('/dashboard');
+      res.json({ success: true });
     })
     .catch((error) => {
       console.error('Error inserting casino individual feature:', error);
