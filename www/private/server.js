@@ -261,6 +261,7 @@ const casinoSchema = new mongoose.Schema({
     default: false
   },
   features: [String],
+  individualFeatures: [String],
   providers: [String],
   paymentMethods: [String],
   reviewTitle: String,
