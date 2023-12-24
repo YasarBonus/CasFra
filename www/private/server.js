@@ -319,6 +319,29 @@ const casinoFeaturesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+// Define Casino individual features schema
+const casinoIndividualFeaturesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  casino: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: 0
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
+});
+
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
   name: String,
@@ -2352,6 +2375,7 @@ app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req,
 });
 
 //#endregion Casino Features
+
 
 //#region Casino Providers
 
