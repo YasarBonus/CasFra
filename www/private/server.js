@@ -2428,7 +2428,7 @@ app.get('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('mana
 });
 
 // Insert casino individual feature into MongoDB
-app.post('/api/casinos/:id/individualfeatures/add', checkPermissions('manageCasinos'), (req, res) => {
+app.post('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos'), (req, res) => {
   const {
     name,
     description,
