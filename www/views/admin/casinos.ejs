@@ -28,6 +28,7 @@
                     const selectedCategories = casino.categories;
                     const selectedFeatures = casino.features;
                     const selectedIndividualFeatures = casino.individualFeatures;
+                    console.log('Selected Individual Features:', selectedIndividualFeatures);
                     const selectedProviders = casino.providers;
                     const selectedPaymentMethods = casino.paymentMethods;
                     const selectedBoni = casino.boni;
@@ -419,7 +420,8 @@
             const featuresSelect = document.querySelector('select[name="features"]');
             const features = Array.from(featuresSelect.selectedOptions).map(option => option.value);
 
-            
+            const individualFeaturesSelect = document.querySelector('select[name="individualFeatures"]');
+            const individualFeatures = Array.from(individualFeaturesSelect.selectedOptions).map(option => option.value);
 
             const providersSelect = document.querySelector('select[name="providers"]');
             const providers = Array.from(providersSelect.selectedOptions).map(option => option.value);
@@ -446,7 +448,8 @@
                 maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit,
                 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
-                review, 'image:', image, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink);
+                review, 'image:', image, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink,
+                'IndividualFeatures:', individualFeatures);
 
 
             // Send a PUT request to the API with the updated casino data
@@ -469,6 +472,7 @@
                         prohibitedGamesProtection,
                         vpn,
                         features,
+                        individualFeatures,
                         providers,
                         paymentMethods,
                         reviewTitle,
