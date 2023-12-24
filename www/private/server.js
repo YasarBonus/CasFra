@@ -2033,7 +2033,7 @@ app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Insert casino category into MongoDB
 app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req, res) => {
@@ -2557,7 +2557,7 @@ app.put('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('mana
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete casino individual feature
 app.delete('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('manageCasinos'), (req, res) => {
@@ -2585,7 +2585,7 @@ app.delete('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('m
 });
 
 //#endregion Casino Individual Features
-      
+
 
 //#region Casino Providers
 
@@ -2707,7 +2707,7 @@ app.post('/api/casinos/providers/:id/duplicate', checkPermissions('manageCasinos
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Edit casino provider
 app.put('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -2898,7 +2898,7 @@ app.post('/api/casinos/paymentmethods/:id/duplicate', checkPermissions('manageCa
         error: 'Internal server error'
       });
     });
-}); 
+});
 
 // Edit casino payment method
 app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
