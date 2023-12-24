@@ -42,7 +42,7 @@
                             .remove(); // Remove the existing modal if it exists
                     }
                     const modal = document.createElement('div');
-                    modal.classList.add('ui', 'modal');
+                    modal.classList.add('ui', 'modal', 'edit');
 
                     modal.innerHTML = `
                     <div class="header">Edit Casino</div>
@@ -124,6 +124,7 @@
                                     <label>Individual Features (<a href="casinos/${casino._id}/individualfeatures">manage</a>)</label>
                                     <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
                                     </select>
+                                    <div class="ui primary button" onclick="createAddIndividualCasinoFeatureModal('${casino._id}')">Add Individual Feature</div>
                                 </div>
                                 <div class="field">
                                     <label>Providers (<a href="casinos/providers">manage</a>)</label>
