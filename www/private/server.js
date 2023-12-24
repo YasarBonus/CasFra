@@ -273,8 +273,8 @@ const casinoSchema = new mongoose.Schema({
   review: String,
   image: String,
   imageUrl: String,
-  affiliateLink: String,
-  affiliateShirtlink: String
+  affiliateUrl: String,
+  affiliateShortlink: String
 });
 
 // Define Casino Review schema
@@ -506,7 +506,7 @@ const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymen
 const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
 const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
-const shortLinks = mongoose.model('ShortLinks', shortLinksSchema);
+const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 
 
 const languageEntries = [{
@@ -3348,8 +3348,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     affiliateUrl,
     affiliateShortlink
   } = req.body; // Get the updated values from the request body
-  console.log(req.body);
-  console.log(active);
+  console.log("Updating Casino:", req.body);
   Casino.findOneAndUpdate({
       _id: id
     }, {
@@ -3986,6 +3985,7 @@ async function setImageUrl(id = null) {
     console.error('Error retrieving images:', error);
   }
 }
+
 
 // Run the function on startup, then every hour
 deleteUnusedRegistrationKeys();
