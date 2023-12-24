@@ -524,10 +524,12 @@
                     console.log('Casino updated:', result);
                     // Close the modal and fetch the updated casinos
                     $('.ui.modal').modal('hide');
+                    showToast('success', 'Casino updated successfully', 'The casino has been updated successfully');
                     fetchCasinos();
                 })
                 .catch(error => {
                     console.error('Error updating casino:', error);
+                    showToast('error', 'Error updating casino', error);
                 });
         }
 
