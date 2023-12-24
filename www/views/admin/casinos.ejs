@@ -27,6 +27,7 @@
                 .then(casino => {
                     const selectedCategories = casino.categories;
                     const selectedFeatures = casino.features;
+                    const selectedIndividualFeatures = casino.individualFeatures;
                     const selectedProviders = casino.providers;
                     const selectedPaymentMethods = casino.paymentMethods;
                     const selectedBoni = casino.boni;
@@ -34,15 +35,15 @@
                     const selectedWagerTypes = casino.wagerType;
                     const selectedImage = casino.image;
 
-                                    // Open the modal for editing the casino data
-                                    if (document.querySelector('.ui.modal')) {
-                                        document.querySelector('.ui.modal')
-                                            .remove(); // Remove the existing modal if it exists
-                                    }
-                                    const modal = document.createElement('div');
-                                    modal.classList.add('ui', 'modal');
+                    // Open the modal for editing the casino data
+                    if (document.querySelector('.ui.modal')) {
+                        document.querySelector('.ui.modal')
+                            .remove(); // Remove the existing modal if it exists
+                    }
+                    const modal = document.createElement('div');
+                    modal.classList.add('ui', 'modal');
 
-                                    modal.innerHTML = `
+                    modal.innerHTML = `
                     <div class="header">Edit Casino</div>
                     <div class="content">
                         <form class="ui form">
@@ -188,89 +189,18 @@
                         <div class="ui primary button" onclick="saveCasino('${casino._id}')">Save</div>
                     </div>
                 `;
-                                    document.body.appendChild(modal);
-                                    $(modal).modal('show');
-                                    $('.ui.dropdown').dropdown(); // Initialize the dropdown
-                                    console.log('Edit button clicked for casino with ID:', casinoId);
+                    document.body.appendChild(modal);
+                    $(modal).modal('show');
+                    $('.ui.dropdown').dropdown(); // Initialize the dropdown
 
-                                    // Populate the categories dropdown with available categories
-                                    getAvailableCategories(selectedCategories);
-                                    getAvailableImages(selectedImage);
+                    // Populate the categories dropdown with available categories
+                    getAvailableCategories(selectedCategories);
+                    getAvailableImages(selectedImage);
 
-                                    fetch(`/api/casinos/${casinoId}/wagertypes`)
-                                        .then(response => response.json())
-                                        .then(selectedWagerTypes => {
-                                            console.log('Selected wager types:', selectedWagerTypes);
-                                            getAvailableWagerTypes(selectedWagerTypes);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/features`)
-                                        .then(response => response.json())
-                                        .then(selectedFeatures => {
-                                            console.log('Selected features:', selectedFeatures);
-                                            getAvailableFeatures(selectedFeatures);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/providers`)
-                                        .then(response => response.json())
-                                        .then(selectedProviders => {
-                                            console.log('Selected providers:', selectedProviders);
-                                            getAvailableProviders(selectedProviders);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/paymentmethods`)
-                                        .then(response => response.json())
-                                        .then(selectedPaymentMethods => {
-                                            console.log('Selected payment methods:',
-                                                selectedPaymentMethods);
-                                            getAvailablePaymentMethods(selectedPaymentMethods);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/boni`)
-                                        .then(response => response.json())
-                                        .then(selectedBoni => {
-                                            console.log('Selected boni:', selectedBoni);
-                                            getAvailableBoni(selectedBoni);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/displaybonus`)
-                                        .then(response => response.json())
-                                        .then(selectedDisplayBonus => {
-                                            console.log('Selected display bonus:',
-                                                selectedDisplayBonus);
-                                            getAvailableDisplayBonus(selectedDisplayBonus);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-                                    fetch(`/api/casinos/${casinoId}/image`)
-                                        .then(response => response.json())
-                                        .then(selectedImage => {
-                                            console.log('Selected image:', selectedImage);
-                                            getAvailableImages(selectedImage);
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching selected categories:', error);
-                                        });
-
-
-                                })
+                    // Populate the features dropdown with available features
+                    getAvailableFeatures(selectedFeatures);
+                    getAvailableIndividualFeatures(casinoId, selectedIndividualFeatures);
+                })
 
         }
 
@@ -427,6 +357,31 @@
                 })
                 .catch(error => {
                     console.error('Error fetching payment methods:', error);
+                });
+        }
+
+        function getAvailableIndividualFeatures(casinoId, selectedIndividualFeatures) {
+            fetch('/api/casinos/' + casinoId + '/individualfeatures')
+                .then(response => response.json())
+                .then(individualFeatures => {
+                    const individualFeaturesDropdown = document.getElementById('individualFeaturesDropdown');
+                    console.log('Individual Features Dropdown:', individualFeaturesDropdown);
+                    console.log('Individual Features:', individualFeatures);
+                    individualFeaturesDropdown.innerHTML = ''; // Remove existing options
+
+                    individualFeatures.forEach(individualFeature => {
+                        const option = document.createElement('option');
+                        option.value = individualFeature._id;
+                        option.innerText = individualFeature.name;
+                        if (selectedIndividualFeatures.includes(individualFeature._id)) {
+                            option.selected =
+                                true; // Select the option if it is in the selected individualFeatures
+                        }
+                        individualFeaturesDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching individual features:', error);
                 });
         }
 
