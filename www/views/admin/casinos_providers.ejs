@@ -14,6 +14,7 @@
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Priority (Sorting)</th>
+                                    <th>Image</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -65,11 +66,41 @@
                             '<td contenteditable="true">' + provider.description + '</td>' +
                             '<td contenteditable="true">' + provider.priority + '</td>' +
                             '<td>' +
-                            '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
-                            '<button class="ui small red button delete-btn">Delete</button>' +
-                            '</td>' +
-                            '</tr>';
-                        $('#casinoProvidersTable tbody').append(row);
+                            '<div class="ui fluid search selection dropdown image-dropdown">' +
+                            '<input type="hidden" name="image">' +
+                            '<i class="dropdown icon"></i>' +
+                            '<div class="default text">Select an image</div>' +
+                            '<div class="menu">';
+
+                        // Fetch available images from /api/images
+                        $.ajax({
+                            url: '/api/images',
+                            method: 'GET',
+                            success: function(images) {
+                                // Add options to the dropdown
+                                images.forEach(function(image) {
+                                    var option = '<div class="item" data-value="' + image._id + '">' + image.name + '</div>';
+                                    row += option;
+                                });
+
+                                // Set the selected image based on provider.image
+                                row += '</div>' +
+                                    '</div>' +
+                                    '</td>' +
+                                    '<td>' +
+                                    '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
+                                    '<button class="ui small red button delete-btn">Delete</button>' +
+                                    '</td>' +
+                                    '</tr>';
+
+                                $('#casinoProvidersTable tbody').append(row);
+                                // Set the selected image based on provider.image
+                                $('#' + provider._id + ' .image-dropdown').dropdown('set selected', provider.image);
+                            },
+                            error: function(error) {
+                                console.log('Error:', error);
+                            }
+                        });
                     });
                 },
                 error: function(error) {
@@ -127,7 +158,8 @@
                 data: {
                     name: $('#' + providerId + ' td:nth-child(1)').text(),
                     description: $('#' + providerId + ' td:nth-child(2)').text(),
-                    priority: $('#' + providerId + ' td:nth-child(3)').text()
+                    priority: $('#' + providerId + ' td:nth-child(3)').text(),
+                    image: $('#' + providerId + ' .image-dropdown').dropdown('get value')
                 },
                 success: function(data) {
                     console.log('Success:', data);
