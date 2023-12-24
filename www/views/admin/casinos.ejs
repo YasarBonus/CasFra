@@ -69,17 +69,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="fields">
-                                <div class="four wide field">
-                                    <label>Shortlink</label>
-                                    <input type="text" name="affiliateShortlink" placeholder="Enter the casino image URL" value="${casino.image}">
-                                </div>
-                                <div class="twelve wide field">
-                                    <label>Affiliate Link</label>
-                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.affiliateLink}">
-                                </div>
-                            </div>
-                            </div>
                             <div class="four fields">
                                 <div class="field">
                                     <div class="ui toggle checkbox">
@@ -112,22 +101,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="four fields">
+                        </div>
+                        <div class="ui segment">
+                            <div class="ui header">Features</div>
+                            <div class="three fields">
                                 <div class="field">
                                     <label>Categories (<a href="casinos/categories">manage</a>)</label>
                                     <select name="categories" multiple class="ui fluid search dropdown" id="categoriesDropdown">
                                     </select>
-                                </div>
-                                <div class="field">
-                                    <label>Features (<a href="casinos/features">manage</a>)</label>
-                                    <select name="features" multiple class="ui fluid search dropdown" id="featuresDropdown">
-                                    </select>
-                                </div>
-                                <div class="field">
-                                    <label>Individual Features (<a href="casinos/${casino._id}/individualfeatures">manage</a>)</label>
-                                    <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
-                                    </select>
-                                    <div class="ui primary button" onclick="createAddIndividualCasinoFeatureModal('${casino._id}')">Add Individual Feature</div>
                                 </div>
                                 <div class="field">
                                     <label>Providers (<a href="casinos/providers">manage</a>)</label>
@@ -140,7 +121,27 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="six fields">
+                            <div class="ui divider"></div>
+                            <div class="two fields">
+                                <div class="eight wide field">
+                                    <label>Features (<a href="casinos/features">manage</a>)</label>
+                                    <select name="features" multiple class="ui fluid search dropdown" id="featuresDropdown">
+                                    </select>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>Individual Features (<a href="casinos/${casino._id}/individualfeatures">manage</a>)</label>
+                                    <div class="ui action input">
+                                        <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
+                                        </select>
+                                        <div class="ui small primary button" onclick="createAddIndividualCasinoFeatureModal('${casino._id}')">Create new</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            </div>
+                            <div class="ui segment">
+                                <div class="ui header">Boni</div>
+                            <div class="three fields">
                                 <div class="field">
                                     <label>Boni</label>
                                     <select name="boni" multiple class="ui fluid dropdown" id="boniDropdown">
@@ -151,19 +152,22 @@
                                     <select name="displayBonus" class="ui fluid dropdown" id="displayBonusDropdown">
                                     </select>
                                 </div>
-                                <div class="field">
+                            </div>
+                            <div class="ui divider"></div>
+                            <div class="four fields">
+                                <div class="three two field">
                                     <label>Max Bet</label>
                                     <input type="text" name="maxBet" placeholder="Enter the casino background URL" value="${casino.maxBet}">
                                 </div>
-                                <div class="field">
+                                <div class="three two field">
                                     <label>Max Cashout</label>
                                     <input type="text" name="maxCashout" placeholder="Enter the casino background URL" value="${casino.maxCashout}">
                                 </div>
-                                <div class="field">
+                                <div class="four wide field">
                                     <label>Wager</label>
                                     <input type="text" name="wager" placeholder="Enter the casino background URL" value="${casino.wager}">
                                 </div>
-                                <div class="field">
+                                <div class="six wide field">
                                     <label>Wager Type (<a href="casinos/wagertypes">manage</a>)</label>
                                     <select name="wagerType" multiple class="ui fluid dropdown" id="wagerTypeDropdown">
                                     </select>
@@ -186,7 +190,20 @@
                                         <textarea name="review" rows="6" placeholder="Enter the casino description">${casino.review}</textarea>
                                     </div>
                             </div>
-                            
+                            </div>
+                            <div class="ui segment">
+                                <div class="ui header">Affiliate</div>
+                                <div class="two fields">
+                                <div class="four wide field">
+                                    <label>Shortlink</label>
+                                    <input type="text" name="affiliateShortlink" placeholder="Enter the casino image URL" value="${casino.image}">
+                                </div>
+                                <div class="twelve wide field">
+                                    <label>Affiliate Link</label>
+                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.affiliateLink}">
+                                </div>
+                            </div>
+                            </div>
                         </form>
                     </div>
                     <div class="actions">
