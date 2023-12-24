@@ -466,7 +466,7 @@ const casinoCategoriesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
-// Define urlShortener schema
+// Define shortLinks Schema
 const shortLinksSchema = new mongoose.Schema({
   url: String,
   shortUrl: String,
@@ -489,6 +489,17 @@ const shortLinksSchema = new mongoose.Schema({
   attachedTo: String,
 });
 
+// Define shortLinksHits Schema
+const shortLinksHitsSchema = new mongoose.Schema({
+  shortLink: String,
+  ip: String,
+  userAgent: String,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
@@ -508,6 +519,7 @@ const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSche
 const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
+const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
 
 
 const languageEntries = [{
