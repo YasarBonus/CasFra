@@ -4092,6 +4092,32 @@ app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) 
   }
 });
 
+app.get('/dashboard/shortlinks', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+
+    res.render('admin/shortlinks', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+
+    res.render('admin/shortlinks_hits', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 
 //#endregion Routes
 
