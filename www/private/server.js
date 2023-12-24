@@ -485,7 +485,8 @@ const shortLinksSchema = new mongoose.Schema({
   priority: {
     type: Number,
     default: generateRandomPriority()
-  }
+  },
+  attachedTo: String,
 });
 
 // Define models
@@ -3986,6 +3987,39 @@ async function setImageUrl(id = null) {
   }
 }
 
+async function createShortLinks() {
+  try {
+    const casinos = await Casino.find();
+    for (const casino of casinos) {
+      if (casino.affiliateUrl && casino.affiliateShortlink) {
+        const existingShortLink = await ShortLinks.findOne({ attachedTo: casino._id });
+        if (existingShortLink) {
+          existingShortLink.url = casino.affiliateUrl;
+          existingShortLink.shortUrl = casino.affiliateShortlink;
+          existingShortLink.modifiedBy = casino.modifiedBy;
+          existingShortLink.modifiedDate = casino.modifiedDate;
+          await existingShortLink.save();
+          console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
+        } else {
+          const shortLink = await ShortLinks.create({
+            url: casino.affiliateUrl,
+            shortUrl: casino.affiliateShortlink,
+            addedBy: casino.addedBy,
+            addedDate: casino.addedDate,
+            modifiedBy: casino.modifiedBy,
+            modifiedDate: casino.modifiedDate,
+            attachedTo: casino._id,
+          });
+          console.log('ShortLink created for casino ' + casino.name + ' (' + shortLink._id + ')');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error creating/updating ShortLinks:', error);
+  }
+}
+
+createShortLinks();
 
 // Run the function on startup, then every hour
 deleteUnusedRegistrationKeys();
