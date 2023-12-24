@@ -394,7 +394,6 @@
             const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
 
             const description = document.querySelector('textarea[name="description"]').value;
-            const priority = document.querySelector('input[name="priority"]').value;
             const active = document.querySelector('input[name="active"]').checked;
             const isNew = document.querySelector('input[name="isNew"]').checked;
             const label = document.querySelector('input[name="label"]').value;
@@ -420,6 +419,8 @@
             const featuresSelect = document.querySelector('select[name="features"]');
             const features = Array.from(featuresSelect.selectedOptions).map(option => option.value);
 
+            
+
             const providersSelect = document.querySelector('select[name="providers"]');
             const providers = Array.from(providersSelect.selectedOptions).map(option => option.value);
 
@@ -440,7 +441,7 @@
 
 
             console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories,
-                'Description:', description, 'Priority:', priority, 'Active:', active, 'isNew:', isNew, 'Label:',
+                'Description:', description, 'Active:', active, 'isNew:', isNew, 'Label:',
                 label, 'LabelLarge:', labelLarge, 'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:',
                 maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit,
                 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
@@ -455,7 +456,6 @@
                         name,
                         categories,
                         description,
-                        priority,
                         active,
                         isNew,
                         label,
