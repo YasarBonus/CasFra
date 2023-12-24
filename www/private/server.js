@@ -2587,6 +2587,198 @@ app.delete('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('m
 
 //#endregion Casino Individual Features
 
+//#region Casino WagerTypes,
+
+// Get all casino wager types from MongoDB
+app.get('/api/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoWagerTypes.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino wager types:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get details of a specific casino wager type
+app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoWagerTypes.findById(id)
+    .then((casinoWagerTypes) => {
+      if (!casinoWagerTypes) {
+        return res.status(404).json({
+          error: 'Casino wager type not found'
+        });
+      }
+
+      res.json(casinoWagerTypes);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino wager type:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Insert casino wager type into MongoDB
+app.post('/api/casinos/wagertypes/add', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoWagerTypes = new CasinoWagerTypes({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoWagerTypes.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino wager type:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Duplicate casino wager type
+app.post('/api/casinos/wagertypes/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoWagerTypes.findOne({
+      _id: id
+    })
+    .then((casinoWagerTypes) => {
+      if (!casinoWagerTypes) {
+        throw new Error('Casino wager type not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoWagerTypes = new CasinoWagerTypes({
+          addedBy: userId,
+          name: casinoWagerTypes.name + ' (Copy)',
+          description: casinoWagerTypes.description,
+          image: casinoWagerTypes.image,
+          priority: newPriority,
+          active: casinoWagerTypes.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoWagerTypes.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino wager type:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino wager type:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Edit casino wager type
+app.put('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoWagerTypes.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoWagerTypes) => {
+      if (!updatedCasinoWagerTypes) {
+        throw new Error('Casino wager type not found');
+      }
+      res.json(updatedCasinoWagerTypes);
+      console.log('Casino wager type updated: ' + updatedCasinoWagerTypes.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino wager type:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete casino wager type
+app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoWagerTypes.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoWagerType) => {
+      if (!deletedCasinoWagerType) {
+        throw new Error('Casino wager type not found');
+      }
+      res.json(deletedCasinoWagerType);
+      console.log('Casino wager type deleted: ' + deletedCasinoWagerType.name);
+    }
+    )
+    .catch((error) => {
+      console.error('Error deleting casino wager type:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    }
+    );
+} );
+
+//#endregion Casino Wager Types
 
 //#region Casino Providers
 
