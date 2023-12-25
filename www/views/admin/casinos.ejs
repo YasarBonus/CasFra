@@ -29,6 +29,7 @@
                     const selectedIndividualFeatures = casino.individualFeatures;
                     const selectedIndividualBonuses = casino.individualBonuses;
                     const selectedProviders = casino.providers;
+                    const selectedLicenses = casino.licenses;
                     const selectedPaymentMethods = casino.paymentMethods;
                     const selectedDisplayBonus = casino.displayBonus;
                     const selectedWagerTypes = casino.wagerType;
@@ -116,6 +117,11 @@
                                 <div class="field">
                                     <label>Payment Methods (<a href="casinos/paymentmethods">manage</a>)</label>
                                     <select name="paymentMethods" multiple class="ui fluid search dropdown" id="paymentMethodsDropdown">
+                                    </select>
+                                </div>
+                                <div class="two wide field">
+                                    <label>Licenses (<a href="casinos/licenses">manage</a>)</label>
+                                    <select name="licenses" multiple class="ui fluid search dropdown" id="licensesDropdown">
                                     </select>
                                 </div>
                             </div>
@@ -229,6 +235,9 @@
                     // Populate the providers dropdown with available providers
                     getAvailableProviders(selectedProviders);
 
+                    // Populate the licenses dropdown with available licenses
+                    getAvailableLicenses(selectedLicenses);
+
                     // Populate the payment methods dropdown with available payment methods
                     getAvailablePaymentMethods(selectedPaymentMethods);
 
@@ -239,12 +248,7 @@
                     // Populate the bonuses dropdown with available bonuses
                     getAvailableIndividualBonuses(casinoId, selectedIndividualBonuses, selectedDisplayBonus);
 
-
-
-                    
-
                 })
-
         }
 
         function getAvailableImages(selectedImage) {
@@ -265,7 +269,7 @@
                         const img = document.createElement('img');
                         img.src = image.imageUrl;
                         img.alt = image.name;
-                        img.style.width = '50px'; // Set the width of the image (adjust as needed)
+                        //img.style.maxWidth = '200px'; // Set the width of the image (adjust as needed)
 
                         // Append the image element to the option
                         option.appendChild(img);
@@ -375,6 +379,30 @@
                 })
                 .catch(error => {
                     console.error('Error fetching providers:', error);
+                });
+        }
+
+        function getAvailableLicenses(selectedLicenses) {
+            fetch('/api/casinos/licenses')
+                .then(response => response.json())
+                .then(licenses => {
+                    const licensesDropdown = document.getElementById('licensesDropdown');
+                    console.log('Licenses Dropdown:', licensesDropdown);
+                    console.log('Licenses:', licenses);
+                    licensesDropdown.innerHTML = ''; // Remove existing options
+
+                    licenses.forEach(license => {
+                        const option = document.createElement('option');
+                        option.value = license._id;
+                        option.innerText = license.name;
+                        if (selectedLicenses.includes(license._id)) {
+                            option.selected = true; // Select the option if it is in the selected licenses
+                        }
+                        licensesDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching licenses:', error);
                 });
         }
 
@@ -506,6 +534,9 @@
             const providersSelect = document.querySelector('select[name="providers"]');
             const providers = Array.from(providersSelect.selectedOptions).map(option => option.value);
 
+            const licensesSelect = document.querySelector('select[name="licenses"]');
+            const licenses = Array.from(licensesSelect.selectedOptions).map(option => option.value);
+
             const paymentMethodsSelect = document.querySelector('select[name="paymentMethods"]');
             const paymentMethods = Array.from(paymentMethodsSelect.selectedOptions).map(option => option.value);
 
@@ -529,7 +560,7 @@
                 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
                 review, 'image:', image, 'affiliateUrl:', affiliateUrl, 'AffiliateShortlink:', affiliateShortlink,
-                'IndividualFeatures:', individualFeatures, 'IndividualBonuses:', individualBonuses);
+                'IndividualFeatures:', individualFeatures, 'IndividualBonuses:', individualBonuses, 'Licenses:', licenses);
 
 
             // Send a PUT request to the API with the updated casino data
@@ -561,6 +592,7 @@
                         affiliateUrl,
                         affiliateShortlink,
                         individualBonuses,
+                        licenses
                     }),
                     headers: {
                         'Content-Type': 'application/json'
@@ -579,9 +611,6 @@
                     showToast('error', 'Error updating casino', error);
                 });
         }
-
-
-
 
         function openAddModal() {
             const modal = document.createElement('div');
