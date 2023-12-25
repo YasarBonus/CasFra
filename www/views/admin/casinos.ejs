@@ -746,19 +746,28 @@
         function duplicateCasino(casinoId) {
             // Send a POST request to duplicate the casino
             fetch(`/api/casinos/${casinoId}/duplicate`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('Casino duplicated:', result);
-                    fetchCasinos(); // Fetch the updated casinos
-                })
-                .catch(error => {
-                    console.error('Error duplicating casino:', error);
-                });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    showToast('error', 'Error duplicating casino', 'Error duplicating casino: ' + response.status);
+                    throw new Error('Error duplicating casino: ' + response.status);
+                }
+            })
+            .then(result => {
+                console.log('Casino duplicated:', result);
+                showToast('success', 'Casino duplicated successfully', 'The casino has been duplicated successfully');
+                fetchCasinos(); // Fetch the updated casinos
+            })
+            .catch(error => {
+                showToast('error', 'Error duplicating casino', 'Error duplicating casino: ' + error);
+                console.error('Error duplicating casino:', error);
+            });
         }
 
         function confirmDeleteCasino(casinoId) {
