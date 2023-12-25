@@ -4367,6 +4367,45 @@ async function createShortLinks(casinoId = null) {
   }
 }
 
+// Function to update the statistics of short links
+// The list of short links is retrieved from the database
+// The number of hits for each short link is counted from the shortLinksHits table
+// The statistics are then updated in the shortLinksStatistics table
+
+async function updateShortLinksStatistics() {
+  try {
+    // Get all short links from the database
+    const shortLinks = await ShortLinks.find();
+
+    // Loop through all short links
+    for (const shortLink of shortLinks) {
+      // Get the number of hits for the short link
+      const shortLinkHits = await ShortLinksHits.countDocuments({ shortLink: shortLink._id });
+
+      // Check if statistics for the short link already exist
+      const shortLinkStatistics = await ShortLinksStatistics.findOne({ shortLink: shortLink._id });
+
+      if (shortLinkStatistics) {
+        // Update the existing statistics
+        shortLinkStatistics.hits = shortLinkHits;
+        await shortLinkStatistics.save();
+      } else {
+        // Create new statistics
+        await ShortLinksStatistics.create({
+          shortLink: shortLink._id,
+          hits: shortLinkHits,
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error updating short links statistics:', error);
+  }
+}
+
+
+// Call the function on startup, then every hour
+updateShortLinksStatistics();
+
 createShortLinks();
 
 // Run the function on startup, then every hour
