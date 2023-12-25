@@ -4260,6 +4260,25 @@ app.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, r
     });
 });
 
+// Get licenses of a specific casino by ID
+app.get('/api/casinos/:id/licenses', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id
+    })
+    .then((result) => {
+      res.json(result.licenses);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino licenses:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Get paymentMethods of a specific casino by ID
 app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
   const {
