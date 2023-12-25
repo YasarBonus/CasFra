@@ -309,7 +309,8 @@ const casinoSchema = new mongoose.Schema({
   image: String,
   imageUrl: String,
   affiliateUrl: String,
-  affiliateShortlink: String
+  affiliateShortlink: String,
+  licenses: [String],
 });
 
 // Define Casino Review schema
@@ -408,6 +409,29 @@ const casinoIndividualBonusesSchema = new mongoose.Schema({
 
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  imageUrl: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
+});
+
+// Define Casino licenses schema
+const casinoLicensesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
@@ -560,6 +584,7 @@ const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSche
 const Casino = mongoose.model('Casino', casinoSchema);
 const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
 const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
+const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
 const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
 const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
 const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
@@ -3585,6 +3610,8 @@ app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'),
 });
 
 //#endregion Casino Payment Methods
+
+
 
 //#region Casinos
 // Get all casinos from MongoDB
