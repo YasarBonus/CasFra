@@ -4421,12 +4421,24 @@ async function updateShortLinksStatistics() {
         },
       });
 
+      // Get the number of hits in the past 12 months
+      const shortLinkHits12m = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        },
+      });
+
       // Update the short link object with the new statistics
       shortLink.hits = shortLinkHits;
-
+      shortLink.hits1h = shortLinkHits1h;
+      shortLink.hits3h = shortLinkHits3h;
+      shortLink.hits6h = shortLinkHits6h;
+      shortLink.hits12h = shortLinkHits12h;
       shortLink.hits24h = shortLinkHits24h;
       shortLink.hits7d = shortLinkHits7d;
       shortLink.hits30d = shortLinkHits30d;
+      shortLink.hits12m = shortLinkHits12m;
       
       // Check if the short link statistics object already exists
       const shortLinkStatistics = await ShortLinksStatistics.findOne({ shortLink: shortLink._id });
@@ -4434,9 +4446,14 @@ async function updateShortLinksStatistics() {
       if (shortLinkStatistics) {
         // Update the existing short link statistics object
         shortLinkStatistics.hits = shortLinkHits;
+        shortLinkStatistics.hits1h = shortLinkHits1h;
+        shortLinkStatistics.hits3h = shortLinkHits3h;
+        shortLinkStatistics.hits6h = shortLinkHits6h;
+        shortLinkStatistics.hits12h = shortLinkHits12h;
         shortLinkStatistics.hits24h = shortLinkHits24h;
         shortLinkStatistics.hits7d = shortLinkHits7d;
         shortLinkStatistics.hits30d = shortLinkHits30d;
+        shortLinkStatistics.hits12m = shortLinkHits12m;
         await shortLinkStatistics.save();
       }
       else {
@@ -4444,9 +4461,14 @@ async function updateShortLinksStatistics() {
         await ShortLinksStatistics.create({
           shortLink: shortLink._id,
           hits: shortLinkHits,
+          hits1h: shortLinkHits1h,
+          hits3h: shortLinkHits3h,
+          hits6h: shortLinkHits6h,
+          hits12h: shortLinkHits12h,
           hits24h: shortLinkHits24h,
           hits7d: shortLinkHits7d,
           hits30d: shortLinkHits30d,
+          hits12m: shortLinkHits12m,
         });
       }
 
