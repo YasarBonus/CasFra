@@ -2256,24 +2256,15 @@ app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, 
     });
 } );
 
-// Get short link hits by short link ID from MongoDB with pagination
-app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
+// Get short link statistics by short link ID from MongoDB
+app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res) => {
   const {
     id
   } = req.params;
-  const {
-    page,
-    limit
-  } = req.query;
 
   ShortLinksHits.find({
       id: id
     })
-    .sort({
-      timestamp: -1
-    })
-    .skip(parseInt(page) * parseInt(limit))
-    .limit(parseInt(limit))
     .then((results) => {
       res.json(results);
     })
@@ -2284,6 +2275,7 @@ app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, 
       });
     });
 } );
+
 
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
