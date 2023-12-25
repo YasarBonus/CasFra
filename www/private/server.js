@@ -504,14 +504,14 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
   shortLink: String,
   hits: Number,
   uniqueHits: Number,
-  last1hour: Number,
-  last3hours: Number,
-  last6hours: Number,
-  last12hours: Number,
-  last24hours: Number,
-  last7days: Number,
-  last30days: Number,
-  last12months: Number,
+  hits1h: Number,
+  hits3h: Number,
+  hits6h: Number,
+  hits12h: Number,
+  hits24h: Number,
+  hits7d: Number,
+  hits30d: Number,
+  hits12m: Number,
   timestamp: {
     type: Date,
     default: Date.now
@@ -2276,8 +2276,6 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
     });
 } );
 
-
-
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
   const {
@@ -2303,15 +2301,7 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
   );
 } );
 
-
-
 //#endregion ShortLinks
-
-
-
-
-
-
 
 //#region Casino Categories
 
@@ -4375,20 +4365,93 @@ async function updateShortLinksStatistics() {
       // Get the number of hits for the short link
       const shortLinkHits = await ShortLinksHits.countDocuments({ shortLink: shortLink._id });
 
-      // Check if statistics for the short link already exist
+      // Get the number of hits in the past 1 hour
+      const shortLinkHits1h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 3 hours
+      const shortLinkHits3h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 3 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 6 hours
+      const shortLinkHits6h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 6 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 12 hours
+      const shortLinkHits12h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 12 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 24 hours
+      const shortLinkHits24h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 7 days
+      const shortLinkHits7d = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 30 days
+      const shortLinkHits30d = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Update the short link object with the new statistics
+      shortLink.hits = shortLinkHits;
+
+      shortLink.hits24h = shortLinkHits24h;
+      shortLink.hits7d = shortLinkHits7d;
+      shortLink.hits30d = shortLinkHits30d;
+      
+      // Check if the short link statistics object already exists
       const shortLinkStatistics = await ShortLinksStatistics.findOne({ shortLink: shortLink._id });
 
       if (shortLinkStatistics) {
-        // Update the existing statistics
+        // Update the existing short link statistics object
         shortLinkStatistics.hits = shortLinkHits;
+        shortLinkStatistics.hits24h = shortLinkHits24h;
+        shortLinkStatistics.hits7d = shortLinkHits7d;
+        shortLinkStatistics.hits30d = shortLinkHits30d;
         await shortLinkStatistics.save();
-      } else {
-        // Create new statistics
+      }
+      else {
+        // Create a new short link statistics object
         await ShortLinksStatistics.create({
           shortLink: shortLink._id,
           hits: shortLinkHits,
+          hits24h: shortLinkHits24h,
+          hits7d: shortLinkHits7d,
+          hits30d: shortLinkHits30d,
         });
       }
+
+      // Save the updated short link object
+      await shortLink.save();
     }
   } catch (error) {
     console.error('Error updating short links statistics:', error);
