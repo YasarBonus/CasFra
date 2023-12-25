@@ -347,6 +347,29 @@ const casinoIndividualFeaturesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+// Define Casino individual bonuses schema
+const casinoIndividualBonusesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  casino: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: 0
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String
+});
+
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
   name: String,
@@ -397,35 +420,6 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   name: String,
   short: String,
   description: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino boni schema
-const casinoBoniSchema = new mongoose.Schema({
-  name: String,
-  bonus: Number,
-  freespins: Number,
-  max: Number,
-  sticky: {
-    type: Boolean,
-    default: true
-  },
-  description: String,
-  image: String,
   active: {
     type: Boolean,
     default: true
@@ -531,10 +525,10 @@ const Casino = mongoose.model('Casino', casinoSchema);
 const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
 const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
 const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
+const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
 const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
 const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
 const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
-const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
@@ -736,24 +730,6 @@ const CasinoWagerTypesEntries = [{
   description: 'A bonus is a bonus that you receive when you make a deposit.',
 }];
 
-const CasinoBoniEntries = [{
-  name: 'Welcome Bonus',
-  bonus: 100,
-  freespins: 0,
-  max: 100,
-  sticky: true,
-  description: 'Welcome Bonus',
-  image: 'https://www.casinofreak.com/images/bonuses/welcome-bonus.png'
-}, {
-  name: 'No Deposit Bonus',
-  bonus: 0,
-  freespins: 0,
-  max: 0,
-  sticky: true,
-  description: 'No Deposit Bonus',
-  image: 'https://www.casinofreak.com/images/bonuses/no-deposit-bonus.png'
-}];
-
 const CasinoCategoriesEntries = [{
   name: 'Default',
   description: 'Default Casino Category',
@@ -821,18 +797,6 @@ const saveDefaultCasinoDatabaseData = async () => {
         const newCasino = new CasinoWagerTypes(casinoWagerTypesEntry);
         promises.push(newCasino.save());
         console.log('CasinoWagerTypes entry saved:', newCasino);
-      }
-    }
-
-    for (const casinoBoniEntry of CasinoBoniEntries) {
-      const existingCasinoBoni = await CasinoBoni.findOne({
-        name: casinoBoniEntry.name
-      });
-
-      if (!existingCasinoBoni) {
-        const newCasinoBoni = new CasinoBoni(casinoBoniEntry);
-        promises.push(newCasinoBoni.save());
-        console.log('CasinoBoni entry saved:', newCasinoBoni);
       }
     }
 
@@ -2894,6 +2858,124 @@ app.delete('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('m
 
 //#endregion Casino Individual Features
 
+//#region Casino Individual Bonuses
+
+// Get all casino individual bonuses from MongoDB
+app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoIndividualBonuses.find({
+      casino: id
+    })
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino individual bonuses:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get details of a specific casino individual bonus
+app.get('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id,
+    bonusId
+  } = req.params;
+  
+  CasinoIndividualBonuses.findOne({
+      casino: id,
+      _id: bonusId
+    })
+    .then((casinoIndividualBonuses) => {
+      if (!casinoIndividualBonuses) {
+        return res.status(404).json({
+          error: 'Casino individual bonus not found'
+        });
+      } else {
+        res.json(casinoIndividualBonuses);
+      }
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino individual bonus:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    }
+  );
+});
+
+// Insert casino individual bonus into MongoDB
+app.post('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    id
+  } = req.params;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoIndividualBonuses = new CasinoIndividualBonuses({
+    addedBy: userId,
+    casino: id,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoIndividualBonuses.save()
+    .then(() => {
+      res.json({ success: true });
+    })
+    .catch((error) => {
+      console.error('Error inserting casino individual bonus:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Delete casino individual bonus
+app.delete('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id,
+    bonusId
+  } = req.params;
+
+  CasinoIndividualBonuses.findOneAndDelete({
+      _id: bonusId
+    })
+    .then((deletedCasinoIndividualBonus) => {
+      if (!deletedCasinoIndividualBonus) {
+        throw new Error('Casino individual bonus not found');
+      }
+      res.json(deletedCasinoIndividualBonus);
+      console.log('Casino individual bonus deleted: ' + deletedCasinoIndividualBonus.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino individual bonus:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Casino Individual Bonuses
+
+
 //#region Casino WagerTypes,
 
 // Get all casino wager types from MongoDB
@@ -4162,20 +4244,6 @@ app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req
     next(err);
   }
 });
-
-app.get('/dashboard/casinos/boni', checkPermissions('manageCasinos'), (req, res, next) => {
-  try {
-    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') boni');
-    const user = req.session.user;
-
-    res.render('admin/casinos_boni', {
-      user: user
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
 
 app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
   try {
