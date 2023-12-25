@@ -27,9 +27,9 @@
                     const selectedCategories = casino.categories;
                     const selectedFeatures = casino.features;
                     const selectedIndividualFeatures = casino.individualFeatures;
+                    const selectedIndividualBonuses = casino.individualBonuses;
                     const selectedProviders = casino.providers;
                     const selectedPaymentMethods = casino.paymentMethods;
-                    const selectedBoni = casino.boni;
                     const selectedDisplayBonus = casino.displayBonus;
                     const selectedWagerTypes = casino.wagerType;
                     const selectedImage = casino.image;
@@ -138,12 +138,13 @@
                             </div>
                             </div>
                             <div class="ui segment">
-                                <div class="ui header">Boni</div>
+                                <div class="ui header">Bonuses</div>
                             <div class="three fields">
                                 <div class="field">
-                                    <label>Boni</label>
-                                    <select name="boni" multiple class="ui fluid dropdown" id="boniDropdown">
+                                    <label>Individual Bonuses <div class="ui mini primary button" onclick="showEditableIndividualBonuses('${casino._id}')">manage</div></label>
+                                    <select name="individualBonuses" multiple class="ui fluid dropdown" id="individualBonusesDropdown">
                                     </select>
+                                    <div class="ui small primary button" onclick="createAddIndividualCasinoBonusModal('${casino._id}')">Create new</div>
                                 </div>
                                 <div class="field">
                                     <label>Display Bonus</label>
@@ -234,6 +235,13 @@
 
                     // Populate the wager types dropdown with available wager types
                     getAvailableWagerTypes(selectedWagerTypes);
+
+                    // Populate the bonuses dropdown with available bonuses
+                    getAvailableIndividualBonuses(casinoId, selectedIndividualBonuses, selectedDisplayBonus);
+
+
+
+                    
 
                 })
 
@@ -420,6 +428,44 @@
                 });
         }
 
+        function getAvailableIndividualBonuses(casinoId, selectedIndividualBonuses, selectedDisplayBonus) {
+            fetch('/api/casinos/' + casinoId + '/individualbonuses')
+                .then(response => response.json())
+                .then(individualBonuses => {
+                    const individualBonusesDropdown = document.getElementById('individualBonusesDropdown');
+                    const displayBonusDropdown = document.getElementById('displayBonusDropdown');
+                    console.log('Individual Bonuses Dropdown:', individualBonusesDropdown);
+                    console.log('Individual Bonuses:', individualBonuses);
+                    individualBonusesDropdown.innerHTML = ''; // Remove existing options
+                    displayBonusDropdown.innerHTML = ''; // Remove existing options
+
+                    individualBonuses.forEach(individualBonus => {
+                        const option = document.createElement('option');
+                        option.value = individualBonus._id;
+                        option.innerText = individualBonus.name;
+                        if (selectedIndividualBonuses.includes(individualBonus._id)) {
+                            option.selected = true; // Select the option if it is in the selected individualBonuses
+                        }
+                        individualBonusesDropdown.appendChild(option);
+
+                        // Add the same option to the displayBonusDropdown
+                        const displayOption = document.createElement('option');
+                        displayOption.value = individualBonus._id;
+                        displayOption.innerText = individualBonus.name;
+                        if (selectedDisplayBonus.includes(individualBonus._id)) {
+                            displayOption.selected = true; // Select the option if it is in the selected individualBonuses
+                        }
+                        displayBonusDropdown.appendChild(displayOption);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching individual bonuses:', error);
+                });
+        }
+
+
+
+
         function saveCasino(casinoId) {
 
             //#region Get the updated casino data from the form
@@ -434,8 +480,8 @@
             const label = document.querySelector('input[name="label"]').value;
             const labelLarge = document.querySelector('input[name="labelLarge"]').value;
 
-            // const boniSelect = document.querySelector('select[name="boni"]').value;
-            // const boni = Array.from(boniSelect.selectedOptions).map(option => option.value);
+            const individualBonusesSelect = document.querySelector('select[name="individualBonuses"]');
+            const individualBonuses = Array.from(individualBonusesSelect.selectedOptions).map(option => option.value);
 
             const displayBonus = document.querySelector('select[name="displayBonus"]').value;
 
@@ -483,7 +529,7 @@
                 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
                 review, 'image:', image, 'affiliateUrl:', affiliateUrl, 'AffiliateShortlink:', affiliateShortlink,
-                'IndividualFeatures:', individualFeatures);
+                'IndividualFeatures:', individualFeatures, 'IndividualBonuses:', individualBonuses);
 
 
             // Send a PUT request to the API with the updated casino data
@@ -513,7 +559,8 @@
                         review,
                         image,
                         affiliateUrl,
-                        affiliateShortlink
+                        affiliateShortlink,
+                        individualBonuses,
                     }),
                     headers: {
                         'Content-Type': 'application/json'
@@ -771,11 +818,11 @@
                 });
         }
 
-    function showEditableIndividualFeatures(casinoId) {
-        // Create a Fomantic UI modal to display the editable individual features table
-        const modal = document.createElement('div');
-        modal.classList.add('ui', 'modal');
-        modal.innerHTML = `
+        function showEditableIndividualFeatures(casinoId) {
+            // Create a Fomantic UI modal to display the editable individual features table
+            const modal = document.createElement('div');
+            modal.classList.add('ui', 'modal');
+            modal.innerHTML = `
             <div class="header">Individual Features</div>
             <div class="content">
                 <table class="ui celled table">
@@ -793,16 +840,16 @@
                 <div class="ui button">Close</div>
             </div>
         `;
-        document.body.appendChild(modal);
-        $(modal).modal('show');
+            document.body.appendChild(modal);
+            $(modal).modal('show');
 
 
-        // Fetch individual features for the specific casino
-        fetch(`/api/casinos/${casinoId}/individualfeatures`)
-            .then(response => response.json())
-            .then(features => {
-                const tbody = modal.querySelector('tbody');
-                tbody.innerHTML = features.map(feature => `
+            // Fetch individual features for the specific casino
+            fetch(`/api/casinos/${casinoId}/individualfeatures`)
+                .then(response => response.json())
+                .then(features => {
+                    const tbody = modal.querySelector('tbody');
+                    tbody.innerHTML = features.map(feature => `
                     <tr data-feature-id="${feature._id}">
                         <td contenteditable="true">${feature.name}</td>
                         <td contenteditable="true">${feature.description}</td>
@@ -813,71 +860,307 @@
                     </tr>
                 `).join('');
 
-                // Add event listeners to save buttons
-                const saveButtons = modal.querySelectorAll('.save-button');
-                saveButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const tr = button.closest('tr');
-                        const featureId = tr.dataset.featureId;
-                        const name = tr.querySelector('td:nth-child(1)').textContent;
-                        const description = tr.querySelector('td:nth-child(2)').textContent;
+                    // Add event listeners to save buttons
+                    const saveButtons = modal.querySelectorAll('.save-button');
+                    saveButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const tr = button.closest('tr');
+                            const featureId = tr.dataset.featureId;
+                            const name = tr.querySelector('td:nth-child(1)').textContent;
+                            const description = tr.querySelector('td:nth-child(2)').textContent;
 
-                        // Send a PUT request to update the individual feature
-                        fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
-                            method: 'PUT',
-                            body: JSON.stringify({
-                                name: name,
-                                description: description
-                            }),
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Individual feature updated:', result);
-                            location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Error updating individual feature:', error);
+                            // Send a PUT request to update the individual feature
+                            fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                                    method: 'PUT',
+                                    body: JSON.stringify({
+                                        name: name,
+                                        description: description
+                                    }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log('Individual feature updated:', result);
+                                    location.reload();
+                                })
+                                .catch(error => {
+                                    console.error('Error updating individual feature:', error);
+                                });
                         });
                     });
-                });
 
-                // Add event listeners to delete buttons
-                const deleteButtons = modal.querySelectorAll('.delete-button');
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const tr = button.closest('tr');
-                        const featureId = tr.dataset.featureId;
+                    // Add event listeners to delete buttons
+                    const deleteButtons = modal.querySelectorAll('.delete-button');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const tr = button.closest('tr');
+                            const featureId = tr.dataset.featureId;
 
-                        // Send a DELETE request to delete the individual feature
-                        fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Individual feature deleted:', result);
-                            tr.remove();
-                        })
-                        .catch(error => {
-                            console.error('Error deleting individual feature:', error);
+                            // Send a DELETE request to delete the individual feature
+                            fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log('Individual feature deleted:', result);
+                                    tr.remove();
+                                })
+                                .catch(error => {
+                                    console.error('Error deleting individual feature:', error);
+                                });
                         });
                     });
+                })
+                .catch(error => {
+                    console.error('Error fetching individual features:', error);
                 });
+        }
+
+        // Function to create a Fomantic UI modal with a form to add an individual feature to a casino
+        function createAddIndividualCasinoFeatureModal(casinoId) {
+            // Create the modal element
+            var modal = $('<div>').addClass('ui modal');
+
+            // Create the modal content
+            var content = $('<div>').addClass('content');
+            var form = $('<form>').addClass('ui form');
+            var featureInput = $('<div>').addClass('field');
+            var featureLabel = $('<label>').text('Feature');
+            var featureInputField = $('<input>').attr('type', 'text').attr('placeholder', 'Enter feature');
+            featureInput.append(featureLabel, featureInputField);
+            form.append(featureInput);
+            content.append(form);
+
+            // Create the modal actions
+            var actions = $('<div>').addClass('actions');
+            var cancelButton = $('<button>').addClass('ui button').text('Cancel');
+            var addButton = $('<button>').addClass('ui primary button').text('Add');
+            actions.append(cancelButton, addButton);
+
+            // Append the content and actions to the modal
+            modal.append(content, actions);
+
+            // Initialize the modal
+            modal.modal();
+
+            // Event listener for cancel button
+            cancelButton.on('click', function () {
+                modal.modal('hide');
+            });
+
+            // Event listener for add button
+            addButton.on('click', function () {
+                var featureName = featureInputField.val();
+                addIndividualCasinoFeature(casinoId, featureName);
+
+                modal.modal('hide');
+            });
+
+            // Show the modal
+            modal.modal('show');
+        }
+
+        // Function to add an individual feature to a casino
+        function addIndividualCasinoFeature(casinoId, featureName) {
+            $.ajax({
+                url: '/api/casinos/' + casinoId + '/individualfeatures',
+                method: 'POST',
+                data: {
+                    name: featureName
+                },
+                success: function (data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Feature added successfully');
+                    $('.ui.modal.edit').modal('show');
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                    showToast('error', 'Error adding feature');
+                    $('.ui.modal.edit').modal('show');
+                    document.querySelector('.ui.modal').scrollTop = 0;
+                }
+            });
+        }
+
+        function showEditableIndividualBonuses(casinoId) {
+            // Create a Fomantic UI modal to display the editable individual bonuses table
+            const modal = document.createElement('div');
+            modal.classList.add('ui', 'modal');
+            modal.innerHTML = `
+            <div class="header">Individual Bonuses</div>
+            <div class="content">
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <div class="ui button">Close</div>
+            </div>
+        `;
+            document.body.appendChild(modal);
+            $(modal).modal('show');
+
+
+            // Fetch individual bonuses for the specific casino
+            fetch(`/api/casinos/${casinoId}/individualbonuses`)
+                .then(response => response.json())
+                .then(bonuses => {
+                    const tbody = modal.querySelector('tbody');
+                    tbody.innerHTML = bonuses.map(bonus => `
+                    <tr data-bonus-id="${bonus._id}">
+                        <td contenteditable="true">${bonus.name}</td>
+                        <td contenteditable="true">${bonus.description}</td>
+                        <td>
+                            <button class="ui primary button save-button">Save</button>
+                            <button class="ui red button delete-button">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                    // Add event listeners to save buttons
+                    const saveButtons = modal.querySelectorAll('.save-button');
+                    saveButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const tr = button.closest('tr');
+                            const bonusId = tr.dataset.bonusId;
+                            const name = tr.querySelector('td:nth-child(1)').textContent;
+                            const description = tr.querySelector('td:nth-child(2)').textContent;
+
+                            // Send a PUT request to update the individual bonus
+                            fetch(`/api/casinos/${casinoId}/individualbonuses/${bonusId}`, {
+                                    method: 'PUT',
+                                    body: JSON.stringify({
+                                        name: name,
+                                        description: description
+                                    }),
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log('Individual bonus updated:', result);
+                                    location.reload();
+                                })
+                                .catch(error => {
+                                    console.error('Error updating individual bonus:', error);
+                                });
+                        });
+                    });
+
+                    // Add event listeners to delete buttons
+                    const deleteButtons = modal.querySelectorAll('.delete-button');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const tr = button.closest('tr');
+                            const bonusId = tr.dataset.bonusId;
+
+                            // Send a DELETE request to delete the individual bonus
+                            fetch(`/api/casinos/${casinoId}/individualbonuses/${bonusId}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log('Individual bonus deleted:', result);
+                                    tr.remove();
+                                })
+                                .catch(error => {
+                                    console.error('Error deleting individual bonus:', error);
+                                });
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching individual bonuses:', error);
+                });
+        }
+
+        // Function to create a Fomantic UI modal with a form to add an individual bonus to a casino
+        function createAddIndividualCasinoBonusModal(casinoId) {
+            // Create the modal element
+            var modal = $('<div>').addClass('ui modal');
+
+            // Create the modal content
+            var content = $('<div>').addClass('content');
+            var form = $('<form>').addClass('ui form');
+            var bonusInput = $('<div>').addClass('field');
+            var bonusLabel = $('<label>').text('Bonus');
+            var bonusInputField = $('<input>').attr('type', 'text').attr('placeholder', 'Enter bonus');
+            bonusInput.append(bonusLabel, bonusInputField);
+            form.append(bonusInput);
+            content.append(form);
+
+            // Create the modal actions
+            var actions = $('<div>').addClass('actions');
+            var cancelButton = $('<button>').addClass('ui button').text('Cancel');
+            var addButton = $('<button>').addClass('ui primary button').text('Add');
+            actions.append(cancelButton, addButton);
+
+            // Append the content and actions to the modal
+            modal.append(content, actions);
+
+            // Initialize the modal
+            modal.modal();
+
+            // Event listener for cancel button
+            cancelButton.on('click', function () {
+                modal.modal('hide');
+            });
+
+            // Event listener for add button
+            addButton.on('click', function () {
+                var bonusName = bonusInputField.val();
+                addIndividualCasinoBonus(casinoId, bonusName);
+
+                modal.modal('hide');
+            });
+
+            // Show the modal
+            modal.modal('show');
+        }
+
+        // Function to add an individual bonus to a casino
+        function addIndividualCasinoBonus(casinoId, bonusName) {
+            fetch(`/api/casinos/${casinoId}/individualbonuses`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: bonusName
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                showToast('success', 'Bonus added successfully');
+                $('.ui.modal.edit').modal('show');
             })
             .catch(error => {
-                console.error('Error fetching individual features:', error);
+                console.log('Error:', error);
+                showToast('error', 'Error adding bonus');
+                $('.ui.modal.edit').modal('show');
+                document.querySelector('.ui.modal').scrollTop = 0;
             });
-    }
+        }
 
-    
-
-    fetchCasinos();
-</script>
+        fetchCasinos();
+    </script>
 </body>
 
 </html>
