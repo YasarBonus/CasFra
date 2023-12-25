@@ -115,13 +115,13 @@
                                     </select>
                                 </div>
                                 <div class="field">
-                                    <label>Licenses (<a href="casinos/licenses">manage</a>)</label>
-                                    <select name="licenses" multiple class="ui fluid search dropdown" id="licensesDropdown">
-                                    </select>
-                                </div>
-                                <div class="field">
                                     <label>Payment Methods (<a href="casinos/paymentmethods">manage</a>)</label>
                                     <select name="paymentMethods" multiple class="ui fluid search dropdown" id="paymentMethodsDropdown">
+                                    </select>
+                                </div>
+                                <div class="two wide field">
+                                    <label>Licenses (<a href="casinos/licenses">manage</a>)</label>
+                                    <select name="licenses" multiple class="ui fluid search dropdown" id="licensesDropdown">
                                     </select>
                                 </div>
                             </div>
@@ -611,9 +611,6 @@
                     showToast('error', 'Error updating casino', error);
                 });
         }
-
-
-
 
         function openAddModal() {
             const modal = document.createElement('div');
