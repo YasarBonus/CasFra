@@ -163,8 +163,14 @@ const userSchema = new mongoose.Schema({
 
 // Define UserGroup schema
 const userGroupSchema = new mongoose.Schema({
-  name: String,
-  permissions: [String],
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  permissions: {
+    type: [String]
+  },
   priority: {
     type: Number,
     default: generateRandomPriority()
