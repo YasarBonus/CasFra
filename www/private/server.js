@@ -110,19 +110,42 @@ const tenanciesSchema = new mongoose.Schema({
 
 // Define User schema
 const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-  groupId: String,
-  email: String,
-  language: String,
-  nickname: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 10,
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8
+  },
+  groupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserGroup'
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /.+\@.+\..+/
+  },  language: String,
+  nickname: {
+    type: String,
+    default: '',
+    maxlength: 20
+  },
   priority: {
     type: Number,
     default: generateRandomPriority()
   },
   active: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true
   },
   banned: {
     type: Boolean,
