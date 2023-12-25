@@ -2262,19 +2262,20 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
     id
   } = req.params;
 
-  ShortLinksHits.find({
-      id: id
+  ShortLinksStatistics.find({
+      shortLink: id
     })
     .then((results) => {
       res.json(results);
     })
     .catch((error) => {
-      console.error('Error retrieving short link hits:', error);
+      console.error('Error retrieving short link statistics:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
     });
 } );
+
 
 
 // Delete short link from MongoDB
