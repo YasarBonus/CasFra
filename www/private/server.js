@@ -266,7 +266,8 @@ const casinoSchema = new mongoose.Schema({
   },
   addedDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   addedBy: String,
   modifiedDate: Date,
