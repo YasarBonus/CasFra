@@ -110,19 +110,42 @@ const tenanciesSchema = new mongoose.Schema({
 
 // Define User schema
 const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-  groupId: String,
-  email: String,
-  language: String,
-  nickname: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 10,
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8
+  },
+  groupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserGroup'
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /.+\@.+\..+/
+  },  language: String,
+  nickname: {
+    type: String,
+    default: '',
+    maxlength: 20
+  },
   priority: {
     type: Number,
     default: generateRandomPriority()
   },
   active: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true
   },
   banned: {
     type: Boolean,
@@ -140,8 +163,14 @@ const userSchema = new mongoose.Schema({
 
 // Define UserGroup schema
 const userGroupSchema = new mongoose.Schema({
-  name: String,
-  permissions: [String],
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  permissions: {
+    type: [String]
+  },
   priority: {
     type: Number,
     default: generateRandomPriority()
@@ -150,14 +179,20 @@ const userGroupSchema = new mongoose.Schema({
 
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
-  regkey: String,
+  regkey: { 
+    type: String,
+    required: true,
+    unique: true
+  },
   created: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   used: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true
   },
   usedDate: Date,
   userId: String,
@@ -231,7 +266,8 @@ const casinoSchema = new mongoose.Schema({
   },
   addedDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   addedBy: String,
   modifiedDate: Date,
@@ -4028,17 +4064,6 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
 });
 
 //#endregion Casinos
-
-
-
-// Middleware to check if the user is logged in
-function checkLoggedIn(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect('/login');
-  }
-}
 
 // Middleware to check if the user is logged in and has the required permission
 function checkPermissions(requiredPermission) {
