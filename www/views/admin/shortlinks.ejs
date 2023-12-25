@@ -10,6 +10,25 @@
                 <div class="ui segment">
                 <div class="ui container">
                     <h2>ShortLinks</h2>
+                    <div class="ui segment">
+                        <div class="ui form">
+                            <div class="three fields">
+                            <div class="field">
+                                <label>ShortUrl</label>
+                                <input type="text" id="shortUrlInput" placeholder="ShortUrl">
+                            </div>
+                            <div class="field">
+                                <label>Url</label>
+                                <input type="text" id="urlInput" placeholder="Url">
+                            </div>
+                            <div class="field">
+                                <label>Description</label>
+                                <input type="text" id="descriptionInput" placeholder="Description">
+                            </div>
+                        </div>
+                            <div class="ui green button" id="addLinkBtn">Add Link</div>
+                        </div>
+                    </div>
                     <table id="shortlinksTable" class="ui celled table">
                         <thead>
                             <tr>
@@ -95,7 +114,42 @@
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
         });
+    } 
+
+    // Event listener for add link button
+    $('#addLinkBtn').on('click', function() {
+        var shortUrl = $('#shortUrlInput').val();
+        var url = $('#urlInput').val();
+        var description = $('#descriptionInput').val();
+
+        addLink(shortUrl, url, description);
+    });
+
+    // Function to add a link
+    function addLink(shortUrl, url, description) {
+        $.ajax({
+            url: '/api/shortlinks',
+            method: 'POST',
+            data: {
+                shortUrl: shortUrl,
+                url: url,
+                description: description
+            },
+            success: function(data) {
+                console.log('Success:', data);
+                showToast('success', 'Link added successfully');
+                loadInitialData();
+            },
+            error: function(error) {
+                console.log('Error:', error);
+                showToast('error', 'Error adding link');
+                loadInitialData();
+                document.querySelector('.ui.modal').scrollTop = 0;
+            }
+        });
     }
+
+
 
     loadInitialData();
 
