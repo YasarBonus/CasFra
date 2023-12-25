@@ -4485,6 +4485,20 @@ app.get('/dashboard/casinos/providers', checkPermissions('manageCasinos'), (req,
   }
 });
 
+app.get('/dashboard/casinos/licenses', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed licenses');
+    const user = req.session.user;
+
+    res.render('admin/casinos_licenses', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get('/dashboard/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed paymentmethods');
