@@ -3420,6 +3420,197 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
 
 //#endregion Casino Providers
 
+//#region Casino Licenses
+
+// Get all casino licenses from MongoDB
+app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoLicenses.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino licenses:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get details of a specific casino license
+app.get('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoLicenses.findById(id)
+    .then((casinoLicenses) => {
+      if (!casinoLicenses) {
+        return res.status(404).json({
+          error: 'Casino license not found'
+        });
+      }
+
+      res.json(casinoLicenses);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino license:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Insert casino license into MongoDB
+app.post('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoLicenses = new CasinoLicenses({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoLicenses.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino license:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Duplicate casino license
+app.post('/api/casinos/licenses/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoLicenses.findOne({
+      _id: id
+    })
+    .then((casinoLicenses) => {
+      if (!casinoLicenses) {
+        throw new Error('Casino license not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoLicenses = new CasinoLicenses({
+          addedBy: userId,
+          name: casinoLicenses.name + ' (Copy)',
+          description: casinoLicenses.description,
+          image: casinoLicenses.image,
+          priority: newPriority,
+          active: casinoLicenses.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoLicenses.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino license:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error duplicating casino license:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit casino license
+app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoLicenses.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoLicenses) => {
+      if (!updatedCasinoLicenses) {
+        throw new Error('Casino license not found');
+      }
+      res.json(updatedCasinoLicenses);
+      console.log('Casino license updated: ' + updatedCasinoLicenses.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino license:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete casino license
+app.delete('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoLicenses.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoLicense) => {
+      if (!deletedCasinoLicense) {
+        throw new Error('Casino license not found');
+      }
+      res.json(deletedCasinoLicense);
+      console.log('Casino license deleted: ' + deletedCasinoLicense.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino license:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+//#endregion Casino Licenses
+
 //#region Casino Payment Methods
 
 // Get all casino payment methods from MongoDB
@@ -3610,8 +3801,6 @@ app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'),
 });
 
 //#endregion Casino Payment Methods
-
-
 
 //#region Casinos
 // Get all casinos from MongoDB
