@@ -179,14 +179,20 @@ const userGroupSchema = new mongoose.Schema({
 
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
-  regkey: String,
+  regkey: { 
+    type: String,
+    required: true,
+    unique: true
+  },
   created: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   used: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true
   },
   usedDate: Date,
   userId: String,
