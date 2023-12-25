@@ -246,7 +246,7 @@ const casinoSchema = new mongoose.Schema({
   },
   label: String,
   labelLarge: String,
-  boni: [String],
+  individualBonuses: [String],
   displayBonus: String,
   maxBet: Number,
   maxCashout: Number,
@@ -2975,7 +2975,6 @@ app.delete('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('mana
 
 //#endregion Casino Individual Bonuses
 
-
 //#region Casino WagerTypes,
 
 // Get all casino wager types from MongoDB
@@ -3593,7 +3592,7 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), (req, 
           isNew: casino.isNew,
           label: casino.label,
           labelLarge: casino.labelLarge,
-          boni: casino.boni,
+          individualBonuses: casino.individualBonuses,
           displayBonus: casino.displayBonus,
           maxBet: casino.maxBet,
           maxCashout: casino.maxCashout,
@@ -3703,7 +3702,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     isNew,
     label,
     labelLarge,
-    boni,
+    individualBonuses,
     displayBonus,
     maxBet,
     maxCashout,
@@ -3734,7 +3733,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
       isNew,
       label,
       labelLarge,
-      boni,
+      individualBonuses,
       displayBonus,
       maxBet,
       maxCashout,
@@ -3945,8 +3944,8 @@ app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, 
     });
 });
 
-// Get boni of a specific casino by ID
-app.get('/api/casinos/:id/boni', checkPermissions('manageCasinos'), (req, res) => {
+// Get individualbonus of a specific casino by ID
+app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
   const {
     id
   } = req.params; // Get the ID from the request params
@@ -3954,10 +3953,10 @@ app.get('/api/casinos/:id/boni', checkPermissions('manageCasinos'), (req, res) =
       _id: id
     })
     .then((result) => {
-      res.json(result.boni);
+      res.json(result.individualBonuses);
     })
     .catch((error) => {
-      console.error('Error retrieving casino boni:', error);
+      console.error('Error retrieving casino individualbonuses:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
