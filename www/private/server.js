@@ -3971,7 +3971,8 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     reviewTitle,
     image,
     affiliateUrl,
-    affiliateShortlink
+    affiliateShortlink,
+    licenses
   } = req.body; // Get the updated values from the request body
   console.log("Updating Casino:", req.body);
   Casino.findOneAndUpdate({
@@ -4002,7 +4003,8 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
       reviewTitle,
       image,
       affiliateUrl,
-      affiliateShortlink
+      affiliateShortlink,
+      licenses
     }, {
       modifiedBy: userId,
       modifiedDate: Date.now()
