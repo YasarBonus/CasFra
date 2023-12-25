@@ -4233,11 +4233,9 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
     const user = req.session.user;
     const id = req.params.id;
 
-    const shortLink = ShortLinks.findOne({ id });
-
     res.render('admin/shortlinks_statistics', {
       user: user,
-      shortLink: shortLink
+      shortLink: id
     });
   } catch (err) {
     next(err);
