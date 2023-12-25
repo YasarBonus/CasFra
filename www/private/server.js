@@ -4227,6 +4227,23 @@ app.get('/dashboard/shortlinks/hits', checkPermissions('manageShortLinks'), (req
   }
 } );
 
+app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+    const id = req.params.id;
+
+    const shortLink = ShortLinks.findOne({ id });
+
+    res.render('admin/shortlinks_statistics', {
+      user: user,
+      shortLink: shortLink
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 
 //#endregion Routes
 
