@@ -95,71 +95,9 @@ showActionButton('logoutButton', 'logout');
 -->
 <% if (user) { %>
 <script>
-  // Function to create a Fomantic UI modal with a form to add an individual feature to a casino
-  function createAddIndividualCasinoFeatureModal(casinoId) {
-      // Create the modal element
-      var modal = $('<div>').addClass('ui modal');
+  
 
-      // Create the modal content
-      var content = $('<div>').addClass('content');
-      var form = $('<form>').addClass('ui form');
-      var featureInput = $('<div>').addClass('field');
-      var featureLabel = $('<label>').text('Feature');
-      var featureInputField = $('<input>').attr('type', 'text').attr('placeholder', 'Enter feature');
-      featureInput.append(featureLabel, featureInputField);
-      form.append(featureInput);
-      content.append(form);
 
-      // Create the modal actions
-      var actions = $('<div>').addClass('actions');
-      var cancelButton = $('<button>').addClass('ui button').text('Cancel');
-      var addButton = $('<button>').addClass('ui primary button').text('Add');
-      actions.append(cancelButton, addButton);
-
-      // Append the content and actions to the modal
-      modal.append(content, actions);
-
-      // Initialize the modal
-      modal.modal();
-
-      // Event listener for cancel button
-      cancelButton.on('click', function () {
-          modal.modal('hide');
-      });
-
-      // Event listener for add button
-      addButton.on('click', function () {
-          var featureName = featureInputField.val();
-          addIndividualCasinoFeature(casinoId, featureName);
-
-          modal.modal('hide');
-      });
-
-      // Show the modal
-      modal.modal('show');
-  }
-
-  // Function to add an individual feature to a casino
-  function addIndividualCasinoFeature(casinoId, featureName) {
-      $.ajax({
-          url: '/api/casinos/' + casinoId + '/individualfeatures',
-          method: 'POST',
-          data: {
-              name: featureName
-          },
-          success: function (data) {
-              console.log('Success:', data);
-              showToast('success', 'Feature added successfully');
-              $('.ui.modal.edit').modal('show');
-          },
-          error: function (error) {
-              console.log('Error:', error);
-              showToast('error', 'Error adding feature');
-              $('.ui.modal.edit').modal('show');
-              document.querySelector('.ui.modal').scrollTop = 0;
-          }
-      });
-  }
 </script>
 <% } %>
 
