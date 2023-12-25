@@ -198,11 +198,11 @@
                                 <div class="two fields">
                                 <div class="four wide field">
                                     <label>Shortlink</label>
-                                    <input type="text" name="affiliateShortlink" placeholder="Enter the casino image URL" value="${casino.image}">
+                                    <input type="text" name="affiliateShortlink" placeholder="Enter the casino image URL" value="${casino.affiliateShortlink}">
                                 </div>
                                 <div class="twelve wide field">
                                     <label>Affiliate Link</label>
-                                    <input type="text" name="affiliateLink" placeholder="Enter the casino background URL" value="${casino.affiliateLink}">
+                                    <input type="text" name="affiliateUrl" placeholder="Enter the casino background URL" value="${casino.affiliateUrl}">
                                 </div>
                             </div>
                             </div>
@@ -469,7 +469,7 @@
             const imageDropdown = document.querySelector('select[name="image"]');
             const image = imageDropdown.value;
 
-            const affiliateLink = document.querySelector('input[name="affiliateLink"]').value;
+            const affiliateUrl = document.querySelector('input[name="affiliateUrl"]').value;
 
             const affiliateShortlink = document.querySelector('input[name="affiliateShortlink"]').value;
             //#endregion
@@ -482,7 +482,7 @@
                 maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit,
                 'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
-                review, 'image:', image, 'AffiliateLink:', affiliateLink, 'AffiliateShortlink:', affiliateShortlink,
+                review, 'image:', image, 'affiliateUrl:', affiliateUrl, 'AffiliateShortlink:', affiliateShortlink,
                 'IndividualFeatures:', individualFeatures);
 
 
@@ -512,7 +512,7 @@
                         reviewTitle,
                         review,
                         image,
-                        affiliateLink,
+                        affiliateUrl,
                         affiliateShortlink
                     }),
                     headers: {

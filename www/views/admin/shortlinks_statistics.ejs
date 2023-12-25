@@ -1,0 +1,32 @@
+<!-- sessions.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                <div class="ui container">
+                    <h2>Statistics for ShortLink <%= shortLink %></h2>
+                    <div class="ui divider"></div>
+                    <div id="statistics"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script>
+    fetch('/api/shortlinks/<%= shortLink %>/statistics')
+        .then(response => response.json())
+        .then(data => {
+            // Format and display the data
+            const statisticsDiv = document.getElementById('statistics');
+            statisticsDiv.innerHTML = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+</script>

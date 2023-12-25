@@ -41,7 +41,6 @@ const sendPasswordResetEmail = (email, resetToken) => {
 
 // Use the sendPasswordResetEmail function
 
-
 const app = express();
 const port = 3000;
 
@@ -80,6 +79,17 @@ function generateRandomPriority() {
 const languageSchema = new mongoose.Schema({
   name: String,
   code: String
+});
+
+const SessionSchema = new mongoose.Schema({
+  userId: String,
+  username: String,
+  ip: String,
+  userAgent: String,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const tenanciesSchema = new mongoose.Schema({
@@ -156,12 +166,6 @@ const registrationKeySchema = new mongoose.Schema({
     type: Number,
     default: generateRandomPriority()
   }
-});
-
-// Define LinkHit schema
-const linkHitSchema = new mongoose.Schema({
-  name: String,
-  timestamp: Date
 });
 
 const imagesSchema = new mongoose.Schema({
@@ -268,8 +272,8 @@ const casinoSchema = new mongoose.Schema({
   review: String,
   image: String,
   imageUrl: String,
-  affiliateLink: String,
-  affiliateShirtlink: String
+  affiliateUrl: String,
+  affiliateShortlink: String
 });
 
 // Define Casino Review schema
@@ -461,12 +465,53 @@ const casinoCategoriesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+// Define shortLinks Schema
+const shortLinksSchema = new mongoose.Schema({
+  url: String,
+  shortUrl: String,
+  description: String,
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  attachedTo: String,
+});
 
-const SessionSchema = new mongoose.Schema({
-  userId: String,
-  username: String,
+// Define shortLinksHits Schema
+const shortLinksHitsSchema = new mongoose.Schema({
+  shortLink: String,
   ip: String,
   userAgent: String,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Define shortLinksStatistics Schema
+const shortLinksStatisticsSchema = new mongoose.Schema({
+  shortLink: String,
+  hits: Number,
+  uniqueHits: Number,
+  hits1h: Number,
+  hits3h: Number,
+  hits6h: Number,
+  hits12h: Number,
+  hits24h: Number,
+  hits7d: Number,
+  hits30d: Number,
+  hits12m: Number,
   timestamp: {
     type: Date,
     default: Date.now
@@ -480,7 +525,6 @@ const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
-const LinkHit = mongoose.model('LinkHit', linkHitSchema);
 const Images = mongoose.model('Images', imagesSchema);
 const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 const Casino = mongoose.model('Casino', casinoSchema);
@@ -492,6 +536,9 @@ const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymen
 const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
 const CasinoBoni = mongoose.model('CasinoBoni', casinoBoniSchema);
 const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
+const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
+const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
+const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
 
 
 const languageEntries = [{
@@ -553,7 +600,7 @@ const registrationKeyEntries = [{
 
 const userAdminGroup = new UserGroup({
   name: 'Admin',
-  permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageCasinos',
+  permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageShortLinks', 'manageCasinos',
     'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
     'manageSessions', 'manageImages', 'manageImagesCategories'
   ]
@@ -1996,6 +2043,266 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 //#endregion Images
 
+//#region ShortLinks
+
+// Get all short links from MongoDB
+app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  ShortLinks.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short links:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get short link by ID from MongoDB
+app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinks.findById(id)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({
+          error: 'Short link not found'
+        });
+        return;
+      }
+
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Add short link to MongoDB
+app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  if (!shortUrl) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  if (!url) {
+    res.status(400).json({
+      error: 'URL is required'
+    });
+    return;
+  }
+
+  const shortLink = new ShortLinks({
+    description,
+    url,
+    shortUrl,
+    addedBy: userId,
+    addedDate: Date.now()
+  });
+
+  shortLink.save()
+    .then(() => {
+      res.status(201).json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error inserting short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit multiple short links in MongoDB
+app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    shortLinks
+  } = req.body;
+
+  if (!shortLinks) {
+    res.status(400).json({
+      error: 'Short links are required'
+    });
+    return;
+  }
+
+  shortLinks.forEach((shortLink) => {
+    ShortLinks.findByIdAndUpdate(shortLink._id, {
+        description: shortLink.description,
+        url: shortLink.url,
+        shortUrl: shortLink.shortUrl,
+        modifiedBy: userId,
+        modifiedDate: Date.now()
+      })
+      .then(() => {
+        res.json({
+          success: true
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating short link:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  });
+} );
+
+// Edit short link in MongoDB
+app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  
+  if (!shortUrl) {
+    res.status(400).json({
+      error: 'shortUrl is required'
+    });
+    return;
+  }
+  
+  if (!url) {
+    res.status(400).json({
+      error: 'URL is required'
+    });
+    return;
+  } 
+  
+  ShortLinks.findByIdAndUpdate(id, {
+      description,
+      url,
+      shortUrl,
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error updating short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+
+} );
+
+// Get all short link hits from MongoDB
+// This table contains all hits of all short links and this is a very large table.
+// Therefore, it is not recommended to use this endpoint.
+// Instead, use the endpoint below to get the hits of a specific short link.
+
+app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  ShortLinksHits.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link hits:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Get short link hits by short link ID from MongoDB
+app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinksHits.find({
+      id: id
+    })
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link hits:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Get short link statistics by short link ID from MongoDB
+app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinksStatistics.find({
+      shortLink: id
+    })
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving short link statistics:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete short link from MongoDB
+app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  ShortLinks.findByIdAndDelete(id)
+    .then((result) => {
+      if (!result) {
+        throw new Error('Short link not found');
+      }
+      res.json({
+        success: true
+      });
+      console.log('Short link deleted');
+    })
+    .catch((error) => {
+      console.error('Error deleting short link:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    }
+  );
+} );
+
+//#endregion ShortLinks
+
 //#region Casino Categories
 
 // Get all casino categories from MongoDB
@@ -3333,8 +3640,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     affiliateUrl,
     affiliateShortlink
   } = req.body; // Get the updated values from the request body
-  console.log(req.body);
-  console.log(active);
+  console.log("Updating Casino:", req.body);
   Casino.findOneAndUpdate({
       _id: id
     }, {
@@ -3377,6 +3683,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
 
       // Call setCasinoImageUrl(ID) function here
       setCasinoImageUrl(updatedCasino._id);
+      createShortLinks(updatedCasino._id);
     })
     .catch((error) => {
       console.error('Error updating casino:', error);
@@ -3894,6 +4201,47 @@ app.get('/dashboard/images', checkPermissions('manageImages'), (req, res, next) 
   }
 });
 
+app.get('/dashboard/shortlinks', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+
+    res.render('admin/shortlinks', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+
+    res.render('admin/shortlinks_hits', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') shortlinks');
+    const user = req.session.user;
+    const id = req.params.id;
+
+    res.render('admin/shortlinks_statistics', {
+      user: user,
+      shortLink: id
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 
 //#endregion Routes
 
@@ -3972,6 +4320,187 @@ async function setImageUrl(id = null) {
   }
 }
 
+async function createShortLinks(casinoId = null) {
+  try {
+    let casinos;
+    if (casinoId) {
+      casinos = await Casino.findOne({ _id: casinoId });
+      casinos = [casinos]; // Convert single object to array
+    } else {
+      casinos = await Casino.find();
+    }
+    for (const casino of casinos) {
+      if (casino.affiliateUrl && casino.affiliateShortlink) {
+        const existingShortLink = await ShortLinks.findOne({ attachedTo: casino._id });
+        if (existingShortLink) {
+          existingShortLink.url = casino.affiliateUrl;
+          existingShortLink.shortUrl = casino.affiliateShortlink;
+          existingShortLink.modifiedBy = casino.modifiedBy;
+          existingShortLink.modifiedDate = casino.modifiedDate;
+          await existingShortLink.save();
+          console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
+        } else {
+          const shortLink = await ShortLinks.create({
+            url: casino.affiliateUrl,
+            shortUrl: casino.affiliateShortlink,
+            addedBy: casino.addedBy,
+            addedDate: casino.addedDate,
+            modifiedBy: casino.modifiedBy,
+            modifiedDate: casino.modifiedDate,
+            attachedTo: casino._id,
+          });
+          console.log('ShortLink created for casino ' + casino.name + ' (' + shortLink._id + ')');
+        }
+      }
+    }
+
+    // Delete ShortLinks where the attachedTo object no longer exists
+    const attachedToIds = casinos.map(casino => casino._id);
+    if (attachedToIds.length > 0) {
+      await ShortLinks.deleteMany({ attachedTo: { $nin: attachedToIds } });
+      console.log('Deleted ShortLinks with missing attachedTo objects');
+    }
+  } catch (error) {
+    console.error('Error creating/updating ShortLinks:', error);
+  }
+}
+
+// Function to update the statistics of short links
+// The list of short links is retrieved from the database
+// The number of hits for each short link is counted from the shortLinksHits table
+// The statistics are then updated in the shortLinksStatistics table
+
+async function updateShortLinksStatistics() {
+  try {
+    // Get all short links from the database
+    const shortLinks = await ShortLinks.find();
+
+    // Loop through all short links
+    for (const shortLink of shortLinks) {
+      // Get the number of hits for the short link
+      const shortLinkHits = await ShortLinksHits.countDocuments({ shortLink: shortLink._id });
+
+      // Get the number of hits in the past 1 hour
+      const shortLinkHits1h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 3 hours
+      const shortLinkHits3h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 3 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 6 hours
+      const shortLinkHits6h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 6 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 12 hours
+      const shortLinkHits12h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 12 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 24 hours
+      const shortLinkHits24h = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 7 days
+      const shortLinkHits7d = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 30 days
+      const shortLinkHits30d = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Get the number of hits in the past 12 months
+      const shortLinkHits12m = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id,
+        timestamp: {
+          $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Update the short link object with the new statistics
+      shortLink.hits = shortLinkHits;
+      shortLink.hits1h = shortLinkHits1h;
+      shortLink.hits3h = shortLinkHits3h;
+      shortLink.hits6h = shortLinkHits6h;
+      shortLink.hits12h = shortLinkHits12h;
+      shortLink.hits24h = shortLinkHits24h;
+      shortLink.hits7d = shortLinkHits7d;
+      shortLink.hits30d = shortLinkHits30d;
+      shortLink.hits12m = shortLinkHits12m;
+      
+      // Check if the short link statistics object already exists
+      const shortLinkStatistics = await ShortLinksStatistics.findOne({ shortLink: shortLink._id });
+
+      if (shortLinkStatistics) {
+        // Update the existing short link statistics object
+        shortLinkStatistics.hits = shortLinkHits;
+        shortLinkStatistics.hits1h = shortLinkHits1h;
+        shortLinkStatistics.hits3h = shortLinkHits3h;
+        shortLinkStatistics.hits6h = shortLinkHits6h;
+        shortLinkStatistics.hits12h = shortLinkHits12h;
+        shortLinkStatistics.hits24h = shortLinkHits24h;
+        shortLinkStatistics.hits7d = shortLinkHits7d;
+        shortLinkStatistics.hits30d = shortLinkHits30d;
+        shortLinkStatistics.hits12m = shortLinkHits12m;
+        await shortLinkStatistics.save();
+      }
+      else {
+        // Create a new short link statistics object
+        await ShortLinksStatistics.create({
+          shortLink: shortLink._id,
+          hits: shortLinkHits,
+          hits1h: shortLinkHits1h,
+          hits3h: shortLinkHits3h,
+          hits6h: shortLinkHits6h,
+          hits12h: shortLinkHits12h,
+          hits24h: shortLinkHits24h,
+          hits7d: shortLinkHits7d,
+          hits30d: shortLinkHits30d,
+          hits12m: shortLinkHits12m,
+        });
+      }
+
+      // Save the updated short link object
+      await shortLink.save();
+    }
+  } catch (error) {
+    console.error('Error updating short links statistics:', error);
+  }
+}
+
+// Call the function on startup, then every hour
+updateShortLinksStatistics();
+setInterval(updateShortLinksStatistics, 60 * 60 * 1000);
+
+createShortLinks();
+
 // Run the function on startup, then every hour
 deleteUnusedRegistrationKeys();
 setInterval(deleteUnusedRegistrationKeys, 60 * 60 * 1000);
@@ -3992,6 +4521,20 @@ process.on('SIGINT', () => {
     console.log('Closed the MongoDB connection.');
     process.exit(0);
   });
+});
+
+// Route zum Umleiten von kurzen URLs
+app.get('/:shortUrl', async (req, res) => {
+  const { shortUrl } = req.params;
+  const url = await ShortLinks.findOne({ shortUrl });
+  if (url) {
+    // Record link hit to shortLinksHits table
+    await ShortLinksHits.create({ shortLink: url._id, timestamp: new Date(), ip: req.ip, userAgent: req.get('User-Agent') });
+
+    res.redirect(url.url);
+  } else {
+    res.status(404).send({ error: 'Url not found' });
+  }
 });
 
 // Start the server
