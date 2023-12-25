@@ -4064,17 +4064,6 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
 
 //#endregion Casinos
 
-
-
-// Middleware to check if the user is logged in
-function checkLoggedIn(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect('/login');
-  }
-}
-
 // Middleware to check if the user is logged in and has the required permission
 function checkPermissions(requiredPermission) {
   return function (req, res, next) {
