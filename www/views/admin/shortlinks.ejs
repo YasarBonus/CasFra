@@ -89,8 +89,9 @@
                         '<td contenteditable="true">' + link.description + '</td>' +
                         '<td>' + link.created + '</td>' +
                         '<td>' +
-                        '<button class="ui small red button delete-btn">Delete</button>' +
-                        '<button class="ui small green button save-btn">Save</button>' +
+                        '<div class="ui small red button delete-btn">Delete</div>' +
+                        '<a href="/dashboard/shortlinks/' + link._id + '/statistics" class="ui small olive button statistics-btn">Statistics</a>' +
+                        '<div class="ui small green button save-btn">Save</div>' +
                         '</td>' +
                         '</tr>';
                     $('#shortlinksTable tbody').append(row);
