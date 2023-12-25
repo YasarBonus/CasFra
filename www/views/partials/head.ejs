@@ -167,27 +167,3 @@
     }
 
   </script>
-  
-</head>
-
-      
-      var textLoader = document.createElement('div');
-      textLoader.classList.add('ui', 'text', 'loader');
-
-      if (status === 'loading') {
-          loaderElement.classList.add('active');
-          textLoader.innerText = 'hi';
-
-      } else if (status === 'success') {
-          loaderElement.classList.remove('active');
-      } else if (status === 'saving') {
-        console.log('saving');
-          loaderElement.classList.add('active');
-          textLoader.textContent = 'Saving...';
-      }
-      // loaderElement.appendChild(icon);
-    }
-
-  </script>
-  
-</head>
