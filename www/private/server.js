@@ -4402,9 +4402,9 @@ async function updateShortLinksStatistics() {
   }
 }
 
-
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
+setInterval(updateShortLinksStatistics, 60 * 60 * 1000);
 
 createShortLinks();
 
