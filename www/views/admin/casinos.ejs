@@ -716,23 +716,31 @@
 
             // Send a POST request to swap the priorities
             fetch('/api/casinos/priority/swap', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        id1,
-                        id2
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('Priorities swapped:', result);
-                    fetchCasinos(); // Fetch the updated casinos
-                })
-                .catch(error => {
-                    console.error('Error swapping priorities:', error);
-                });
+                method: 'PUT',
+                body: JSON.stringify({
+                    id1,
+                    id2
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    showToast('error', 'Error swapping priorities', 'Error swapping priorities: ' + response.status);
+                    throw new Error('Error swapping priorities: ' + response.status);
+                }
+            })
+            .then(result => {
+                console.log('Priorities swapped:', result);
+                showToast('success', 'Priorities swapped successfully', 'The priorities have been swapped successfully');
+                fetchCasinos(); // Fetch the updated casinos
+            })
+            .catch(error => {
+                console.error(error);
+            });
         }
 
         function duplicateCasino(casinoId) {
