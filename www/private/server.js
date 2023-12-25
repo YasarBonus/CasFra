@@ -3855,6 +3855,13 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
     });
   }
 
+  // Check if id1 and id2 are the same
+  if (id1 === id2) {
+    return res.status(400).json({
+      error: 'Cannot swap priority of the same casino'
+    });
+  }
+
   // Find the two casinos by their IDs
   Casino.find({
       _id: {
