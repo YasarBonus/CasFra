@@ -3909,8 +3909,7 @@ app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const {
-    name,
-    priority
+    name
   } = req.body; // Get the name and location from the request body
   const {
     userId
@@ -3920,7 +3919,8 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const newCasino = new Casino({
     addedBy: userId,
     name: name,
-    priority: priority
+    addedDate: Date.now(),
+    addedBy: userId
   });
 
   // Save the new casino to the database
