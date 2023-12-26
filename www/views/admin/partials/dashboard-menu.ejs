@@ -61,15 +61,17 @@
               </div>
               
         <% } %>
-        <% if (user.activeTenancy) { %>}
-        <div class="ui dropdown item">
-          <i class="building icon"></i><%= user.activeTenancy %> <i class="dropdown icon"></i>
+
+            
+        <% if (user.activeTenancy) { %>
+        <div class="ui tenancies dropdown item">
+          <i class="building icon"></i> <i class="dropdown icon"></i>
           <div class="menu">
               <a href="/dashboard/account" class="item">Manage Account</a>
           </div>
         </div>
         <% } %>
-
+        
           <div class="ui dropdown item">
             <i class="user icon"></i><%= user.username %> <i class="dropdown icon"></i>
             <div class="menu">
@@ -100,15 +102,50 @@ showActionButton('logoutButton', 'logout');
     ;
     </script>
 
-<!--  Additional Code only for users
--->
+<!--  Additional Code only for users -->
+
 <% if (user) { %>
+
 <script>
-  
+  function fetchTenancies() {
+    fetch('/api/user/tenancies')
+      .then(response => response.json())
+      .then(data => {
+        const dropdownMenu = document.querySelector('.tenancies.dropdown .menu');
+        dropdownMenu.innerHTML = '';
 
+        data.forEach(tenancy => {
+          const item = document.createElement('a');
+          item.classList.add('item');
+          item.onclick = switchTenancy(tenancy._id);
+          item.textContent = tenancy.name;
+          dropdownMenu.appendChild(item);
+        });
 
+        $('.tenancies.dropdown').dropdown();
+      })
+      .catch(error => {
+        console.error('Error fetching tenancies:', error);
+      });
+  }
+
+  fetchTenancies();
+
+  function switchTenancy(tenancyId) {
+    return () => {
+      fetch(`/api/user/tenancy/${tenancyId}`, { method: 'PUT' })
+        .then(response => response.json())
+        .then(data => {
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Error switching tenancy:', error);
+        });
+    };
+  }
 </script>
+
 <% } %>
 
-
+<!-- Rest of the code... -->
 
