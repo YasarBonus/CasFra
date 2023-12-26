@@ -61,7 +61,11 @@
               </div>
               
         <% } %>
-        
+        <div class="ui dropdown item">
+          <i class="building icon"></i><%= user.tenancy %> <i class="dropdown icon"></i>
+          <div class="menu">
+              <a href="/dashboard/account" class="item">Manage Account</a>
+          </div>
           <div class="ui dropdown item">
             <i class="user icon"></i><%= user.username %> <i class="dropdown icon"></i>
             <div class="menu">

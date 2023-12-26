@@ -39,16 +39,10 @@ const sendPasswordResetEmail = (email, resetToken) => {
   });
 };
 
-// Use the sendPasswordResetEmail function
-
 const app = express();
 const port = 3000;
 
-// Set 'views' directory for any views 
-// being rendered res.render()
 app.set('views', path.join(__dirname, '../views'));
-
-// Set view engine as EJS
 app.set('view engine', 'ejs');
 
 app.use(express.static(path.join('public')));
@@ -106,6 +100,15 @@ const tenanciesSchema = new mongoose.Schema({
   modifiedBy: String,
   modifiedDate: Date,
   image: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  imageUrl: String,
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  }
 })
 
 // Define User schema
@@ -174,6 +177,23 @@ const userGroupSchema = new mongoose.Schema({
   priority: {
     type: Number,
     default: generateRandomPriority()
+  },
+  tenancies: [String],
+  active: {
+    type: Boolean,
+    default: true
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+  default: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -200,7 +220,8 @@ const registrationKeySchema = new mongoose.Schema({
   priority: {
     type: Number,
     default: generateRandomPriority()
-  }
+  },
+  tenancies: [String],
 });
 
 const imagesSchema = new mongoose.Schema({
@@ -232,6 +253,7 @@ const imagesSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  tenancies: [String],
 });
 
 const imagesCategoriesSchema = new mongoose.Schema({
@@ -253,6 +275,7 @@ const imagesCategoriesSchema = new mongoose.Schema({
   addedBy: String,
   modifiedDate: Date,
   modifiedBy: String,
+  tenancies: [String],
 });
 
 // Define Casino schema
@@ -312,6 +335,7 @@ const casinoSchema = new mongoose.Schema({
   affiliateShortlink: String,
   licenses: [String],
   tags: [String],
+  tenancies: [String],
 });
 
 // Define Casino Review schema
@@ -326,6 +350,7 @@ const casinoReviewSchema = new mongoose.Schema({
   modifiedDate: Date,
   rating: Number,
   review: String,
+  tenancies: [String],
   timestamp: {
     type: Date,
     default: Date.now
@@ -353,7 +378,8 @@ const casinoTagsSchema = new mongoose.Schema({
   priority: {
     type: Number,
     default: generateRandomPriority()
-  }
+  },
+  tenancies: [String],
 });
 
 // Define Casino features schema
@@ -375,7 +401,8 @@ const casinoFeaturesSchema = new mongoose.Schema({
   },
   addedBy: String,
   modifiedDate: Date,
-  modifiedBy: String
+  modifiedBy: String,
+  tenancies: [String],
 });
 
 // Define Casino individual features schema
@@ -398,7 +425,9 @@ const casinoIndividualFeaturesSchema = new mongoose.Schema({
   },
   addedBy: String,
   modifiedDate: Date,
-  modifiedBy: String
+  modifiedBy: String,
+  tenancies: [String],
+
 });
 
 // Define Casino individual bonuses schema
@@ -406,6 +435,8 @@ const casinoIndividualBonusesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
+  tenancies: [String],
+
   casino: String,
   active: {
     type: Boolean,
@@ -430,6 +461,8 @@ const casinoProviderSchema = new mongoose.Schema({
   description: String,
   image: String,
   imageUrl: String,
+  tenancies: [String],
+
   active: {
     type: Boolean,
     default: true
@@ -453,6 +486,8 @@ const casinoLicensesSchema = new mongoose.Schema({
   description: String,
   image: String,
   imageUrl: String,
+  tenancies: [String],
+
   active: {
     type: Boolean,
     default: true
@@ -475,6 +510,8 @@ const casinoPaymentMethodsSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
+  tenancies: [String],
+
   active: {
     type: Boolean,
     default: true
@@ -497,6 +534,8 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   name: String,
   short: String,
   description: String,
+  tenancies: [String],
+
   active: {
     type: Boolean,
     default: true
@@ -519,6 +558,8 @@ const casinoCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
+  tenancies: [String],
+
   active: {
     type: Boolean,
     default: true
@@ -541,6 +582,8 @@ const shortLinksSchema = new mongoose.Schema({
   url: String,
   shortUrl: String,
   description: String,
+  tenancies: [String],
+
   addedDate: {
     type: Date,
     default: Date.now
@@ -564,6 +607,8 @@ const shortLinksHitsSchema = new mongoose.Schema({
   shortLink: String,
   ip: String,
   userAgent: String,
+  tenancies: [String],
+
   timestamp: {
     type: Date,
     default: Date.now
