@@ -4527,6 +4527,22 @@ app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req
   }
 });
 
+app.get('/dashboard/casinos/:id/edit', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed casino edit');
+    const user = req.session.user;
+    const id = req.params.id;
+
+    res.render('admin/casino_edit', {
+      user: user,
+      casinoId: id
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get('/dashboard/images/categories', checkPermissions('manageImagesCategories'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
