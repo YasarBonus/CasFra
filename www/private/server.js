@@ -3909,8 +3909,7 @@ app.get('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const {
-    name,
-    priority
+    name
   } = req.body; // Get the name and location from the request body
   const {
     userId
@@ -3920,7 +3919,8 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   const newCasino = new Casino({
     addedBy: userId,
     name: name,
-    priority: priority
+    addedDate: Date.now(),
+    addedBy: userId
   });
 
   // Save the new casino to the database
@@ -4521,6 +4521,22 @@ app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req
 
     res.render('admin/casinos_wagertypes', {
       user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/casinos/:id/edit', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed casino edit');
+    const user = req.session.user;
+    const id = req.params.id;
+
+    res.render('admin/casinos_edit', {
+      user: user,
+      casinoId: id
     });
   } catch (err) {
     next(err);
