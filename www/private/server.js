@@ -4534,7 +4534,7 @@ app.get('/dashboard/casinos/:id/edit', checkPermissions('manageCasinos'), (req, 
     const user = req.session.user;
     const id = req.params.id;
 
-    res.render('admin/casino_edit', {
+    res.render('admin/casinos_edit', {
       user: user,
       casinoId: id
     });
