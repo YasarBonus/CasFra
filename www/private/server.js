@@ -2362,6 +2362,21 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
     });
 });
 
+// Get amount of all categories
+app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoCategories.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino categories:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+
 // Get details of a specific casino category
 app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2553,6 +2568,21 @@ app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
     });
 } );
 
+// Get amount of all tags
+app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoTags.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino tags:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+
 // Get details of a specific casino tag
 app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2742,6 +2772,23 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
     });
 });
 
+// Get count of all features from MongoDB
+app.get('/api/casinos/features/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoFeatures.countDocuments()
+
+    .then((results) => {  
+      res.json(results);
+    }
+    )
+    .catch((error) => {
+      console.error('Error retrieving casino features:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+
 // Get details of a specific casino feature
 app.get('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -2928,6 +2975,20 @@ app.get('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos')
   CasinoIndividualFeatures.find({
       casino: id
     })
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino individual features:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get count of all individual features
+app.get('/api/casinos/individualfeatures/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoIndividualFeatures.countDocuments()
     .then((results) => {
       res.json(results);
     })
@@ -3148,6 +3209,20 @@ app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'),
     });
 });
 
+// Get count of all individual bonuses
+app.get('/api/casinos/individualbonuses/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoIndividualBonuses.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino individual bonuses count:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Get details of a specific casino individual bonus
 app.get('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -3253,6 +3328,20 @@ app.get('/api/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res)
     })
     .catch((error) => {
       console.error('Error retrieving casino wager types:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get count of all casino wager types from MongoDB
+app.get('/api/casinos/wagertypes/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoWagerTypes.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino wager types count:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
@@ -3452,6 +3541,20 @@ app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) 
     });
 });
 
+// Get count of all casino providers from MongoDB
+app.get('/api/casinos/providers/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoProvider.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino providers count:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Get details of a specific casino provider
 app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -3643,6 +3746,20 @@ app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) =
     });
 });
 
+// Get amount of all casino licenses from MongoDB
+app.get('/api/casinos/licenses/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoLicenses.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino licenses count:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Get details of a specific casino license
 app.get('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -3828,6 +3945,20 @@ app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, 
     })
     .catch((error) => {
       console.error('Error retrieving casino payment methods:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Get count of all casino payment methods from MongoDB
+app.get('/api/casinos/paymentmethods/count', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoPaymentMethods.countDocuments()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino payment methods count:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
