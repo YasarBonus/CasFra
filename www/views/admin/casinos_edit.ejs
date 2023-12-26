@@ -515,8 +515,6 @@
             const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
 
             const description = document.querySelector('textarea[name="description"]').value;
-            const active = document.querySelector('input[name="active"]').checked;
-            const isNew = document.querySelector('input[name="isNew"]').checked;
             const label = document.querySelector('input[name="label"]').value;
             const labelLarge = document.querySelector('input[name="labelLarge"]').value;
 
@@ -532,10 +530,6 @@
 
             const wagerTypeSelect = document.querySelector('select[name="wagerType"]');
             const wagerType = Array.from(wagerTypeSelect.selectedOptions).map(option => option.value);
-
-            const noDeposit = document.querySelector('input[name="noDeposit"]').checked;
-            const prohibitedGamesProtection = document.querySelector('input[name="prohibitedGamesProtection"]').checked;
-            const vpn = document.querySelector('input[name="vpn"]').checked;
 
             const tagsSelect = document.querySelector('select[name="tags"]');
             const tags = Array.from(tagsSelect.selectedOptions).map(option => option.value);
@@ -569,10 +563,9 @@
 
 
             console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories,
-                'Description:', description, 'Active:', active, 'isNew:', isNew, 'Label:',
+                'Description:', description, 'Label:',
                 label, 'LabelLarge:', labelLarge, 'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:',
-                maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit,
-                'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features, 'Tags:', tags,
+                maxCashout, 'Wager:', wager, 'WagerType:', wagerType, features, 'Tags:', tags,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
                 review, 'image:', image, 'affiliateUrl:', affiliateUrl, 'AffiliateShortlink:', affiliateShortlink,
                 'IndividualFeatures:', individualFeatures, 'IndividualBonuses:', individualBonuses, 'Licenses:', licenses);
@@ -585,8 +578,6 @@
                         name,
                         categories,
                         description,
-                        active,
-                        isNew,
                         label,
                         labelLarge,
                         displayBonus,
@@ -594,9 +585,6 @@
                         maxCashout,
                         wager,
                         wagerType,
-                        noDeposit,
-                        prohibitedGamesProtection,
-                        vpn,
                         tags,
                         features,
                         individualFeatures,
