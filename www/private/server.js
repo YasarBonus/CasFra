@@ -2577,12 +2577,11 @@ app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
 } );
 
 // Insert casino tag into MongoDB
-app.post('/api/casinos/tags/add', checkPermissions('manageCasinos'), (req, res) => {
+app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   const {
     name,
     description,
     image,
-    priority,
     active
   } = req.body;
   const {
@@ -2594,7 +2593,6 @@ app.post('/api/casinos/tags/add', checkPermissions('manageCasinos'), (req, res) 
     name: name,
     description: description,
     image: image,
-    priority: priority,
     active: active,
     addedDate: Date.now(),
   });
