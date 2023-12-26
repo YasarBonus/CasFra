@@ -1007,7 +1007,8 @@ app.use(session({
 app.post('/api/auth/login', (req, res) => {
   const {
     username,
-    password
+    password,
+    tenancy
   } = req.body;
 
   if (!password) {
@@ -1070,16 +1071,64 @@ app.post('/api/auth/login', (req, res) => {
                 return;
               }
 
-              req.session.user = {
-                userId: user._id,
-                username: user.username,
-                activeTenancy: user.activeTenancy,
-                permissions: userGroup.permissions
-              };
+              if (tenancy) {
+                // Check if the tenancy is in the user's tenancies
+                if (user.tenancies.includes(tenancy)) {
+                  req.session.user = {
+                    userId: user._id,
+                    username: user.username,
+                    activeTenancy: tenancy,
+                    permissions: userGroup.permissions
+                  };
 
-              res.json({
-                success: true
-              });
+                  // Update the activeTenancy in the database
+                  user.activeTenancy = tenancy;
+                  user.save()
+                    .then(() => {
+                      res.json({
+                        success: true
+                      });
+                    })
+                    .catch((error) => {
+                      console.error('Error updating user:', error);
+                      res.status(500).json({
+                        error: 'Internal server error'
+                      });
+                    });
+                } else {
+                  req.session.user = {
+                    userId: user._id,
+                    username: user.username,
+                    activeTenancy: user.activeTenancy,
+                    permissions: userGroup.permissions
+                  };
+
+                  res.json({
+                    success: true
+                  });
+                }
+              } else {
+                // No tenancy provided, remove activeTenancy in the database
+                user.activeTenancy = undefined;
+                user.save()
+                  .then(() => {
+                    req.session.user = {
+                      userId: user._id,
+                      username: user.username,
+                      permissions: userGroup.permissions
+                    };
+
+                    res.json({
+                      success: true
+                    });
+                  })
+                  .catch((error) => {
+                    console.error('Error updating user:', error);
+                    res.status(500).json({
+                      error: 'Internal server error'
+                    });
+                  });
+              }
             })
             .catch((error) => {
               console.error('Error retrieving user group:', error);
