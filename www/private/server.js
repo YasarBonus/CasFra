@@ -1011,16 +1011,16 @@ app.post('/api/auth/login', (req, res) => {
     tenancy
   } = req.body;
 
-  if (!password) {
+  if (!password || typeof password !== 'string') {
     res.status(400).json({
-      error: 'Password is required'
+      error: 'Password is required and must be a string'
     });
     return;
   }
 
-  if (!username) {
+  if (!username || typeof username !== 'string') {
     res.status(400).json({
-      error: 'Username is required'
+      error: 'Username is required and must be a string'
     });
     return;
   }
@@ -1071,7 +1071,7 @@ app.post('/api/auth/login', (req, res) => {
                 return;
               }
 
-              if (tenancy) {
+              if (tenancy && typeof tenancy === 'string') {
                 // Check if the tenancy is in the user's tenancies
                 if (user.tenancies.includes(tenancy)) {
                   req.session.user = {
@@ -1567,8 +1567,6 @@ const editUserDetails = (req, res) => {
 // Edit user details of the current user
 app.post('/api/user', editUserDetails);
 
-// Edit user details of the current user
-app.put('/api/user', editUserDetails);
 
 // Change password of the current user
 app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => {
