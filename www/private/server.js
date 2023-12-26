@@ -135,7 +135,8 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     match: /.+\@.+\..+/
-  },  language: String,
+  },
+  language: String,
   nickname: {
     type: String,
     default: '',
@@ -200,7 +201,7 @@ const userGroupSchema = new mongoose.Schema({
 
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
-  regkey: { 
+  regkey: {
     type: String,
     required: true,
     unique: true
@@ -2172,7 +2173,7 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Add short link to MongoDB
 app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2219,7 +2220,7 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Edit multiple short links in MongoDB
 app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2257,7 +2258,7 @@ app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
         });
       });
   });
-} );
+});
 
 // Edit short link in MongoDB
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2272,21 +2273,21 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
   const {
     userId
   } = req.session.user;
-  
+
   if (!shortUrl) {
     res.status(400).json({
       error: 'shortUrl is required'
     });
     return;
   }
-  
+
   if (!url) {
     res.status(400).json({
       error: 'URL is required'
     });
     return;
-  } 
-  
+  }
+
   ShortLinks.findByIdAndUpdate(id, {
       description,
       url,
@@ -2306,7 +2307,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
       });
     });
 
-} );
+});
 
 // Get all short link hits from MongoDB
 // This table contains all hits of all short links and this is a very large table.
@@ -2324,7 +2325,7 @@ app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res)
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Get short link hits by short link ID from MongoDB
 app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2344,7 +2345,7 @@ app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Get short link statistics by short link ID from MongoDB
 app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2364,7 +2365,7 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
@@ -2387,9 +2388,8 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       res.status(500).json({
         error: 'Internal server error'
       });
-    }
-  );
-} );
+    });
+});
 
 //#endregion ShortLinks
 
@@ -2613,7 +2613,7 @@ app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Get amount of all tags
 app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res) => {
@@ -2627,7 +2627,7 @@ app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res)
         error: 'Internal server error'
       });
     });
-} );
+});
 
 
 // Get details of a specific casino tag
@@ -2652,7 +2652,7 @@ app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Insert casino tag into MongoDB
 app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
@@ -2685,7 +2685,7 @@ app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Duplicate casino tag
 app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
@@ -2725,14 +2725,14 @@ app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (
             });
           });
       }
-    } )
+    })
     .catch((error) => {
       console.error('Error duplicating casino tag:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Edit casino tag
 app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -2775,7 +2775,7 @@ app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete casino tag
 app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -2799,7 +2799,7 @@ app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res
         error: 'Internal server error'
       });
     });
-} );
+});
 
 //#endregion Casino Tags
 
@@ -2823,10 +2823,9 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
 app.get('/api/casinos/features/count', checkPermissions('manageCasinos'), (req, res) => {
   CasinoFeatures.countDocuments()
 
-    .then((results) => {  
+    .then((results) => {
       res.json(results);
-    }
-    )
+    })
     .catch((error) => {
       console.error('Error retrieving casino features:', error);
       res.status(500).json({
@@ -3104,7 +3103,9 @@ app.post('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos'
 
   casinoIndividualFeatures.save()
     .then(() => {
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error inserting casino individual feature:', error);
@@ -3276,7 +3277,7 @@ app.get('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageC
     id,
     bonusId
   } = req.params;
-  
+
   CasinoIndividualBonuses.findOne({
       casino: id,
       _id: bonusId
@@ -3295,8 +3296,7 @@ app.get('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageC
       res.status(500).json({
         error: 'Internal server error'
       });
-    }
-  );
+    });
 });
 
 // Insert casino individual bonus into MongoDB
@@ -3328,7 +3328,9 @@ app.post('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos')
 
   casinoIndividualBonuses.save()
     .then(() => {
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error inserting casino individual bonus:', error);
@@ -3417,7 +3419,7 @@ app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Insert casino wager type into MongoDB
 app.post('/api/casinos/wagertypes/add', checkPermissions('manageCasinos'), (req, res) => {
@@ -3542,7 +3544,7 @@ app.put('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete casino wager type
 app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -3559,16 +3561,14 @@ app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (re
       }
       res.json(deletedCasinoWagerType);
       console.log('Casino wager type deleted: ' + deletedCasinoWagerType.name);
-    }
-    )
+    })
     .catch((error) => {
       console.error('Error deleting casino wager type:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
-    }
-    );
-} );
+    });
+});
 
 //#endregion Casino Wager Types
 
@@ -3911,7 +3911,7 @@ app.post('/api/casinos/licenses/:id/duplicate', checkPermissions('manageCasinos'
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Edit casino license
 app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -3954,7 +3954,7 @@ app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Delete casino license
 app.delete('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -4926,7 +4926,7 @@ app.get('/dashboard/casinos/tags', checkPermissions('manageCasinos'), (req, res,
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/casinos/:id/edit', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
@@ -4979,7 +4979,7 @@ app.get('/dashboard/shortlinks', checkPermissions('manageShortLinks'), (req, res
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res, next) => {
   try {
@@ -4992,7 +4992,7 @@ app.get('/dashboard/shortlinks/hits', checkPermissions('manageShortLinks'), (req
   } catch (err) {
     next(err);
   }
-} );
+});
 
 app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res, next) => {
   try {
@@ -5007,7 +5007,7 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
   } catch (err) {
     next(err);
   }
-} );
+});
 
 
 //#endregion Routes
@@ -5091,14 +5091,18 @@ async function createShortLinks(casinoId = null) {
   try {
     let casinos;
     if (casinoId) {
-      casinos = await Casino.findOne({ _id: casinoId });
+      casinos = await Casino.findOne({
+        _id: casinoId
+      });
       casinos = [casinos]; // Convert single object to array
     } else {
       casinos = await Casino.find();
     }
     for (const casino of casinos) {
       if (casino.affiliateUrl && casino.affiliateShortlink) {
-        const existingShortLink = await ShortLinks.findOne({ attachedTo: casino._id });
+        const existingShortLink = await ShortLinks.findOne({
+          attachedTo: casino._id
+        });
         if (existingShortLink) {
           existingShortLink.url = casino.affiliateUrl;
           existingShortLink.shortUrl = casino.affiliateShortlink;
@@ -5124,7 +5128,11 @@ async function createShortLinks(casinoId = null) {
     // Delete ShortLinks where the attachedTo object no longer exists
     const attachedToIds = casinos.map(casino => casino._id);
     if (attachedToIds.length > 0) {
-      await ShortLinks.deleteMany({ attachedTo: { $nin: attachedToIds } });
+      await ShortLinks.deleteMany({
+        attachedTo: {
+          $nin: attachedToIds
+        }
+      });
       console.log('Deleted ShortLinks with missing attachedTo objects');
     }
   } catch (error) {
@@ -5145,7 +5153,9 @@ async function updateShortLinksStatistics() {
     // Loop through all short links
     for (const shortLink of shortLinks) {
       // Get the number of hits for the short link
-      const shortLinkHits = await ShortLinksHits.countDocuments({ shortLink: shortLink._id });
+      const shortLinkHits = await ShortLinksHits.countDocuments({
+        shortLink: shortLink._id
+      });
 
       // Get the number of hits in the past 1 hour
       const shortLinkHits1h = await ShortLinksHits.countDocuments({
@@ -5221,9 +5231,11 @@ async function updateShortLinksStatistics() {
       shortLink.hits7d = shortLinkHits7d;
       shortLink.hits30d = shortLinkHits30d;
       shortLink.hits12m = shortLinkHits12m;
-      
+
       // Check if the short link statistics object already exists
-      const shortLinkStatistics = await ShortLinksStatistics.findOne({ shortLink: shortLink._id });
+      const shortLinkStatistics = await ShortLinksStatistics.findOne({
+        shortLink: shortLink._id
+      });
 
       if (shortLinkStatistics) {
         // Update the existing short link statistics object
@@ -5237,8 +5249,7 @@ async function updateShortLinksStatistics() {
         shortLinkStatistics.hits30d = shortLinkHits30d;
         shortLinkStatistics.hits12m = shortLinkHits12m;
         await shortLinkStatistics.save();
-      }
-      else {
+      } else {
         // Create a new short link statistics object
         await ShortLinksStatistics.create({
           shortLink: shortLink._id,
@@ -5292,15 +5303,26 @@ process.on('SIGINT', () => {
 
 // Route zum Umleiten von kurzen URLs
 app.get('/:shortUrl', async (req, res) => {
-  const { shortUrl } = req.params;
-  const url = await ShortLinks.findOne({ shortUrl });
+  const {
+    shortUrl
+  } = req.params;
+  const url = await ShortLinks.findOne({
+    shortUrl
+  });
   if (url) {
     // Record link hit to shortLinksHits table
-    await ShortLinksHits.create({ shortLink: url._id, timestamp: new Date(), ip: req.ip, userAgent: req.get('User-Agent') });
+    await ShortLinksHits.create({
+      shortLink: url._id,
+      timestamp: new Date(),
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
 
     res.redirect(url.url);
   } else {
-    res.status(404).send({ error: 'Url not found' });
+    res.status(404).send({
+      error: 'Url not found'
+    });
   }
 });
 
