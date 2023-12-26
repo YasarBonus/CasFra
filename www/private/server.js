@@ -1074,6 +1074,7 @@ app.post('/api/auth/login', (req, res) => {
               req.session.user = {
                 userId: user._id,
                 username: user.username,
+                activeTenancy: user.activeTenancy,
                 permissions: userGroup.permissions
               };
 
