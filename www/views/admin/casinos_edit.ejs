@@ -10,7 +10,46 @@
             <div class="ui segment">
                 <h2>Edit Casino</h2>
 
-                <div class="header">Edit Casino</div>
+                <div id="editSection"></div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        const casinoId = '<%= casinoId %>';
+        console.log('Casino ID:', casinoId);
+
+        getCasino(casinoId);
+
+        function getCasino(casinoId) {
+            // Fetch the casino details from the API
+            fetch(`/api/casinos/${casinoId}`)
+                .then(response => response.json())
+                .then(casino => {
+                    const selectedCategories = casino.categories;
+                    const selectedFeatures = casino.features;
+                    const selectedIndividualFeatures = casino.individualFeatures;
+                    const selectedIndividualBonuses = casino.individualBonuses;
+                    const selectedProviders = casino.providers;
+                    const selectedLicenses = casino.licenses;
+                    const selectedPaymentMethods = casino.paymentMethods;
+                    const selectedDisplayBonus = casino.displayBonus;
+                    const selectedWagerTypes = casino.wagerType;
+                    const selectedImage = casino.image;
+
+
+                    var editSection = document.getElementById('editSection');
+                    if (editSection) {
+                        editSection.innerHTML = '';
+                    }
+
+                    const editBox = document.createElement('div');
+                    editBox.classList.add('ui', 'section');
+
+                    editBox.innerHTML = ``;
+                    editBox.innerHTML = `
                     <div class="content">
                         <form class="ui form">
                             <div class="ui segment">
@@ -184,34 +223,11 @@
                     <div class="actions">
                         <div class="ui button">Cancel</div>
                         <div class="ui primary button" onclick="saveCasino('${casino._id}')">Save</div>
-                    </div>
-            </div>
-        </div>
-    </div>
+                    </div>`;
 
-    <%- include('../partials/footer') %>
+                    document.getElementById('editSection').appendChild(editBox);
 
-    <script>
-        const casinoId = '<%= casinoId %>';
-        console.log('Casino ID:', casinoId);
-
-        getCasino(casinoId);
-
-        function getCasino(casinoId) {
-            // Fetch the casino details from the API
-            fetch(`/api/casinos/${casinoId}`)
-                .then(response => response.json())
-                .then(casino => {
-                    const selectedCategories = casino.categories;
-                    const selectedFeatures = casino.features;
-                    const selectedIndividualFeatures = casino.individualFeatures;
-                    const selectedIndividualBonuses = casino.individualBonuses;
-                    const selectedProviders = casino.providers;
-                    const selectedLicenses = casino.licenses;
-                    const selectedPaymentMethods = casino.paymentMethods;
-                    const selectedDisplayBonus = casino.displayBonus;
-                    const selectedWagerTypes = casino.wagerType;
-                    const selectedImage = casino.image;
+                    
 
                     console.log('Casino:', casino);
                     $('.ui.dropdown').dropdown(); // Initialize the dropdown
@@ -596,7 +612,7 @@
                     // Close the modal and fetch the updated casinos
                     $('.ui.modal').modal('hide');
                     showToast('success', 'Casino updated successfully', 'The casino has been updated successfully');
-                    fetchCasinos();
+                    getCasino(casinoId);
                 })
                 .catch(error => {
                     console.error('Error updating casino:', error);
