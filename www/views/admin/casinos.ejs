@@ -622,15 +622,7 @@
                         <form class="ui form">
                             <div class="field">
                                 <label>Name</label>
-                                <input type="text" name="name" placeholder="Enter the casino name">
-                            </div>
-                            <div class="field">
-                                <label>Location</label>
-                                <input type="text" name="location" placeholder="Enter the casino location">
-                            </div>
-                            <div class="field">
-                                <label>Description</label>
-                                <textarea name="description" placeholder="Enter the casino description"></textarea>
+                                <input type="text" name="newCasinoName" placeholder="Enter the casino name">
                             </div>
                         </form>
                     </div>
@@ -645,17 +637,14 @@
 
         function saveNewCasino() {
             // Get the new casino data from the form
-            const name = document.querySelector('input[name="name"]').value;
-            const location = document.querySelector('input[name="location"]').value;
-            const description = document.querySelector('textarea[name="description"]').value;
+            const name = document.querySelector('input[name="newCasinoName"]').value;
 
             // Send a POST request to the API to add the new casino
             fetch('/api/casinos', {
                     method: 'POST',
                     body: JSON.stringify({
                         name,
-                        location,
-                        description
+                        active: false
                     }),
                     headers: {
                         'Content-Type': 'application/json'
