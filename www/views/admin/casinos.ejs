@@ -8,8 +8,7 @@
         <div class="ui segment">
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <h2>Casinos</h2>
-                <h3>Manage Casinos</h3>
+                <h2>Manage Casinos</h2>
                 <div class="ui primary button" onclick="openAddModal()">Add new Casino</div>
                 <div id="casinos-container" class="ui items"></div>
             </div>
@@ -92,16 +91,16 @@
                         item.innerHTML = `
                             <div class="image">
                                 <div class="ui ${casino.active ? 'green' : 'red'} label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
-                            <img style="max-width: 100px" src="${casino.imageUrl}">
+                            <img style="max-width: 50px" src="${casino.imageUrl}">
                             </div>
                             <div class="content">
                             <a class="header">${casino.name}</a>
-                            <div class="meta">
+                            <!-- div class="meta">
                                 <span>${casino.label} (${casino.labelLarge})</span>
                             </div>
                             <div class="description">
                                 <p>${casino.description}</p>
-                            </div>
+                            </div -->
                             <div class="extra">
                                 <a class="ui right floated primary button" href="/dashboard/casinos/${casino._id}/edit">
                                     Edit
@@ -112,7 +111,7 @@
                                 <div class="ui right floated red button" onclick="confirmDeleteCasino('${casino._id}')">
                                     Delete
                                 </div>
-                                <div class="ui label">Limited</div>
+                                <!-- div class="ui label">Limited</div -->
                             </div>
                             </div>
                             `;
