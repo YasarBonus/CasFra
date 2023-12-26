@@ -4735,6 +4735,20 @@ app.get('/dashboard/casinos/wagertypes', checkPermissions('manageCasinos'), (req
   }
 });
 
+app.get('/dashboard/casinos/tags', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed tags');
+    const user = req.session.user;
+
+    res.render('admin/casinos_tags', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 app.get('/dashboard/casinos/:id/edit', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
