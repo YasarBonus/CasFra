@@ -8,8 +8,7 @@
         <div class="ui segment">
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <h2>Edit Casino</h2>
-
+                <h1>Edit Casino</h1>
                 <div id="editSection"></div>
             </div>
         </div>
@@ -51,7 +50,10 @@
                     editBox.innerHTML = ``;
                     editBox.innerHTML = `
                     <div class="content">
+                        <div class="ui ${casino.active ? 'green' : 'red'} top right attached massive label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
+
                         <form class="ui form">
+
                             <div class="ui segment">
                             <div class="ui header">General</div>
                             <div class="three fields">
@@ -738,7 +740,12 @@
                 .then(response => response.json())
                 .then(result => {
                     console.log('Casino active state updated:', result);
-                    // Fetch the updated casinos
+                    // update the button text and color
+                    const button = document.querySelector('.ui.label');
+                    button.classList.toggle('green');
+                    button.classList.toggle('red');
+                    button.innerText = result.active ? 'active' : 'disabled';
+
                 })
                 .catch(error => {
                     console.error('Error updating casino active state:', error);
