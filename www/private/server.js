@@ -311,6 +311,7 @@ const casinoSchema = new mongoose.Schema({
   affiliateUrl: String,
   affiliateShortlink: String,
   licenses: [String],
+  tags: [String],
 });
 
 // Define Casino Review schema
@@ -4171,6 +4172,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     vpn,
     features,
     individualFeatures,
+    tags,
     providers,
     paymentMethods,
     review,
@@ -4201,6 +4203,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
       noDeposit,
       prohibitedGamesProtection,
       vpn,
+      tags,
       features,
       individualFeatures,
       providers,
