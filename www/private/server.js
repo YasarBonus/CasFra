@@ -339,6 +339,22 @@ const casinoReviewSchema = new mongoose.Schema({
   }
 });
 
+// Define Casino tags schema
+const casinoTagsSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  imageUrl: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  }
+});
+
 // Define Casino features schema
 const casinoFeaturesSchema = new mongoose.Schema({
   name: String,
@@ -583,6 +599,7 @@ const Images = mongoose.model('Images', imagesSchema);
 const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 const Casino = mongoose.model('Casino', casinoSchema);
 const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
+const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
 const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
 const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
 const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
@@ -2518,6 +2535,197 @@ app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (re
 });
 
 //#endregion Casino Categories
+
+//#region Casino Tags
+
+// Get all casino tags from MongoDB
+app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
+  CasinoTags.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino tags:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Get details of a specific casino tag
+app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoTags.findById(id)
+    .then((casinoTag) => {
+      if (!casinoTag) {
+        return res.status(404).json({
+          error: 'Casino tag not found'
+        });
+      }
+
+      res.json(casinoTag);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Insert casino tag into MongoDB
+app.post('/api/casinos/tags/add', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoTags = new CasinoTags({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    priority: priority,
+    active: active,
+    addedDate: Date.now(),
+  });
+
+  casinoTags.save()
+    .then(() => {
+      res.redirect('/dashboard');
+    })
+    .catch((error) => {
+      console.error('Error inserting casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Duplicate casino tag
+app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+
+  CasinoTags.findOne({
+      _id: id
+    })
+    .then((casinoTags) => {
+      if (!casinoTags) {
+        throw new Error('Casino tag not found');
+      } else {
+        newPriority = generateRandomPriority();
+        const newCasinoTags = new CasinoTags({
+          addedBy: userId,
+          name: casinoTags.name + ' (Copy)',
+          description: casinoTags.description,
+          image: casinoTags.image,
+          priority: newPriority,
+          active: casinoTags.active,
+          addedDate: Date.now(),
+        });
+
+        newCasinoTags.save()
+          .then(() => {
+            res.redirect('/dashboard');
+          })
+          .catch((error) => {
+            console.error('Error duplicating casino tag:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    } )
+    .catch((error) => {
+      console.error('Error duplicating casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Edit casino tag
+app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+
+  CasinoTags.findOneAndUpdate({
+      _id: id
+    }, {
+      name,
+      description,
+      image,
+      priority,
+      active
+    }, {
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    })
+    .then((updatedCasinoTags) => {
+      if (!updatedCasinoTags) {
+        throw new Error('Casino tag not found');
+      }
+      res.json(updatedCasinoTags);
+      console.log('Casino tag updated: ' + updatedCasinoTags.name);
+    })
+    .catch((error) => {
+      console.error('Error updating casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+// Delete casino tag
+app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  CasinoTags.findOneAndDelete({
+      _id: id
+    })
+    .then((deletedCasinoTag) => {
+      if (!deletedCasinoTag) {
+        throw new Error('Casino tag not found');
+      }
+      res.json(deletedCasinoTag);
+      console.log('Casino tag deleted: ' + deletedCasinoTag.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
+//#endregion Casino Tags
 
 //#region Casino Features
 
