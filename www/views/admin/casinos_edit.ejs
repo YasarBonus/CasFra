@@ -192,7 +192,12 @@
     <%- include('../partials/footer') %>
 
     <script>
-        function openEditModal(casinoId) {
+        const casinoId = '<%= casinoId %>';
+        console.log('Casino ID:', casinoId);
+
+        getCasino(casinoId);
+
+        function getCasino(casinoId) {
             // Fetch the casino details from the API
             fetch(`/api/casinos/${casinoId}`)
                 .then(response => response.json())
@@ -208,19 +213,7 @@
                     const selectedWagerTypes = casino.wagerType;
                     const selectedImage = casino.image;
 
-                    // Open the modal for editing the casino data
-                    if (document.querySelector('.ui.modal')) {
-                        document.querySelector('.ui.modal')
-                            .remove(); // Remove the existing modal if it exists
-                    }
-                    const modal = document.createElement('div');
-                    modal.classList.add('ui', 'modal', 'edit');
-
-                    modal.innerHTML = `
-                    
-                `;
-                    document.body.appendChild(modal);
-                    $(modal).modal('show');
+                    console.log('Casino:', casino);
                     $('.ui.dropdown').dropdown(); // Initialize the dropdown
 
                     // Populate the categories dropdown with available categories
@@ -671,132 +664,7 @@
                 });
         }
 
-        function fetchCasinos() {
-            fetch('/api/casinos')
-                .then(response => response.json())
-                .then(casinos => {
-                    // Sort the casinos by priority
-                    casinos.sort((a, b) => a.priority - b.priority);
-
-                    const casinosContainer = document.getElementById('casinos-container');
-                    casinosContainer.innerHTML = ''; // Remove existing items
-
-                    casinos.forEach(casino => {
-                        // Create a Fomantic UI item for each casino
-                        const item = document.createElement('div');
-                        item.classList.add('item');
-                        item.style.backgroundColor = casino.active ? '#fff' : '#eee';
-                        item.id = casino._id;
-                        item.draggable = true; // Enable drag and drop
-                        item.addEventListener('dragstart', handleDragStart);
-                        item.addEventListener('dragover', handleDragOver);
-                        item.addEventListener('drop', handleDrop);
-                        item.innerHTML = `
-                            <div class="image">
-                                <div class="ui ${casino.active ? 'green' : 'red'} label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
-                            <img style="max-width: 100px" src="${casino.imageUrl}">
-                            </div>
-                            <div class="content">
-                            <a class="header">${casino.name}</a>
-                            <div class="meta">
-                                <span>${casino.label} (${casino.labelLarge})</span>
-                            </div>
-                            <div class="description">
-                                <p>${casino.description}</p>
-                            </div>
-                            <div class="extra">
-                                <div class="ui right floated primary button" onclick="openEditModal('${casino._id}')">
-                                    Edit
-                                </div>
-                                <div class="ui right floated primary button" onclick="duplicateCasino('${casino._id}')">
-                                    Duplicate
-                                </div>
-                                <div class="ui right floated red button" onclick="confirmDeleteCasino('${casino._id}')">
-                                    Delete
-                                </div>
-                                <div class="ui label">Limited</div>
-                            </div>
-                            </div>
-                            `;
-                        casinosContainer.appendChild(item);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching casinos:', error);
-                });
-        }
-
-        function handleDragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.id);
-        }
-
-        function handleDragOver(event) {
-            event.preventDefault();
-        }
-
-        function handleDrop(event) {
-            event.preventDefault();
-            const id1 = event.dataTransfer.getData('text/plain');
-            const cardElement = event.target.closest('[id]');
-            const id2 = cardElement ? cardElement.id : null;
-            console.log('ID1:' + id1);
-            console.log('ID2:' + id2);
-
-            // Send a POST request to swap the priorities
-            fetch('/api/casinos/priority/swap', {
-                method: 'PUT',
-                body: JSON.stringify({
-                    id1,
-                    id2
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    showToast('error', 'Error swapping priorities', 'Error swapping priorities: ' + response.status);
-                    throw new Error('Error swapping priorities: ' + response.status);
-                }
-            })
-            .then(result => {
-                console.log('Priorities swapped:', result);
-                showToast('success', 'Priorities swapped successfully', 'The priorities have been swapped successfully');
-                fetchCasinos(); // Fetch the updated casinos
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        }
-
-        function duplicateCasino(casinoId) {
-            // Send a POST request to duplicate the casino
-            fetch(`/api/casinos/${casinoId}/duplicate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    showToast('error', 'Error duplicating casino', 'Error duplicating casino: ' + response.status);
-                    throw new Error('Error duplicating casino: ' + response.status);
-                }
-            })
-            .then(result => {
-                console.log('Casino duplicated:', result);
-                showToast('success', 'Casino duplicated successfully', 'The casino has been duplicated successfully');
-                fetchCasinos(); // Fetch the updated casinos
-            })
-            .catch(error => {
-                showToast('error', 'Error duplicating casino', 'Error duplicating casino: ' + error);
-                console.error('Error duplicating casino:', error);
-            });
-        }
+        
 
         function confirmDeleteCasino(casinoId) {
             // Create a Fomantic UI mini dialog for confirmation
@@ -834,7 +702,6 @@
                     $('.ui.modal').modal('hide');
                     // delete the modal element from the DOM
                     document.querySelector('.ui.modal').remove();
-                    fetchCasinos();
                 })
                 .catch(error => {
                     console.error('Error deleting casino:', error);
@@ -856,7 +723,6 @@
                 .then(result => {
                     console.log('Casino active state updated:', result);
                     // Fetch the updated casinos
-                    fetchCasinos();
                 })
                 .catch(error => {
                     console.error('Error updating casino active state:', error);
@@ -1204,7 +1070,6 @@
             });
         }
 
-        fetchCasinos();
     </script>
 </body>
 
