@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred" >
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment" >
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <h2>Casino Tags</h2>
+                        <table id="casinoTagsTable" class="ui celled table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Priority (Sorting)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows will be dynamically added here -->
+                            </tbody>
+                        </table>
+                        <div class="ui green button" id="saveAllBtn">Save All</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include('../partials/footer') %>
+    </body>
+</html>
+
+<script>
+    $(document).ready(function() {
+        // Function to load initial data from API endpoint
+        function loadInitialData() {
+            // Clear the table
+            $('#casinoTagsTable tbody').empty();
+
+            $.ajax({
+                url: '/api/casinos/tags',
+                method: 'GET',
+                success: function(data) {
+                    // Sort the tags by priority
+                    data.sort(function(a, b) {
+                        return a.priority - b.priority;
+                    });
+
+                    // Populate the table with data
+                    data.forEach(function(tag) {
+                        var row = '<tr id="' + tag._id + '">' +
+                            '<td contenteditable="true">' + tag.name + '</td>' +
+                            '<td contenteditable="true">' + tag.description + '</td>' +
+                            '<td contenteditable="true">' + tag.priority + '</td>' +
+                            '<td>' +
+                            '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
+                            '<button class="ui small red button delete-btn">Delete</button>' +
+                            '</td>' +
+                            '</tr>';
+                        $('#casinoTagsTable tbody').append(row);
+                    });
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        // Call the function to load initial data
+        loadInitialData();
+
+        // Event listener for duplicate button
+        $(document).on('click', '.duplicate-btn', function() {
+            var tagId = $(this).closest('tr').attr('id');
+            duplicateTag(tagId);
+        });
+
+        // Event listener for delete button
+        $(document).on('click', '.delete-btn', function() {
+            var tagId = $(this).closest('tr').attr('id');
+            showDeleteConfirmation(tagId);
+        });
+
+        // Event listener for save all button
+        $(document).on('click', '#saveAllBtn', function() {
+            saveAllTags();
+        });
+
+        // Function to duplicate a tag
+        function duplicateTag(tagId) {
+            $.ajax({
+                url: '/api/casinos/tags/' + tagId + '/duplicate',
+                method: 'POST',
+                success: function(data) {
+                    loadInitialData();
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        // Function to save a tag
+        function saveTag(tagId) {
+            $.ajax({
+                url: '/api/casinos/tags/' + tagId,
+                method: 'PUT',
+                data: {
+                    name: $('#' + tagId + ' td:nth-child(1)').text(),
+                    description: $('#' + tagId + ' td:nth-child(2)').text(),
+                    priority: $('#' + tagId + ' td:nth-child(3)').text()
+                },
+                success: function(data) {
+                    console.log('Success:', data);
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        // Function to save all tags
+        function saveAllTags() {
+            $('#casinoTagsTable tbody tr').each(function() {
+                var tagId = $(this).attr('id');
+                saveTag(tagId);
+            });
+            loadInitialData();
+        }
+
+        // Function to show delete confirmation dialog
+        function showDeleteConfirmation(tagId) {
+            $.ajax({
+                url: '/api/casinos/tags/' + tagId + '/casinos',
+                method: 'GET',
+                success: function(casinos) {
+                    var dialogExists = $('.ui.modal.confirmDelete').length;
+                    if (dialogExists) {
+                        $('.ui.modal.confirmDelete').remove();
+                    }
+                    var dialogContent = '<div class="ui small modal confirmDelete">' +
+                        '<div class="header">Delete Confirmation</div>' +
+                        '<div class="content">' +
+                        '<p>Are you sure you want to delete the tag <b>' + $('#' + tagId + ' td:nth-child(1)').text() + '</b>?</p>' +
+                        '<p>This is potentially a destructive operation and cannot be undone.</p>' +
+                        '<p>Casinos with this tag will no longer have the tag assigned:</p>' +
+                        '<ul>';
+                    casinos.forEach(function(casino) {
+                        dialogContent += '<li>' + casino.name + '</li>';
+                    });
+                    dialogContent += '</ul>' +
+                        '</div>' +
+                        '<div class="actions">' +
+                        '<div class="ui red button">Cancel</div>' +
+                        '<div class="ui green button deleteBtn" data-tag-id="' + tagId + '">Delete</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('body').append(dialogContent);
+                    $('.ui.modal.confirmDelete').modal('show');
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        // Event listener for delete button
+        $(document).on('click', '.deleteBtn', function() {
+            var tagId = $(this).data('tag-id');
+            deleteTag(tagId);
+            $('.ui.modal.confirmDelete').modal('hide');
+        });
+
+        // Function to delete a tag
+        function deleteTag(tagId) {
+            $.ajax({
+                url: '/api/casinos/tags/' + tagId,
+                method: 'DELETE',
+                success: function(data) {
+                    console.log('Tag deleted successfully');
+                    showToast('success', 'Tag deleted successfully');
+                    loadInitialData();
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+    });
+</script>
