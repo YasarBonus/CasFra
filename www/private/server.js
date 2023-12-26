@@ -1025,7 +1025,7 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   User.findOne({
-      username: username
+      username
     })
     .then((user) => {
       if (!user) {
@@ -1059,7 +1059,6 @@ app.post('/api/auth/login', (req, res) => {
         }
 
         if (result) {
-          // Get user permissions
           UserGroup.findOne({
               _id: user.groupId
             })
@@ -1071,7 +1070,6 @@ app.post('/api/auth/login', (req, res) => {
                 return;
               }
 
-              // Add user permissions to session data
               req.session.user = {
                 userId: user._id,
                 username: user.username,
