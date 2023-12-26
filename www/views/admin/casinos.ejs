@@ -40,7 +40,7 @@
                         document.querySelector('.ui.modal')
                             .remove(); // Remove the existing modal if it exists
                     }
-                    
+
                     const modal = document.createElement('div');
                     modal.classList.add('ui', 'modal', 'edit');
 
@@ -707,9 +707,9 @@
                                 <p>${casino.description}</p>
                             </div>
                             <div class="extra">
-                                <div class="ui right floated primary button" onclick="openEditModal('${casino._id}')">
+                                <a class="ui right floated primary button" href="/dashboard/casinos/${casino._id}/edit">
                                     Edit
-                                </div>
+                                </a>
                                 <div class="ui right floated primary button" onclick="duplicateCasino('${casino._id}')">
                                     Duplicate
                                 </div>
