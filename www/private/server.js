@@ -1535,6 +1535,47 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     });
 });
 
+// Change tenancy of the current user
+app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, res) => {
+  const { userId } = req.session.user;
+  const { tenancyId } = req.params;
+
+  // Check if the tenancy exists in the user's tenancies
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      const { tenancies } = user;
+      const tenancyExists = tenancies.some((tenancy) => tenancy._id.toString() === tenancyId);
+
+      if (!tenancyExists) {
+        res.status(400).json({ error: 'Tenancy does not exist for the user' });
+        return;
+      }
+
+      // Update activeTenancy in session
+      req.session.user.activeTenancy = tenancyId;
+
+      // Update activeTenancy in database
+      User.findByIdAndUpdate(userId, { activeTenancy: tenancyId })
+        .then(() => {
+          res.json({ success: true });
+        })
+        .catch((error) => {
+          console.error('Error updating user details:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        });
+    })
+    .catch((error) => {
+      console.error('Error retrieving user details:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
 // Reusable function to edit user details
 const editUserDetails = (req, res) => {
   const {
