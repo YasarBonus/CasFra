@@ -8,8 +8,7 @@
         <div class="ui segment">
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <h2>Edit Casino</h2>
-
+                <h1>Edit Casino</h1>
                 <div id="editSection"></div>
             </div>
         </div>
@@ -38,6 +37,7 @@
                     const selectedDisplayBonus = casino.displayBonus;
                     const selectedWagerTypes = casino.wagerType;
                     const selectedImage = casino.image;
+                    const selectedTags = casino.tags;
 
 
                     var editSection = document.getElementById('editSection');
@@ -51,7 +51,10 @@
                     editBox.innerHTML = ``;
                     editBox.innerHTML = `
                     <div class="content">
+                        <div class="ui ${casino.active ? 'green' : 'red'} top right attached massive label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
+
                         <form class="ui form">
+
                             <div class="ui segment">
                             <div class="ui header">General</div>
                             <div class="three fields">
@@ -68,76 +71,50 @@
                                     <input type="text" name="labelLarge" placeholder="Enter the casino label" value="${casino.labelLarge}">
                                 </div>
                                     <div class="field">
-                                    <label>Image (<a href="/dashboard/images">manage</a>)</label>
+                                    <label>Image</label>
                                     <select name="image" class="ui fluid search selection dropdown" id="imageDropdown">
                                     </select>
                                 </div>
                             </div>
-                            <div class="four fields">
-                                <div class="field">
-                                    <div class="ui toggle checkbox">
-                                        <input type="checkbox" name="active" ${casino.active ? 'checked' : ''}>
-                                        <label>Active</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui toggle checkbox">
-                                        <input type="checkbox" name="isNew" ${casino.isNew ? 'checked' : ''}>
-                                        <label>New</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui toggle checkbox">
-                                        <input type="checkbox" name="vpn" ${casino.vpn ? 'checked' : ''}>
-                                        <label>VPN allowed</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui toggle checkbox">
-                                        <input type="checkbox" name="noDeposit" ${casino.noDeposit ? 'checked' : ''}>
-                                        <label>No Deposit</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui toggle checkbox">
-                                        <input type="checkbox" name="prohibitedGamesProtection" ${casino.prohibitedGamesProtection ? 'checked' : ''}>
-                                        <label>Prohibited Games Protection</label>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                         <div class="ui segment">
                             <div class="ui header">Features</div>
                             <div class="three fields">
                                 <div class="field">
-                                    <label>Categories (<a href="/dashboard/casinos/categories">manage</a>)</label>
+                                    <label>Categories</label>
                                     <select name="categories" multiple class="ui fluid search dropdown" id="categoriesDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
-                                    <label>Providers (<a href="/dashboard/casinos/providers">manage</a>)</label>
+                                    <label>Providers</label>
                                     <select name="providers" multiple class="ui fluid search dropdown" id="providersDropdown">
                                     </select>
                                 </div>
                                 <div class="field">
-                                    <label>Payment Methods (<a href="/dashboard/casinos/paymentmethods">manage</a>)</label>
+                                    <label>Payment Methods</label>
                                     <select name="paymentMethods" multiple class="ui fluid search dropdown" id="paymentMethodsDropdown">
                                     </select>
                                 </div>
                                 <div class="two wide field">
-                                    <label>Licenses (<a href="/dashboard/casinos/licenses">manage</a>)</label>
+                                    <label>Licenses</label>
                                     <select name="licenses" multiple class="ui fluid search dropdown" id="licensesDropdown">
                                     </select>
                                 </div>
                             </div>
                             <div class="ui divider"></div>
                             <div class="two fields">
-                                <div class="eight wide field">
-                                    <label>Features (<a href="/dashboard/casinos/features">manage</a>)</label>
+                                <div class="four wide field">
+                                    <label>Tags</label>
+                                    <select name="tags" multiple class="ui fluid search dropdown" id="tagsDropdown">
+                                    </select>
+                                </div>
+                                <div class="five wide field">
+                                    <label>Features</label>
                                     <select name="features" multiple class="ui fluid search dropdown" id="featuresDropdown">
                                     </select>
                                 </div>
-                                <div class="eight wide field">
+                                <div class="seven wide field">
                                     <label>Individual Features <div class="ui mini primary button" onclick="showEditableIndividualFeatures('${casino._id}')">manage</div></label>
                                     <div class="ui action input">
                                         <select name="individualFeatures" multiple class="ui fluid search dropdown" id="individualFeaturesDropdown">
@@ -239,6 +216,9 @@
                     // Populate the features dropdown with available features
                     getAvailableFeatures(selectedFeatures);
                     getAvailableIndividualFeatures(casinoId, selectedIndividualFeatures);
+
+                    // Populate the tags dropdown with available tags
+                    getAvailableTags(selectedTags);
 
                     // Populate the providers dropdown with available providers
                     getAvailableProviders(selectedProviders);
@@ -363,6 +343,30 @@
                 })
                 .catch(error => {
                     console.error('Error fetching features:', error);
+                });
+        }
+
+        function getAvailableTags(selectedTags) {
+            fetch('/api/casinos/tags')
+                .then(response => response.json())
+                .then(tags => {
+                    const tagsDropdown = document.getElementById('tagsDropdown');
+                    console.log('Tags Dropdown:', tagsDropdown);
+                    console.log('Tags:', tags);
+                    tagsDropdown.innerHTML = ''; // Remove existing options
+
+                    tags.forEach(tag => {
+                        const option = document.createElement('option');
+                        option.value = tag._id;
+                        option.innerText = tag.name;
+                        if (selectedTags.includes(tag._id)) {
+                            option.selected = true; // Select the option if it is in the selected tags
+                        }
+                        tagsDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching tags:', error);
                 });
         }
 
@@ -511,8 +515,6 @@
             const categories = Array.from(categoriesSelect.selectedOptions).map(option => option.value);
 
             const description = document.querySelector('textarea[name="description"]').value;
-            const active = document.querySelector('input[name="active"]').checked;
-            const isNew = document.querySelector('input[name="isNew"]').checked;
             const label = document.querySelector('input[name="label"]').value;
             const labelLarge = document.querySelector('input[name="labelLarge"]').value;
 
@@ -529,9 +531,8 @@
             const wagerTypeSelect = document.querySelector('select[name="wagerType"]');
             const wagerType = Array.from(wagerTypeSelect.selectedOptions).map(option => option.value);
 
-            const noDeposit = document.querySelector('input[name="noDeposit"]').checked;
-            const prohibitedGamesProtection = document.querySelector('input[name="prohibitedGamesProtection"]').checked;
-            const vpn = document.querySelector('input[name="vpn"]').checked;
+            const tagsSelect = document.querySelector('select[name="tags"]');
+            const tags = Array.from(tagsSelect.selectedOptions).map(option => option.value);
 
             const featuresSelect = document.querySelector('select[name="features"]');
             const features = Array.from(featuresSelect.selectedOptions).map(option => option.value);
@@ -562,10 +563,9 @@
 
 
             console.log('Casino', casinoId, 'will be updated with data:', 'Name:', name, 'Categories:', categories,
-                'Description:', description, 'Active:', active, 'isNew:', isNew, 'Label:',
+                'Description:', description, 'Label:',
                 label, 'LabelLarge:', labelLarge, 'DisplayBonus:', displayBonus, 'MaxBet:', maxBet, 'MaxCashout:',
-                maxCashout, 'Wager:', wager, 'WagerType:', wagerType, 'NoDeposit:', noDeposit,
-                'ProhibitedGamesProtection:', prohibitedGamesProtection, 'VPN:', vpn, 'Features:', features,
+                maxCashout, 'Wager:', wager, 'WagerType:', wagerType, features, 'Tags:', tags,
                 'Providers:', providers, 'PaymentMethods:', paymentMethods, 'ReviewTitle:', reviewTitle, 'Review:',
                 review, 'image:', image, 'affiliateUrl:', affiliateUrl, 'AffiliateShortlink:', affiliateShortlink,
                 'IndividualFeatures:', individualFeatures, 'IndividualBonuses:', individualBonuses, 'Licenses:', licenses);
@@ -578,8 +578,6 @@
                         name,
                         categories,
                         description,
-                        active,
-                        isNew,
                         label,
                         labelLarge,
                         displayBonus,
@@ -587,9 +585,7 @@
                         maxCashout,
                         wager,
                         wagerType,
-                        noDeposit,
-                        prohibitedGamesProtection,
-                        vpn,
+                        tags,
                         features,
                         individualFeatures,
                         providers,
@@ -738,7 +734,12 @@
                 .then(response => response.json())
                 .then(result => {
                     console.log('Casino active state updated:', result);
-                    // Fetch the updated casinos
+                    // update the button text and color
+                    const button = document.querySelector('.ui.label');
+                    button.classList.toggle('green');
+                    button.classList.toggle('red');
+                    button.innerText = result.active ? 'active' : 'disabled';
+
                 })
                 .catch(error => {
                     console.error('Error updating casino active state:', error);
@@ -810,7 +811,7 @@
                                 .then(response => response.json())
                                 .then(result => {
                                     console.log('Individual feature updated:', result);
-                                    location.reload();
+                                    showToast('success', 'Individual feature updated successfully', 'The individual feature has been updated successfully');
                                 })
                                 .catch(error => {
                                     console.error('Error updating individual feature:', error);
@@ -979,7 +980,7 @@
                                 .then(response => response.json())
                                 .then(result => {
                                     console.log('Individual bonus updated:', result);
-                                    location.reload();
+                                    showToast('success', 'Individual bonus updated successfully', 'The individual bonus has been updated successfully');
                                 })
                                 .catch(error => {
                                     console.error('Error updating individual bonus:', error);
