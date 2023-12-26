@@ -61,11 +61,15 @@
               </div>
               
         <% } %>
+        <% if (user.activeTenancy) { %>}
         <div class="ui dropdown item">
-          <i class="building icon"></i><%= user.tenancy %> <i class="dropdown icon"></i>
+          <i class="building icon"></i><%= user.activeTenancy %> <i class="dropdown icon"></i>
           <div class="menu">
               <a href="/dashboard/account" class="item">Manage Account</a>
           </div>
+        </div>
+        <% } %>
+
           <div class="ui dropdown item">
             <i class="user icon"></i><%= user.username %> <i class="dropdown icon"></i>
             <div class="menu">

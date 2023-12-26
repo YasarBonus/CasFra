@@ -162,6 +162,7 @@ const userSchema = new mongoose.Schema({
   lastLoginDate: Date,
   lastLoginIp: String,
   tenancies: [String],
+  activeTenancy: String,
 });
 
 // Define UserGroup schema
