@@ -84,11 +84,13 @@
                                 row.append($('<td>').text(user.banned));
                                 var actions = $('<td>');
                                 var deleteButton = $('<div class="ui tiny red button">').text('Delete');
+                                var editButton = $('<a href="/dashboard/super/users/' + user._id + '/edit" class="ui tiny primary button">').text('Edit');
                                 // Add click event listener to delete button
                                 deleteButton.click(function() {
                                     deleteUser(user._id);
                                 });
                                 actions.append(deleteButton);
+                                actions.append(editButton);
                                 row.append(actions);
                                 tableBody.append(row);
                             });

@@ -1873,6 +1873,31 @@ app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
     });
 });
 
+// Get details of a user by ID
+app.get('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  User.findById(id)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({
+          error: 'User not found'
+        });
+        return;
+      }
+
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error('Error retrieving user:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 //#endregion User
 
 //#region Registration Keys
