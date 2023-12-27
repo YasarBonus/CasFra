@@ -209,7 +209,7 @@
                 // Function to add a new license
                 function addLicense(formData) {
                     $.ajax({
-                        url: '/api/casinos/licenses',
+                        url: '/api/casinos/licenses/add',
                         method: 'POST',
                         data: formData,
                         success: function (data) {
