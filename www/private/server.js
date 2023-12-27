@@ -5058,6 +5058,22 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
   }
 });
 
+app.get('/dashboard/super/users/:userId/edit', checkPermissions('manageUserGroups'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed user edit');
+    const user = req.session.user;
+    const userId = req.params.userId;
+
+    res.render('admin/users_edit', {
+      user: user,
+      userId: userId
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get('/dashboard/super/tenancies', checkPermissions('manageTenancies'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
