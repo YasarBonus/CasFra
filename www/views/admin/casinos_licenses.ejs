@@ -179,10 +179,6 @@
                         '<label>Description</label>' +
                         '<input type="text" name="description" placeholder="Enter description">' +
                         '</div>' +
-                        '<div class="field">' +
-                        '<label>Priority</label>' +
-                        '<input type="text" name="priority" placeholder="Enter priority">' +
-                        '</div>' +
                         '</form>' +
                         '</div>' +
                         '<div class="actions">' +
@@ -242,6 +238,7 @@
 
                 // Function to duplicate a license
                 function duplicateLicense(licenseId) {
+                    updateStatus('loading', 'Duplicating license');
                     $.ajax({
                         url: '/api/casinos/licenses/' + licenseId + '/duplicate',
                         method: 'POST',
@@ -249,6 +246,7 @@
                             loadInitialData();
                         },
                         error: function (error) {
+                            updateStatus('error', 'Error duplicating license');
                             console.log('Error:', error);
                         }
                     });
@@ -256,6 +254,7 @@
 
                 // Function to save a license
                 function saveLicense(licenseId) {
+                    updateStatus('loading', 'Saving license');
                     $.ajax({
                         url: '/api/casinos/licenses/' + licenseId,
                         method: 'PUT',
@@ -266,6 +265,7 @@
                             image: $('#' + licenseId + ' .image-dropdown').dropdown('get value')
                         },
                         success: function (data) {
+                            updateStatus('success', 'License saved successfully');
                             console.log('Success:', data);
                         },
                         error: function (error) {
@@ -276,6 +276,7 @@
 
                 // Function to save all licenses
                 function saveAllLicenses() {
+                    updateStatus('loading', 'Saving all licenses');
                     $('#casinoLicensesTable tbody tr').each(function () {
                         var licenseId = $(this).attr('id');
                         saveLicense(licenseId);
