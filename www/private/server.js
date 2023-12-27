@@ -1877,7 +1877,9 @@ app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys
 
 // Get all images categories from MongoDB
 app.get('/api/images/categories', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
-  ImagesCategories.find()
+  const userTenancy = req.session.user.tenancy;
+
+  ImagesCategories.find({ tenancies: userTenancy })
     .then((results) => {
       res.json(results);
     })
@@ -1910,6 +1912,7 @@ app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'
     priority: priority,
     active: active,
     addedDate: Date.now(),
+    tenancy: req.session.user.tenancy // Add tenancy field
   });
 
   imagesCategories.save()
@@ -1934,7 +1937,8 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
   } = req.params;
 
   ImagesCategories.findOne({
-      _id: id
+      _id: id,
+      tenancy: req.session.user.tenancy // Add condition for tenancy
     })
     .then((imagesCategories) => {
       if (!imagesCategories) {
@@ -1949,6 +1953,7 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
           priority: newPriority,
           active: imagesCategories.active,
           addedDate: Date.now(),
+          tenancy: req.session.user.tenancy // Set tenancy for duplicated object
         });
 
         newImagesCategories.save()
@@ -1987,34 +1992,30 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
     active
   } = req.body;
 
-  ImagesCategories.findOne({
-      _id: id
-    })
-    .then((imagesCategories) => {
-      if (!imagesCategories) {
-        throw new Error('Image category not found');
-      } else {
-        imagesCategories.name = name;
-        imagesCategories.description = description;
-        imagesCategories.image = image;
-        imagesCategories.priority = priority;
-        imagesCategories.active = active;
-        imagesCategories.modifiedDate = Date.now();
-        imagesCategories.modifiedBy = userId;
-
-        imagesCategories.save()
-          .then(() => {
-            res.status(200).json({
-              success: 'Image Categorie updated'
-            });
-          })
-          .catch((error) => {
-            console.error('Error editing image category:', error);
-            res.status(500).json({
-              error: 'Internal server error'
-            });
-          });
+  ImagesCategories.findOneAndUpdate(
+    { _id: id, tenancy: req.session.user.tenancy }, // Add condition for tenancy
+    {
+      name,
+      description,
+      image,
+      priority,
+      active,
+      modifiedDate: Date.now(),
+      modifiedBy: userId
+    },
+    { new: true } // Return the updated document
+  )
+    .then((updatedImageCategory) => {
+      if (!updatedImageCategory) {
+        return res.status(404).json({
+          error: 'Image category not found'
+        });
       }
+
+      res.status(200).json({
+        success: 'Image category updated',
+        imageCategory: updatedImageCategory
+      });
     })
     .catch((error) => {
       console.error('Error editing image category:', error);
@@ -2028,7 +2029,7 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
 app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
   const imageCategoryId = req.params.id;
 
-  ImagesCategories.findByIdAndDelete(imageCategoryId)
+  ImagesCategories.findOneAndDelete({ _id: imageCategoryId, tenancy: req.session.user.tenancy })
     .then((deletedImageCategory) => {
       if (!deletedImageCategory) {
         return res.status(404).json({
@@ -2053,11 +2054,20 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
   const id = req.params.id;
 
   Images.findById(id)
-    .populate('category')
+    .populate({
+      path: 'category',
+      match: { tenancy: req.session.user.tenancy } // Filter by tenancy
+    })
     .then((image) => {
       if (!image) {
         return res.status(404).json({
           error: 'Image not found'
+        });
+      }
+
+      if (!image.category) {
+        return res.status(404).json({
+          error: 'Category not found for the image'
         });
       }
 
@@ -2095,26 +2105,14 @@ app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
     });
 });
 
-// Get all images categories from MongoDB
-app.get('/api/images/categories', checkPermissions('manageImages'), (req, res) => {
-  ImagesCategories.find()
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((error) => {
-      console.error('Error retrieving images categories:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
-
 // Get all images of a specific category
 app.get('/api/images/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
   const categoryId = req.params.categoryId;
+  const userTenancy = req.session.user.tenancy;
 
   Images.find({
-      category: categoryId
+      category: categoryId,
+      tenancies: userTenancy
     })
     .then((results) => {
       const updatedResults = results.map((image) => {
@@ -2133,8 +2131,6 @@ app.get('/api/images/categories/:categoryId/images', checkPermissions('manageIma
       });
     });
 });
-
-
 
 // Set up multer storage
 const storage = multer.diskStorage({
@@ -2173,6 +2169,7 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
     categoryId: req.body.categoryId,
     addedBy: req.session.user.userId,
     category: req.body.categoryId,
+    tenancies: req.session.user.tenancy // Add tenancies field
   });
 
   newImage.save()
@@ -2193,29 +2190,15 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
 
 // Edit image
 app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
-  const {
-    userId
-  } = req.session.user;
-  const {
-    id
-  } = req.params;
-  const {
-    name,
-    description,
-    priority,
-    active,
-    category
-  } = req.body;
+  const { userId } = req.session.user;
+  const { id } = req.params;
+  const { name, description, priority, active, category } = req.body;
   console.log(req.body);
 
-  Images.findOne({
-      _id: id
-    })
+  Images.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add condition for tenancies
     .then((image) => {
       if (!image) {
-        res.status(404).json({
-          error: 'Image not found'
-        });
+        res.status(404).json({ error: 'Image not found' });
       } else {
         image.name = name;
         image.description = description;
@@ -2227,31 +2210,26 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
         image.save()
           .then(() => {
-            res.status(200).json({
-              message: 'Image ' + image.name + ' edited successfully'
-            });
+            res.status(200).json({ message: 'Image ' + image.name + ' edited successfully' });
           })
           .catch((error) => {
             console.error('Error editing image:', error);
-            res.status(500).json({
-              error: 'Internal server error'
-            });
+            res.status(500).json({ error: 'Internal server error' });
           });
       }
     })
     .catch((error) => {
       console.error('Error editing image:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
 // Delete image from MongoDB and from the file system by ID
 app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   const id = req.params.id;
+  const { tenancy } = req.session.user;
 
-  Images.findByIdAndDelete(id)
+  Images.findOneAndDelete({ _id: id, tenancies: tenancy })
     .then((deletedImage) => {
       if (!deletedImage) {
         return res.status(404).json({
@@ -2551,7 +2529,9 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
 
 // Get all casino categories from MongoDB
 app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoCategories.find()
+  const { tenancy } = req.session.user;
+
+  CasinoCategories.find({ tenancies: tenancy })
     .then((results) => {
       res.json(results);
     })
@@ -2565,7 +2545,9 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
 
 // Get amount of all categories
 app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoCategories.countDocuments()
+  const { tenancy } = req.session.user;
+
+  CasinoCategories.countDocuments({ tenancies: tenancy })
     .then((results) => {
       res.json(results);
     })
@@ -2580,11 +2562,10 @@ app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req
 
 // Get details of a specific casino category
 app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const {
-    id
-  } = req.params;
+  const { id } = req.params;
+  const { tenancy } = req.session.user;
 
-  CasinoCategories.findById(id)
+  CasinoCategories.findOne({ _id: id, tenancies: tenancy })
     .then((casinoCategory) => {
       if (!casinoCategory) {
         return res.status(404).json({
@@ -2623,6 +2604,7 @@ app.post('/api/casinos/categories/add', checkPermissions('manageCasinos'), (req,
     priority: priority,
     active: active,
     addedDate: Date.now(),
+    tenancies: req.session.user.tenancy // Add tenancy condition
   });
 
   casinoCategories.save()
