@@ -40,6 +40,7 @@
             </div>
           </div>
     <% } %>
+
     
     <div class="right menu">
         <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
@@ -82,9 +83,42 @@
       <div class="item">
         <div id="logoutButton" class="ui right labeled icon button" onclick="callLogoutAPI()">Logout</div>
     </div>
+
   </div>
+
 </div>
-  <script>
+<div id="statusLabel" class="ui fluid top attached label"></div>
+
+<script>
+async function updateStatus(status, message) {
+  return new Promise((resolve, reject) => {
+    var label = document.getElementById("statusLabel");
+
+    console.log("updateLabel: " + status + " " + message);
+
+    if (status === "loading") {
+      style = "gray";
+      icon = '<i class="fa fa-spinner fa-spin"></i> ';
+      content = message;
+    }
+
+
+    if (status === "success") {
+      style = "green";
+      content = "Ok";
+      icon = '<i class="check icon"></i> ';
+      label.style.display = "none";
+    }
+    
+    label.className = "ui fluid label " + style;
+    label.innerHTML = icon + content;
+
+    resolve();
+  });
+}
+
+updateStatus('loading', 'Fetching User Details...');
+    
 showActionButton('logoutButton', 'logout'); 
     callLogoutAPI = () => {
       showActionButton('logoutButton', 'loading'); 
