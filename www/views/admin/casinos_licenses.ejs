@@ -6,79 +6,101 @@
 <body class="bg-yasarred">
     <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
         <div class="ui segment">
-            <%- include('./partials/dashboard-menu') %>
-            <div class="ui segment">
-                <h2>Casino Licenses</h2>
-                <table id="casinoLicensesTable" class="ui celled table">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Priority (Sorting)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Table rows will be dynamically added here -->
-                    </tbody>
-                </table>
-                <div class="ui green button" id="saveAllBtn">Save All</div>
-                <div class="ui green button" id="addLicenseBtn">Add License</div>
+
+                    <%- include('./partials/dashboard-menu') %>
+                    <div class="ui segment">
+                        <h2>Casino Licenses</h2>
+                        <table id="casinoLicensesTable" class="ui celled table">
+                            <thead>
+                                <tr>
+                                    <th width="15%">Image</th>
+                                    <th width="25%">Name</th>
+                                    <th width="30%">Description</th>
+                                    <th width="20%">Priority (Sorting)</th>
+                                    <th width="10%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sortable"></tbody>
+                                <!-- Table rows will be dynamically added here -->
+                            </tbody>
+                        </table>
+                        <div class="ui primary button" id="saveAllBtn">Save All</div>
+                        <div class="ui primary button" id="addLicenseBtn">Add License</div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    </div>
-    <%- include('../partials/footer') %>
+            </div>
+            <%- include('../partials/footer') %>
 
-    <!-- Fomantic UI small modal -->
-    <div id="deleteModal" class="ui small modal">
-        <div class="header">Delete License</div>
-        <div class="content">
-            <p>Are you sure you want to delete this license?</p>
-        </div>
-        <div class="actions">
-            <div class="ui negative button">Cancel</div>
-            <div class="ui positive button" id="confirmDeleteBtn">Delete</div>
-        </div>
-    </div>
-</body>
+            <!-- Fomantic UI small modal -->
+            <div id="deleteModal" class="ui small modal">
+                <div class="header">Delete License</div>
+                <div class="content">
+                    <p>Are you sure you want to delete this license?</p>
+                </div>
+                <div class="actions">
+                    <div class="ui negative button">Cancel</div>
+                    <div class="ui positive button" id="confirmDeleteBtn">Delete</div>
+                </div>
+            </div>
+        </body>
 
-</html>
+        </html>
 
-<script>
-    $(document).ready(function () {
-        // Function to load initial data from API endpoint
-        function loadInitialData() {
-            // Clear the table
-            $('#casinoLicensesTable tbody').empty();
+        <script>
+            $(document).ready(function () {
 
-            $.ajax({
-                url: '/api/casinos/licenses',
-                method: 'GET',
-                success: function (data) {
-                    // Sort the licenses by priority
-                    data.sort(function (a, b) {
-                        return a.priority - b.priority;
-                    });
+                // Function to load initial data from API endpoint
+                async function loadInitialData() {
+                    updateStatus('loading', 'Fetching available images');
+                    // Clear the table
+                    $('#casinoLicensesTable tbody').empty();
 
-                    // Populate the table with data
-                    data.forEach(function (license) {
-                        var row = '<tr id="' + license._id + '">' +
-                            '<td>' +
-                            '<div class="ui fluid search selection dropdown image-dropdown">' +
-                            '<input type="hidden" name="image">' +
-                            '<i class="dropdown icon"></i>' +
-                            '<div class="default text">Select an image</div>' +
-                            '<div class="menu">';
-
+                    try {
                         // Fetch available images from /api/images
-                        $.ajax({
-                            url: '/api/images',
-                            method: 'GET',
-                            success: function (images) {
+                        const imagesResponse = await fetch('/api/images');
+                        const images = await imagesResponse.json();
+
+                        // Call the function to populate the table with data
+                        await populateTable(images);
+                        updateStatus('success', 'Data loaded successfully');
+                    } catch (error) {
+                        console.log('Error:', error);
+                        // Hide loading indicator
+                        updateStatus('error', 'Error loading data');
+                    }
+                }
+
+                async function populateTable(images) {
+                    updateStatus('loading', 'Fetching licenses');
+
+                    try {
+                        // Fetch licenses from /api/casinos/licenses
+                        const licensesResponse = await fetch('/api/casinos/licenses');
+                        const data = await licensesResponse.json();
+
+                        // Sort the licenses by priority
+                        data.sort(function (a, b) {
+                            return a.priority - b.priority;
+                        });
+
+                        // Populate the table with data
+                        for (const license of data) {
+                            try {
+                                // Fetch license details from /api/casinos/licenses/:id
+                                const licenseDetailsResponse = await fetch('/api/casinos/licenses/' + license._id);
+                                const licenseDetails = await licenseDetailsResponse.json();
+
+                                var row = '<tr id="' + license._id + '">' +
+                                    '<td>' +
+                                    '<div class="ui fluid search selection dropdown image-dropdown">' +
+                                    '<input type="hidden" name="image">' +
+                                    '<i class="dropdown icon"></i>' +
+                                    '<div class="default text">Image</div>' +
+                                    '<div class="menu">';
+
                                 // Add options to the dropdown
-                                images.forEach(function (image) {
+                                for (const image of images) {
                                     var option =
                                         '<div class="item" data-value="' +
                                         image._id +
@@ -86,17 +108,17 @@
                                         image.imageUrl + '">' + image
                                         .name + '</div>';
                                     row += option;
-                                });
+                                }
 
                                 // Set the selected image based on license.image
                                 row += '</div>' +
                                     '</div>' +
                                     '</td>' +
-                                    '<td contenteditable="true">' + license
+                                    '<td contenteditable="true">' + licenseDetails
                                     .name + '</td>' +
-                                    '<td contenteditable="true">' + license
+                                    '<td contenteditable="true">' + licenseDetails
                                     .description + '</td>' +
-                                    '<td contenteditable="true">' + license
+                                    '<td contenteditable="true">' + licenseDetails
                                     .priority + '</td>' +
                                     '<td>' +
                                     '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
@@ -108,173 +130,177 @@
                                 // Set the selected image based on license.image
                                 $('#' + license._id + ' .image-dropdown')
                                     .dropdown('set selected', license.image);
-                            },
-                            error: function (error) {
+                            } catch (error) {
                                 console.log('Error:', error);
                             }
-                        });
+                        }
+
+                        // Initialize the dropdowns
+                        $('.image-dropdown').dropdown();
+
+                        updateStatus('success', 'Data loaded successfully');
+                    } catch (error) {
+                        console.log('Error:', error);
+                        // Hide loading indicator
+                        updateStatus('error', 'Error loading data');
+                    }
+                }
+            
+
+                // Call the function to load initial data
+                loadInitialData();
+
+                // Event listener for duplicate button
+                $(document).on('click', '.duplicate-btn', function () {
+                    var licenseId = $(this).closest('tr').attr('id');
+                    duplicateLicense(licenseId);
+                });
+
+                // Event listener for delete button
+                $(document).on('click', '.delete-btn', function () {
+                    var licenseId = $(this).closest('tr').attr('id');
+                    showDeleteModal(licenseId);
+                });
+
+
+                // Function to create a modal with a form to add a new license
+                function createAddLicenseModal() {
+                    var modal = '<div id="addLicenseModal" class="ui modal">' +
+                        '<div class="header">Add New License</div>' +
+                        '<div class="content">' +
+                        '<form id="addLicenseForm" class="ui form">' +
+                        '<div class="field">' +
+                        '<label>Name</label>' +
+                        '<input type="text" name="name" placeholder="Enter name">' +
+                        '</div>' +
+                        '<div class="field">' +
+                        '<label>Description</label>' +
+                        '<input type="text" name="description" placeholder="Enter description">' +
+                        '</div>' +
+                        '<div class="field">' +
+                        '<label>Priority</label>' +
+                        '<input type="text" name="priority" placeholder="Enter priority">' +
+                        '</div>' +
+                        '</form>' +
+                        '</div>' +
+                        '<div class="actions">' +
+                        '<div class="ui primary button" id="saveLicenseBtn">Save</div>' +
+                        '<div class="ui button" id="cancelLicenseBtn">Cancel</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('body').append(modal);
+
+                    // Event listener for save license button
+                    $(document).on('click', '#saveLicenseBtn', function () {
+                        var formData = $('#addLicenseForm').serialize();
+                        addLicense(formData);
+                        $('#addLicenseModal').modal('hide');
                     });
-                },
-                error: function (error) {
-                    console.log('Error:', error);
+
+                    // Event listener for cancel button
+                    $(document).on('click', '#cancelLicenseBtn', function () {
+                        $('#addLicenseModal').modal('hide');
+                    });
                 }
-            });
-        }
 
-        // Call the function to load initial data
-        loadInitialData();
+                // Function to add a new license
+                function addLicense(formData) {
+                    $.ajax({
+                        url: '/api/casinos/licenses',
+                        method: 'POST',
+                        data: formData,
+                        success: function (data) {
+                            console.log('Success:', data);
+                            loadInitialData();
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                }
 
-        // Event listener for duplicate button
-        $(document).on('click', '.duplicate-btn', function () {
-            var licenseId = $(this).closest('tr').attr('id');
-            duplicateLicense(licenseId);
-        });
+                // Event listener for add license button
+                $(document).on('click', '#addLicenseBtn', function () {
+                    createAddLicenseModal();
+                    $('#addLicenseModal').modal('show');
+                });
 
-        // Event listener for delete button
-        $(document).on('click', '.delete-btn', function () {
-            var licenseId = $(this).closest('tr').attr('id');
-            showDeleteModal(licenseId);
-        });
+                // Event listener for confirm delete button
+                $(document).on('click', '#confirmDeleteBtn', function () {
+                    var licenseId = $(this).closest('.modal').data('licenseId');
+                    deleteLicense(licenseId);
+                    $('#deleteModal').modal('hide');
+                });
 
+                // Event listener for save all button
+                $(document).on('click', '#saveAllBtn', function () {
+                    saveAllLicenses();
+                });
 
-        // Function to create a modal with a form to add a new license
-        function createAddLicenseModal() {
-            var modal = '<div id="addLicenseModal" class="ui modal">' +
-                '<div class="header">Add New License</div>' +
-                '<div class="content">' +
-                '<form id="addLicenseForm" class="ui form">' +
-                '<div class="field">' +
-                '<label>Name</label>' +
-                '<input type="text" name="name" placeholder="Enter name">' +
-                '</div>' +
-                '<div class="field">' +
-                '<label>Description</label>' +
-                '<input type="text" name="description" placeholder="Enter description">' +
-                '</div>' +
-                '<div class="field">' +
-                '<label>Priority</label>' +
-                '<input type="text" name="priority" placeholder="Enter priority">' +
-                '</div>' +
-                '</form>' +
-                '</div>' +
-                '<div class="actions">' +
-                '<div class="ui primary button" id="saveLicenseBtn">Save</div>' +
-                '<div class="ui button" id="cancelLicenseBtn">Cancel</div>' +
-                '</div>' +
-                '</div>';
+                // Function to duplicate a license
+                function duplicateLicense(licenseId) {
+                    $.ajax({
+                        url: '/api/casinos/licenses/' + licenseId + '/duplicate',
+                        method: 'POST',
+                        success: function (data) {
+                            loadInitialData();
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                }
 
-            $('body').append(modal);
+                // Function to save a license
+                function saveLicense(licenseId) {
+                    $.ajax({
+                        url: '/api/casinos/licenses/' + licenseId,
+                        method: 'PUT',
+                        data: {
+                            name: $('#' + licenseId + ' td:nth-child(2)').text(),
+                            description: $('#' + licenseId + ' td:nth-child(3)').text(),
+                            priority: $('#' + licenseId + ' td:nth-child(4)').text(),
+                            image: $('#' + licenseId + ' .image-dropdown').dropdown('get value')
+                        },
+                        success: function (data) {
+                            console.log('Success:', data);
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                }
 
-            // Event listener for save license button
-            $(document).on('click', '#saveLicenseBtn', function () {
-                var formData = $('#addLicenseForm').serialize();
-                addLicense(formData);
-                $('#addLicenseModal').modal('hide');
-            });
-
-            // Event listener for cancel button
-            $(document).on('click', '#cancelLicenseBtn', function () {
-                $('#addLicenseModal').modal('hide');
-            });
-        }
-
-        // Function to add a new license
-        function addLicense(formData) {
-            $.ajax({
-                url: '/api/casinos/licenses',
-                method: 'POST',
-                data: formData,
-                success: function (data) {
-                    console.log('Success:', data);
+                // Function to save all licenses
+                function saveAllLicenses() {
+                    $('#casinoLicensesTable tbody tr').each(function () {
+                        var licenseId = $(this).attr('id');
+                        saveLicense(licenseId);
+                    });
                     loadInitialData();
-                },
-                error: function (error) {
-                    console.log('Error:', error);
                 }
-            });
-        }
 
-        // Event listener for add license button
-        $(document).on('click', '#addLicenseBtn', function () {
-            createAddLicenseModal();
-            $('#addLicenseModal').modal('show');
-        });
-
-        // Event listener for confirm delete button
-        $(document).on('click', '#confirmDeleteBtn', function () {
-            var licenseId = $(this).closest('.modal').data('licenseId');
-            deleteLicense(licenseId);
-            $('#deleteModal').modal('hide');
-        });
-
-        // Event listener for save all button
-        $(document).on('click', '#saveAllBtn', function () {
-            saveAllLicenses();
-        });
-
-        // Function to duplicate a license
-        function duplicateLicense(licenseId) {
-            $.ajax({
-                url: '/api/casinos/licenses/' + licenseId + '/duplicate',
-                method: 'POST',
-                success: function (data) {
-                    loadInitialData();
-                },
-                error: function (error) {
-                    console.log('Error:', error);
+                // Function to delete a license
+                function deleteLicense(licenseId) {
+                    $.ajax({
+                        url: '/api/casinos/licenses/' + licenseId,
+                        method: 'DELETE',
+                        success: function (data) {
+                            console.log('License deleted successfully');
+                            loadInitialData();
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
                 }
-            });
-        }
 
-        // Function to save a license
-        function saveLicense(licenseId) {
-            $.ajax({
-                url: '/api/casinos/licenses/' + licenseId,
-                method: 'PUT',
-                data: {
-                    name: $('#' + licenseId + ' td:nth-child(2)').text(),
-                    description: $('#' + licenseId + ' td:nth-child(3)').text(),
-                    priority: $('#' + licenseId + ' td:nth-child(4)').text(),
-                    image: $('#' + licenseId + ' .image-dropdown').dropdown('get value')
-                },
-                success: function (data) {
-                    console.log('Success:', data);
-                },
-                error: function (error) {
-                    console.log('Error:', error);
+                // Function to show delete modal
+                function showDeleteModal(licenseId) {
+                    $('#deleteModal').data('licenseId', licenseId).modal('show');
                 }
+
             });
-        }
-
-        // Function to save all licenses
-        function saveAllLicenses() {
-            $('#casinoLicensesTable tbody tr').each(function () {
-                var licenseId = $(this).attr('id');
-                saveLicense(licenseId);
-            });
-            loadInitialData();
-        }
-
-        // Function to delete a license
-        function deleteLicense(licenseId) {
-            $.ajax({
-                url: '/api/casinos/licenses/' + licenseId,
-                method: 'DELETE',
-                success: function (data) {
-                    console.log('License deleted successfully');
-                    loadInitialData();
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Function to show delete modal
-        function showDeleteModal(licenseId) {
-            $('#deleteModal').data('licenseId', licenseId).modal('show');
-        }
-
-    });
-</script>
-</script>
+        </script>
+        </script>

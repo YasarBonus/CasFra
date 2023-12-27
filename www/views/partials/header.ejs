@@ -3,7 +3,19 @@
 
 <div class="ui fixed inverted menu">
     <div class="ui container" style="font-size:20px">
-        <div style="display:none" id="fetchingIndicator" class="ui right aligned active large orange loader"></div>
+      <div style="display:none; color:white" id="fetchingIndicator" class="ui right aligned active large orange loader">
+        Loading 
+    </div>
+    <script>
+      function showFetchingIndicator(x, message) {
+        $('#fetchingIndicator').show();
+        $('#fetchingIndicator').html(message + '<i class="fa fa-spinner fa-spin"></i>');
+      }
+
+      function hideFetchingIndicator() {
+        $('#fetchingIndicator').hide();
+      }
+    </script>
   
       <a href="/" class="header item">
         <img class="logo" src="/img/logo-egon-animated.gif">
