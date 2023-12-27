@@ -4008,6 +4008,76 @@ app.post('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) 
     });
 });
 
+// Swap casino license priority
+app.put('/api/casinos/licenses/swap', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id1,
+    id2
+  } = req.body;
+
+  CasinoLicenses.findOne({
+      _id: id1,
+      tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
+    })
+    .then((casinoLicense1) => {
+      if (!casinoLicense1) {
+        throw new Error('Casino license 1 not found');
+      } else {
+        CasinoLicenses.findOne({
+            _id: id2,
+            tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
+          })
+          .then((casinoLicense2) => {
+            if (!casinoLicense2) {
+              throw new Error('Casino license 2 not found');
+            } else {
+              const tempPriority = casinoLicense1.priority;
+              casinoLicense1.priority = casinoLicense2.priority;
+              casinoLicense2.priority = tempPriority;
+
+              casinoLicense1.save()
+                .then(() => {
+                  casinoLicense2.save()
+                    .then(() => {
+                      res.status(200).json({
+                        message: 'Casino license priority swapped successfully'
+                      });
+                    })
+                    .catch((error) => {
+                      console.error('Error swapping casino license priority:', error);
+                      res.status(500).json({
+                        error: 'Internal server error'
+                      });
+                    });
+                })
+                .catch((error) => {
+                  console.error('Error swapping casino license priority:', error);
+                  res.status(500).json({
+                    error: 'Internal server error'
+                  });
+                });
+            }
+          })
+          .catch((error) => {
+            console.error('Error swapping casino license priority:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          }
+        );
+      }
+    })
+    .catch((error) => {
+      console.error('Error swapping casino license priority:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Delete casino license
 app.delete('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
   const {
@@ -4032,6 +4102,8 @@ app.delete('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req,
       });
     });
 });
+
+
 
 // Duplicate casino license
 app.post('/api/casinos/licenses/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
@@ -4081,6 +4153,8 @@ app.post('/api/casinos/licenses/:id/duplicate', checkPermissions('manageCasinos'
       });
     });
 });
+
+
 
 // Edit casino license
 app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
