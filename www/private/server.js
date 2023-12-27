@@ -1912,7 +1912,7 @@ app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'
     priority: priority,
     active: active,
     addedDate: Date.now(),
-    tenancy: req.session.user.tenancy // Add tenancy field
+    tenancies: req.session.user.tenancy // Add tenancy field
   });
 
   imagesCategories.save()
@@ -1938,7 +1938,7 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
 
   ImagesCategories.findOne({
       _id: id,
-      tenancy: req.session.user.tenancy // Add condition for tenancy
+      tenancies: req.session.user.tenancy // Add condition for tenancy
     })
     .then((imagesCategories) => {
       if (!imagesCategories) {
@@ -1953,7 +1953,7 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
           priority: newPriority,
           active: imagesCategories.active,
           addedDate: Date.now(),
-          tenancy: req.session.user.tenancy // Set tenancy for duplicated object
+          tenancies: req.session.user.tenancy // Set tenancy for duplicated object
         });
 
         newImagesCategories.save()
@@ -1993,7 +1993,7 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
   } = req.body;
 
   ImagesCategories.findOneAndUpdate(
-    { _id: id, tenancy: req.session.user.tenancy }, // Add condition for tenancy
+    { _id: id, tenancies: req.session.user.tenancy }, // Add condition for tenancy
     {
       name,
       description,
@@ -2029,7 +2029,7 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
 app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
   const imageCategoryId = req.params.id;
 
-  ImagesCategories.findOneAndDelete({ _id: imageCategoryId, tenancy: req.session.user.tenancy })
+  ImagesCategories.findOneAndDelete({ _id: imageCategoryId, tenancies: req.session.user.tenancy })
     .then((deletedImageCategory) => {
       if (!deletedImageCategory) {
         return res.status(404).json({
@@ -2056,7 +2056,7 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
   Images.findById(id)
     .populate({
       path: 'category',
-      match: { tenancy: req.session.user.tenancy } // Filter by tenancy
+      match: { tenancies: req.session.user.tenancy } // Filter by tenancy
     })
     .then((image) => {
       if (!image) {
@@ -5390,7 +5390,7 @@ app.get('/:shortUrl', async (req, res) => {
       timestamp: new Date(),
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      tenancy: url.tenancies
+      tenancies: url.tenancies
     });
 
     res.redirect(url.url);
