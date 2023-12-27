@@ -21,7 +21,7 @@
                                 <!-- Table rows will be dynamically added here -->
                             </tbody>
                         </table>
-                        <div class="ui green button" id="saveAllBtn">Save All</div>
+                        <div class="ui green button" id="saveAllBtn">Save All</div> <div class="ui blue button" id="addNewBtn">Add New</div>
                     </div>
                 </div>
             </div>
@@ -187,6 +187,72 @@
                 }
             });
         }
+
+        // Function to create and show add new dialog
+        function showAddNewDialog() {
+            var dialogExists = $('.ui.modal.addNew').length;
+            if (dialogExists) {
+                $('.ui.modal.addNew').remove();
+            }
+            var dialogContent = '<div class="ui small modal addNew">' +
+                '<div class="header">Add New Category</div>' +
+                '<div class="content">' +
+                '<div class="ui form">' +
+                '<div class="field">' +
+                '<label>Name</label>' +
+                '<input type="text" name="name" placeholder="Name">' +
+                '</div>' +
+                '<div class="field">' +
+                '<label>Description</label>' +
+                '<input type="text" name="description" placeholder="Description">' +
+                '</div>' +
+                '<div class="field">' +
+                '<label>Priority</label>' +
+                '<input type="text" name="priority" placeholder="Priority">' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="actions">' +
+                '<div class="ui red button">Cancel</div>' +
+                '<div class="ui green button saveNewBtn">Add New</div>' +
+                '</div>' +
+                '</div>';
+
+            $('body').append(dialogContent);
+            $('.ui.modal.addNew').modal('show');
+        }
+
+        // Event listener for add new button
+        $(document).on('click', '#addNewBtn', function() {
+            showAddNewDialog();
+        });
+
+        // Event listener for save new button
+        $(document).on('click', '.saveNewBtn', function() {
+            var name = $('input[name="name"]').val();
+            var description = $('input[name="description"]').val();
+            var priority = $('input[name="priority"]').val();
+
+            $.ajax({
+                url: '/api/images/categories/add',
+                method: 'POST',
+                data: {
+                    name: name,
+                    description: description,
+                    priority: priority
+                },
+                success: function(data) {
+                    console.log('Category created successfully');
+                    showToast('success', 'Category created successfully');
+                    loadInitialData();
+                    $('.ui.modal.addNew').modal('hide');
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+
 
     });
 </script>

@@ -1901,7 +1901,8 @@ app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'
     active
   } = req.body;
   const {
-    userId
+    userId,
+    tenancy
   } = req.session.user;
 
   const imagesCategories = new ImagesCategories({
@@ -1912,7 +1913,7 @@ app.post('/api/images/categories/add', checkPermissions('manageImagesCategories'
     priority: priority,
     active: active,
     addedDate: Date.now(),
-    tenancies: req.session.user.tenancy // Add tenancy field
+    tenancies: tenancy // Add tenancy field
   });
 
   imagesCategories.save()
