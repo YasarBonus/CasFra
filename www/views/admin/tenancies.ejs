@@ -1,0 +1,146 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <%- include('../partials/header') %>
+    <body class="bg-yasarred">
+        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+            <div class="ui segment">
+                <%- include('./partials/dashboard-menu') %>
+                <div class="ui segment">
+                    <div class="ui container">
+                        <h2>Tenancies</h2>
+                        <button id="addTenancyBtn" class="ui primary button">Add</button>
+                        <table id="tenanciesTable" class="ui celled table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tenant</th>
+                                    <th>Created on</th>
+                                    <th>Active</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include('../partials/footer') %>
+
+        <!-- Add Tenancy Modal -->
+        <div id="addTenancyModal" class="ui modal">
+            <div class="header">Add Tenancy</div>
+            <div class="content">
+                <form id="addTenancyForm" class="ui form">
+                    <div class="field">
+                        <label>Name</label>
+                        <input type="text" name="name" placeholder="Enter name">
+                    </div>
+                    <div class="field">
+                        <label>Type</label>
+                        <select name="type" id="tenancyTypeDropdown"></select>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui primary button" id="saveTenancyBtn">Save</div>
+                <div class="ui button" id="cancelTenancyBtn">Cancel</div>
+            </div>
+        </div>
+
+        <script>
+            function fetchAndPopulateTenancies() {
+                // Fetch tenancies using AJAX
+                fetch('/api/tenancies')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the table with tenancies data
+                        const tenanciesTable = document.getElementById('tenanciesTable');
+                        const tbody = tenanciesTable.querySelector('tbody');
+                        data.forEach(tenancy => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${tenancy._id}</td>
+                                <td>${tenancy.name}</td>
+                                <td>${tenancy.notes}</td>
+                                <td>${tenancy.createdDate}</td>
+                                <td>${tenancy.active}</td>
+                                <td>
+                                    <button class="ui primary button editBtn">Edit</button>
+                                    <button class="ui disabled negative button deleteBtn">Delete</button>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    });
+            }
+
+            // Call the function to fetch and populate tenancies
+            fetchAndPopulateTenancies();
+
+            // Fetch tenancy types and populate the dropdown
+            fetch('/api/tenancies/types')
+                .then(response => response.json())
+                .then(data => {
+                    const tenancyTypeDropdown = document.getElementById('tenancyTypeDropdown');
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type._id;
+                        option.textContent = type.name;
+                        tenancyTypeDropdown.appendChild(option);
+                    });
+                });
+
+            // Add button event listener
+            const addTenancyBtn = document.getElementById('addTenancyBtn');
+            addTenancyBtn.addEventListener('click', () => {
+                $('#addTenancyModal').modal('show');
+            });
+
+            // Save button event listener
+            const saveTenancyBtn = document.getElementById('saveTenancyBtn');
+            saveTenancyBtn.addEventListener('click', () => {
+                const name = document.querySelector('#addTenancyForm input[name="name"]').value;
+                const type = document.querySelector('#addTenancyForm select[name="type"]').value;
+                const data = { name, type };
+
+                fetch('/api/tenancies/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    // Handle the response from the server
+                    console.log(result);
+                    // Close the modal
+                    $('#addTenancyModal').modal('hide');
+                    fetchAndPopulateTenancies();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+
+            // Edit button event listener
+            const editBtns = document.querySelectorAll('.editBtn');
+            editBtns.forEach(editBtn => {
+                editBtn.addEventListener('click', () => {
+                    // Add logic for editing a tenancy
+                });
+            });
+
+            // Delete button event listener
+            const deleteBtns = document.querySelectorAll('.deleteBtn');
+            deleteBtns.forEach(deleteBtn => {
+                deleteBtn.addEventListener('click', () => {
+                    // Add logic for deleting a tenancy
+                });
+            });
+        </script>
+    </body>
+</html>
