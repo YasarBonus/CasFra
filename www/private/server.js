@@ -988,6 +988,10 @@ app.use(express.urlencoded({
   extended: true
 }));
 
+app.use((req, res, next) => {
+  setTimeout(next, 50);
+});
+
 const MongoStore = require('connect-mongo');
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
