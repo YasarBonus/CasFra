@@ -5118,6 +5118,7 @@ async function setCasinoImageUrl(casinoId = null) {
         });
         if (image) {
           casino.imageUrl = `/img/images/${image.filename}`;
+          casino.tenancies = [casino.tenancies];
           await casino.save();
           console.log('Image URL for Casino ' + casino.name + '(' + casino._id + ') (' + casino.imageUrl + ') saved');
         }
@@ -5146,6 +5147,7 @@ async function setImageUrl(id = null) {
         });
         if (foundImage) {
           foundImage.imageUrl = `/img/images/${foundImage.filename}`;
+          foundImage.tenancies = [foundImage.tenancies];
           await foundImage.save();
           console.log('Image URL for Image ' + foundImage.name + '(' + foundImage._id + ') (' + foundImage.imageUrl + ') saved');
         }
@@ -5177,6 +5179,7 @@ async function createShortLinks(casinoId = null) {
           existingShortLink.shortUrl = casino.affiliateShortlink;
           existingShortLink.modifiedBy = casino.modifiedBy;
           existingShortLink.modifiedDate = casino.modifiedDate;
+          existingShortLink.tenancies = casino.tenancies;
           await existingShortLink.save();
           console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
         } else {
@@ -5188,6 +5191,7 @@ async function createShortLinks(casinoId = null) {
             modifiedBy: casino.modifiedBy,
             modifiedDate: casino.modifiedDate,
             attachedTo: casino._id,
+            tenancies: casino.tenancies
           });
           console.log('ShortLink created for casino ' + casino.name + ' (' + shortLink._id + ')');
         }
@@ -5331,6 +5335,7 @@ async function updateShortLinksStatistics() {
           hits7d: shortLinkHits7d,
           hits30d: shortLinkHits30d,
           hits12m: shortLinkHits12m,
+          tenancies: shortLink.tenancies
         });
       }
 
@@ -5384,7 +5389,8 @@ app.get('/:shortUrl', async (req, res) => {
       shortLink: url._id,
       timestamp: new Date(),
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgent: req.get('User-Agent'),
+      tenancy: url.tenancies
     });
 
     res.redirect(url.url);
