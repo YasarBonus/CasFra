@@ -798,7 +798,7 @@ const userAdminGroup = new UserGroup({
   name: 'Admin',
   permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageShortLinks', 'manageCasinos',
     'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-    'manageSessions', 'manageImages', 'manageImagesCategories'
+    'manageSessions', 'manageImages', 'manageImagesCategories', 'manageUsers'
   ]
 });
 
