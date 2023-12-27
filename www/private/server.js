@@ -3973,7 +3973,7 @@ app.get('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
 });
 
 // Insert casino license into MongoDB
-app.post('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) => {
+app.post('/api/casinos/licenses/add', checkPermissions('manageCasinos'), (req, res) => {
   const {
     name,
     description,
