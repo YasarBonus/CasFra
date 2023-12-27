@@ -446,7 +446,7 @@ const casinoIndividualBonusesSchema = new mongoose.Schema({
   },
   priority: {
     type: Number,
-    default: 0
+    default: generateRandomPriority()
   },
   addedDate: {
     type: Date,
@@ -3978,7 +3978,6 @@ app.post('/api/casinos/licenses/add', checkPermissions('manageCasinos'), (req, r
     name,
     description,
     image,
-    priority,
     active
   } = req.body;
   const {
@@ -3990,7 +3989,6 @@ app.post('/api/casinos/licenses/add', checkPermissions('manageCasinos'), (req, r
     name: name,
     description: description,
     image: image,
-    priority: priority,
     active: active,
     addedDate: Date.now(),
     tenancies: [req.session.user.tenancy] // Add the user's tenancy to the tenancies array
