@@ -5058,7 +5058,7 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
   }
 });
 
-app.get('/dashboard/super/users/:userId/edit', checkPermissions('manageUserGroups'), (req, res, next) => {
+app.get('/dashboard/super/users/:userId/edit', checkPermissions('manageUsers'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
       ') accessed user edit');
