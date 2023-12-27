@@ -104,7 +104,7 @@ breadcrumbHtml += '</div>';
 document.getElementById("breadcrumb").innerHTML = breadcrumbHtml;
 </script>
 
-<div id="statusLabel" class="ui fluid top attached label"></div>
+<div id="statusLabel" style="display:none;" class="ui fluid top attached label"></div>
 
 <script>
 async function updateStatus(status, message) {
@@ -117,7 +117,7 @@ async function updateStatus(status, message) {
       style = "gray";
       icon = '<i class="fa fa-spinner fa-spin"></i> ';
       content = message;
-      label.style.display = "none";
+      label.style.display = "block";
 
       showFetchingIndicator();
     }
@@ -131,15 +131,13 @@ async function updateStatus(status, message) {
       hideFetchingIndicator();
     }
     
-    label.className = "ui fluid label " + style;
+    label.className = "ui fluid top attached label " + style;
     label.innerHTML = icon + content;
 
     resolve();
   });
 }
 
-updateStatus('loading', 'Fetching User Details...');
-    
 showActionButton('logoutButton', 'logout'); 
     callLogoutAPI = () => {
       showActionButton('logoutButton', 'loading'); 
