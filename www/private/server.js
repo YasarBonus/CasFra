@@ -91,7 +91,6 @@ const tenanciesSchema = new mongoose.Schema({
   notes: String,
   createdBy: {
     type: String,
-    default: "System"
   },
   createdDate: {
     type: Date,
@@ -100,6 +99,7 @@ const tenanciesSchema = new mongoose.Schema({
   modifiedBy: String,
   modifiedDate: Date,
   image: String,
+  admins: [String],
   active: {
     type: Boolean,
     default: true
@@ -108,8 +108,36 @@ const tenanciesSchema = new mongoose.Schema({
   priority: {
     type: Number,
     default: generateRandomPriority()
-  }
+  },
+  type: String,
 })
+
+// Define tenanciesTypes schema
+const tenanciesTypesSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  image: String,
+  imageUrl: String,
+  active: {
+    type: Boolean,
+    default: true
+  },
+  priority: {
+    type: Number,
+    default: generateRandomPriority()
+  },
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+  short: {
+    type: String,
+    required: true,  
+  }
+});
 
 // Define User schema
 const userSchema = new mongoose.Schema({
@@ -640,6 +668,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
+const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 const User = mongoose.model('User', userSchema);
 const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
@@ -711,6 +740,53 @@ const saveDefaultTenancieDatabaseData = async () => {
 };
 
 saveDefaultTenancieDatabaseData();
+
+const tenanciesTypesEntries = [{
+  name: 'Default',
+  short: 'default',
+  description: 'Default Tenancies Type'
+}, {
+  name: 'Hosting',
+  short: 'hosting',
+  description: 'Hosting Tenant'
+}, {
+  name: 'Casino Affiliate',
+  short: 'casinoAffiliate',
+  description: 'Casino Affiliate Tenant'
+}, {
+  name: 'Lagnum',
+  short: 'lagnum',
+  description: 'Lagnum Tenant'
+}];
+
+const saveDefaultTenanciesTypesDatabaseData = async () => {
+  try {
+    const promises = [];
+
+    for (const tenanciesTypesEntry of tenanciesTypesEntries) {
+      const existingTenanciesTypes = await TenanciesTypes.findOne({
+        name: tenanciesTypesEntry.name
+      });
+
+      if (!existingTenanciesTypes) {
+        const newTenanciesTypes = new TenanciesTypes(tenanciesTypesEntry);
+        promises.push(newTenanciesTypes.save());
+        console.log('TenanciesTypes entry saved:', newTenanciesTypes);
+      } else if (existingTenanciesTypes.description !== tenanciesTypesEntry.description) {
+        existingTenanciesTypes.description = tenanciesTypesEntry.description;
+        promises.push(existingTenanciesTypes.save());
+        console.log('TenanciesTypes entry updated:', existingTenanciesTypes);
+      }
+    }
+
+    await Promise.all(promises);
+    console.log('Default TenanciesTypes Database Data successfully saved.');
+  } catch (error) {
+    console.error('Error saving Default TenanciesTypes Database Data:', error);
+  }
+};
+
+saveDefaultTenanciesTypesDatabaseData();
 
 const registrationKeyEntries = [{
   regkey: 'admin',
@@ -1209,6 +1285,20 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
 
 //#region Tenancies
 
+// Get all tenancies types from MongoDB
+app.get('/api/tenancies/types', checkPermissions('manageTenancies'), (req, res) => {
+  TenanciesTypes.find()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error retrieving tenancies types:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 // Get all tenancies from MongoDB
 app.get('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
   Tenancie.find()
@@ -1249,16 +1339,14 @@ app.get('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
 });
 
 // Add tenancie to MongoDB
-app.post('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
+app.post('/api/tenancies/add', checkPermissions('manageTenancies'), (req, res) => {
   const {
     name,
     notes,
-    createdBy,
-    createdDate,
-    modifiedBy,
-    modifiedDate,
+    type,
     image
   } = req.body;
+  const userId = req.session.user.userId;
 
   if (!name) {
     res.status(400).json({
@@ -1270,11 +1358,11 @@ app.post('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
   const tenancie = new Tenancie({
     name,
     notes,
-    createdBy,
-    createdDate,
-    modifiedBy,
-    modifiedDate,
-    image
+    createdBy: userId,
+    createdDate: new Date(),
+    admins: [userId],
+    image,
+    type
   });
 
   tenancie.save()
@@ -4963,6 +5051,19 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
     res.render('admin/users', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dashboard/super/tenancies', checkPermissions('manageTenancies'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed tenancies');
+    const user = req.session.user;
+    res.render('admin/tenancies', {
       user: user
     });
   } catch (err) {
