@@ -47,7 +47,11 @@
             || user.permissions.includes('manageSessions')) { %>
             <div class="ui dropdown item">
                 Super <i class="dropdown icon"></i>
+
                 <div class="menu">
+                  <% if (user.permissions.includes('manageTenancies')) { %>
+                    <a class="item" href="/dashboard/super/tenancies">Tenancies</a>
+                <% } %>
                   <% if (user.permissions.includes('manageUsers')) { %>
                     <a class="item" href="/dashboard/super/users">Users</a>
                 <% } %>
