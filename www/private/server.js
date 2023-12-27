@@ -2087,7 +2087,7 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
 
 // Get all images from MongoDB
 app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
-  Images.find()
+  Images.find({ tenancies: req.session.user.tenancy })
     .then((results) => {
       const updatedResults = results.map((image) => {
         return {
