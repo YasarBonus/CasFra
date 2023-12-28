@@ -116,6 +116,14 @@
 <div id="statusLabel" style="display:none;" class="ui fluid top attached label"></div>
 
 <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+  fetchTenancies();
+  getUserDetails();
+  getUserTenancy();
+});
+
+
   async function updateStatus(status, message) {
     return new Promise((resolve, reject) => {
       var label = document.getElementById("statusLabel");
@@ -183,7 +191,6 @@
       });
   }
 
-  getUserDetails();
 
   function getUserTenancy() {
     fetch('/api/user/tenancy')
@@ -200,7 +207,7 @@
       });
   }
 
-  getUserTenancy();
+
 
   function fetchTenancies() {
     fetch('/api/user/tenancies')
@@ -224,7 +231,7 @@
       });
   }
 
-  fetchTenancies();
+ 
 
   function switchTenancy(tenancyId) {
     return () => {
