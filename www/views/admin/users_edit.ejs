@@ -12,8 +12,12 @@
                         <h2>Edit User</h2>
                         <form class="ui form" id="editUserForm">
                             <div class="field">
-                                <label>Name</label>
-                                <input type="text" name="name" id="nameInput" placeholder="Enter name">
+                                <label>Username</label>
+                                <input type="text" name="username" id="usernameInput" placeholder="Enter name">
+                            </div>
+                            <div class="field">
+                                <label>Nickname</label>
+                                <input type="text" name="nickname" id="nicknameInput" placeholder="Enter nickname">
                             </div>
                             <div class="field">
                                 <label>Email</label>
@@ -35,23 +39,28 @@
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('nameInput').value = data.username;
+                    document.getElementById('usernameInput').value = data.username;
+                    document.getElementById('nicknameInput').value = data.nickname;
                     document.getElementById('emailInput').value = data.email;
                 })
                 .catch(error => console.error('Error:', error));
 
-            // Submit the form to /api/users/:userId
+            // Submit the form fields to /api/users/:userId
             const form = document.getElementById('editUserForm');
 
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
 
                 const formData = new FormData(form);
+                console.log('Form data:', formData);
                 const submitUrl = `/api/users/${userId}`;
 
                 fetch(submitUrl, {
-                    method: 'POST',
-                    body: formData
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
                 })
                 .then(response => response.json())
                 .then(data => {
