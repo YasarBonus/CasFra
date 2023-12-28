@@ -92,22 +92,23 @@
                 // Populate the table with data
                 data.forEach(function(link) {
                     var row = '<tr id="' + link._id + '">' +
-                        '<td contenteditable="true">' + link.shortUrl + '</td>' +
-                        '<td contenteditable="true">' + link.url + '</td>' +
-                        '<td contenteditable="true">' + link.description + '</td>' +
-                        '<td contenteditable="true">' + link.hits + '</td>' +
+                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.shortUrl + '</td>' +
+                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.url + '</td>' +
+                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.description + '</td>' +
+                        '<td>' + link.hits + '</td>' +
                         '<td>' + link.addedDate + '</td>' +
                         '<td>' +
                         '<div class="ui small red button delete-btn">Delete</div>' +
                         '<a href="/dashboard/shortlinks/' + link._id + '/statistics" class="ui small olive button statistics-btn">Statistics</a>' +
-                        '<div class="ui small green button save-btn">Save</div>' +
+                        (link.attachedTo ? '<a href="/dashboard/casinos/' + link.attachedTo + '/edit#affiliate" class="ui small primary button">Edit Casino</a>' : '<div class="ui small green button save-btn">Save</div>') +
+
                         '</td>' +
                         '</tr>';
                     $('#shortlinksTable tbody').append(row);
                 });
             }
         });
-    } 
+    }
 
     // Event listener for save button
     $('#shortlinksTable').on('click', '.save-btn', function() {
