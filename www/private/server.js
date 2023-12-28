@@ -2568,26 +2568,16 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 
 // Add short link to MongoDB
 app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    description,
-    url,
-    shortUrl
-  } = req.body;
-  const {
-    userId
-  } = req.session.user;
+  const { description, url, shortUrl } = req.body;
+  const { userId } = req.session.user;
 
   if (!shortUrl) {
-    res.status(400).json({
-      error: 'Name is required'
-    });
+    res.status(400).json({ error: 'Short URL is required' });
     return;
   }
 
   if (!url) {
-    res.status(400).json({
-      error: 'URL is required'
-    });
+    res.status(400).json({ error: 'URL is required' });
     return;
   }
 
@@ -2601,15 +2591,11 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
 
   shortLink.save()
     .then(() => {
-      res.status(201).json({
-        success: true
-      });
+      res.status(201).json({ success: true, message: 'Short link added successfully' });
     })
     .catch((error) => {
       console.error('Error inserting short link:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
@@ -2761,13 +2747,8 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
 
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    id
-  } = req.params;
-  const {
-    tenancy
-  } = req.session.user;
-
+  const { id } = req.params;
+  const { tenancy } = req.session.user;
 
   ShortLinks.findById(id)
     .then((shortLink) => {
@@ -2780,21 +2761,15 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       return ShortLinks.findByIdAndDelete(id);
     })
     .then(() => {
-      res.json({
-        success: true
-      });
+      res.json({ success: true, message: 'Short link deleted' });
       console.log('Short link deleted');
     })
     .catch((error) => {
       console.error('Error deleting short link:', error);
       if (error.message === 'Short link not found' || error.message === 'Unauthorized') {
-        res.status(404).json({
-          error: error.message
-        });
+        res.status(404).json({ error: error.message });
       } else {
-        res.status(500).json({
-          error: 'Internal server error'
-        });
+        res.status(500).json({ error: 'Internal server error' });
       }
     });
 });
