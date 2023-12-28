@@ -1910,7 +1910,8 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     active,
     banned,
     groupId,
-    tenancies
+    tenancies,
+    tenancy
   } = req.body;
   console.log(req.body);
 
@@ -1928,7 +1929,8 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
       active,
       banned,
       groupId,
-      tenancies
+      tenancies,
+      tenancy
     })
     .then(() => {
       res.json({
