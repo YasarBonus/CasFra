@@ -2729,60 +2729,53 @@ app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
 
 // Edit short link in MongoDB
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    id
-  } = req.params;
-  const {
-    description,
-    url,
-    shortUrl
-  } = req.body;
-  const {
-    userId
-  } = req.session.user;
+  const { id } = req.params;
+  const { description, url, shortUrl } = req.body;
+  const { userId } = req.session.user;
 
   if (!shortUrl) {
-    res.status(400).json({
-      error: 'shortUrl is required'
-    });
+    res.status(400).json({ error: 'shortUrl is required' });
     return;
   }
 
   if (!url) {
-    res.status(400).json({
-      error: 'URL is required'
-    });
+    res.status(400).json({ error: 'URL is required' });
     return;
   }
 
-  ShortLinks.findOneAndUpdate({
-        _id: id,
-        tenancies: req.session.user.tenancy
-      }, // Add condition to match tenancy
-      {
-        description,
-        url,
-        shortUrl,
-        modifiedBy: userId,
-        modifiedDate: Date.now()
-      }
-    )
-    .then((updatedShortLink) => {
-      if (!updatedShortLink) {
-        res.status(404).json({
-          error: 'Short link not found'
-        });
+  ShortLinks.findOne({ _id: id, tenancies: req.session.user.tenancy })
+    .then((shortLink) => {
+      if (!shortLink) {
+        res.status(404).json({ error: 'Short link not found' });
         return;
       }
-      res.json({
-        success: true
-      });
+
+      if (shortLink.attachedTo) {
+        res.status(403).json({ error: 'Cannot edit a short link with attachedTo' });
+        return;
+      }
+
+      return ShortLinks.findOneAndUpdate(
+        { _id: id, tenancies: req.session.user.tenancy },
+        {
+          description,
+          url,
+          shortUrl,
+          modifiedBy: userId,
+          modifiedDate: Date.now(),
+        }
+      );
+    })
+    .then((updatedShortLink) => {
+      if (!updatedShortLink) {
+        res.status(404).json({ error: 'Short link not found' });
+        return;
+      }
+      res.json({ success: true });
     })
     .catch((error) => {
       console.error('Error updating short link:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
@@ -5903,7 +5896,8 @@ async function createShortLinks(casinoId = null) {
     for (const casino of casinos) {
       if (casino.affiliateUrl && casino.affiliateShortlink) {
         const existingShortLink = await ShortLinks.findOne({
-          attachedTo: casino._id
+          attachedTo: casino._id,
+          tenancies: casino.tenancies,
         });
         if (existingShortLink) {
           existingShortLink.url = casino.affiliateUrl;
@@ -5911,6 +5905,7 @@ async function createShortLinks(casinoId = null) {
           existingShortLink.modifiedBy = casino.modifiedBy;
           existingShortLink.modifiedDate = casino.modifiedDate;
           existingShortLink.tenancies = casino.tenancies;
+          existingShortLink.attachedTo = casino._id;
           await existingShortLink.save();
           console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
         } else {
