@@ -629,6 +629,7 @@ const shortLinksSchema = new mongoose.Schema({
     default: generateRandomPriority()
   },
   attachedTo: String,
+  hits: Number,
 });
 
 // Define shortLinksHits Schema
@@ -5848,7 +5849,7 @@ async function setCasinoImageUrl(casinoId = null) {
         });
         if (image) {
           casino.imageUrl = `/img/images/${image.filename}`;
-          casino.tenancies = [casino.tenancies];
+          casino.tenancies = casino.tenancies;
           await casino.save();
           console.log('Image URL for Casino ' + casino.name + '(' + casino._id + ') (' + casino.imageUrl + ') saved');
         }
