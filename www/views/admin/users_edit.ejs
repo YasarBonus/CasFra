@@ -1,73 +1,148 @@
 <!-- media.ejs -->
 <!DOCTYPE html>
 <html>
-    <%- include('../partials/head') %>
-    <%- include('../partials/header') %>
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+        <div class="ui segment">
+            <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <%- include('./partials/dashboard-menu') %>
-                <div class="ui segment">
-                    <div class="ui container">
-                        <h2>Edit User</h2>
-                        <form class="ui form" id="editUserForm">
+                <div class="ui container">
+                    <h2>Edit User</h2>
+                    <form class="ui form" id="editUserForm">
+                        <div class="field">
+                            <label>Username</label>
+                            <input type="text" name="username" id="usernameInput" placeholder="Enter name">
+                        </div>
+                        <div class="field">
+                            <label>Nickname</label>
+                            <input type="text" name="nickname" id="nicknameInput" placeholder="Enter nickname">
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" name="email" id="emailInput" placeholder="Enter email">
+                        </div>
+                        <div class="ui header">Tenancies</div>
+                        <div class="ui red message">
+                            <h4>Handle with care</h4>
+                            <p>A user can switch between any of the selected Available Tenancies.</p>
+                        </div>
+                        <div class="two fields">
                             <div class="field">
-                                <label>Username</label>
-                                <input type="text" name="username" id="usernameInput" placeholder="Enter name">
+                                <label>Available Tenancies</label>
+                                <select class="ui fluid search dropdown" name="tenancies" id="tenanciesDropdown" multiple>
+                                    <!-- Dropdown options will be populated dynamically -->
+                                    <option value="">Select tenancies</option>
+                                </select>
                             </div>
                             <div class="field">
-                                <label>Nickname</label>
-                                <input type="text" name="nickname" id="nicknameInput" placeholder="Enter nickname">
+                                <label>Active Tenancy</label>
+                                <select class="ui dropdown" name="tenancy" id="tenancyDropdown">
+                                    <!-- Dropdown options will be populated dynamically -->
+                                </select>
                             </div>
-                            <div class="field">
-                                <label>Email</label>
-                                <input type="email" name="email" id="emailInput" placeholder="Enter email">
-                            </div>
-                            <button class="ui button" type="submit">Save</button>
-                        </form>
-                    </div>
+                        </div>
+                        <button class="ui button" type="submit">Save</button>
+                    </form>
                 </div>
             </div>
         </div>
-        <%- include('../partials/footer') %>
+    </div>
+    <%- include('../partials/footer') %>
 
-        <script>
-            // Pre-fill the form from /api/users/:userId
-            const userId = '<%= userId %>'; // Replace with the actual user ID
-            const apiUrl = `/api/users/${userId}`;
+    <script>
+        // Populate the tenancy dropdown from /api/tenancies
+        const tenancyDropdown = document.getElementById('tenancyDropdown');
+        const tenanciesUrl = '/api/tenancies';
 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('usernameInput').value = data.username;
-                    document.getElementById('nicknameInput').value = data.nickname;
-                    document.getElementById('emailInput').value = data.email;
-                })
-                .catch(error => console.error('Error:', error));
+        async function populateTenancyDropdown() {
+            updateStatus('loading', 'Fetching available tenancies');
+            try {
+                const response = await fetch(tenanciesUrl);
+                const data = await response.json();
+                data.forEach(tenancy => {
+                    const option = document.createElement('option');
+                    option.value = tenancy._id;
+                    option.text = tenancy.name;
+                    tenancyDropdown.appendChild(option);
+                    tenanciesDropdown.appendChild(option.cloneNode(true));
+                });
+                prefillForm(); // Pre-fill the form after the dropdown is populated
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-            // Submit the form fields to /api/users/:userId
-            const form = document.getElementById('editUserForm');
+        populateTenancyDropdown();
 
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
+        // Pre-fill the form from /api/users/:userId
+        const userId = '<%= userId %>'; // Replace with the actual user ID
+        const apiUrl = `/api/users/${userId}`;
 
-                const formData = new FormData(form);
-                console.log('Form data:', formData);
-                const submitUrl = `/api/users/${userId}`;
+        async function prefillForm() {
+            updateStatus('loading', 'Fetching user data');
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                document.getElementById('usernameInput').value = data.username;
+                document.getElementById('nicknameInput').value = data.nickname;
+                document.getElementById('emailInput').value = data.email;
+                document.getElementById('tenancyDropdown').value = data.tenancy;
 
-                fetch(submitUrl, {
+                const tenanciesDropdown = document.getElementById('tenanciesDropdown');
+                const selectedTenancies = data.tenancies;
+
+                Array.from(tenanciesDropdown.options).forEach(option => {
+                    if (selectedTenancies.includes(option.value)) {
+                        option.selected = true;
+                    }
+                });
+
+                updateStatus('success', 'User data fetched successfully');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+
+        // Submit the form fields to /api/users/:userId
+        const form = document.getElementById('editUserForm');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const tenanciesDropdown = document.getElementById('tenanciesDropdown');
+            const selectedTenancies = Array.from(tenanciesDropdown.selectedOptions).map(option => option.value);
+
+            const formData = {
+                username: document.getElementById('usernameInput').value,
+                nickname: document.getElementById('nicknameInput').value,
+                email: document.getElementById('emailInput').value,
+                tenancy: document.getElementById('tenancyDropdown').value,
+                tenancies: selectedTenancies,
+            }
+            console.log('Form data:', formData);
+            const submitUrl = `/api/users/${userId}`;
+
+            try {
+                const response = await fetch(submitUrl, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(Object.fromEntries(formData))
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response data
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        </script>
-    </body>
+                    body: JSON.stringify(formData), // Convert formData to JSON string
+                });
+                const data = await response.json();
+                // Handle the response data
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+
+    </script>
+</body>
+
 </html>
