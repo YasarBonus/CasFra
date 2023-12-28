@@ -613,7 +613,6 @@ const shortLinksSchema = new mongoose.Schema({
   shortUrl: String,
   description: String,
   tenancies: [String],
-
   addedDate: {
     type: Date,
     default: Date.now
@@ -661,7 +660,8 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
   timestamp: {
     type: Date,
     default: Date.now
-  }
+  },
+  tenancies: [String],
 });
 
 // Define models
@@ -2596,7 +2596,6 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
     url,
     shortUrl,
     addedBy: userId,
-    addedDate: Date.now(),
     tenancies: req.session.user.tenancy // Set the tenancies field to req.session.user.tenancy
   });
 
