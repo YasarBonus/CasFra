@@ -2740,7 +2740,7 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
       }
       console.log(shortLink);
       console.log(tenancy);
-      if (shortLink.tenancies !== tenancy) {
+      if (!shortLink.tenancies.includes(tenancy)) {
         throw new Error('Unauthorized');
       }
       return ShortLinksStatistics.find({
@@ -2764,13 +2764,17 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
   const {
     id
   } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
+
 
   ShortLinks.findById(id)
     .then((shortLink) => {
       if (!shortLink) {
         throw new Error('Short link not found');
       }
-      if (shortLink.tenancies !== req.session.user.tenancy) {
+      if (!shortLink.tenancies.includes(tenancy)) {
         throw new Error('Unauthorized');
       }
       return ShortLinks.findByIdAndDelete(id);
