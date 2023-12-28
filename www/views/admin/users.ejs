@@ -62,6 +62,25 @@
                         .modal('show');
                 }
 
+                // Function to handle login as user button click
+                function loginAsUser(userId) {
+                    // Send userId in the request body
+                    $.ajax({
+                        url: '/api/auth/loginAs',
+                        method: 'POST',
+                        data: JSON.stringify({ userId: userId }),
+                        contentType: 'application/json',
+                        success: function(response) {
+                            console.log('Logged in as user:', response);
+                            location.reload();
+                        },
+                        error: function(error) {
+                            console.log('Error logging in as user:', error);
+                            // Handle the error as needed
+                        }
+                    });
+                }
+
                 // Function to get users and populate the table
                 function getUsers() {
                     $.ajax({
@@ -85,12 +104,18 @@
                                 var actions = $('<td>');
                                 var deleteButton = $('<div class="ui tiny red button">').text('Delete');
                                 var editButton = $('<a href="/dashboard/super/users/' + user._id + '/edit" class="ui tiny primary button">').text('Edit');
+                                var loginAsButton = $('<div class="ui tiny primary button">').text('Login as User');
                                 // Add click event listener to delete button
                                 deleteButton.click(function() {
                                     deleteUser(user._id);
                                 });
+                                // Add click event listener to login as user button
+                                loginAsButton.click(function() {
+                                    loginAsUser(user._id);
+                                });
                                 actions.append(deleteButton);
                                 actions.append(editButton);
+                                actions.append(loginAsButton);
                                 row.append(actions);
                                 tableBody.append(row);
                             });
