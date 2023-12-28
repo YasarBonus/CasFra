@@ -811,7 +811,7 @@ const userOperatorGroup = new UserGroup({
 
 const userUserGroup = new UserGroup({
   name: 'User',
-  permissions: ['viewDashboard', 'manageAccount']
+  permissions: ['authenticate', 'viewDashboard', 'manageAccount']
 });
 
 const saveDefaultUserDatabaseData = async () => {
