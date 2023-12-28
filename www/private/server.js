@@ -2729,18 +2729,23 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
   const {
     id
   } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
   ShortLinks.findById(id)
     .then((shortLink) => {
       if (!shortLink) {
         throw new Error('Short link not found');
       }
-      if (shortLink.tenancies !== req.session.user.tenancy) {
+      console.log(shortLink);
+      console.log(tenancy);
+      if (shortLink.tenancies !== tenancy) {
         throw new Error('Unauthorized');
       }
       return ShortLinksStatistics.find({
         shortLink: id,
-        tenancies: req.session.user.tenancy
+        tenancies: tenancy
       });
     })
     .then((results) => {
