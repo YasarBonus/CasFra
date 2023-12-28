@@ -44,78 +44,86 @@
             </div>
           </div>
 
-          <script>
-            $('#resetPassword').click(function () {
-              $('#passwordResetModal').modal('show');
-              showActionButton('submitPasswordReset', 'changePassword')
-            });
+          <div class="ui blurring segment">
 
-            $('#submitPasswordReset').click(function () {
-              showActionButton('submitPasswordReset', 'loading')
-              var currentPassword = $('#passwordResetForm input[name="currentPassword"]').val();
-              var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
-              var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
-
-
-              if (newPassword !== confirmNewPassword) {
-                showActionButton('submitPasswordReset', 'error', 'Passwords do not match.',
-                  'The provided passwords do not match each other. Please try again.', 'changePassword');
-                console.log('Passwords do not match');
-                $('#passwordResetModal').modal('show');
-                return;
-              }
-
-              // AJAX function to POST the new password
-              $.ajax({
-                url: '/api/user/password',
-                method: 'POST',
-                data: {
-                  currentPassword: currentPassword,
-                  newPassword: newPassword
-                },
-                success: function (response) {
-                  // Handle success response
-                  console.log('Password reset successful');
-                  showToast('success', 'Password reset successful.',
-                    'Your password has been reset successfully.');
-                },
-                error: function (error) {
-                  // Handle error response
-                  showActionButton('submitPasswordReset', 'error', 'Password reset failed.',
-                    'The provided password is incorrect. Please try again.', 'changePassword')
-                  console.log('Password reset failed');
-                  $('#passwordResetModal').modal('show');
-                },
-                complete: function () {}
-              });
-            });
-          </script>
-          <div class="ui divider"></div>
-          <form class="ui form" id="userForm">
-            <div class="ui blurring segment">
-              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+            <form class="ui form" id="userForm">
               <h4 class="ui dividing header">Account Details </h4>
-              <div class="field">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Benutzername">
-              </div>
-              <div class="field">
-                <label>Nickname (other Users may see this Name)</label>
-                <input type="text" name="nickname" placeholder="Nickname">
-              </div>
-              <div class="field">
-                <label>E-Mail</label>
-                <input type="text" name="email" placeholder="E-Mail">
-              </div>
-              
-            </div>
-        </div>
-      </div>
-      <button class="ui labeled icon button" id="saveButton">
-      </button>
-      </form>
-    </div>
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
 
+              <div class="two fields">
+                <div class="field">
+                  <label>Username</label>
+                  <input type="text" name="username" placeholder="Benutzername">
+                </div>
+                <div class="field">
+                  <label>Nickname (visible to others)</label>
+                  <input type="text" name="nickname" placeholder="Nickname">
+                </div>
+              </div>
+              <div class="two fields">
+
+                <div class="field">
+                  <label>E-Mail</label>
+                  <input type="text" name="email" placeholder="E-Mail">
+                </div>
+              </div>
+          </div>
+          <button class="ui labeled icon button" id="saveButton">
+
+          </button>
+        </div>
+
+
+        </form>
+      </div>
+
+    </div>
+    <script>
+      $('#resetPassword').click(function () {
+        $('#passwordResetModal').modal('show');
+        showActionButton('submitPasswordReset', 'changePassword')
+      });
+
+      $('#submitPasswordReset').click(function () {
+        showActionButton('submitPasswordReset', 'loading')
+        var currentPassword = $('#passwordResetForm input[name="currentPassword"]').val();
+        var newPassword = $('#passwordResetForm input[name="newPassword"]').val();
+        var confirmNewPassword = $('#passwordResetForm input[name="confirmNewPassword"]').val();
+
+
+        if (newPassword !== confirmNewPassword) {
+          showActionButton('submitPasswordReset', 'error', 'Passwords do not match.',
+            'The provided passwords do not match each other. Please try again.', 'changePassword');
+          console.log('Passwords do not match');
+          $('#passwordResetModal').modal('show');
+          return;
+        }
+
+        // AJAX function to POST the new password
+        $.ajax({
+          url: '/api/user/password',
+          method: 'POST',
+          data: {
+            currentPassword: currentPassword,
+            newPassword: newPassword
+          },
+          success: function (response) {
+            // Handle success response
+            console.log('Password reset successful');
+            showToast('success', 'Password reset successful.',
+              'Your password has been reset successfully.');
+          },
+          error: function (error) {
+            // Handle error response
+            showActionButton('submitPasswordReset', 'error', 'Password reset failed.',
+              'The provided password is incorrect. Please try again.', 'changePassword')
+            console.log('Password reset failed');
+            $('#passwordResetModal').modal('show');
+          },
+          complete: function () {}
+        });
+      });
+    </script>
     <script>
       showActionButton('saveButton', 'save');
       // showLoader('formLoaderPersonalDetails', 'disabled');
