@@ -1898,6 +1898,51 @@ app.get('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     });
 });
 
+// Edit user details by ID
+app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    username,
+    nickname,
+    email,
+    active,
+    banned,
+    groupId,
+    tenancies
+  } = req.body;
+  console.log(req.body);
+
+  if (!username) {
+    res.status(400).json({
+      error: 'Username is required'
+    });
+    return;
+  }
+
+  User.findByIdAndUpdate(id, {
+      username,
+      nickname,
+      email,
+      active,
+      banned,
+      groupId,
+      tenancies
+    })
+    .then(() => {
+      res.json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error updating user:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
 //#endregion User
 
 //#region Registration Keys
