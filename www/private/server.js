@@ -1742,6 +1742,51 @@ app.get('/api/user/tenancies', checkPermissions('authenticate'), (req, res) => {
     });
 });
 
+// Get details of current tenancy of the current user
+app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
+  const {
+    userId
+  } = req.session.user;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({
+          error: 'User not found'
+        });
+        return;
+      }
+
+      const {
+        tenancy
+      } = user;
+
+      Tenancie.findById(tenancy)
+        .then((result) => {
+          if (!result) {
+            res.status(404).json({
+              error: 'Tenancy not found'
+            });
+            return;
+          }
+
+          res.json(result);
+        })
+        .catch((error) => {
+          console.error('Error retrieving tenancy:', error);
+          res.status(500).json({
+            error: 'Internal server error'
+          });
+        });
+    })
+    .catch((error) => {
+      console.error('Error retrieving user details:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
 // Change tenancy of the current user
 app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, res) => {
   const { userId } = req.session.user;
