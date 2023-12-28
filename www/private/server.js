@@ -135,7 +135,7 @@ const tenanciesTypesSchema = new mongoose.Schema({
   modifiedBy: String,
   short: {
     type: String,
-    required: true,  
+    required: true,
   }
 });
 
@@ -1315,7 +1315,7 @@ app.post('/api/auth/loginAs', checkPermissions('manageUsers'), (req, res) => {
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Get all sessions from MongoDB
 app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
@@ -1785,27 +1785,39 @@ app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
         error: 'Internal server error'
       });
     });
-} );
+});
 
 // Change tenancy of the current user
 app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, res) => {
-  const { userId } = req.session.user;
-  const { tenancyId } = req.params;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    tenancyId
+  } = req.params;
   console.log('User', userId, 'requested changing tenancy to', tenancyId);
 
   // Check if the tenancy exists in the user's tenancies
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          error: 'User not found'
+        });
         return;
       }
 
-      const { tenancies } = user;
-      const tenancyExists = Tenancie.exists({ _id: tenancyId });
+      const {
+        tenancies
+      } = user;
+      const tenancyExists = Tenancie.exists({
+        _id: tenancyId
+      });
 
       if (!tenancyExists) {
-        res.status(400).json({ error: 'Tenancy does not exist for the user' });
+        res.status(400).json({
+          error: 'Tenancy does not exist for the user'
+        });
         return;
       }
 
@@ -1813,19 +1825,27 @@ app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, 
       req.session.user.tenancy = tenancyId;
 
       // Update tenancy in database
-      User.findByIdAndUpdate(userId, { tenancy: tenancyId })
+      User.findByIdAndUpdate(userId, {
+          tenancy: tenancyId
+        })
         .then(() => {
           console.log('Tenancy changed to', tenancyId, 'for user', userId);
-          res.json({ success: true });
+          res.json({
+            success: true
+          });
         })
         .catch((error) => {
           console.error('Error updating user details:', error);
-          res.status(500).json({ error: 'Internal server error' });
+          res.status(500).json({
+            error: 'Internal server error'
+          });
         });
     })
     .catch((error) => {
       console.error('Error retrieving user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -2046,7 +2066,7 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
         error: 'Internal server error'
       });
     });
-} );
+});
 
 //#endregion User
 
@@ -2146,7 +2166,9 @@ app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys
 app.get('/api/images/categories', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
 
-  ImagesCategories.find({ tenancies: userTenancy })
+  ImagesCategories.find({
+      tenancies: userTenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2260,19 +2282,22 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
     active
   } = req.body;
 
-  ImagesCategories.findOneAndUpdate(
-    { _id: id, tenancies: req.session.user.tenancy }, // Add condition for tenancy
-    {
-      name,
-      description,
-      image,
-      priority,
-      active,
-      modifiedDate: Date.now(),
-      modifiedBy: userId
-    },
-    { new: true } // Return the updated document
-  )
+  ImagesCategories.findOneAndUpdate({
+        _id: id,
+        tenancies: req.session.user.tenancy
+      }, // Add condition for tenancy
+      {
+        name,
+        description,
+        image,
+        priority,
+        active,
+        modifiedDate: Date.now(),
+        modifiedBy: userId
+      }, {
+        new: true
+      } // Return the updated document
+    )
     .then((updatedImageCategory) => {
       if (!updatedImageCategory) {
         return res.status(404).json({
@@ -2297,7 +2322,10 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
 app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
   const imageCategoryId = req.params.id;
 
-  ImagesCategories.findOneAndDelete({ _id: imageCategoryId, tenancies: req.session.user.tenancy })
+  ImagesCategories.findOneAndDelete({
+      _id: imageCategoryId,
+      tenancies: req.session.user.tenancy
+    })
     .then((deletedImageCategory) => {
       if (!deletedImageCategory) {
         return res.status(404).json({
@@ -2324,7 +2352,9 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
   Images.findById(id)
     .populate({
       path: 'category',
-      match: { tenancies: req.session.user.tenancy } // Filter by tenancy
+      match: {
+        tenancies: req.session.user.tenancy
+      } // Filter by tenancy
     })
     .then((image) => {
       if (!image) {
@@ -2355,7 +2385,9 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
 
 // Get all images from MongoDB
 app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
-  Images.find({ tenancies: req.session.user.tenancy })
+  Images.find({
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       const updatedResults = results.map((image) => {
         return {
@@ -2458,15 +2490,30 @@ app.post('/api/images', checkPermissions('manageImages'), upload.single('image')
 
 // Edit image
 app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, priority, active, category } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    priority,
+    active,
+    category
+  } = req.body;
   console.log(req.body);
 
-  Images.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add condition for tenancies
+  Images.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add condition for tenancies
     .then((image) => {
       if (!image) {
-        res.status(404).json({ error: 'Image not found' });
+        res.status(404).json({
+          error: 'Image not found'
+        });
       } else {
         image.name = name;
         image.description = description;
@@ -2478,26 +2525,37 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
         image.save()
           .then(() => {
-            res.status(200).json({ message: 'Image ' + image.name + ' edited successfully' });
+            res.status(200).json({
+              message: 'Image ' + image.name + ' edited successfully'
+            });
           })
           .catch((error) => {
             console.error('Error editing image:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       }
     })
     .catch((error) => {
       console.error('Error editing image:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Delete image from MongoDB and from the file system by ID
 app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   const id = req.params.id;
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  Images.findOneAndDelete({ _id: id, tenancies: tenancy })
+  Images.findOneAndDelete({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((deletedImage) => {
       if (!deletedImage) {
         return res.status(404).json({
@@ -2528,9 +2586,13 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 // Get all short links from MongoDB
 app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  ShortLinks.find({ tenancies: tenancy })
+  ShortLinks.find({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2544,10 +2606,17 @@ app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
 
 // Get short link by ID from MongoDB
 app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  ShortLinks.findOne({ _id: id, tenancies: tenancy })
+  ShortLinks.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((result) => {
       if (!result) {
         res.status(404).json({
@@ -2568,16 +2637,26 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 
 // Add short link to MongoDB
 app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const { description, url, shortUrl } = req.body;
-  const { userId } = req.session.user;
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
 
   if (!shortUrl) {
-    res.status(400).json({ error: 'Short URL is required' });
+    res.status(400).json({
+      error: 'Short URL is required'
+    });
     return;
   }
 
   if (!url) {
-    res.status(400).json({ error: 'URL is required' });
+    res.status(400).json({
+      error: 'URL is required'
+    });
     return;
   }
 
@@ -2591,83 +2670,118 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
 
   shortLink.save()
     .then(() => {
-      res.status(201).json({ success: true, message: 'Short link added successfully' });
+      res.status(201).json({
+        success: true,
+        message: 'Short link added successfully'
+      });
     })
     .catch((error) => {
       console.error('Error inserting short link:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit multiple short links in MongoDB
 app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const { userId } = req.session.user;
-  const { shortLinks } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    shortLinks
+  } = req.body;
 
   if (!shortLinks) {
-    res.status(400).json({ error: 'Short links are required' });
+    res.status(400).json({
+      error: 'Short links are required'
+    });
     return;
   }
 
   const updatePromises = shortLinks.map((shortLink) => {
-    return ShortLinks.findOneAndUpdate(
-      { _id: shortLink._id, tenancies: req.session.user.tenancy },
-      {
-        description: shortLink.description,
-        url: shortLink.url,
-        shortUrl: shortLink.shortUrl,
-        modifiedBy: userId,
-        modifiedDate: Date.now()
-      }
-    );
+    return ShortLinks.findOneAndUpdate({
+      _id: shortLink._id,
+      tenancies: req.session.user.tenancy
+    }, {
+      description: shortLink.description,
+      url: shortLink.url,
+      shortUrl: shortLink.shortUrl,
+      modifiedBy: userId,
+      modifiedDate: Date.now()
+    });
   });
 
   Promise.all(updatePromises)
     .then(() => {
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error updating short link:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit short link in MongoDB
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const { id } = req.params;
-  const { description, url, shortUrl } = req.body;
-  const { userId } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    description,
+    url,
+    shortUrl
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
 
   if (!shortUrl) {
-    res.status(400).json({ error: 'shortUrl is required' });
+    res.status(400).json({
+      error: 'shortUrl is required'
+    });
     return;
   }
 
   if (!url) {
-    res.status(400).json({ error: 'URL is required' });
+    res.status(400).json({
+      error: 'URL is required'
+    });
     return;
   }
 
-  ShortLinks.findOneAndUpdate(
-    { _id: id, tenancies: req.session.user.tenancy }, // Add condition to match tenancy
-    {
-      description,
-      url,
-      shortUrl,
-      modifiedBy: userId,
-      modifiedDate: Date.now()
-    }
-  )
+  ShortLinks.findOneAndUpdate({
+        _id: id,
+        tenancies: req.session.user.tenancy
+      }, // Add condition to match tenancy
+      {
+        description,
+        url,
+        shortUrl,
+        modifiedBy: userId,
+        modifiedDate: Date.now()
+      }
+    )
     .then((updatedShortLink) => {
       if (!updatedShortLink) {
-        res.status(404).json({ error: 'Short link not found' });
+        res.status(404).json({
+          error: 'Short link not found'
+        });
         return;
       }
-      res.json({ success: true });
+      res.json({
+        success: true
+      });
     })
     .catch((error) => {
       console.error('Error updating short link:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -2678,8 +2792,8 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 
 app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res) => {
   ShortLinksHits.find({
-    tenancies: req.session.user.tenancy
-  })
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2693,12 +2807,14 @@ app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res)
 
 // Get short link hits by short link ID from MongoDB
 app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
   ShortLinksHits.find({
-    id: id,
-    tenancies: req.session.user.tenancy
-  })
+      id: id,
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2747,8 +2863,12 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
 
 // Delete short link from MongoDB
 app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
   ShortLinks.findById(id)
     .then((shortLink) => {
@@ -2761,15 +2881,22 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       return ShortLinks.findByIdAndDelete(id);
     })
     .then(() => {
-      res.json({ success: true, message: 'Short link deleted' });
+      res.json({
+        success: true,
+        message: 'Short link deleted'
+      });
       console.log('Short link deleted');
     })
     .catch((error) => {
       console.error('Error deleting short link:', error);
       if (error.message === 'Short link not found' || error.message === 'Unauthorized') {
-        res.status(404).json({ error: error.message });
+        res.status(404).json({
+          error: error.message
+        });
       } else {
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({
+          error: 'Internal server error'
+        });
       }
     });
 });
@@ -2780,9 +2907,13 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
 
 // Get all casino categories from MongoDB
 app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoCategories.find({ tenancies: tenancy })
+  CasinoCategories.find({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2796,9 +2927,13 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
 
 // Get amount of all categories
 app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoCategories.countDocuments({ tenancies: tenancy })
+  CasinoCategories.countDocuments({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -2813,10 +2948,17 @@ app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req
 
 // Get details of a specific casino category
 app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoCategories.findOne({ _id: id, tenancies: tenancy })
+  CasinoCategories.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((casinoCategory) => {
       if (!casinoCategory) {
         return res.status(404).json({
@@ -3003,7 +3145,9 @@ app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   const {
     userId
   } = req.session.user;
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
   const casinoTags = new CasinoTags({
     addedBy: userId,
@@ -3031,9 +3175,13 @@ app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
 
 // Get all casino tags from MongoDB
 app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.find({ tenancies: tenancy })
+  CasinoTags.find({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -3047,9 +3195,13 @@ app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
 
 // Get amount of all tags
 app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.countDocuments({ tenancies: tenancy })
+  CasinoTags.countDocuments({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -3063,10 +3215,17 @@ app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res)
 
 // Get details of a specific casino tag
 app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.findOne({ _id: id, tenancies: tenancy })
+  CasinoTags.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((casinoTag) => {
       if (!casinoTag) {
         return res.status(404).json({
@@ -3095,7 +3254,9 @@ app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   const {
     userId
   } = req.session.user;
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
   const casinoTags = new CasinoTags({
     addedBy: userId,
@@ -3121,11 +3282,20 @@ app.post('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
 
 // Duplicate casino tag
 app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.findOne({ _id: id, tenancies: tenancy })
+  CasinoTags.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((casinoTags) => {
       if (!casinoTags) {
         throw new Error('Casino tag not found');
@@ -3148,28 +3318,54 @@ app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (
           })
           .catch((error) => {
             console.error('Error duplicating casino tag:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({
+              error: 'Internal server error'
+            });
           });
       }
     })
     .catch((error) => {
       console.error('Error duplicating casino tag:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Edit casino tag
 app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, image, priority, active } = req.body;
-  const { tenancy } = req.session.user;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.findOneAndUpdate(
-    { _id: id, tenancies: tenancy }, // Only update if tenancies match
-    { name, description, image, priority, active },
-    { modifiedBy: userId, modifiedDate: Date.now() }
-  )
+  CasinoTags.findOneAndUpdate({
+        _id: id,
+        tenancies: tenancy
+      }, // Only update if tenancies match
+      {
+        name,
+        description,
+        image,
+        priority,
+        active
+      }, {
+        modifiedBy: userId,
+        modifiedDate: Date.now()
+      }
+    )
     .then((updatedCasinoTags) => {
       if (!updatedCasinoTags) {
         throw new Error('Casino tag not found');
@@ -3179,16 +3375,25 @@ app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
     })
     .catch((error) => {
       console.error('Error updating casino tag:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Delete casino tag
 app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoTags.findOneAndDelete({ _id: id, tenancies: tenancy })
+  CasinoTags.findOneAndDelete({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((deletedCasinoTag) => {
       if (!deletedCasinoTag) {
         throw new Error('Casino tag not found');
@@ -3198,7 +3403,9 @@ app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res
     })
     .catch((error) => {
       console.error('Error deleting casino tag:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -3208,9 +3415,13 @@ app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res
 
 // Get all casino features from MongoDB
 app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoFeatures.find({ tenancies: tenancy })
+  CasinoFeatures.find({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -3224,9 +3435,13 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
 
 // Get count of all features from MongoDB
 app.get('/api/casinos/features/count', checkPermissions('manageCasinos'), (req, res) => {
-  const { tenancy } = req.session.user;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoFeatures.countDocuments({ tenancies: tenancy })
+  CasinoFeatures.countDocuments({
+      tenancies: tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -3241,10 +3456,17 @@ app.get('/api/casinos/features/count', checkPermissions('manageCasinos'), (req, 
 
 // Get details of a specific casino feature
 app.get('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoFeatures.findOne({ _id: id, tenancies: tenancy })
+  CasinoFeatures.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((casinoFeatures) => {
       if (!casinoFeatures) {
         return res.status(404).json({
@@ -3784,7 +4006,9 @@ app.delete('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('mana
 app.get('/api/casinos/wagertypes/count', checkPermissions('manageCasinos'), (req, res) => {
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.countDocuments({ tenancies: tenancy }) // Filter by tenancy
+  CasinoWagerTypes.countDocuments({
+      tenancies: tenancy
+    }) // Filter by tenancy
     .then((results) => {
       res.json(results);
     })
@@ -3803,7 +4027,10 @@ app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
   } = req.params;
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.findOne({ _id: id, tenancies: tenancy }) // Filter by id and tenancy
+  CasinoWagerTypes.findOne({
+      _id: id,
+      tenancies: tenancy
+    }) // Filter by id and tenancy
     .then((casinoWagerTypes) => {
       if (!casinoWagerTypes) {
         // Handle not found case
@@ -3823,7 +4050,9 @@ app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
 app.get('/api/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.find({ tenancies: tenancy }) // Filter by tenancy
+  CasinoWagerTypes.find({
+      tenancies: tenancy
+    }) // Filter by tenancy
     .then((results) => {
       res.json(results);
     })
@@ -3962,7 +4191,11 @@ app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (re
 
 // Get count of all casino providers from MongoDB
 app.get('/api/casinos/providers/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoProvider.countDocuments({ tenancies: { $in: [req.session.user.tenancy] } })
+  CasinoProvider.countDocuments({
+      tenancies: {
+        $in: [req.session.user.tenancy]
+      }
+    })
     .then((results) => {
       res.json(results);
     })
@@ -3976,9 +4209,14 @@ app.get('/api/casinos/providers/count', checkPermissions('manageCasinos'), (req,
 
 // Get details of a specific casino provider
 app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
-  CasinoProvider.findOne({ _id: id, tenancies: req.session.user.tenancy })
+  CasinoProvider.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    })
     .then((casinoProvider) => {
       if (!casinoProvider) {
         // Handle not found case
@@ -3995,7 +4233,9 @@ app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, r
 
 // Get all casino providers from MongoDB
 app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoProvider.find({ tenancies: req.session.user.tenancy })
+  CasinoProvider.find({
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -4173,7 +4413,9 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
 
 // Get all casino licenses from MongoDB
 app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoLicenses.find({ tenancies: req.session.user.tenancy })
+  CasinoLicenses.find({
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -4187,7 +4429,9 @@ app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) =
 
 // Get amount of all casino licenses from MongoDB
 app.get('/api/casinos/licenses/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoLicenses.countDocuments({ tenancies: req.session.user.tenancy })
+  CasinoLicenses.countDocuments({
+      tenancies: req.session.user.tenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -4201,20 +4445,31 @@ app.get('/api/casinos/licenses/count', checkPermissions('manageCasinos'), (req, 
 
 // Get details of a specific casino license
 app.get('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
-  const { tenancy } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
 
-  CasinoLicenses.findOne({ _id: id, tenancies: tenancy })
+  CasinoLicenses.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
     .then((casinoLicense) => {
       if (!casinoLicense) {
-        return res.status(404).json({ error: 'Casino license not found' });
+        return res.status(404).json({
+          error: 'Casino license not found'
+        });
       }
 
       res.json(casinoLicense);
     })
     .catch((error) => {
       console.error('Error retrieving casino license:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -4310,8 +4565,7 @@ app.put('/api/casinos/licenses/swap', checkPermissions('manageCasinos'), (req, r
             res.status(500).json({
               error: 'Internal server error'
             });
-          }
-        );
+          });
       }
     })
     .catch((error) => {
@@ -4451,7 +4705,9 @@ app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
 // Get all casino payment methods from MongoDB
 app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
-  CasinoPaymentMethods.find({ tenancies: userTenancy })
+  CasinoPaymentMethods.find({
+      tenancies: userTenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -4466,7 +4722,9 @@ app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, 
 // Get count of all casino payment methods from MongoDB
 app.get('/api/casinos/paymentmethods/count', checkPermissions('manageCasinos'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
-  CasinoPaymentMethods.countDocuments({ tenancies: userTenancy })
+  CasinoPaymentMethods.countDocuments({
+      tenancies: userTenancy
+    })
     .then((results) => {
       res.json(results);
     })
@@ -4480,10 +4738,15 @@ app.get('/api/casinos/paymentmethods/count', checkPermissions('manageCasinos'), 
 
 // Get details of a specific casino payment method
 app.get('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
   const userTenancy = req.session.user.tenancy;
 
-  CasinoPaymentMethods.findOne({ _id: id, tenancies: userTenancy })
+  CasinoPaymentMethods.findOne({
+      _id: id,
+      tenancies: userTenancy
+    })
     .then((casinoPaymentMethods) => {
       if (!casinoPaymentMethods) {
         return res.status(404).json({
@@ -4631,27 +4894,33 @@ app.post('/api/casinos/paymentmethods/:id/duplicate', checkPermissions('manageCa
 
 // Edit casino payment method
 app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
-  const { name, description, image, priority, active } = req.body;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
+  const {
+    name,
+    description,
+    image,
+    priority,
+    active
+  } = req.body;
 
-  CasinoPaymentMethods.findOneAndUpdate(
-    {
+  CasinoPaymentMethods.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Add the condition to check tenancies
-    },
-    {
+    }, {
       name,
       description,
       image,
       priority,
       active
-    },
-    {
+    }, {
       modifiedBy: userId,
       modifiedDate: Date.now()
-    }
-  )
+    })
     .then((updatedCasinoPaymentMethods) => {
       if (!updatedCasinoPaymentMethods) {
         throw new Error('Casino payment method not found');
@@ -4669,12 +4938,14 @@ app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (r
 
 // Delete casino payment method
 app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
   CasinoPaymentMethods.findOneAndDelete({
-    _id: id,
-    tenancies: req.session.user.tenancy // Add the condition to check tenancies
-  })
+      _id: id,
+      tenancies: req.session.user.tenancy // Add the condition to check tenancies
+    })
     .then((deletedCasinoPaymentMethods) => {
       if (!deletedCasinoPaymentMethods) {
         throw new Error('Casino payment method not found');
@@ -4697,7 +4968,9 @@ app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'),
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) => {
   try {
-    const results = await Casino.find({ tenancies: req.session.user.tenancy }); // Retrieve casinos with matching tenancy
+    const results = await Casino.find({
+      tenancies: req.session.user.tenancy
+    }); // Retrieve casinos with matching tenancy
     res.json(results);
   } catch (error) {
     console.error('Error retrieving casinos:', error);
@@ -4709,25 +4982,39 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) => {
 
 // Get the details of a specific casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), async (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
   try {
-    const casino = await Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }); // Retrieve casino with matching tenancy
+    const casino = await Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }); // Retrieve casino with matching tenancy
     if (!casino) {
-      return res.status(404).json({ error: 'Casino not found' });
+      return res.status(404).json({
+        error: 'Casino not found'
+      });
     }
     res.json(casino);
   } catch (error) {
-    console.error('Error retrieving casino:', error); 
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error retrieving casino:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
   }
 });
 
 
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
-  const { name } = req.body; // Get the name and location from the request body
-  const { userId, tenancy } = req.session.user; // Get the user ID from the session data
+  const {
+    name
+  } = req.body; // Get the name and location from the request body
+  const {
+    userId,
+    tenancy
+  } = req.session.user; // Get the user ID from the session data
 
   // Create a new casino object
   const newCasino = new Casino({
@@ -4745,18 +5032,27 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error creating casino:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Duplicate a casino
 app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), async (req, res) => {
-  const { userId } = req.session.user;
-  const { id } = req.params;
+  const {
+    userId
+  } = req.session.user;
+  const {
+    id
+  } = req.params;
 
   try {
     const tenancies = await getTenancyByUserId(userId); // Get the tenancyId of the current user
-    const casino = await Casino.findOne({ _id: id, tenancies }); // Check if the casino belongs to the user's tenancy
+    const casino = await Casino.findOne({
+      _id: id,
+      tenancies
+    }); // Check if the casino belongs to the user's tenancy
 
     if (!casino) {
       throw new Error('Casino not found');
@@ -4847,7 +5143,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     licenses
   } = req.body; // Get the updated values from the request body
   console.log("Updating Casino:", req.body);
-  
+
   // Add the condition to check if the user has access to the casino
   Casino.findOneAndUpdate({
       _id: id,
@@ -4906,15 +5202,22 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
 
 // Toggle the active status of a casino by its ID
 app.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID of the casino from the request params
+  const {
+    id
+  } = req.params; // Get the ID of the casino from the request params
 
   // Validate the ID
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ error: 'Invalid ID format' });
+    return res.status(400).json({
+      error: 'Invalid ID format'
+    });
   }
 
   // Find the casino by its ID and tenancy
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy })
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    })
     .then((casino) => {
       if (!casino) {
         throw new Error('Casino not found');
@@ -4925,32 +5228,49 @@ app.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req
       return casino.save();
     })
     .then((updatedCasino) => {
-      res.json({ success: true, casino: updatedCasino });
+      res.json({
+        success: true,
+        casino: updatedCasino
+      });
     })
     .catch((error) => {
       console.error('Error toggling active status:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Swap the priority of two casinos by their ID
 app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, res) => {
-  const { id1, id2 } = req.body; // Get the IDs of the two casinos from the request body
+  const {
+    id1,
+    id2
+  } = req.body; // Get the IDs of the two casinos from the request body
 
   console.log(id1 + ' ' + id2);
 
   // Validate the IDs
   if (!id1.match(/^[0-9a-fA-F]{24}$/) || !id2.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ error: 'Invalid ID format' });
+    return res.status(400).json({
+      error: 'Invalid ID format'
+    });
   }
 
   // Check if id1 and id2 are the same
   if (id1 === id2) {
-    return res.status(400).json({ error: 'Cannot swap priority of the same casino' });
+    return res.status(400).json({
+      error: 'Cannot swap priority of the same casino'
+    });
   }
 
   // Find the two casinos by their IDs and tenancy
-  Casino.find({ _id: { $in: [id1, id2] }, tenancies: req.session.user.tenancy }) // Add tenancy check
+  Casino.find({
+      _id: {
+        $in: [id1, id2]
+      },
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((casinos) => {
       if (casinos.length !== 2) {
         throw new Error('Two casinos not found');
@@ -4970,112 +5290,170 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
     })
     .catch((error) => {
       console.error('Error swapping casinos priority:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get individualbonus of a specific casino by ID
 app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.individualBonuses);
     })
     .catch((error) => {
       console.error('Error retrieving casino individualbonuses:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get features of a specific casino by ID
 app.get('/api/casinos/:id/features', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.features);
     })
     .catch((error) => {
       console.error('Error retrieving casino features:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get image of a specific casino by ID
 app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       console.log(result);
       res.json(result.image);
     })
     .catch((error) => {
       console.error('Error retrieving casino image:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get categories of a specific casino by ID
 app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.categories);
     })
     .catch((error) => {
       console.error('Error retrieving casino categories:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get wagerTypes of a specific casino by ID
 app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.wagerTypes);
     })
     .catch((error) => {
       console.error('Error retrieving casino wagerTypes:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get providers of a specific casino by ID
 app.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.providers);
     })
     .catch((error) => {
       console.error('Error retrieving casino providers:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get licenses of a specific casino by ID
 app.get('/api/casinos/:id/licenses', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.licenses);
     })
     .catch((error) => {
       console.error('Error retrieving casino licenses:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
 // Get paymentMethods of a specific casino by ID
 app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
-  const { id } = req.params; // Get the ID from the request params
-  Casino.findOne({ _id: id, tenancies: req.session.user.tenancy }) // Add tenancy check
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+  Casino.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add tenancy check
     .then((result) => {
       res.json(result.paymentMethods);
     })
     .catch((error) => {
       console.error('Error retrieving casino paymentMethods:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
