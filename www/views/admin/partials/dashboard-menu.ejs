@@ -1,91 +1,96 @@
 <div class="ui small menu">
-    <% if (user.permissions.includes('viewDashboard')) { %>
-        <a class="item" href="/dashboard">Dashboard</a>
-    <% } %>
-    <% if (user.permissions.includes('manageCasinos')) { %>
-        <a class="item" href="/dashboard/casinos">Casinos</a>
-    <% } %>
+  <% if (user.permissions.includes('viewDashboard')) { %>
+  <a class="item" href="/dashboard">Dashboard</a>
+  <% } %>
+  <% if (user.permissions.includes('manageCasinos')) { %>
+  <a class="item" href="/dashboard/casinos">Casinos</a>
+  <% } %>
 
-      <div class="ui dropdown item">
-          Tenancy <i class="dropdown icon"></i>
-          <div class="menu">
-            <a href="/dashboard/casinos/categories" class="item">Casino Categories</a>
-            <a href="/dashboard/casinos/tags" class="item">Casino Tags</a>
-            <a href="/dashboard/casinos/features" class="item">Casino Features</a>
-            <a href="/dashboard/casinos/providers" class="item">Casino Providers</a>
-            <a href="/dashboard/casinos/paymentmethods" class="item">Casino Payment Methods</a>
-            <a href="/dashboard/casinos/licenses" class="item">Casino Licenses</a>
-          </div>
-        </div>
-        
-    <% if (user.permissions.includes('manageLinks')) { %>
-        <div class="ui dropdown item">
-            ShortLinks <i class="dropdown icon"></i>
-            <div class="menu">
-              <a href="/dashboard/shortlinks" class="item">Manage</a>
-              <a href="/dashboard/shortlinks/hits" class="disabled item">Hits</a>
-            </div>
-          </div>
-    <% } %>
-    <% if (user.permissions.includes('manageImages') || user.permissions.includes('manageImagesCategories')) { %>
-        <div class="ui dropdown item">
-            Images <i class="dropdown icon"></i>
-            <div class="menu">
-                <% if (user.permissions.includes('manageImages')) { %>
-                    <a class="item" href="/dashboard/images">Images</a>
-                <% } %>
-                <% if (user.permissions.includes('manageImagesCategories')) { %>
-                  <a class="item" href="/dashboard/images/categories">Image Categories</a>
-              <% } %>
-            </div>
-          </div>
-    <% } %>
+  <div class="ui dropdown item">
+    Tenancy <i class="dropdown icon"></i>
+    <div class="menu">
+      <a href="/dashboard/casinos/categories" class="item">Casino Categories</a>
+      <a href="/dashboard/casinos/tags" class="item">Casino Tags</a>
+      <a href="/dashboard/casinos/features" class="item">Casino Features</a>
+      <a href="/dashboard/casinos/providers" class="item">Casino Providers</a>
+      <a href="/dashboard/casinos/paymentmethods" class="item">Casino Payment Methods</a>
+      <a href="/dashboard/casinos/licenses" class="item">Casino Licenses</a>
+    </div>
+  </div>
 
-    
-    <div class="right menu">
-        <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
+  <% if (user.permissions.includes('manageLinks')) { %>
+  <div class="ui dropdown item">
+    ShortLinks <i class="dropdown icon"></i>
+    <div class="menu">
+      <a href="/dashboard/shortlinks" class="item">Manage</a>
+      <a href="/dashboard/shortlinks/hits" class="disabled item">Hits</a>
+    </div>
+  </div>
+  <% } %>
+  <% if (user.permissions.includes('manageImages') || user.permissions.includes('manageImagesCategories')) { %>
+  <div class="ui dropdown item">
+    Images <i class="dropdown icon"></i>
+    <div class="menu">
+      <% if (user.permissions.includes('manageImages')) { %>
+      <a class="item" href="/dashboard/images">Images</a>
+      <% } %>
+      <% if (user.permissions.includes('manageImagesCategories')) { %>
+      <a class="item" href="/dashboard/images/categories">Image Categories</a>
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+
+
+  <div class="right menu">
+    <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
             || user.permissions.includes('manageSessions')) { %>
-            <div class="ui dropdown item">
-                Super <i class="dropdown icon"></i>
+    <div class="ui dropdown item">
+      Super <i class="dropdown icon"></i>
 
-                <div class="menu">
-                  <% if (user.permissions.includes('manageTenancies')) { %>
-                    <a class="item" href="/dashboard/super/tenancies">Tenancies</a>
-                <% } %>
-                  <% if (user.permissions.includes('manageUsers')) { %>
-                    <a class="item" href="/dashboard/super/users">Users</a>
-                <% } %>
-                    <% if (user.permissions.includes('manageRegistrationKeys')) { %>
-                        <a class="item" href="/dashboard/super/registrationkeys">Registration Keys</a>
-                    <% } %>
-                    <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
-                        <a class="item" href="/dashboard/super/sessions">User Sessions</a>
-                    <% } %>
-
-                </div>
-              </div>
-              
+      <div class="menu">
+        <% if (user.permissions.includes('manageTenancies')) { %>
+        <a class="item" href="/dashboard/super/tenancies">Tenancies</a>
+        <% } %>
+        <% if (user.permissions.includes('manageUsers')) { %>
+        <a class="item" href="/dashboard/super/users">Users</a>
+        <% } %>
+        <% if (user.permissions.includes('manageRegistrationKeys')) { %>
+        <a class="item" href="/dashboard/super/registrationkeys">Registration Keys</a>
+        <% } %>
+        <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
+        <a class="item" href="/dashboard/super/sessions">User Sessions</a>
         <% } %>
 
-            
-        <% if (user.tenancy) { %>
-        <div class="ui tenancies dropdown item">
-          <i class="building icon"></i> <i class="dropdown icon"></i>
-          <div class="menu">
-              <a href="/dashboard/account" class="item">Manage Account</a>
-          </div>
-        </div>
-        <% } %>
-        
-          <div class="ui dropdown item">
-            <i class="user icon"></i><%= user.username %> <i class="dropdown icon"></i>
-            <div class="menu">
-                <a href="/dashboard/account" class="item">Manage Account</a>
- 
-            </div>
-          </div>
-      <div class="item">
-        <div id="logoutButton" class="ui right labeled icon button" onclick="callLogoutAPI()">Logout</div>
+      </div>
+    </div>
+
+    <% } %>
+
+
+    <% if (user.tenancy) { %>
+    <div class="ui tenancies dropdown item">
+      <i class="building icon"></i>
+      <div id="tenancyMenuName">
+        <div class="ui active inline mini loader"></div>
+      </div> <i class="dropdown icon"></i>
+      <div class="menu">
+        <a href="/dashboard/account" class="item">Manage Account</a>
+      </div>
+    </div>
+    <% } %>
+
+    <div class="ui dropdown item">
+      <i class="user icon"></i>
+      <div id="accountMenuUsername">        <div class="ui active inline mini loader"></div>
+    </div> <i class="dropdown icon"></i>
+      <div class="menu">
+        <a href="/dashboard/account" class="item">Manage Account</a>
+
+      </div>
+    </div>
+    <div class="item">
+      <div id="logoutButton" class="ui right labeled icon button" onclick="callLogoutAPI()">Logout</div>
     </div>
 
   </div>
@@ -96,74 +101,107 @@
 
 <script>
   var currentUri = window.location.pathname;
-var uriParts = currentUri.split('/').filter(part => part !== '');
-var breadcrumbHtml = '<div class="ui breadcrumb">';
-uriParts.forEach((part, index) => {
-  breadcrumbHtml += '<a href="/' + uriParts.slice(0, index + 1).join('/') + '" class="section">' + part + '</a>';
-  if (index !== uriParts.length - 1) {
-    breadcrumbHtml += '<i class="right angle icon divider"></i>';
-  }
-});
-breadcrumbHtml += '</div>';
-document.getElementById("breadcrumb").innerHTML = breadcrumbHtml;
+  var uriParts = currentUri.split('/').filter(part => part !== '');
+  var breadcrumbHtml = '<div class="ui breadcrumb">';
+  uriParts.forEach((part, index) => {
+    breadcrumbHtml += '<a href="/' + uriParts.slice(0, index + 1).join('/') + '" class="section">' + part + '</a>';
+    if (index !== uriParts.length - 1) {
+      breadcrumbHtml += '<i class="right angle icon divider"></i>';
+    }
+  });
+  breadcrumbHtml += '</div>';
+  document.getElementById("breadcrumb").innerHTML = breadcrumbHtml;
 </script>
 
 <div id="statusLabel" style="display:none;" class="ui fluid top attached label"></div>
 
 <script>
-async function updateStatus(status, message) {
-  return new Promise((resolve, reject) => {
-    var label = document.getElementById("statusLabel");
+  async function updateStatus(status, message) {
+    return new Promise((resolve, reject) => {
+      var label = document.getElementById("statusLabel");
 
-    console.log("updateLabel: " + status + " " + message);
+      console.log("updateLabel: " + status + " " + message);
 
-    if (status === "loading") {
-      style = "gray";
-      icon = '<i class="fa fa-spinner fa-spin"></i> ';
-      content = message;
-      label.style.display = "block";
+      if (status === "loading") {
+        style = "gray";
+        icon = '<i class="fa fa-spinner fa-spin"></i> ';
+        content = message;
+        label.style.display = "block";
 
-      showFetchingIndicator();
-    }
+        showFetchingIndicator();
+      }
 
 
-    if (status === "success") {
-      style = "green";
-      content = "Ok";
-      icon = '<i class="check icon"></i> ';
-      label.style.display = "none";
-      hideFetchingIndicator();
-    }
-    
-    label.className = "ui fluid top attached label " + style;
-    label.innerHTML = icon + content;
+      if (status === "success") {
+        style = "green";
+        content = "Ok";
+        icon = '<i class="check icon"></i> ';
+        label.style.display = "none";
+        hideFetchingIndicator();
+      }
 
-    resolve();
-  });
-}
+      label.className = "ui fluid top attached label " + style;
+      label.innerHTML = icon + content;
 
-showActionButton('logoutButton', 'logout'); 
-    callLogoutAPI = () => {
-      showActionButton('logoutButton', 'loading'); 
-      $.ajax({
-        url: '/api/auth/logout',
-        type: 'POST',
-        success: function(result) {
-          window.location.href = '/login';
-        }
-      });
-    };
+      resolve();
+    });
+  }
 
-    $('.ui.dropdown')
-      .dropdown()
-    ;
-    </script>
+  showActionButton('logoutButton', 'logout');
+  callLogoutAPI = () => {
+    showActionButton('logoutButton', 'loading');
+    $.ajax({
+      url: '/api/auth/logout',
+      type: 'POST',
+      success: function (result) {
+        window.location.href = '/login';
+      }
+    });
+  };
+
+  $('.ui.dropdown')
+    .dropdown();
+</script>
 
 <!--  Additional Code only for users -->
 
 <% if (user) { %>
 
 <script>
+  function getUserDetails() {
+    fetch('/api/user')
+      .then(response => response.json())
+      .then(data => {
+        const user = data;
+
+        // find the tenancy dropdown
+        const accountMenuUsername = document.getElementById('accountMenuUsername');
+        accountMenuUsername.textContent = user.nickname;
+      })
+      .catch(error => {
+        console.error('Error fetching user details:', error);
+      });
+  }
+
+  getUserDetails();
+
+  function getUserTenancy() {
+    fetch('/api/user/tenancy')
+      .then(response => response.json())
+      .then(data => {
+        const tenancy = data;
+
+        // find the tenancy dropdown
+        const tenancyMenuName = document.getElementById('tenancyMenuName');
+        tenancyMenuName.textContent = tenancy.name;
+      })
+      .catch(error => {
+        console.error('Error fetching user tenancy:', error);
+      });
+  }
+
+  getUserTenancy();
+
   function fetchTenancies() {
     fetch('/api/user/tenancies')
       .then(response => response.json())
@@ -190,7 +228,9 @@ showActionButton('logoutButton', 'logout');
 
   function switchTenancy(tenancyId) {
     return () => {
-      fetch(`/api/user/tenancy/${tenancyId}`, { method: 'PUT' })
+      fetch(`/api/user/tenancy/${tenancyId}`, {
+          method: 'PUT'
+        })
         .then(response => response.json())
         .then(data => {
           window.location.reload();
@@ -205,4 +245,3 @@ showActionButton('logoutButton', 'logout');
 <% } %>
 
 <!-- Rest of the code... -->
-
