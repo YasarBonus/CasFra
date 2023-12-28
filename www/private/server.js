@@ -1259,6 +1259,64 @@ app.get('/api/auth/session', checkPermissions('authenticate'), (req, res) => {
   }
 });
 
+// Login as other user
+app.post('/api/auth/loginAs', checkPermissions('manageUsers'), (req, res) => {
+  const {
+    userId
+  } = req.body;
+
+  if (!userId) {
+    res.status(400).json({
+      error: 'User ID is required'
+    });
+    return;
+  }
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({
+          error: 'User not found'
+        });
+        return;
+      }
+
+      UserGroup.findOne({
+          _id: user.groupId
+        })
+        .then((userGroup) => {
+          if (!userGroup) {
+            res.status(500).json({
+              error: 'User group not found'
+            });
+            return;
+          }
+
+          req.session.user = {
+            userId: user._id,
+            username: user.username,
+            permissions: userGroup.permissions
+          };
+
+          res.json({
+            success: true
+          });
+        })
+        .catch((error) => {
+          console.error('Error retrieving user group:', error);
+          res.status(500).json({
+            error: 'Internal server error'
+          });
+        });
+    })
+    .catch((error) => {
+      console.error('Error retrieving user:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+} );
+
 // Get all sessions from MongoDB
 app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
   Session.find()
