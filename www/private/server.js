@@ -5565,17 +5565,6 @@ async function createShortLinks(casinoId = null) {
         }
       }
     }
-
-    // Delete ShortLinks where the attachedTo object no longer exists
-    const attachedToIds = casinos.map(casino => casino._id);
-    if (attachedToIds.length > 0) {
-      await ShortLinks.deleteMany({
-        attachedTo: {
-          $nin: attachedToIds
-        }
-      });
-      console.log('Deleted ShortLinks with missing attachedTo objects');
-    }
   } catch (error) {
     console.error('Error creating/updating ShortLinks:', error);
   }
