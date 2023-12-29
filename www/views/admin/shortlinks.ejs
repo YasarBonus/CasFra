@@ -163,7 +163,7 @@
             },
             success: function(data) {
                 console.log('Success:', data);
-                showToast('success', 'Link added successfully');
+                showToast('success', 'Success', data.message.message);
                 loadInitialData();
             },
             error: function(error) {
