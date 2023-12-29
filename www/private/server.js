@@ -2705,6 +2705,7 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
   });
 }
 
+// Function to validate short link data
 function validateShortLinkData(description, url, shortUrl) {
   if (!url) {
     throw new Error('URL is required');
@@ -2736,7 +2737,7 @@ function validateShortLinkData(description, url, shortUrl) {
   if (description && description.length > 100) {
     throw new Error('Description must be at most 100 characters long');
   }
-
+  
   return true;
 }
 
