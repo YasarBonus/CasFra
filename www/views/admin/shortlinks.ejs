@@ -1,40 +1,42 @@
 <!-- sessions.ejs -->
 <!DOCTYPE html>
 <html>
-    <%- include('../partials/head') %>
-    <%- include('../partials/header') %>
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+        <div class="ui segment">
+            <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <%- include('./partials/dashboard-menu') %>
-                <div class="ui segment">
                 <div class="ui container">
                     <h2>ShortLinks</h2>
                     <div class="ui segment">
                         <div class="ui form">
                             <div class="three fields">
-                            <div class="two wide field">
-                                <label>ShortUrl</label>
-                                <input type="text" id="shortUrlInput" placeholder="ShortUrl">
+                                <div class="two wide field">
+                                    <label>ShortUrl</label>
+                                    <input type="text" id="shortUrlInput" placeholder="ShortUrl">
+                                </div>
+                                <div class="six wide field">
+                                    <label>Url</label>
+                                    <input type="text" id="urlInput" placeholder="Url">
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Description</label>
+                                    <input type="text" id="descriptionInput" placeholder="Description">
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green small button" id="addLinkBtn">Add</div>
+                                </div>
                             </div>
-                            <div class="six wide field">
-                                <label>Url</label>
-                                <input type="text" id="urlInput" placeholder="Url">
-                            </div>
-                            <div class="seven wide field">
-                                <label>Description</label>
-                                <input type="text" id="descriptionInput" placeholder="Description">
-                            </div>
-                            <div class="one wide field">
-                                <label>&nbsp;</label>
-                                <div class="ui green small button" id="addLinkBtn">Add</div>
-                            </div>
-                        </div>
                         </div>
                         <div class="ui bottom attached warning message">
                             <i class="icon help"></i>
-                            Short Links for Casinos will be automatically generated and updated. Add and edit them <a href="/dashboard/casinos">here</a> instead.
-                          </div>
+                            Short Links for Casinos will be automatically generated and updated. Add and edit them <a
+                                href="/dashboard/casinos">here</a> instead.
+                        </div>
                     </div>
                     <table id="shortlinksTable" class="ui celled table">
                         <thead>
@@ -54,6 +56,7 @@
                 </div>
             </div>
         </div>
+
 </html>
 
 <div class="ui small modal delete">
@@ -74,148 +77,154 @@
         </div>
     </div>
 
-<script>
+    <script>
+        function loadInitialData() {
+            // Clear the table
+            $('#shortlinksTable tbody').empty();
 
-    function loadInitialData() {
-        // Clear the table
-        $('#shortlinksTable tbody').empty();
+            $.ajax({
+                url: '/api/shortlinks',
+                method: 'GET',
+                success: function (data) {
+                    // Sort the links by created date
+                    data.sort(function (a, b) {
+                        return new Date(b.created) - new Date(a.created);
+                    });
 
-        $.ajax({
-            url: '/api/shortlinks',
-            method: 'GET',
-            success: function(data) {
-                // Sort the links by created date
-                data.sort(function(a, b) {
-                    return new Date(b.created) - new Date(a.created);
-                });
+                    // Populate the table with data
+                    data.forEach(function (link) {
+                        var row = '<tr id="' + link._id + '">' +
+                            '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' +
+                            link.shortUrl + '</td>' +
+                            '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' +
+                            link.url + '</td>' +
+                            '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' +
+                            link.description + '</td>' +
+                            '<td>' + link.hits + '</td>' +
+                            '<td>' + link.addedDate + '</td>' +
+                            '<td>' +
+                            '<a href="/dashboard/shortlinks/' + link._id +
+                            '/statistics" class="ui small olive button statistics-btn">Statistics</a>' +
 
-                // Populate the table with data
-                data.forEach(function(link) {
-                    var row = '<tr id="' + link._id + '">' +
-                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.shortUrl + '</td>' +
-                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.url + '</td>' +
-                        '<td contenteditable="' + (link.attachedTo ? 'false' : 'true') + '">' + link.description + '</td>' +
-                        '<td>' + link.hits + '</td>' +
-                        '<td>' + link.addedDate + '</td>' +
-                        '<td>' +
-                        '<div class="ui small red button delete-btn">Delete</div>' +
-                        '<a href="/dashboard/shortlinks/' + link._id + '/statistics" class="ui small olive button statistics-btn">Statistics</a>' +
-                        (link.attachedTo ? '<a href="/dashboard/casinos/' + link.attachedTo + '/edit#affiliate" class="ui small primary button">Edit Parent</a>' : '<div class="ui small green button save-btn">Save</div>') +
+                            (link.attachedTo ? '' :
+                                '<div class="ui small red button delete-btn">Delete</div>') +
+                            (link.attachedTo ? '<a href="/dashboard/casinos/' + link.attachedTo +
+                                '/edit#affiliate" class="ui small primary button">Edit Parent</a>' :
+                                '<div class="ui small green button save-btn">Save</div>') +
 
-                        '</td>' +
-                        '</tr>';
-                    $('#shortlinksTable tbody').append(row);
-                });
-            }
-        });
-    }
-
-    // Event listener for save button
-    $('#shortlinksTable').on('click', '.save-btn', function() {
-        var id = $(this).closest('tr').attr('id');
-        var shortUrl = $(this).closest('tr').find('td:nth-child(1)').text();
-        var url = $(this).closest('tr').find('td:nth-child(2)').text();
-        var description = $(this).closest('tr').find('td:nth-child(3)').text();
-
-        saveLink(id, shortUrl, url, description);
-    });
-
-    // Function to save a link
-    function saveLink(id, shortUrl, url, description) {
-        $.ajax({
-            url: '/api/shortlinks/' + id,
-            method: 'PUT',
-            data: {
-                shortUrl: shortUrl,
-                url: url,
-                description: description
-            },
-            success: function(data) {
-                console.log('Success:', data);
-                showToast('success', 'Link saved successfully:', data.message.message);
-            },
-            error: function(error) {
-                console.log('Error:', error);
-                showToast('error', 'Error saving link:', error.responseJSON.error.error);
-                document.querySelector('.ui.modal').scrollTop = 0;
-            }
-        });
-    } 
-
-    // Event listener for add link button
-    $('#addLinkBtn').on('click', function() {
-        var shortUrl = $('#shortUrlInput').val();
-        var url = $('#urlInput').val();
-        var description = $('#descriptionInput').val();
-
-        addLink(shortUrl, url, description);
-    });
-
-    // Function to add a link
-    function addLink(shortUrl, url, description) {
-        $.ajax({
-            url: '/api/shortlinks',
-            method: 'POST',
-            data: {
-                shortUrl: shortUrl,
-                url: url,
-                description: description
-            },
-            success: function(data) {
-                console.log('Success:', data);
-                showToast('success', 'Link added', data.message.message);
-                loadInitialData();
-            },
-            error: function(error) {
-                console.log('Error:', error);
-                showToast('error', 'Error adding link', error.responseJSON.error.error);
-                loadInitialData();
-                document.querySelector('.ui.modal').scrollTop = 0;
-            }
-        });
-    }
-
-    // Event listener for delete button
-    $('#shortlinksTable').on('click', '.delete-btn', function() {
-        var id = $(this).closest('tr').attr('id');
-        var shortUrl = $(this).closest('tr').find('td:nth-child(1)').text();
-        var url = $(this).closest('tr').find('td:nth-child(2)').text();
-        var description = $(this).closest('tr').find('td:nth-child(3)').text();
-
-        showDeleteDialog(id, shortUrl, url, description);
-    });
-
-    // Function to show delete dialog
-    function showDeleteDialog(id, shortUrl, url, description) {
-        $('.ui.modal.delete')
-            .modal({
-                closable: true,
-                onApprove: function() {
-                    deleteLink(id);
+                            '</td>' +
+                            '</tr>';
+                        $('#shortlinksTable tbody').append(row);
+                    });
                 }
-            })
-            .modal('show');
-    }
+            });
+        }
 
-    // Function to delete a link
-    function deleteLink(id) {
-        $.ajax({
-            url: '/api/shortlinks/' + id,
-            method: 'DELETE',
-            success: function(data) {
-                console.log('Success:', data);
-                showToast('success', 'Link deleted successfully', data.message.message);
-                loadInitialData();
-            },
-            error: function(error) {
-                console.log('Error:', error);
-                showToast('error', 'Error deleting link', error.responseJSON.error.error);
-                loadInitialData();
-                document.querySelector('.ui.modal').scrollTop = 0;
-            }
+        // Event listener for save button
+        $('#shortlinksTable').on('click', '.save-btn', function () {
+            var id = $(this).closest('tr').attr('id');
+            var shortUrl = $(this).closest('tr').find('td:nth-child(1)').text();
+            var url = $(this).closest('tr').find('td:nth-child(2)').text();
+            var description = $(this).closest('tr').find('td:nth-child(3)').text();
+
+            saveLink(id, shortUrl, url, description);
         });
-    }
 
-    loadInitialData();
+        // Function to save a link
+        function saveLink(id, shortUrl, url, description) {
+            $.ajax({
+                url: '/api/shortlinks/' + id,
+                method: 'PUT',
+                data: {
+                    shortUrl: shortUrl,
+                    url: url,
+                    description: description
+                },
+                success: function (data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Link saved successfully:', data.message.message);
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                    showToast('error', 'Error saving link:', error.responseJSON.error.error);
+                    document.querySelector('.ui.modal').scrollTop = 0;
+                }
+            });
+        }
 
-</script>
+        // Event listener for add link button
+        $('#addLinkBtn').on('click', function () {
+            var shortUrl = $('#shortUrlInput').val();
+            var url = $('#urlInput').val();
+            var description = $('#descriptionInput').val();
+
+            addLink(shortUrl, url, description);
+        });
+
+        // Function to add a link
+        function addLink(shortUrl, url, description) {
+            $.ajax({
+                url: '/api/shortlinks',
+                method: 'POST',
+                data: {
+                    shortUrl: shortUrl,
+                    url: url,
+                    description: description
+                },
+                success: function (data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Link added', data.message.message);
+                    loadInitialData();
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                    showToast('error', 'Error adding link', error.responseJSON.error.error);
+                    loadInitialData();
+                    document.querySelector('.ui.modal').scrollTop = 0;
+                }
+            });
+        }
+
+        // Event listener for delete button
+        $('#shortlinksTable').on('click', '.delete-btn', function () {
+            var id = $(this).closest('tr').attr('id');
+            var shortUrl = $(this).closest('tr').find('td:nth-child(1)').text();
+            var url = $(this).closest('tr').find('td:nth-child(2)').text();
+            var description = $(this).closest('tr').find('td:nth-child(3)').text();
+
+            showDeleteDialog(id, shortUrl, url, description);
+        });
+
+        // Function to show delete dialog
+        function showDeleteDialog(id, shortUrl, url, description) {
+            $('.ui.modal.delete')
+                .modal({
+                    closable: true,
+                    onApprove: function () {
+                        deleteLink(id);
+                    }
+                })
+                .modal('show');
+        }
+
+        // Function to delete a link
+        function deleteLink(id) {
+            $.ajax({
+                url: '/api/shortlinks/' + id,
+                method: 'DELETE',
+                success: function (data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Link deleted successfully', data.message.message);
+                    loadInitialData();
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                    showToast('error', 'Error deleting link', error.responseJSON.error.error);
+                    loadInitialData();
+                    document.querySelector('.ui.modal').scrollTop = 0;
+                }
+            });
+        }
+
+        loadInitialData();
+    </script>
