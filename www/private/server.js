@@ -2636,96 +2636,46 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     });
 });
 
+// Function to alter shortLink database entries
+function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits) {
+  // Check if an ID is provided
+  if (id) {
+    // Update existing entry
+    ShortLinks.findByIdAndUpdate(id, { description, url, shortUrl, modifiedBy })
+      .then(() => {
+        console.log('Short link updated successfully');
+      })
+      .catch((error) => {
+        console.error('Error updating short link:', error);
+      });
+  } else {
+    // Create new entry
+    if (!url) {
+      return { success: false, message: 'URL is required' };
+    }
+
+    const newShortLink = new ShortLinks({ description, url, shortUrl, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
+    newShortLink.save()
+      .then(() => {
+        console.log('Short link created successfully');
+        return { success: true, message: 'Short link created successfully' };
+      })
+      .catch((error) => {
+        console.error('Error creating short link:', error);
+        return { success: false, message: 'Error creating short link' };
+      });
+  }
+}
+
 // Add short link to MongoDB
 app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    description,
-    url,
-    shortUrl
-  } = req.body;
-  const {
-    userId
-  } = req.session.user;
+  const { description, url, shortUrl } = req.body;
+  const { userId, tenancy } = req.session.user;
 
-  if (!shortUrl) {
-    res.status(400).json({
-      error: 'Short URL is required'
-    });
-    return;
-  }
-
-  if (!url) {
-    res.status(400).json({
-      error: 'URL is required'
-    });
-    return;
-  }
-
-  const shortLink = new ShortLinks({
-    description,
-    url,
-    shortUrl,
-    addedBy: userId,
-    tenancies: req.session.user.tenancy // Set the tenancies field to req.session.user.tenancy
-  });
-
-  shortLink.save()
-    .then(() => {
-      res.status(201).json({
-        success: true,
-        message: 'Short link added successfully'
-      });
-    })
-    .catch((error) => {
-      console.error('Error inserting short link:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
+  const response = alterShortLink(null, description, url, shortUrl, null, userId, null, null, null, null);
+  res.json(response);
 });
 
-// Edit multiple short links in MongoDB
-app.put('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    userId
-  } = req.session.user;
-  const {
-    shortLinks
-  } = req.body;
-
-  if (!shortLinks) {
-    res.status(400).json({
-      error: 'Short links are required'
-    });
-    return;
-  }
-
-  const updatePromises = shortLinks.map((shortLink) => {
-    return ShortLinks.findOneAndUpdate({
-      _id: shortLink._id,
-      tenancies: req.session.user.tenancy
-    }, {
-      description: shortLink.description,
-      url: shortLink.url,
-      shortUrl: shortLink.shortUrl,
-      modifiedBy: userId,
-      modifiedDate: Date.now()
-    });
-  });
-
-  Promise.all(updatePromises)
-    .then(() => {
-      res.json({
-        success: true
-      });
-    })
-    .catch((error) => {
-      console.error('Error updating short link:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
 
 // Edit short link in MongoDB
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
