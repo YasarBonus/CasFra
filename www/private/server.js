@@ -612,14 +612,14 @@ const shortLinksSchema = new mongoose.Schema({
   url: String,
   shortUrl: String,
   description: String,
-  tenancies: [String],
+  tenancies: [mongoose.Schema.Types.ObjectId,],
   addedDate: {
     type: Date,
     default: Date.now
   },
-  addedBy: String,
+  addedBy: mongoose.Schema.Types.ObjectId,
   modifiedDate: Date,
-  modifiedBy: String,
+  modifiedBy: mongoose.Schema.Types.ObjectId,
   active: {
     type: Boolean,
     default: true
@@ -628,8 +628,13 @@ const shortLinksSchema = new mongoose.Schema({
     type: Number,
     default: generateRandomPriority()
   },
-  attachedTo: String,
-  hits: Number,
+  attachedTo: {
+    type: mongoose.Schema.Types.ObjectId
+  },
+  hits: {
+    type: Number,
+    default: 0
+  }
 });
 
 // Define shortLinksHits Schema
@@ -2638,33 +2643,32 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 
 // Function to alter shortLink database entries
 function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits) {
-  // Check if an ID is provided
-  if (id) {
-    // Update existing entry
-    ShortLinks.findByIdAndUpdate(id, { description, url, shortUrl, modifiedBy })
-      .then(() => {
-        console.log('Short link updated successfully');
-      })
-      .catch((error) => {
-        console.error('Error updating short link:', error);
-      });
-  } else {
-    // Create new entry
-    if (!url) {
-      return { success: false, message: 'URL is required' };
+  return new Promise((resolve, reject) => {
+    // Check if an ID is provided
+    if (id) {
+      // Update existing entry
+      ShortLinks.findByIdAndUpdate(id, { description, url, shortUrl, modifiedBy })
+        .then(() => {
+          console.log('Short link updated successfully');
+          resolve({ message: 'Short link updated successfully' });
+        })
+        .catch((error) => {
+          console.error('Error updating short link:', error);
+          reject({ error: 'Error updating short link' });
+        });
+    } else {
+      const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
+      newShortLink.save()
+        .then(() => {
+          console.log('Short link created successfully');
+          resolve({ message: 'Short link created successfully' });
+        })
+        .catch((error) => {
+          console.error('Error creating short link:', error);
+          reject({ error: 'Error creating short link' });
+        });
     }
-
-    const newShortLink = new ShortLinks({ description, url, shortUrl, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
-    newShortLink.save()
-      .then(() => {
-        console.log('Short link created successfully');
-        return { success: true, message: 'Short link created successfully' };
-      })
-      .catch((error) => {
-        console.error('Error creating short link:', error);
-        return { success: false, message: 'Error creating short link' };
-      });
-  }
+  });
 }
 
 // Add short link to MongoDB
@@ -2672,8 +2676,18 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
   const { description, url, shortUrl } = req.body;
   const { userId, tenancy } = req.session.user;
 
-  const response = alterShortLink(null, description, url, shortUrl, null, userId, null, null, null, null);
-  res.json(response);
+  const addedDate = Date.now();
+
+  // use the alterShortLink function to add the short link
+  alterShortLink(null, description, url, shortUrl, null, userId, addedDate, null, null, tenancy, null)
+    .then((message) => {
+      res.status(200).json({ message });
+      console.log(message);
+    })
+    .catch((error) => {
+      console.error('Error creating short link:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
 });
 
 
@@ -2683,15 +2697,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
   const { description, url, shortUrl } = req.body;
   const { userId } = req.session.user;
 
-  if (!shortUrl) {
-    res.status(400).json({ error: 'shortUrl is required' });
-    return;
-  }
 
-  if (!url) {
-    res.status(400).json({ error: 'URL is required' });
-    return;
-  }
 
   ShortLinks.findOne({ _id: id, tenancies: req.session.user.tenancy })
     .then((shortLink) => {
