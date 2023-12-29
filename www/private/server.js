@@ -2690,16 +2690,29 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
           reject({ error: 'Error finding short link' });
         });
     } else {
-      // Create a new ShortLink entry
-      const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
-      newShortLink.save()
-        .then(() => {
-          console.log('Short link created successfully');
-          resolve({ message: 'Short link created successfully' });
+      // Check if the ShortLink already exists for the tenancy
+      ShortLinks.findOne({ shortUrl, tenancies: tenancies })
+        .then((existingShortLink) => {
+          if (existingShortLink) {
+            reject({ error: 'Short link already exists for the tenancy' });
+            return;
+          }
+
+          // Create a new ShortLink entry
+          const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
+          newShortLink.save()
+            .then(() => {
+              console.log('Short link created successfully');
+              resolve({ message: 'Short link created successfully' });
+            })
+            .catch((error) => {
+              console.error('Error creating short link:', error);
+              reject({ error: 'Error creating short link' });
+            });
         })
         .catch((error) => {
-          console.error('Error creating short link:', error);
-          reject({ error: 'Error creating short link' });
+          console.error('Error finding existing short link:', error);
+          reject({ error: 'Error finding existing short link' });
         });
     }
   });
