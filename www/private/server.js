@@ -2870,6 +2870,9 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       if (!shortLink.tenancies.includes(tenancy)) {
         throw new Error('Unauthorized');
       }
+      if (shortLink.attachedTo) {
+        throw new Error('Short link is attached to an object and cannot be deleted');
+      }
       return ShortLinks.findByIdAndDelete(id);
     })
     .then(() => {
@@ -2883,6 +2886,10 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       console.error('Error deleting short link:', error);
       if (error.message === 'Short link not found' || error.message === 'Unauthorized') {
         res.status(404).json({
+          error: error.message
+        });
+      } else if (error.message === 'Short link has an attached object and cannot be deleted') {
+        res.status(400).json({
           error: error.message
         });
       } else {
