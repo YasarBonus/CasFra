@@ -163,12 +163,12 @@
             },
             success: function(data) {
                 console.log('Success:', data);
-                showToast('success', 'Success', data.message.message);
+                showToast('success', 'Link added', data.message.message);
                 loadInitialData();
             },
             error: function(error) {
                 console.log('Error:', error);
-                showToast('error', 'Error adding link');
+                showToast('error', 'Error adding link', error.responseJSON.error.error);
                 loadInitialData();
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
