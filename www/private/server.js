@@ -2624,7 +2624,7 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     });
 });
 
-function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits, userTenancy) {
+function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, userTenancy) {
   return new Promise((resolve, reject) => {
 
     try {
@@ -2746,7 +2746,7 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
   const addedDate = Date.now();
 
   // use the alterShortLink function to add the short link
-  alterShortLink(null, description, url, shortUrl, null, userId, addedDate, null, null, tenancy, null, null)
+  alterShortLink(null, description, url, shortUrl, null, userId, addedDate, null, null, tenancy, null)
     .then((message) => {
       res.status(200).json({ message });
     })
@@ -2766,7 +2766,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
   const modifiedDate = Date.now();
 
   // use the alterShortLink function to edit the short link
-  alterShortLink(id, description, url, shortUrl, null, null, null, userId, modifiedDate, null, null, tenancy)
+  alterShortLink(id, description, url, shortUrl, null, null, null, userId, modifiedDate, null, tenancy)
     .then((message) => {
       res.status(200).json({ message });
     })
