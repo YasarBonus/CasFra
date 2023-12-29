@@ -2752,7 +2752,7 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
     })
     .catch((error) => {
       console.error('Error creating short link:', error);
-      res.status(500).json({ error: error });
+      res.status(500).json({ error });
     });
 });
 
@@ -2772,7 +2772,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     })
     .catch((error) => {
       console.error('Error editing short link:', error);
-      res.status(500).json({ error: error });
+      res.status(500).json({ error });
     }
   );
 });
