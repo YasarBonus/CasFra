@@ -204,12 +204,12 @@
             method: 'DELETE',
             success: function(data) {
                 console.log('Success:', data);
-                showToast('success', 'Link deleted successfully');
+                showToast('success', 'Link deleted successfully', data.message.message);
                 loadInitialData();
             },
             error: function(error) {
                 console.log('Error:', error);
-                showToast('error', 'Error deleting link');
+                showToast('error', 'Error deleting link', error.responseJSON.error.error);
                 loadInitialData();
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
