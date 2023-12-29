@@ -132,11 +132,11 @@
             },
             success: function(data) {
                 console.log('Success:', data);
-                showToast('success', 'Link saved successfully');
+                showToast('success', 'Link saved successfully:', data.message.message);
             },
             error: function(error) {
                 console.log('Error:', error);
-                showToast('error', 'Error saving link');
+                showToast('error', 'Error saving link:', error.responseJSON.message);
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
         });
