@@ -2592,42 +2592,27 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
 
 // Get all short links from MongoDB
 app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    tenancy
-  } = req.session.user;
+  const { tenancy } = req.session.user;
 
-  ShortLinks.find({
-      tenancies: tenancy
-    })
+  ShortLinks.find({ tenancies: tenancy })
     .then((results) => {
       res.json(results);
     })
     .catch((error) => {
       console.error('Error retrieving short links:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
 // Get short link by ID from MongoDB
 app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
-  const {
-    id
-  } = req.params;
-  const {
-    tenancy
-  } = req.session.user;
+  const { id } = req.params;
+  const { tenancy } = req.session.user;
 
-  ShortLinks.findOne({
-      _id: id,
-      tenancies: tenancy
-    })
+  ShortLinks.findOne({ _id: id, tenancies: tenancy })
     .then((result) => {
       if (!result) {
-        res.status(404).json({
-          error: 'Short link not found'
-        });
+        res.status(404).json({ error: 'Short link not found' });
         return;
       }
 
@@ -2635,9 +2620,7 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     })
     .catch((error) => {
       console.error('Error retrieving short link:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
+      res.status(500).json({ error: 'Internal server error' });
     });
 });
 
@@ -2699,7 +2682,8 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
           }
 
           // Create a new ShortLink entry
-          const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
+          
+          const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies });
           newShortLink.save()
             .then(() => {
               console.log('Short link created successfully');
