@@ -2641,22 +2641,56 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     });
 });
 
-// Function to alter shortLink database entries
-function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits) {
+function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits, userTenancy) {
   return new Promise((resolve, reject) => {
+
+    try {
+      // Validate the short link data
+      validateShortLinkData(description, url, shortUrl);
+    } catch (error) {
+      reject({ error: error.message });
+      return;
+    }
+
     // Check if an ID is provided
     if (id) {
       // Update existing entry
-      ShortLinks.findByIdAndUpdate(id, { description, url, shortUrl, modifiedBy })
-        .then(() => {
-          console.log('Short link updated successfully');
-          resolve({ message: 'Short link updated successfully' });
+      ShortLinks.findById(id)
+        .then((shortLink) => {
+          if (!shortLink) {
+            reject({ error: 'Short link not found' });
+            return;
+          }
+
+          // Make sure the ShortLink tenancies include the user tenancy
+          if (!shortLink.tenancies.includes(userTenancy)) {
+            reject({ error: 'User tenancy is not included in the ShortLink tenancies' });
+            return;
+          }
+
+          // Update the ShortLink with the provided values
+          shortLink.description = description;
+          shortLink.url = url;
+          shortLink.shortUrl = shortUrl;
+          shortLink.modifiedBy = modifiedBy;
+          shortLink.modifiedDate = modifiedDate;
+
+          shortLink.save()
+            .then(() => {
+              console.log('Short link updated successfully');
+              resolve({ message: 'Short link updated successfully' });
+            })
+            .catch((error) => {
+              console.error('Error updating short link:', error);
+              reject({ error: 'Error updating short link' });
+            });
         })
         .catch((error) => {
-          console.error('Error updating short link:', error);
-          reject({ error: 'Error updating short link' });
+          console.error('Error finding short link:', error);
+          reject({ error: 'Error finding short link' });
         });
     } else {
+      // Create a new ShortLink entry
       const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies, hits });
       newShortLink.save()
         .then(() => {
@@ -2671,6 +2705,41 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
   });
 }
 
+function validateShortLinkData(description, url, shortUrl) {
+  if (!url) {
+    throw new Error('URL is required');
+  }
+
+  // Check if the URL is valid
+  try {
+    new URL(url);
+  } catch (error) {
+    throw new Error('Invalid URL');
+  }
+
+  if (!shortUrl) {
+    throw new Error('Short URL is required');
+  }
+
+  if (shortUrl.length < 3) {
+    throw new Error('Short URL must be at least 3 characters long');
+  }
+
+  if (shortUrl.length > 20) {
+    throw new Error('Short URL must be at most 20 characters long');
+  }
+
+  if (!/^[a-zA-Z0-9]+$/.test(shortUrl)) {
+    throw new Error('Short URL must contain only letters and numbers');
+  }
+
+  if (description && description.length > 100) {
+    throw new Error('Description must be at most 100 characters long');
+  }
+
+  return true;
+}
+
 // Add short link to MongoDB
 app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   const { description, url, shortUrl } = req.body;
@@ -2679,14 +2748,13 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
   const addedDate = Date.now();
 
   // use the alterShortLink function to add the short link
-  alterShortLink(null, description, url, shortUrl, null, userId, addedDate, null, null, tenancy, null)
+  alterShortLink(null, description, url, shortUrl, null, userId, addedDate, null, null, tenancy, null, null)
     .then((message) => {
       res.status(200).json({ message });
-      console.log(message);
     })
     .catch((error) => {
       console.error('Error creating short link:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error });
     });
 });
 
@@ -2695,44 +2763,20 @@ app.post('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => 
 app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
   const { id } = req.params;
   const { description, url, shortUrl } = req.body;
-  const { userId } = req.session.user;
+  const { userId, tenancy } = req.session.user;
 
+  const modifiedDate = Date.now();
 
-
-  ShortLinks.findOne({ _id: id, tenancies: req.session.user.tenancy })
-    .then((shortLink) => {
-      if (!shortLink) {
-        res.status(404).json({ error: 'Short link not found' });
-        return;
-      }
-
-      if (shortLink.attachedTo) {
-        res.status(403).json({ error: 'Cannot edit a short link with attachedTo' });
-        return;
-      }
-
-      return ShortLinks.findOneAndUpdate(
-        { _id: id, tenancies: req.session.user.tenancy },
-        {
-          description,
-          url,
-          shortUrl,
-          modifiedBy: userId,
-          modifiedDate: Date.now(),
-        }
-      );
-    })
-    .then((updatedShortLink) => {
-      if (!updatedShortLink) {
-        res.status(404).json({ error: 'Short link not found' });
-        return;
-      }
-      res.json({ success: true });
+  // use the alterShortLink function to edit the short link
+  alterShortLink(id, description, url, shortUrl, null, null, null, userId, modifiedDate, null, null, tenancy)
+    .then((message) => {
+      res.status(200).json({ message });
     })
     .catch((error) => {
-      console.error('Error updating short link:', error);
+      console.error('Error editing short link:', error);
       res.status(500).json({ error: 'Internal server error' });
-    });
+    }
+  );
 });
 
 // Get all short link hits from MongoDB
