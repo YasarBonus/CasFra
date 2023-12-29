@@ -609,15 +609,30 @@ const casinoCategoriesSchema = new mongoose.Schema({
 
 // Define shortLinks Schema
 const shortLinksSchema = new mongoose.Schema({
-  url: String,
+  url: {
+    type: String,
+    required: true,
+    minlength: 3,
+    maxlength: 20
+  },
   shortUrl: String,
-  description: String,
-  tenancies: [mongoose.Schema.Types.ObjectId,],
+  description: {
+    type: String,
+    maxlength: 100
+  },
+  tenancies: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true
+  },
   addedDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
-  addedBy: mongoose.Schema.Types.ObjectId,
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
   modifiedDate: Date,
   modifiedBy: mongoose.Schema.Types.ObjectId,
   active: {
@@ -629,7 +644,7 @@ const shortLinksSchema = new mongoose.Schema({
     default: generateRandomPriority()
   },
   attachedTo: {
-    type: mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId,
   },
   hits: {
     type: Number,
