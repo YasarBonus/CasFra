@@ -133,12 +133,10 @@
             success: function(data) {
                 console.log('Success:', data);
                 showToast('success', 'Link saved successfully');
-                loadInitialData();
             },
             error: function(error) {
                 console.log('Error:', error);
                 showToast('error', 'Error saving link');
-                loadInitialData();
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
         });
