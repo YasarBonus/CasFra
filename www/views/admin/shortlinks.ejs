@@ -136,7 +136,7 @@
             },
             error: function(error) {
                 console.log('Error:', error);
-                showToast('error', 'Error saving link:', error.responseJSON.message);
+                showToast('error', 'Error saving link:', error.responseJSON.error.error);
                 document.querySelector('.ui.modal').scrollTop = 0;
             }
         });

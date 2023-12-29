@@ -2772,7 +2772,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     })
     .catch((error) => {
       console.error('Error editing short link:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error });
     }
   );
 });
