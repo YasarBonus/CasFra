@@ -2683,7 +2683,7 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
 
           // Create a new ShortLink entry
           
-          const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, modifiedBy, modifiedDate, tenancies });
+          const newShortLink = new ShortLinks({ description, url, shortUrl, attachedTo, addedBy, addedDate, tenancies });
           newShortLink.save()
             .then(() => {
               console.log('Short link created successfully');
