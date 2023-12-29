@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const item = document.createElement('a');
           item.classList.add('item');
           item.onclick = switchTenancy(tenancy._id);
-          item.textContent = tenancy.name;
+          item.textContent = tenancy.name + ' (' + tenancy._id + ')';
           dropdownMenu.appendChild(item);
         });
 
