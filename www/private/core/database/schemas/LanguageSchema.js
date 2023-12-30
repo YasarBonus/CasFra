@@ -43,7 +43,6 @@ const saveDefaultLanguageDatabaseData = async () => {
         }
     
         await Promise.all(promises);
-        console.log('Default Language Database Data successfully saved.');
     } catch (error) {
         console.error('Error saving Default Language Database Data:', error);
     }

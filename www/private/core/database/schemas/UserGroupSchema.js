@@ -101,7 +101,6 @@ const userGroupSchema = new mongoose.Schema({
   
   
       await Promise.all(promises);
-      console.log('Default UserGroups and RegistrationKeys Database Data successfully saved.');
     } catch (error) {
       console.error('Error saving Default UserGroups and RegistrationKeys Database Data:', error);
     }

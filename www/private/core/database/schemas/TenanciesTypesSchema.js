@@ -70,7 +70,6 @@ const tenanciesTypesSchema = new mongoose.Schema({
       }
   
       await Promise.all(promises);
-      console.log('Default TenanciesTypes Database Data successfully saved.');
     } catch (error) {
       console.error('Error saving Default TenanciesTypes Database Data:', error);
     }

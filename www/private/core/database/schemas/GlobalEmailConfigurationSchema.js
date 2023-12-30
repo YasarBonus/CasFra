@@ -40,7 +40,6 @@ const GlobalEmailConfigurationSchema = new mongoose.Schema({
       }
   
       await Promise.all(promises);
-      console.log('Default GlobalEmailConfiguration Database Data successfully saved.');
     } catch (error) {
       console.error('Error saving Default GlobalEmailConfiguration Database Data:', error);
     }
