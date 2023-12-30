@@ -1,4 +1,29 @@
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
+
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+  console.log('Neue WebSocket-Verbindung');
+
+  // Senden Sie eine Benachrichtigung an den Client
+  socket.emit('notification', { message: 'Willkommen!' });
+
+  // Hören Sie auf eine Benachrichtigung vom Client
+  socket.on('notification', (data) => {
+    console.log('Benachrichtigung vom Client:', data);
+  });
+});
+
+app.use(express.static(path.join('public')));
+app.set('views', path.join(__dirname, '../views'));
+app.set('view engine', 'ejs');
+
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -6,11 +31,8 @@ const bcrypt = require('bcrypt');
 const schedule = require('node-schedule');
 const fs = require('fs');
 const multer = require('multer');
-const path = require('path');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-const http = require('http');
-const socketIo = require('socket.io');
 
 
 const nodemailer = require('nodemailer');
@@ -64,29 +86,10 @@ const sendPasswordResetEmail = (email, resetToken) => {
   });
 };
 
-const app = express();
-const port = 3000;
-
-const server = http.createServer(app);
-const io = socketIo(server);
-
-io.on('connection', (socket) => {
-  console.log('Neue WebSocket-Verbindung');
-
-  // Senden Sie eine Benachrichtigung an den Client
-  socket.emit('notification', { message: 'Willkommen!' });
-
-  // Hören Sie auf eine Benachrichtigung vom Client
-  socket.on('notification', (data) => {
-    console.log('Benachrichtigung vom Client:', data);
-  });
-});
 
 
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'ejs');
 
-app.use(express.static(path.join('public')));
+
 
 
 //#region MongoDB
@@ -6202,6 +6205,8 @@ app.get('/:shortUrl', async (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+const port = 3000;
+
+server.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });
