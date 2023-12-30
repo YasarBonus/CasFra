@@ -14,14 +14,34 @@ const nodemailer = require('nodemailer');
 
 // Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: 'mail.behindthemars.de',
   port: 587,
   secure: false,
   auth: {
-    user: 'your-email@gmail.com',
-    pass: 'your-password'
+    user: 'system@treudler.net',
+    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
   }
 });
+
+// Reusable function to send a email
+const sendEmail = (email, subject, text) => {
+  const mailOptions = {
+    from: 'system@treudler.net',
+    to: email,
+    subject,
+    text
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+};
+
+
 
 // Function to send password reset email
 const sendPasswordResetEmail = (email, resetToken) => {
