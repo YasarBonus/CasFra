@@ -1,5 +1,6 @@
 const email = require('./emailService.js');
 const db = require('../database/database.js');
+const generateRandomPriority = require('../utils/generateRandomPriority.js')
 
 
 // Function to hand over notifications to the different handlers

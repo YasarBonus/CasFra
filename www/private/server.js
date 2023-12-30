@@ -504,7 +504,6 @@ app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res)
 
 // Insert user into MongoDB
 app.post('/api/users/register', (req, res) => {
-  console.log(req.body);
   const {
     username,
     password,
@@ -897,8 +896,6 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
         });
         return;
       }
-      console.log(user);
-      console.log(currentPassword + ' ' + newPassword);
       // Check if the current password matches
       bcrypt.compare(currentPassword, user.password, (err, result) => {
         if (err) {
@@ -1033,7 +1030,6 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     tenancies,
     tenancy
   } = req.body;
-  console.log(req.body);
 
   if (!username) {
     res.status(400).json({
@@ -1500,7 +1496,6 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
     active,
     category
   } = req.body;
-  console.log(req.body);
 
   db.Images.findOne({
       _id: id,
@@ -1894,8 +1889,6 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
       if (!shortLink) {
         throw new Error('Short link not found');
       }
-      console.log(shortLink);
-      console.log(tenancy);
       if (!shortLink.tenancies.includes(tenancy)) {
         throw new Error('Unauthorized');
       }
@@ -4203,7 +4196,6 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     affiliateShortlink,
     licenses
   } = req.body; // Get the updated values from the request body
-  console.log("Updating Casino:", req.body);
 
   // Add the condition to check if the user has access to the casino
   db.Casino.findOneAndUpdate({
@@ -4407,7 +4399,6 @@ app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) 
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
     .then((result) => {
-      console.log(result);
       res.json(result.image);
     })
     .catch((error) => {
@@ -5129,7 +5120,6 @@ async function updateShortLinksStatistics() {
 // Function to generate a random priority
 function generateRandomPriority() {
   const random = Math.floor(Math.random() * 100000000000000000000);
-  console.log(random);
   return random;
 }
 

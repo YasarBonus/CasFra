@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const generateRandomPriority = require('../../utils/generateRandomPriority');
 
+
+
 // Define shortLinks Schema
 const shortLinksSchema = new mongoose.Schema({
     url: {
