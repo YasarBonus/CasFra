@@ -34,18 +34,10 @@ app.use(express.static(path.join('public')));
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-const schedule = require('node-schedule');
 const fs = require('fs');
 const multer = require('multer');
-const ejs = require('ejs');
-
-
-
-
 
 // Middleware
 app.use(express.json());
@@ -57,6 +49,7 @@ app.use((req, res, next) => {
   setTimeout(next, 50);
 });
 
+// Session Storage
 const MongoStore = require('connect-mongo');
 const {
   send
@@ -72,6 +65,8 @@ app.use(session({
     mongoUrl: 'mongodb://localhost:27017/casfra'
   })
 }));
+//
+
 
 const getTenancyByUserId = async (userId) => {
   try {
