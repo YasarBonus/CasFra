@@ -111,7 +111,7 @@ const SessionSchema = new mongoose.Schema({
   socketId: String,
 });
 
-const NotificationsSchema = new mongoose.Schema({
+const NotificationEmailsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
@@ -149,7 +149,7 @@ const NotificationsSchema = new mongoose.Schema({
   },
 });
 
-const NotificationQueueSchema = new mongoose.Schema({
+const NotificationEmailQueueSchema = new mongoose.Schema({
   notificationId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
@@ -778,8 +778,8 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
-const Notifications = mongoose.model('Notifications', NotificationsSchema);
-const NotificationQueue = mongoose.model('NotificationQueue', NotificationQueueSchema);
+const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
+const NotificationEmailQueue = mongoose.model('NotificationEmailQueue', NotificationEmailQueueSchema);
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 const User = mongoose.model('User', userSchema);
@@ -6249,93 +6249,109 @@ async function updateShortLinksStatistics() {
   }
 }
 
-// Function to add a notification to the Notifications and NotificationQueue
-async function addNotification(userId, type, transporter, subject, message, timestamp) {
+// Function to hand over notifications to the different handlers
+// This function will check the transporter types and call the appropriate handler
+
+async function addNotification(userId, type, subject, message, transporter) {
   try {
-    const notification = await Notifications.create({
-      userId,
-      type,
-      transporter,
-      subject,
-      message,
-      timestamp
-    });
-
-    // Get the ID of the newly created notification
-    const notificationId = notification.id;
-    const updateTimestamp = new Date();
-
-    // Add the notification ID to the NotificationQueue
-    await NotificationQueue.create({
-      notificationId,
-      updateTimestamp
-    });
+    if (transporter === 'email') {
+      // Call the addNotificationEmail function
+      await addNotificationEmail(userId, type, subject, message);
+    } else {
+      console.error('Error adding notification: Invalid transporter type');
+    }
   } catch (error) {
     console.error('Error adding notification:', error);
   }
 }
 
-addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test', 'Test', new Date());
+addNotification('65834f6fefa5bb088ca50288', 'info', 'Test', 'Test', 'email');
 
-// Function to send notifications from the NotificationQueue using the sendEmail function
-// Get the first notification from the queue, then
-// get the userId from the Notification by its id, then
-// get the user's email address from the userId, then
-// send a websocket message to the user, then
-// send the email to the user's email address, then
-// set the notification emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address, then
-// save the notification, then delete the notification from the queue, then
-// call the function again to send the next notification
-// with a 1 second delay between each notification
-// if there are no more notifications in the queue, then the function will sleep for 5 seconds and then call itself again
-
-async function sendNotifications() {
+async function addNotificationEmail(userId, type, subject, message) {
   try {
-    // Get the first notification from the queue
-    const notificationQueue = await NotificationQueue.findOne().sort({
-      updateTimestamp: 1
+    // Create a new NotificationEmail object
+    const notificationEmail = await NotificationEmails.create({
+      userId,
+      type,
+      subject,
+      message,
+      emailDelivered: false,
+      emailDeliveredDate: null,
+      emailDeliveredTo: null,
     });
 
-    if (notificationQueue) {
-      // Get the notification from the queue
-      const notification = await Notifications.findById(notificationQueue.notificationId);
-
-      // Get the user's email address
-      const user = await User.findById(notification.userId);
-      const email = user.email;
-
-      // Send a websocket message to the user
-      io.to(user.socketId).emit('notification', notification);
-      console.log('Notification sent to user ' + user.username + user.socketId + '(' + user._id + ')');
-
-      // Send the email to the user's email address
-      await sendEmail(email, notification.subject, notification.message);
-
-      // Set the notification emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
-      notification.emailDelivered = true;
-      notification.emailDeliveredDate = new Date();
-      notification.emailDeliveredTo = email;
-
-      // Save the notification
-      await notification.save();
-
-      // Delete the notification from the queue
-      await NotificationQueue.deleteOne({
-        notificationId: notification.id
-      });
-
-      // Call the function again to send the next notification
-      setTimeout(sendNotifications, 1000);
-    } else {
-      // Sleep for 5 seconds and then call the function again
-      setTimeout(sendNotifications, 5000);
-    }
+    // Add the notification email to the queue
+    await NotificationEmailQueue.create({
+      notificationId: notificationEmail._id
+    });
   } catch (error) {
-    console.error('Error sending notifications:', error);
+    console.error('Error adding notification email:', error);
   }
 }
 
-sendNotifications();
+// Function to send NotificationEmails from the NotificationEmailQueue using the sendEmail function
+// Get the first entry from the NotificationEmailQueue, then
+// get the userId from the NotificationEmails by its id, then
+// get the user's email address from the userId, then
+// send the email to the user's email address, then
+// set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address, then
+// save the NotificationEmail, then delete the NotificationEmail from the NotificationEmailQueue, then
+// call the function again to send the next NotificationEmail
+// with a 1 second delay between each NotificationEmail
+// if there are no more NotificationEmail in the queue, then the function will sleep for 5 seconds and then call itself again
+
+async function sendNotificationEmails() {
+  try {
+    // Get the first entry from the NotificationEmailQueue
+    const notificationEmailQueue = await NotificationEmailQueue.findOne().sort({
+      _id: 1
+    });
+
+    if (notificationEmailQueue) {
+      // Get the NotificationEmail by its id
+      const notificationEmail = await NotificationEmails.findById(notificationEmailQueue.notificationId);
+
+      // Get the user by its id
+      const user = await User.findById(notificationEmail.userId);
+
+      // Send the email to the user's email address
+      await sendEmail(user.email, notificationEmail.subject, notificationEmail.message);
+
+      // Set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
+      notificationEmail.emailDelivered = true;
+      notificationEmail.emailDeliveredDate = new Date();
+      notificationEmail.emailDeliveredTo = user.email;
+
+      // Save the NotificationEmail
+      await notificationEmail.save();
+
+      // Delete the NotificationEmail from the NotificationEmailQueue
+      await NotificationEmailQueue.deleteOne({
+        notificationId: notificationEmail._id
+      });
+
+      // Call the function again to send the next NotificationEmail
+      setTimeout(sendNotificationEmails, 1000);
+    } else {
+      // Sleep for 5 seconds
+      await sleep(5000);
+
+      // Call the function again
+      sendNotificationEmails();
+    }
+  } catch (error) {
+    console.error('Error sending notification emails:', error);
+  }
+}
+
+// sleep function
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+sendNotificationEmails();
 
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
