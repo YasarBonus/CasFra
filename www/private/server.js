@@ -9,6 +9,7 @@ const multer = require('multer');
 const path = require('path');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const http = require('http');
 const socketIo = require('socket.io');
 
 
@@ -65,6 +66,22 @@ const sendPasswordResetEmail = (email, resetToken) => {
 
 const app = express();
 const port = 3000;
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+  console.log('Neue WebSocket-Verbindung');
+
+  // Senden Sie eine Benachrichtigung an den Client
+  socket.emit('notification', { message: 'Willkommen!' });
+
+  // Hören Sie auf eine Benachrichtigung vom Client
+  socket.on('notification', (data) => {
+    console.log('Benachrichtigung vom Client:', data);
+  });
+});
+
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
