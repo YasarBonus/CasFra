@@ -3,7 +3,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -15,12 +14,10 @@ io.on('connection', (socket) => {
     message: 'Willkommen beim WebSocket-Server'
   });
 
-  // Senden Sie eine Benachrichtigung an den Client
   socket.emit('notification', {
     message: 'Willkommen beim WebSocket-Server'
   });
 
-  // Hören Sie auf eine Benachrichtigung vom Client
   socket.on('notification', (data) => {
     console.log('Benachrichtigung vom Client empfangen:', data);
   });
@@ -40,7 +37,6 @@ const multer = require('multer');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 
-
 const nodemailer = require('nodemailer');
 
 // Create a transporter for sending emails
@@ -53,6 +49,8 @@ const transporter = nodemailer.createTransport({
     pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
   }
 });
+
+
 
 // Reusable function to send a email
 const sendEmail = (email, subject, text) => {
