@@ -4072,7 +4072,7 @@ app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
   } = req.session.user; // Get the user ID from the session data
 
   // Create a new casino object
-  const newCasino = new Casino({
+  const newCasino = new db.Casino({
     addedBy: userId,
     name: name,
     addedDate: Date.now(),
@@ -4114,7 +4114,7 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), async 
     }
 
     const newPriority = generateRandomPriority();
-    const newCasino = new Casino({
+    const newCasino = new db.Casino({
       addedBy: userId,
       name: casino.name + ' (Copy)',
       categories: casino.categories,
