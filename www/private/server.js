@@ -3,6 +3,8 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
+const email = require('./modules/emailService.js');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -37,38 +39,7 @@ const multer = require('multer');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 
-const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  host: 'mail.behindthemars.de',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'system@treudler.net',
-    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-// Reusable function to send a email
-const sendEmail = (email, subject, text) => {
-  const mailOptions = {
-    from: 'system@treudler.net',
-    to: email,
-    subject,
-    text
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
-  });
-};
 
 //#region MongoDB
 // Connect to MongoDB
@@ -1881,48 +1852,46 @@ app.get('/api/user/tenancies', checkPermissions('authenticate'), (req, res) => {
 
 // Get details of current tenancy of the current user
 app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
-  const { userId } = req.session.user;
+  const {
+    userId
+  } = req.session.user;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          error: 'User not found'
+        });
         return;
       }
 
-      const { tenancy } = user;
+      const {
+        tenancy
+      } = user;
 
       Tenancie.findById(tenancy)
         .then((result) => {
           if (!result) {
-            res.status(404).json({ error: 'Tenancy not found' });
+            res.status(404).json({
+              error: 'Tenancy not found'
+            });
             return;
           }
 
-          const { tenancyId } = result;
-
-          TenanciesTypes.findById(tenancyId)
-            .then((tenancyType) => {
-              if (!tenancyType) {
-                res.status(404).json({ error: 'Tenancy type not found' });
-                return;
-              }
-
-              res.json({ tenancy: result, tenancyType });
-            })
-            .catch((error) => {
-              console.error('Error retrieving tenancy type:', error);
-              res.status(500).json({ error: 'Internal server error' });
-            });
+          res.json(result);
         })
         .catch((error) => {
           console.error('Error retrieving tenancy:', error);
-          res.status(500).json({ error: 'Internal server error' });
+          res.status(500).json({
+            error: 'Internal server error'
+          });
         });
     })
     .catch((error) => {
       console.error('Error retrieving user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({
+        error: 'Internal server error'
+      });
     });
 });
 
@@ -6327,7 +6296,7 @@ async function sendNotificationEmails() {
       const user = await User.findById(notificationEmail.userId);
 
       // Send the email to the user's email address
-      await sendEmail(user.email, notificationEmail.subject, notificationEmail.message);
+      await email.sendEmail(user.email, notificationEmail.subject, notificationEmail.message);
 
       // Set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
       notificationEmail.emailDelivered = true;
