@@ -86,12 +86,6 @@ const sendPasswordResetEmail = (email, resetToken) => {
   });
 };
 
-
-
-
-
-
-
 //#region MongoDB
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casfra', {
@@ -127,7 +121,8 @@ const SessionSchema = new mongoose.Schema({
   timestamp: {
     type: Date,
     default: Date.now
-  }
+  },
+  socketId: String,
 });
 
 const NotificationsSchema = new mongoose.Schema({
@@ -159,6 +154,39 @@ const NotificationsSchema = new mongoose.Schema({
   emailDelivered: {
     type: Boolean,
     default: false
+  },
+  emailDeliveredDate: {
+    type: Date,
+  },
+  emailDeliveredTo: {
+    type: String,
+  },
+});
+
+const NotificationQueueSchema = new mongoose.Schema({
+  notificationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  allDelivered: {
+    type: Boolean,
+    default: false
+  },
+  allDeliveredDate: {
+    type: Date,
+  },
+  emailDelivered: {
+    type: Boolean,
+  },
+  emailDeliveredDate: {
+    type: Date,
+  },
+  emailDeliveredTo: {
+    type: String,
+  },
+  updateTimestamp: {
+    type: Date,
+    default: Date.now
   },
 });
 
@@ -765,6 +793,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
 const Notifications = mongoose.model('Notifications', NotificationsSchema);
+const NotificationQueue = mongoose.model('NotificationQueue', NotificationQueueSchema);
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 const User = mongoose.model('User', userSchema);
@@ -1167,6 +1196,7 @@ app.use((req, res, next) => {
 });
 
 const MongoStore = require('connect-mongo');
+const { send } = require('process');
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
   resave: false,
@@ -6160,10 +6190,10 @@ async function updateShortLinksStatistics() {
   }
 }
 
-// Function to add a notification to the NotificationQueue
+// Function to add a notification to the Notifications and NotificationQueue
 async function addNotification(userId, type, transporter, subject, message, timestamp) {
   try {
-    await Notifications.create({
+    const notification = await Notifications.create({
       userId,
       type,
       transporter,
@@ -6171,15 +6201,86 @@ async function addNotification(userId, type, transporter, subject, message, time
       message,
       timestamp
     });
+
+    // Get the ID of the newly created notification
+    const notificationId = notification.id;
+    const updateTimestamp = new Date();
+
+    // Add the notification ID to the NotificationQueue
+    await NotificationQueue.create({
+      notificationId,
+      updateTimestamp
+    });
   }
   catch (error) {
     console.error('Error adding notification:', error);
   }
 }
 
-addNotification('65834f6fefa5bb088ca50288', null, 'email', 'Test', 'Test', new Date());
+addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test', 'Test', new Date());
+addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test2', 'Test2', new Date());
+addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test3', 'Test3', new Date());
 
-// Function to send notifications from the NotificationQueue
+
+// Function to send notifications from the NotificationQueue using the sendEmail function
+// Get the first notification from the queue, then
+// get the userId from the Notification by its id, then
+// get the user's email address from the userId, then
+// send a websocket message to the user, then
+// send the email to the user's email address, then
+// set the notification emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address, then
+// save the notification, then delete the notification from the queue, then
+// call the function again to send the next notification
+// with a 1 second delay between each notification
+// if there are no more notifications in the queue, then the function will sleep for 5 seconds and then call itself again
+
+async function sendNotifications() {
+  try {
+    // Get the first notification from the queue
+    const notificationQueue = await NotificationQueue.findOne().sort({
+      updateTimestamp: 1
+    });
+
+    if (notificationQueue) {
+      // Get the notification from the queue
+      const notification = await Notifications.findById(notificationQueue.notificationId);
+
+      // Get the user's email address
+      const user = await User.findById(notification.userId);
+      const email = user.email;
+
+      // Send a websocket message to the user
+      io.to(user.socketId).emit('notification', notification);
+      console.log('Notification sent to user ' + user.username + user.socketId + '(' + user._id + ')');
+
+      // Send the email to the user's email address
+      await sendEmail(email, notification.subject, notification.message);
+
+      // Set the notification emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
+      notification.emailDelivered = true;
+      notification.emailDeliveredDate = new Date();
+      notification.emailDeliveredTo = email;
+
+      // Save the notification
+      await notification.save();
+
+      // Delete the notification from the queue
+      await NotificationQueue.deleteOne({
+        notificationId: notification.id
+      });
+
+      // Call the function again to send the next notification
+      setTimeout(sendNotifications, 1000);
+    } else {
+      // Sleep for 5 seconds and then call the function again
+      setTimeout(sendNotifications, 5000);
+    }
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+  }
+}
+
+sendNotifications();
 
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
