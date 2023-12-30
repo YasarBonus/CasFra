@@ -2591,7 +2591,7 @@ app.post('/api/casinos/features/:id/duplicate', checkPermissions('manageCasinos'
       if (!casinoFeatures) {
         throw new Error('Casino feature not found');
       } else {
-        newPriority = generateRandomPriority();
+        const newPriority = generateRandomPriority();
         const newCasinoFeatures = new CasinoFeatures({
           addedBy: userId,
           name: casinoFeatures.name + ' (Copy)',
