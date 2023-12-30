@@ -2706,7 +2706,7 @@ app.get('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos')
     id
   } = req.params;
 
-  CasinoIndividualFeatures.find({
+  db.CasinoIndividualFeatures.find({
       casino: id
     })
     .then((results) => {
@@ -2722,7 +2722,7 @@ app.get('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos')
 
 // Get count of all individual features
 app.get('/api/casinos/individualfeatures/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoIndividualFeatures.countDocuments()
+  db.CasinoIndividualFeatures.countDocuments()
     .then((results) => {
       res.json(results);
     })
@@ -2741,7 +2741,7 @@ app.get('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('mana
     featureId
   } = req.params;
 
-  CasinoIndividualFeatures.findOne({
+  db.CasinoIndividualFeatures.findOne({
       casino: id,
       _id: featureId
     })
@@ -2778,7 +2778,7 @@ app.post('/api/casinos/:id/individualfeatures', checkPermissions('manageCasinos'
     userId
   } = req.session.user;
 
-  const casinoIndividualFeatures = new CasinoIndividualFeatures({
+  const casinoIndividualFeatures = new db.CasinoIndividualFeatures({
     addedBy: userId,
     casino: id,
     name: name,
@@ -2813,7 +2813,7 @@ app.post('/api/casinos/:id/individualfeatures/:featureId/duplicate', checkPermis
     featureId
   } = req.params;
 
-  CasinoIndividualFeatures.findOne({
+  db.CasinoIndividualFeatures.findOne({
       _id: featureId
     })
     .then((casinoIndividualFeatures) => {
@@ -2821,7 +2821,7 @@ app.post('/api/casinos/:id/individualfeatures/:featureId/duplicate', checkPermis
         throw new Error('Casino individual feature not found');
       } else {
         newPriority = generateRandomPriority();
-        const newCasinoIndividualFeatures = new CasinoIndividualFeatures({
+        const newCasinoIndividualFeatures = new db.CasinoIndividualFeatures({
           addedBy: userId,
           casino: id,
           name: casinoIndividualFeatures.name + ' (Copy)',
@@ -2869,7 +2869,7 @@ app.put('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('mana
     active
   } = req.body;
 
-  CasinoIndividualFeatures.findOneAndUpdate({
+  db.CasinoIndividualFeatures.findOneAndUpdate({
       _id: featureId
     }, {
       name,
@@ -2903,7 +2903,7 @@ app.delete('/api/casinos/:id/individualfeatures/:featureId', checkPermissions('m
     featureId
   } = req.params;
 
-  CasinoIndividualFeatures.findOneAndDelete({
+  db.CasinoIndividualFeatures.findOneAndDelete({
       _id: featureId
     })
     .then((deletedCasinoIndividualFeature) => {
