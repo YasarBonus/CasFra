@@ -734,11 +734,18 @@
                 .then(response => response.json())
                 .then(result => {
                     console.log('Casino active state updated:', result);
+
+                    if (result.casino.active === true) {
+                        showToast('success', 'Casino activated successfully', 'The casino has been activated successfully');
+                    } else {
+                        showToast('success', 'Casino disabled successfully', 'The casino has been disabled successfully');
+                    }
+
                     // update the button text and color
                     const button = document.querySelector('.ui.label.activeToggler');
                     button.classList.toggle('green');
                     button.classList.toggle('red');
-                    button.innerText = result.active ? 'active' : 'disabled';
+                    button.innerText = result.casino.active ? 'active' : 'disabled';
 
                 })
                 .catch(error => {
