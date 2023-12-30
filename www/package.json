@@ -19,6 +19,7 @@
     "passport-local": "^1.0.0",
     "piwik-tracker": "^1.1.2",
     "sharp": "^0.33.0",
+    "socket.io": "^4.7.2",
     "sqlite3": "^5.1.6",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",

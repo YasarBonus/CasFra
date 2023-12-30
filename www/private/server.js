@@ -9,6 +9,8 @@ const multer = require('multer');
 const path = require('path');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const socketIo = require('socket.io');
+
 
 const nodemailer = require('nodemailer');
 
@@ -106,6 +108,27 @@ const SessionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+});
+
+const NotificationQueueSchema = new mongoose.Schema({
+  userId: String,
+  subject: String,
+  message: String,
+  timestamp: {
+    type: Date,
+    default: Date.now
+  },
+  read: {
+    type: Boolean,
+    default: false
+  },
+  readDate: {
+    type: Date,
+  },
+  emailDelivered: {
+    type: Boolean,
+    default: false
+  },
 });
 
 const tenanciesSchema = new mongoose.Schema({
@@ -710,6 +733,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
+const NotificationQueue = mongoose.model('NotificationQueue', NotificationQueueSchema);
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 const User = mongoose.model('User', userSchema);
@@ -6104,6 +6128,7 @@ async function updateShortLinksStatistics() {
     console.error('Error updating short links statistics:', error);
   }
 }
+
 
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
