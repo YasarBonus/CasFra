@@ -928,6 +928,7 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
           user.save()
             .then(() => {
               console.log('Password updated:' + newPassword);
+              addNotification(user._id, 'warning', 'Your account password has been changed', 'Your account password has been changed through the casfra panel. If this was not you, contact ohje@treudler.net','email')
               res.json({
                 success: true
               });
