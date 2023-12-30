@@ -249,6 +249,20 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 </script>
 
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+  // Clientseite
+const socket = io('http://127.0.0.1:3000');
+
+// Hören Sie auf eine Benachrichtigung vom Server
+socket.on('notification', (data) => {
+  console.log('Benachrichtigung vom Server:', data);
+});
+
+// Senden Sie eine Benachrichtigung an den Server
+socket.emit('notification', { message: 'Hallo Server!' });
+</script>
+
 <% } %>
 
 <!-- Rest of the code... -->
