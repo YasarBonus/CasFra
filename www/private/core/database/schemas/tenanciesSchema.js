@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const generateRandomPriority = require('../../utils/generateRandomPriority');
 
 const tenanciesSchema = new mongoose.Schema({
     name: String,
@@ -28,12 +29,7 @@ const tenanciesSchema = new mongoose.Schema({
 
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
 
-// Function to generate a random priority
-function generateRandomPriority() {
-    const random = Math.floor(Math.random() * 100000000000000000000);
-    console.log(random);
-    return random;
-  }
+
   
 const tenancieEntries = [{
     name: 'Treudler',
