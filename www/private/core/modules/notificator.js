@@ -19,7 +19,6 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
-
 async function addNotificationEmail(userId, type, subject, message) {
   try {
     // Create a new NotificationEmail object
