@@ -130,10 +130,21 @@ const SessionSchema = new mongoose.Schema({
   }
 });
 
-const NotificationQueueSchema = new mongoose.Schema({
-  userId: String,
+const NotificationsSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
   subject: String,
   message: String,
+  type: {
+    type: String,
+    default: 'info'
+  },
+  transporter: {
+    type: String,
+    default: 'all'
+  },
   timestamp: {
     type: Date,
     default: Date.now
@@ -753,7 +764,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 // Define models
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
-const NotificationQueue = mongoose.model('NotificationQueue', NotificationQueueSchema);
+const Notifications = mongoose.model('Notifications', NotificationsSchema);
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
 const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 const User = mongoose.model('User', userSchema);
@@ -6149,6 +6160,26 @@ async function updateShortLinksStatistics() {
   }
 }
 
+// Function to add a notification to the NotificationQueue
+async function addNotification(userId, type, transporter, subject, message, timestamp) {
+  try {
+    await Notifications.create({
+      userId,
+      type,
+      transporter,
+      subject,
+      message,
+      timestamp
+    });
+  }
+  catch (error) {
+    console.error('Error adding notification:', error);
+  }
+}
+
+addNotification('65834f6fefa5bb088ca50288', null, 'email', 'Test', 'Test', new Date());
+
+// Function to send notifications from the NotificationQueue
 
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
