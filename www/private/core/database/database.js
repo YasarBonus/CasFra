@@ -26,130 +26,12 @@ const Language = require('./schemas/LanguageSchema.js');
 const Session = require('./schemas/SessionSchema.js');
 const NotificationEmails = require('./schemas/NotificationEmailsSchema.js');
 const NotificationEmailQueue = require('./schemas/NotificationEmailQueueSchema.js');
-const Tenancie = require('./schemas/tenanciesSchema.js');
+const Tenancie = require('./schemas/TenanciesSchema.js');
+const TenanciesTypes = require('./schemas/TenanciesTypesSchema.js');
+const User = require('./schemas/UserSchema.js');
+const UserGroup = require('./schemas/UserGroupSchema.js');
 
 
-
-// Define tenanciesTypes schema
-const tenanciesTypesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  short: {
-    type: String,
-    required: true,
-  }
-});
-
-const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
-
-// Define User schema
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 10,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8
-  },
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserGroup'
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    match: /.+\@.+\..+/
-  },
-  language: String,
-  nickname: {
-    type: String,
-    default: '',
-    maxlength: 20
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  active: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  banned: {
-    type: Boolean,
-    default: false
-  },
-  registrationKey: String,
-  registrationDate: Date,
-  registrationIp: String,
-  registrationVerificationCode: String,
-  registrationVerificationCodeExpiry: Date,
-  lastLoginDate: Date,
-  lastLoginIp: String,
-  tenancies: [String],
-  tenancy: String,
-});
-
-const User = mongoose.model('User', userSchema);
-
-// Define UserGroup schema
-const userGroupSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  permissions: {
-    type: [String]
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-  active: {
-    type: Boolean,
-    default: true
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  default: {
-    type: Boolean,
-    default: false
-  }
-});
-
-const UserGroup = mongoose.model('UserGroup', userGroupSchema);
 
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
@@ -649,142 +531,16 @@ const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksSt
 
 
 
-
-const tenanciesTypesEntries = [{
-  name: 'Default',
-  short: 'default',
-  description: 'Default Tenancies Type'
-}, {
-  name: 'Hosting',
-  short: 'hosting',
-  description: 'Hosting Tenant'
-}, {
-  name: 'Casino Affiliate',
-  short: 'casinoAffiliate',
-  description: 'Casino Affiliate Tenant'
-}, {
-  name: 'Lagnum',
-  short: 'lagnum',
-  description: 'Lagnum Tenant'
-}];
-
-const saveDefaultTenanciesTypesDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const tenanciesTypesEntry of tenanciesTypesEntries) {
-      const existingTenanciesTypes = await TenanciesTypes.findOne({
-        name: tenanciesTypesEntry.name
-      });
-
-      if (!existingTenanciesTypes) {
-        const newTenanciesTypes = new TenanciesTypes(tenanciesTypesEntry);
-        promises.push(newTenanciesTypes.save());
-        console.log('TenanciesTypes entry saved:', newTenanciesTypes);
-      } else if (existingTenanciesTypes.description !== tenanciesTypesEntry.description) {
-        existingTenanciesTypes.description = tenanciesTypesEntry.description;
-        promises.push(existingTenanciesTypes.save());
-        console.log('TenanciesTypes entry updated:', existingTenanciesTypes);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default TenanciesTypes Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default TenanciesTypes Database Data:', error);
-  }
-};
-
-saveDefaultTenanciesTypesDatabaseData();
-
 const registrationKeyEntries = [{
   regkey: 'admin',
   created: new Date(),
   used: false
 }];
 
-const userAdminGroup = new UserGroup({
-  name: 'Admin',
-  permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageShortLinks', 'manageCasinos',
-    'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-    'manageSessions', 'manageImages', 'manageImagesCategories', 'manageUsers'
-  ]
-});
-
-const userOperatorGroup = new UserGroup({
-  name: 'Operator',
-  permissions: ['authenticate', 'viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider',
-    'managePaymentMethods', 'manageAccount'
-  ]
-});
-
-const userUserGroup = new UserGroup({
-  name: 'User',
-  permissions: ['authenticate', 'viewDashboard', 'manageAccount']
-});
-
-const saveDefaultUserDatabaseData = async () => {
-  try {
-    const adminGroup = await UserGroup.findOne({
-      name: 'Admin'
-    });
-    const userGroup = await UserGroup.findOne({
-      name: 'User'
-    });
-    const operatorGroup = await UserGroup.findOne({
-      name: 'Operator'
-    });
-
-    const promises = [];
-
-    if (!adminGroup) {
-      promises.push(userAdminGroup.save());
-      console.log('UserGroup "Admin" saved with Permissions:', userAdminGroup.permissions);
-    } else if (adminGroup.permissions.toString() !== userAdminGroup.permissions.toString()) {
-      adminGroup.permissions = userAdminGroup.permissions;
-      promises.push(adminGroup.save());
-      console.log('UserGroup "Admin" permissions updated:', userAdminGroup.permissions);
-    }
-
-    if (!operatorGroup) {
-      promises.push(userOperatorGroup.save());
-      console.log('UserGroup "Operator" saved with Permissions:', userOperatorGroup.permissions);
-    } else if (operatorGroup.permissions.toString() !== userOperatorGroup.permissions.toString()) {
-      operatorGroup.permissions = userOperatorGroup.permissions;
-      promises.push(operatorGroup.save());
-      console.log('UserGroup "Operator" permissions updated:', userOperatorGroup.permissions);
-    }
-
-    if (!userGroup) {
-      promises.push(userUserGroup.save());
-      console.log('UserGroup "User" saved with Permissions:', userUserGroup.permissions);
-    } else if (userGroup.permissions.toString() !== userUserGroup.permissions.toString()) {
-      userGroup.permissions = userUserGroup.permissions;
-      promises.push(userGroup.save());
-      console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
-    }
+// data missing for above
 
 
-    for (const registrationKeyEntry of registrationKeyEntries) {
-      const existingRegistrationKey = await RegistrationKey.findOne({
-        regkey: registrationKeyEntry.regkey
-      });
 
-      if (!existingRegistrationKey) {
-        const newRegistrationKey = new RegistrationKey(registrationKeyEntry);
-        promises.push(newRegistrationKey.save());
-        console.log('Registration key entry saved:', newRegistrationKey);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default UserGroups and RegistrationKeys Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default UserGroups and RegistrationKeys Database Data:', error);
-  }
-};
-
-saveDefaultUserDatabaseData();
 
 const CasinoFeaturesEntries = [{
   name: 'Fast Verification',
