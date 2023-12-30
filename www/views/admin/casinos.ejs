@@ -215,14 +215,8 @@
 
         function deleteCasino(casinoId) {
             // Send a DELETE request to the API
-            fetch(`/api/casinos`, {
+            fetch(`/api/casinos/` + casinoId, {
                     method: 'DELETE',
-                    body: JSON.stringify({
-                        id: casinoId
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
                 })
                 .then(response => response.json())
                 .then(result => {
