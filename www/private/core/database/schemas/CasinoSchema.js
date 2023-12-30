@@ -22,7 +22,7 @@ const casinoSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    isNew: {
+    newCasino: {
       type: Boolean,
       default: false
     },
