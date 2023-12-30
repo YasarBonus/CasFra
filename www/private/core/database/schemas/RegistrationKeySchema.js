@@ -57,4 +57,6 @@ const registrationKeySchema = new mongoose.Schema({
         }
         };
 
+        saveDefaultRegistrationKeyDatabaseData();
+
 module.exports = RegistrationKey;
