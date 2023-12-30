@@ -51,7 +51,7 @@
                     editBox.innerHTML = ``;
                     editBox.innerHTML = `
                     <div class="content">
-                        <div class="ui ${casino.active ? 'green' : 'red'} top right attached massive label" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
+                        <div class="ui ${casino.active ? 'green' : 'red'} top right attached massive label activeToggler" onclick="toggleActive('${casino._id}', ${casino.active})">${casino.active ? 'active' : 'disabled'}</div>
 
                         <form class="ui form">
 
@@ -735,7 +735,7 @@
                 .then(result => {
                     console.log('Casino active state updated:', result);
                     // update the button text and color
-                    const button = document.querySelector('.ui.label');
+                    const button = document.querySelector('.ui.label.activeToggler');
                     button.classList.toggle('green');
                     button.classList.toggle('red');
                     button.innerText = result.active ? 'active' : 'disabled';
