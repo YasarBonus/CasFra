@@ -6,8 +6,7 @@ const path = require('path');
 const email = require('./modules/emailService.js');
 
 // Database Engine
-const db = require('./core/database.js');
-
+const db = require('./core/database/database.js');
 
 const app = express();
 const server = http.createServer(app);
