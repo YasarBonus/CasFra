@@ -30,38 +30,7 @@ const Tenancie = require('./schemas/TenanciesSchema.js');
 const TenanciesTypes = require('./schemas/TenanciesTypesSchema.js');
 const User = require('./schemas/UserSchema.js');
 const UserGroup = require('./schemas/UserGroupSchema.js');
-
-
-
-
-// Define RegistrationKey schema
-const registrationKeySchema = new mongoose.Schema({
-  regkey: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  used: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  usedDate: Date,
-  userId: String,
-  userIp: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-});
-
-const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
+const RegistrationKey = require('./schemas/RegistrationKeySchema.js');
 
 const imagesSchema = new mongoose.Schema({
   name: String,
@@ -525,22 +494,6 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 });
 
 const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
-
-
-
-
-
-
-
-const registrationKeyEntries = [{
-  regkey: 'admin',
-  created: new Date(),
-  used: false
-}];
-
-// data missing for above
-
-
 
 
 //#endregion MongoDB
