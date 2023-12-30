@@ -69,20 +69,6 @@ app.use(session({
 }));
 //
 
-// Check if the user is authenticated
-const checkAuthentication = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.status(401).json({
-      error: 'Not authenticated'
-    });
-  }
-};
-
-
-
-
 const getTenancyByUserId = async (userId) => {
   try {
     const user = await db.db.User.findById(userId);

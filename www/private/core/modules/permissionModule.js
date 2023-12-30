@@ -46,4 +46,15 @@ function checkPermissions(requiredPermission) {
     };
   }
 
-module.exports = checkPermissions;
+// Check if the user is authenticated
+const checkAuthentication = async (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).json({
+            error: 'Not authenticated'
+        });
+    }
+};
+
+module.exports = checkPermissions, checkAuthentication;
