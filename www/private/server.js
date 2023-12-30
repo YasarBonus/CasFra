@@ -5265,6 +5265,15 @@ function sleep(ms) {
 
 sendNotificationEmails();
 
+
+// Function to generate a random priority
+function generateRandomPriority() {
+  const random = Math.floor(Math.random() * 100000000000000000000);
+  console.log(random);
+  return random;
+}
+
+
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
 setInterval(updateShortLinksStatistics, 60 * 60 * 1000);
