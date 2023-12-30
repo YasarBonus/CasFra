@@ -3,7 +3,11 @@ const generateRandomPriority = require('../../utils/generateRandomPriority');
 
 // Define Casino schema
 const casinoSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    minlength: 3,
+    maxlength: 30
+  },
   categories: [String],
   description: String,
   priority: {
@@ -30,9 +34,18 @@ const casinoSchema = new mongoose.Schema({
   labelLarge: String,
   individualBonuses: [String],
   displayBonus: String,
-  maxBet: Number,
-  maxCashout: Number,
-  wager: Number,
+  maxBet: {
+    type: Number,
+    default: 0
+  },
+  maxCashout:{
+    type: Number,
+    default: 0
+  },
+  wager: {
+    type: Number,
+    default: 0
+  },
   wagerType: [String],
   noDeposit: {
     type: Boolean,
@@ -40,7 +53,7 @@ const casinoSchema = new mongoose.Schema({
   },
   prohibitedGamesProtection: {
     type: Boolean,
-    default: true
+    default: false
   },
   vpn: {
     type: Boolean,
