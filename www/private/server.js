@@ -5629,6 +5629,39 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
     });
 });
 
+// Delete a casino by its ID
+app.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params; // Get the ID from the request params
+
+  // Validate the ID
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      error: 'Invalid ID format'
+    });
+  }
+
+  // Find the casino by its ID and tenancy
+  Casino.findOneAndDelete({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    })
+    .then((deletedCasino) => {
+      if (!deletedCasino) {
+        throw new Error('Casino not found');
+      }
+      res.json(deletedCasino);
+      console.log('Casino deleted: ' + deletedCasino.name);
+    })
+    .catch((error) => {
+      console.error('Error deleting casino:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
 //#endregion Casinos
 
 // Middleware to check if the user is logged in and has the required permission
