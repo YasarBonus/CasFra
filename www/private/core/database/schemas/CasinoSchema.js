@@ -54,7 +54,8 @@ const casinoSchema = new mongoose.Schema({
   // displayBonus: mongoose.Schema.Types.ObjectId,
   maxBet: {
     type: Number,
-    default: 0
+    default: 0,
+    maxlength: 6
   },
   maxCashout:{
     type: Number,
