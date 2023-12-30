@@ -40,6 +40,34 @@ const multer = require('multer');
 
 // Middleware
 
+app.use(express.json());
+
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded({
+  extended: true
+}));
+
+// Set a timeout for all requests
+app.use((req, res, next) => {
+  setTimeout(next, 50);
+});
+
+// Session Storage
+const MongoStore = require('connect-mongo');
+
+app.use(session({
+  secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+  },
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://localhost:27017/casfra'
+  })
+}));
+//
+
 // Check if the user is authenticated
 const checkAuthentication = (req, res, next) => {
   if (req.session.user) {
@@ -96,34 +124,6 @@ function checkPermissions(requiredPermission) {
     }
   };
 }
-
-app.use(express.json());
-
-// Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded({
-  extended: true
-}));
-
-// Set a timeout for all requests
-app.use((req, res, next) => {
-  setTimeout(next, 50);
-});
-
-// Session Storage
-const MongoStore = require('connect-mongo');
-
-app.use(session({
-  secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-  },
-  store: MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/casfra'
-  })
-}));
-//
 
 
 const getTenancyByUserId = async (userId) => {
