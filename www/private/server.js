@@ -3,7 +3,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
-const email = require('./core/modules/emailService.js');
 const notificator = require('./core/modules/notificator.js');
 const addNotification = notificator.addNotification;
 
