@@ -39,7 +39,6 @@ const mongoose = require('mongoose');
 
 const nodemailer = require('nodemailer');
 
-// Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
   host: 'mail.behindthemars.de',
   port: 587,
@@ -47,10 +46,11 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'system@treudler.net',
     pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
-
-
 
 // Reusable function to send a email
 const sendEmail = (email, subject, text) => {
@@ -84,6 +84,7 @@ mongoose.connect('mongodb://localhost:27017/casfra', {
   });
 
 
+
 // Function to generate a random priority
 function generateRandomPriority() {
   const random = Math.floor(Math.random() * 100000000000000000000);
@@ -92,17 +93,15 @@ function generateRandomPriority() {
 }
 
 // Define GlobalConfiguration schema
-const globalConfigurationSchema = new mongoose.Schema({
-  name: String,
-  value: String,
-  description: String,
-  addedDate: {
-    type: Date,
-    default: Date.now
+const GlobalEmailConfigurationSchema = new mongoose.Schema({
+  host: String,
+  port: Number,
+  secure: Boolean,
+  auth: {
+    user: String,
+    pass: String
   },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
+  defaultFrom: String,
 });
 
 // Define Language schema
@@ -788,7 +787,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 });
 
 // Define models
-const GlobalConfiguration = mongoose.model('GlobalConfiguration', globalConfigurationSchema);
+const GlobalEmailConfiguration = mongoose.model('GlobalEmailConfiguration', GlobalEmailConfigurationSchema);
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
 const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
@@ -815,7 +814,16 @@ const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
 const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
 
-
+const globalEmailConfigurationEntry = {
+  host: 'mail.behindthemars.de',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'system@treudler.net',
+    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
+  },
+  defaultFrom: 'system@treudler.net',
+};
 const languageEntries = [{
     name: 'English',
     code: 'en'
