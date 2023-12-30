@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const db = require('../database/database.js');
 
 // Middleware to check if the user is logged in and has the required permission
 function checkPermissions(requiredPermission) {
