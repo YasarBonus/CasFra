@@ -27,79 +27,12 @@ const UserGroup = require('./schemas/UserGroupSchema.js');
 const RegistrationKey = require('./schemas/RegistrationKeySchema.js');
 const Images = require('./schemas/ImagesSchema.js');
 const ImagesCategories = require('./schemas/ImagesCategoriesSchema.js');
+const Casino = require('./schemas/CasinoSchema.js');
+const CasinoTags = require('./schemas/CasinoTagsSchema.js');
+const CasinoFeatures = require('./schemas/CasinoFeaturesSchema.js');
+const CasinoIndividualFeatures = require('./schemas/CasinoIndividualFeaturesSchema.js');
 
 
-
-// Define Casino tags schema
-const casinoTagsSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-});
-
-const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
-
-// Define Casino features schema
-const casinoFeaturesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  tenancies: [String],
-});
-
-const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
-
-// Define Casino individual features schema
-const casinoIndividualFeaturesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  casino: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: 0
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  tenancies: [String],
-
-});
-
-const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
 
 // Define Casino individual bonuses schema
 const casinoIndividualBonusesSchema = new mongoose.Schema({
@@ -362,7 +295,6 @@ module.exports = {
     Images,
     ImagesCategories,
     Casino,
-    CasinoReview,
     CasinoTags,
     CasinoFeatures,
     CasinoLicenses,
