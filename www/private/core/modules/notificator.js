@@ -18,7 +18,6 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
-addNotification('65834f6fefa5bb088ca50288', 'info', 'Test', 'Test', 'email');
 
 async function addNotificationEmail(userId, type, subject, message) {
   try {
