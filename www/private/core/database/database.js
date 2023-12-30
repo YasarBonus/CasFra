@@ -31,35 +31,11 @@ const Casino = require('./schemas/CasinoSchema.js');
 const CasinoTags = require('./schemas/CasinoTagsSchema.js');
 const CasinoFeatures = require('./schemas/CasinoFeaturesSchema.js');
 const CasinoIndividualFeatures = require('./schemas/CasinoIndividualFeaturesSchema.js');
+const CasinoIndividualBonuses = require('./schemas/CasinoIndividualBonusesSchema.js');
 
 
 
-// Define Casino individual bonuses schema
-const casinoIndividualBonusesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  tenancies: [String],
 
-  casino: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
 
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
