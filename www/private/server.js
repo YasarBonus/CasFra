@@ -53,58 +53,47 @@ const checkAuthentication = (req, res, next) => {
 
 // Middleware to check if the user is logged in and has the required permission
 function checkPermissions(requiredPermission) {
-  return function (req, res, next) {
-    if (!req.session.user) {
-      res.status(401).json({
-        error: 'Unauthorized'
-      });
-      return;
-    }
-    const userId = req.session.user.userId;
-
-    db.User.findById(userId)
-      .then((user) => {
-        if (!user) {
-          res.status(403).json({
-            error: 'Forbidden'
-          });
-          return;
-        }
-
-        const groupId = user.groupId;
-
-        db.UserGroup.findById(groupId)
-          .then((userGroup) => {
-            if (!userGroup) {
-              res.status(403).json({
-                error: 'Forbidden'
-              });
-              return;
-            }
-
-            const permissions = userGroup.permissions;
-
-            if (permissions.includes(requiredPermission)) {
-              next();
-            } else {
-              res.status(403).json({
-                error: 'Forbidden'
-              });
-            }
-          })
-          .catch((error) => {
-            console.error('Error retrieving user group:', error);
-            res.status(500).json({
-              error: 'Internal server error'
-            });
-          });
-      })
-      .catch((error) => {
-        console.error('Error retrieving user:', error);
-        res.status(500).json({
-          error: 'Internal server error'
+  return async function (req, res, next) {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({
+          error: 'Unauthorized'
         });
+      }
+
+      const userId = req.session.user.userId;
+      const user = await db.User.findById(userId);
+
+      if (!user) {
+        return res.status(403).json({
+          error: 'Forbidden'
+        });
+      }
+
+      const groupId = user.groupId;
+      const userGroup = await db.UserGroup.findById(groupId);
+
+      if (!userGroup) {
+        return res.status(403).json({
+          error: 'Forbidden'
+        });
+      }
+
+      const permissions = userGroup.permissions;
+
+      if (permissions.includes(requiredPermission)) {
+        next();
+      } else {
+        return res.status(403).json({
+          error: 'Forbidden'
+        });
+      }
+    } catch (error) {
+      console.error('Error retrieving user or user group:', error);
+      return res.status(500).json({
+        error: 'Internal server error'
       });
+    }
   };
 }
 
