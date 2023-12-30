@@ -8,8 +8,14 @@ const casinoSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 30
   },
-  categories: [String],
-  description: String,
+  categories: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true
+  },
+  description: {
+    type: String,
+    maxlength: 1000
+  },
   priority: {
     type: Number,
     default: generateRandomPriority()
@@ -19,9 +25,12 @@ const casinoSchema = new mongoose.Schema({
     default: Date.now,
     required: true
   },
-  addedBy: String,
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
   modifiedDate: Date,
-  modifiedBy: String,
+  modifiedBy: mongoose.Schema.Types.ObjectId,
   active: {
     type: Boolean,
     default: false
@@ -30,10 +39,19 @@ const casinoSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  label: String,
-  labelLarge: String,
-  individualBonuses: [String],
-  displayBonus: String,
+  label: {
+    type: String,
+    maxlength: 100
+  },
+  label: {
+    type: String,
+    maxlength: 100
+  },
+  individualBonuses:  {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true
+  },
+  // displayBonus: mongoose.Schema.Types.ObjectId,
   maxBet: {
     type: Number,
     default: 0
@@ -46,7 +64,7 @@ const casinoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  wagerType: [String],
+  wagerType: [mongoose.Schema.Types.ObjectId],
   noDeposit: {
     type: Boolean,
     default: false
@@ -59,19 +77,21 @@ const casinoSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  features: [String],
-  individualFeatures: [String],
-  providers: [String],
-  paymentMethods: [String],
+  features: {
+    type: [mongoose.Schema.Types.ObjectId]
+  },
+  individualFeatures: [mongoose.Schema.Types.ObjectId],
+  providers: [mongoose.Schema.Types.ObjectId],
+  paymentMethods: [mongoose.Schema.Types.ObjectId],
   reviewTitle: String,
   review: String,
   image: String,
   imageUrl: String,
   affiliateUrl: String,
   affiliateShortlink: String,
-  licenses: [String],
-  tags: [String],
-  tenancies: [String],
+  licenses: [mongoose.Schema.Types.ObjectId],
+  tags: [mongoose.Schema.Types.ObjectId],
+  tenancies: [mongoose.Schema.Types.ObjectId],
 });
 
 const Casino = mongoose.model('Casino', casinoSchema);
