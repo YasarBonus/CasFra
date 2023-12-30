@@ -6078,7 +6078,7 @@ async function setImageUrl(id = null) {
         });
         if (foundImage) {
           foundImage.imageUrl = `/img/images/${foundImage.filename}`;
-          foundImage.tenancies = [foundImage.tenancies];
+          foundImage.tenancies = foundImage.tenancies;
           await foundImage.save();
           console.log('Image URL for Image ' + foundImage.name + '(' + foundImage._id + ') (' + foundImage.imageUrl + ') saved');
         }
