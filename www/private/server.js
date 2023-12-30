@@ -14,7 +14,9 @@ const nodemailer = require('nodemailer');
 
 // Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: 'your-email@gmail.com',
     pass: 'your-password'
@@ -5932,6 +5934,7 @@ async function createShortLinks(casinoId = null) {
           const shortLink = await ShortLinks.create({
             url: casino.affiliateUrl,
             shortUrl: casino.affiliateShortlink,
+            description: 'Belongs to Casino ' + casino.name,
             addedBy: casino.addedBy,
             addedDate: casino.addedDate,
             modifiedBy: casino.modifiedBy,
