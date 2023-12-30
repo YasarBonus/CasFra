@@ -24,104 +24,11 @@ function generateRandomPriority() {
 const GlobalEmailConfiguration = require('./schemas/GlobalEmailConfigurationSchema.js');
 const Language = require('./schemas/LanguageSchema.js');
 const Session = require('./schemas/SessionSchema.js');
+const NotificationEmails = require('./schemas/NotificationEmailsSchema.js');
+const NotificationEmailQueue = require('./schemas/NotificationEmailQueueSchema.js');
+const Tenancie = require('./schemas/tenanciesSchema.js');
 
 
-const NotificationEmailsSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  subject: String,
-  message: String,
-  type: {
-    type: String,
-    default: 'info'
-  },
-  transporter: {
-    type: String,
-    default: 'all'
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  read: {
-    type: Boolean,
-    default: false
-  },
-  readDate: {
-    type: Date,
-  },
-  emailDelivered: {
-    type: Boolean,
-    default: false
-  },
-  emailDeliveredDate: {
-    type: Date,
-  },
-  emailDeliveredTo: {
-    type: String,
-  },
-});
-
-const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
-
-const NotificationEmailQueueSchema = new mongoose.Schema({
-  notificationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  allDelivered: {
-    type: Boolean,
-    default: false
-  },
-  allDeliveredDate: {
-    type: Date,
-  },
-  emailDelivered: {
-    type: Boolean,
-  },
-  emailDeliveredDate: {
-    type: Date,
-  },
-  emailDeliveredTo: {
-    type: String,
-  },
-  updateTimestamp: {
-    type: Date,
-    default: Date.now
-  },
-});
-
-const NotificationEmailQueue = mongoose.model('NotificationEmailQueue', NotificationEmailQueueSchema);
-
-const tenanciesSchema = new mongoose.Schema({
-  name: String,
-  notes: String,
-  createdBy: {
-    type: String,
-  },
-  createdDate: {
-    type: Date,
-    default: Date.now
-  },
-  modifiedBy: String,
-  modifiedDate: Date,
-  image: String,
-  admins: [String],
-  active: {
-    type: Boolean,
-    default: true
-  },
-  imageUrl: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  type: String,
-})
-
-const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
 
 // Define tenanciesTypes schema
 const tenanciesTypesSchema = new mongoose.Schema({
@@ -741,38 +648,7 @@ const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksSt
 
 
 
-const tenancieEntries = [{
-  name: 'Treudler',
-}]
 
-const saveDefaultTenancieDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const tenancieEntry of tenancieEntries) {
-      const existingTenancie = await Tenancie.findOne({
-        name: tenancieEntry.name
-      });
-
-      if (!existingTenancie) {
-        const newTenancie = new Tenancie(tenancieEntry);
-        promises.push(newTenancie.save());
-        console.log('Tenancie entry saved:', newTenancie);
-      } else if (existingTenancie.description !== tenancieEntry.description) {
-        existingTenancie.description = tenancieEntry.description;
-        promises.push(existingTenancie.save());
-        console.log('Tenancie entry updated:', existingTenancie);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default Tenancies Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default Tenancies Database Data:', error);
-  }
-};
-
-saveDefaultTenancieDatabaseData();
 
 const tenanciesTypesEntries = [{
   name: 'Default',
