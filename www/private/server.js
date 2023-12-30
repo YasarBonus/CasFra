@@ -91,6 +91,20 @@ function generateRandomPriority() {
   return random;
 }
 
+// Define GlobalConfiguration schema
+const globalConfigurationSchema = new mongoose.Schema({
+  name: String,
+  value: String,
+  description: String,
+  addedDate: {
+    type: Date,
+    default: Date.now
+  },
+  addedBy: String,
+  modifiedDate: Date,
+  modifiedBy: String,
+});
+
 // Define Language schema
 const languageSchema = new mongoose.Schema({
   name: String,
@@ -774,6 +788,7 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
 });
 
 // Define models
+const GlobalConfiguration = mongoose.model('GlobalConfiguration', globalConfigurationSchema);
 const Session = mongoose.model('Session', SessionSchema);
 const Language = mongoose.model('Language', languageSchema);
 const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
