@@ -14,7 +14,6 @@ mongoose.connect('mongodb://localhost:27017/casfra', {
   });
 
 
-
 // Function to generate a random priority
 function generateRandomPriority() {
   const random = Math.floor(Math.random() * 100000000000000000000);
@@ -22,35 +21,10 @@ function generateRandomPriority() {
   return random;
 }
 
-// Define GlobalConfiguration schema
-const GlobalEmailConfigurationSchema = new mongoose.Schema({
-  host: String,
-  port: Number,
-  secure: Boolean,
-  auth: {
-    user: String,
-    pass: String
-  },
-  defaultFrom: String,
-});
+const GlobalEmailConfiguration = require('./schemas/GlobalEmailConfigurationSchema.js');
+const Language = require('./schemas/LanguageSchema.js');
+const Session = require('./schemas/SessionSchema.js');
 
-// Define Language schema
-const languageSchema = new mongoose.Schema({
-  name: String,
-  code: String
-});
-
-const SessionSchema = new mongoose.Schema({
-  userId: String,
-  username: String,
-  ip: String,
-  userAgent: String,
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  socketId: String,
-});
 
 const NotificationEmailsSchema = new mongoose.Schema({
   userId: {
@@ -90,6 +64,8 @@ const NotificationEmailsSchema = new mongoose.Schema({
   },
 });
 
+const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
+
 const NotificationEmailQueueSchema = new mongoose.Schema({
   notificationId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -117,6 +93,8 @@ const NotificationEmailQueueSchema = new mongoose.Schema({
   },
 });
 
+const NotificationEmailQueue = mongoose.model('NotificationEmailQueue', NotificationEmailQueueSchema);
+
 const tenanciesSchema = new mongoose.Schema({
   name: String,
   notes: String,
@@ -142,6 +120,8 @@ const tenanciesSchema = new mongoose.Schema({
   },
   type: String,
 })
+
+const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
 
 // Define tenanciesTypes schema
 const tenanciesTypesSchema = new mongoose.Schema({
@@ -169,6 +149,8 @@ const tenanciesTypesSchema = new mongoose.Schema({
     required: true,
   }
 });
+
+const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
 
 // Define User schema
 const userSchema = new mongoose.Schema({
@@ -225,6 +207,8 @@ const userSchema = new mongoose.Schema({
   tenancy: String,
 });
 
+const User = mongoose.model('User', userSchema);
+
 // Define UserGroup schema
 const userGroupSchema = new mongoose.Schema({
   name: {
@@ -258,6 +242,8 @@ const userGroupSchema = new mongoose.Schema({
   }
 });
 
+const UserGroup = mongoose.model('UserGroup', userGroupSchema);
+
 // Define RegistrationKey schema
 const registrationKeySchema = new mongoose.Schema({
   regkey: {
@@ -284,6 +270,8 @@ const registrationKeySchema = new mongoose.Schema({
   },
   tenancies: [String],
 });
+
+const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
 
 const imagesSchema = new mongoose.Schema({
   name: String,
@@ -317,6 +305,8 @@ const imagesSchema = new mongoose.Schema({
   tenancies: [String],
 });
 
+const Images = mongoose.model('Images', imagesSchema);
+
 const imagesCategoriesSchema = new mongoose.Schema({
   name: String,
   description: String,
@@ -338,6 +328,8 @@ const imagesCategoriesSchema = new mongoose.Schema({
   modifiedBy: String,
   tenancies: [String],
 });
+
+const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 
 // Define Casino schema
 const casinoSchema = new mongoose.Schema({
@@ -399,6 +391,8 @@ const casinoSchema = new mongoose.Schema({
   tenancies: [String],
 });
 
+const Casino = mongoose.model('Casino', casinoSchema);
+
 // Define Casino Review schema
 const casinoReviewSchema = new mongoose.Schema({
   casinoId: String,
@@ -426,6 +420,8 @@ const casinoReviewSchema = new mongoose.Schema({
   }
 });
 
+const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
+
 // Define Casino tags schema
 const casinoTagsSchema = new mongoose.Schema({
   name: String,
@@ -442,6 +438,8 @@ const casinoTagsSchema = new mongoose.Schema({
   },
   tenancies: [String],
 });
+
+const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
 
 // Define Casino features schema
 const casinoFeaturesSchema = new mongoose.Schema({
@@ -465,6 +463,8 @@ const casinoFeaturesSchema = new mongoose.Schema({
   modifiedBy: String,
   tenancies: [String],
 });
+
+const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
 
 // Define Casino individual features schema
 const casinoIndividualFeaturesSchema = new mongoose.Schema({
@@ -491,6 +491,8 @@ const casinoIndividualFeaturesSchema = new mongoose.Schema({
 
 });
 
+const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
+
 // Define Casino individual bonuses schema
 const casinoIndividualBonusesSchema = new mongoose.Schema({
   name: String,
@@ -515,6 +517,8 @@ const casinoIndividualBonusesSchema = new mongoose.Schema({
   modifiedDate: Date,
   modifiedBy: String
 });
+
+const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
 
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
@@ -541,6 +545,8 @@ const casinoProviderSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
+
 // Define Casino licenses schema
 const casinoLicensesSchema = new mongoose.Schema({
   name: String,
@@ -566,6 +572,8 @@ const casinoLicensesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
+
 // Define Casino payment methods schema
 const casinoPaymentMethodsSchema = new mongoose.Schema({
   name: String,
@@ -589,6 +597,8 @@ const casinoPaymentMethodsSchema = new mongoose.Schema({
   modifiedDate: Date,
   modifiedBy: String
 });
+
+const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
 
 // Define Casino wager types schema
 const casinoWagerTypesSchema = new mongoose.Schema({
@@ -614,6 +624,8 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   modifiedBy: String
 });
 
+const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
+
 // Define Casino categories schema
 const casinoCategoriesSchema = new mongoose.Schema({
   name: String,
@@ -637,6 +649,8 @@ const casinoCategoriesSchema = new mongoose.Schema({
   modifiedDate: Date,
   modifiedBy: String
 });
+
+const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 
 // Define shortLinks Schema
 const shortLinksSchema = new mongoose.Schema({
@@ -683,6 +697,8 @@ const shortLinksSchema = new mongoose.Schema({
   }
 });
 
+const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
+
 // Define shortLinksHits Schema
 const shortLinksHitsSchema = new mongoose.Schema({
   shortLink: String,
@@ -695,6 +711,8 @@ const shortLinksHitsSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
 
 // Define shortLinksStatistics Schema
 const shortLinksStatisticsSchema = new mongoose.Schema({
@@ -716,61 +734,12 @@ const shortLinksStatisticsSchema = new mongoose.Schema({
   tenancies: [String],
 });
 
-// Define models
-const GlobalEmailConfiguration = mongoose.model('GlobalEmailConfiguration', GlobalEmailConfigurationSchema);
-const Session = mongoose.model('Session', SessionSchema);
-const Language = mongoose.model('Language', languageSchema);
-const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
-const NotificationEmailQueue = mongoose.model('NotificationEmailQueue', NotificationEmailQueueSchema);
-const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
-const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
-const User = mongoose.model('User', userSchema);
-const UserGroup = mongoose.model('UserGroup', userGroupSchema);
-const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
-const Images = mongoose.model('Images', imagesSchema);
-const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
-const Casino = mongoose.model('Casino', casinoSchema);
-const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
-const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
-const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
-const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
-const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
-const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
-const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
-const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
-const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
-const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
-const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
-const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
 const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
 
-const globalEmailConfigurationEntry = {
-  host: 'mail.behindthemars.de',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'system@treudler.net',
-    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
-  },
-  defaultFrom: 'system@treudler.net',
-};
-const languageEntries = [{
-    name: 'English',
-    code: 'en'
-  },
-  {
-    name: 'French',
-    code: 'fr'
-  },
-  {
-    name: 'Spanish',
-    code: 'es'
-  },
-  {
-    name: 'German',
-    code: 'de'
-  },
-];
+
+
+
+
 
 const tenancieEntries = [{
   name: 'Treudler',
@@ -919,21 +888,6 @@ const saveDefaultUserDatabaseData = async () => {
       console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
     }
 
-    for (const languageEntry of languageEntries) {
-      const existingLanguage = await Language.findOne({
-        name: languageEntry.name
-      });
-
-      if (!existingLanguage) {
-        const newLanguage = new Language(languageEntry);
-        promises.push(newLanguage.save());
-        console.log('Language entry saved:', newLanguage);
-      } else if (existingLanguage.code !== languageEntry.code) {
-        existingLanguage.code = languageEntry.code;
-        promises.push(existingLanguage.save());
-        console.log('Language entry updated:', existingLanguage);
-      }
-    }
 
     for (const registrationKeyEntry of registrationKeyEntries) {
       const existingRegistrationKey = await RegistrationKey.findOne({
