@@ -39,20 +39,90 @@ const fs = require('fs');
 const multer = require('multer');
 
 // Middleware
+
+// Check if the user is authenticated
+const checkAuthentication = (req, res, next) => {
+  if (req.session.user) {
+    next();
+  } else {
+    res.status(401).json({
+      error: 'Not authenticated'
+    });
+  }
+};
+
+// Middleware to check if the user is logged in and has the required permission
+function checkPermissions(requiredPermission) {
+  return function (req, res, next) {
+    if (!req.session.user) {
+      res.status(401).json({
+        error: 'Unauthorized'
+      });
+      return;
+    }
+    const userId = req.session.user.userId;
+
+    db.User.findById(userId)
+      .then((user) => {
+        if (!user) {
+          res.status(403).json({
+            error: 'Forbidden'
+          });
+          return;
+        }
+
+        const groupId = user.groupId;
+
+        db.UserGroup.findById(groupId)
+          .then((userGroup) => {
+            if (!userGroup) {
+              res.status(403).json({
+                error: 'Forbidden'
+              });
+              return;
+            }
+
+            const permissions = userGroup.permissions;
+
+            if (permissions.includes(requiredPermission)) {
+              next();
+            } else {
+              res.status(403).json({
+                error: 'Forbidden'
+              });
+            }
+          })
+          .catch((error) => {
+            console.error('Error retrieving user group:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      })
+      .catch((error) => {
+        console.error('Error retrieving user:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  };
+}
+
 app.use(express.json());
+
+// Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded({
   extended: true
 }));
 
+// Set a timeout for all requests
 app.use((req, res, next) => {
   setTimeout(next, 50);
 });
 
 // Session Storage
 const MongoStore = require('connect-mongo');
-const {
-  send
-} = require('process');
+
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
   resave: false,
@@ -4551,62 +4621,7 @@ app.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => 
 
 //#endregion Casinos
 
-// Middleware to check if the user is logged in and has the required permission
-function checkPermissions(requiredPermission) {
-  return function (req, res, next) {
-    if (!req.session.user) {
-      res.status(401).json({
-        error: 'Unauthorized'
-      });
-      return;
-    }
-    const userId = req.session.user.userId;
 
-    db.User.findById(userId)
-      .then((user) => {
-        if (!user) {
-          res.status(403).json({
-            error: 'Forbidden'
-          });
-          return;
-        }
-
-        const groupId = user.groupId;
-
-        db.UserGroup.findById(groupId)
-          .then((userGroup) => {
-            if (!userGroup) {
-              res.status(403).json({
-                error: 'Forbidden'
-              });
-              return;
-            }
-
-            const permissions = userGroup.permissions;
-
-            if (permissions.includes(requiredPermission)) {
-              next();
-            } else {
-              res.status(403).json({
-                error: 'Forbidden'
-              });
-            }
-          })
-          .catch((error) => {
-            console.error('Error retrieving user group:', error);
-            res.status(500).json({
-              error: 'Internal server error'
-            });
-          });
-      })
-      .catch((error) => {
-        console.error('Error retrieving user:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  };
-}
 
 //#region Routes
 // Routes for rendering views
