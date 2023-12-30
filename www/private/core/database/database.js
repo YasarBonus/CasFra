@@ -30,36 +30,6 @@ const ImagesCategories = require('./schemas/ImagesCategoriesSchema.js');
 
 
 
-
-// Define Casino Review schema
-const casinoReviewSchema = new mongoose.Schema({
-  casinoId: String,
-  addedBy: String,
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  modifiedBy: String,
-  modifiedDate: Date,
-  rating: Number,
-  review: String,
-  tenancies: [String],
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  }
-});
-
-const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
-
 // Define Casino tags schema
 const casinoTagsSchema = new mongoose.Schema({
   name: String,
