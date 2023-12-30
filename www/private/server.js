@@ -172,6 +172,9 @@ app.post('/api/auth/login', (req, res) => {
                   user.tenancy = tenancy;
                   user.save()
                     .then(() => {
+                      // Add notification after successful login
+                      addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
+
                       res.json({
                         success: true
                       });
@@ -190,6 +193,9 @@ app.post('/api/auth/login', (req, res) => {
                     permissions: userGroup.permissions
                   };
 
+                  // Add notification after successful login
+                  addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
+
                   res.json({
                     success: true
                   });
@@ -204,6 +210,9 @@ app.post('/api/auth/login', (req, res) => {
                       username: user.username,
                       permissions: userGroup.permissions
                     };
+
+                    // Add notification after successful login
+                    addNotification('Login successful', user._id);
 
                     res.json({
                       success: true
