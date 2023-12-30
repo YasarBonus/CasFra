@@ -17,4 +17,4 @@ const shortLinksHitsSchema = new mongoose.Schema({
   
   const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
 
-    exports.ShortLinksHits = ShortLinksHits;
+module.exports = ShortLinksHits;

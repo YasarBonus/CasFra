@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../utils/generateRandomPriority');
 
-//#region MongoDB
-// Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casfra', {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -13,7 +10,6 @@ mongoose.connect('mongodb://localhost:27017/casfra', {
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
   });
-
 
 const GlobalEmailConfiguration = require('./schemas/GlobalEmailConfigurationSchema.js');
 const Language = require('./schemas/LanguageSchema.js');
@@ -41,10 +37,6 @@ const ShortLinks = require('./schemas/ShortLinksSchema.js');
 const ShortLinksHits = require('./schemas/ShortLinksHitsSchema.js');
 const ShortLinksStatistics = require('./schemas/ShortLinksStatisticsSchema.js');
 
-
-//#endregion MongoDB
-
-// Exportieren Sie die Modelle, die Sie benötigen
 module.exports = {
     GlobalEmailConfiguration,
     Session,

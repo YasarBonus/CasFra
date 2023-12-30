@@ -29,4 +29,4 @@ const casinoPaymentMethodsSchema = new mongoose.Schema({
   const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
 
   
-    exports.CasinoPaymentMethods = CasinoPaymentMethods;
+module.exports = CasinoPaymentMethods;

@@ -29,4 +29,4 @@ const casinoCategoriesSchema = new mongoose.Schema({
   const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
 
   
-    exports.CasinoCategories = CasinoCategories;
+module.exports = CasinoCategories;

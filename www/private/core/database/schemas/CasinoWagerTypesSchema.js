@@ -29,4 +29,4 @@ const casinoWagerTypesSchema = new mongoose.Schema({
   const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
 
   
-    exports.CasinoWagerTypes = CasinoWagerTypes;
+module.exports = CasinoWagerTypes;

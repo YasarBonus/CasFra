@@ -48,4 +48,4 @@ const shortLinksSchema = new mongoose.Schema({
   
   const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
 
-    exports.ShortLinks = ShortLinks;
+module.exports = ShortLinks;

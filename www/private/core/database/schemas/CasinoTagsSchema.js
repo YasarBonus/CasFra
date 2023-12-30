@@ -21,4 +21,4 @@ const casinoTagsSchema = new mongoose.Schema({
   
   const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
 
-    exports.CasinoTags = CasinoTags;
+  module.exports = CasinoTags;

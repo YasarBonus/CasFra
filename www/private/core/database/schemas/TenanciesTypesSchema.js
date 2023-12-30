@@ -78,3 +78,4 @@ const tenanciesTypesSchema = new mongoose.Schema({
   
   saveDefaultTenanciesTypesDatabaseData();
 
+module.exports = TenanciesTypes;

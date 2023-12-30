@@ -63,4 +63,4 @@ const casinoSchema = new mongoose.Schema({
   
   const Casino = mongoose.model('Casino', casinoSchema);
 
-    exports.Casino = Casino;
+module.exports = Casino;

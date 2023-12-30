@@ -28,4 +28,4 @@ const casinoProviderSchema = new mongoose.Schema({
   
   const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
 
-    exports.CasinoProvider = CasinoProvider;
+module.exports = CasinoProvider;

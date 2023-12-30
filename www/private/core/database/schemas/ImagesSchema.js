@@ -35,4 +35,4 @@ const imagesSchema = new mongoose.Schema({
   
   const Images = mongoose.model('Images', imagesSchema);
 
-  exports.Images = Images;
+module.exports = Images;

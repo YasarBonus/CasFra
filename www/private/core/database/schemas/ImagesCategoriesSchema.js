@@ -25,4 +25,4 @@ const imagesCategoriesSchema = new mongoose.Schema({
 
 const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
 
-exports.ImagesCategories = ImagesCategories;
+module.exports = ImagesCategories;
