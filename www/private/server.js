@@ -6289,17 +6289,6 @@ async function addNotificationEmail(userId, type, subject, message) {
   }
 }
 
-// Function to send NotificationEmails from the NotificationEmailQueue using the sendEmail function
-// Get the first entry from the NotificationEmailQueue, then
-// get the userId from the NotificationEmails by its id, then
-// get the user's email address from the userId, then
-// send the email to the user's email address, then
-// set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address, then
-// save the NotificationEmail, then delete the NotificationEmail from the NotificationEmailQueue, then
-// call the function again to send the next NotificationEmail
-// with a 1 second delay between each NotificationEmail
-// if there are no more NotificationEmail in the queue, then the function will sleep for 5 seconds and then call itself again
-
 async function sendNotificationEmails() {
   try {
     // Get the first entry from the NotificationEmailQueue
@@ -6341,6 +6330,7 @@ async function sendNotificationEmails() {
     }
   } catch (error) {
     console.error('Error sending notification emails:', error);
+    // Handle the error here
   }
 }
 
