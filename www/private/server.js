@@ -9,16 +9,24 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 io.on('connection', (socket) => {
-  console.log('Neue WebSocket-Verbindung');
+  console.log('New Websocket Connection:', socket.id);
+
+  socket.emit('notification', {
+    message: 'Willkommen beim WebSocket-Server'
+  });
 
   // Senden Sie eine Benachrichtigung an den Client
-  socket.emit('notification', { message: 'Willkommen!' });
+  socket.emit('notification', {
+    message: 'Willkommen beim WebSocket-Server'
+  });
 
   // Hören Sie auf eine Benachrichtigung vom Client
   socket.on('notification', (data) => {
-    console.log('Benachrichtigung vom Client:', data);
+    console.log('Benachrichtigung vom Client empfangen:', data);
   });
 });
+
+
 
 app.use(express.static(path.join('public')));
 app.set('views', path.join(__dirname, '../views'));
