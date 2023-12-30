@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const generateRandomPriority = require('../utils/generateRandomPriority');
 
 //#region MongoDB
 // Connect to MongoDB
@@ -13,13 +14,6 @@ mongoose.connect('mongodb://localhost:27017/casfra', {
     console.error('Error connecting to MongoDB:', error);
   });
 
-
-// Function to generate a random priority
-function generateRandomPriority() {
-  const random = Math.floor(Math.random() * 100000000000000000000);
-  console.log(random);
-  return random;
-}
 
 const GlobalEmailConfiguration = require('./schemas/GlobalEmailConfigurationSchema.js');
 const Language = require('./schemas/LanguageSchema.js');
