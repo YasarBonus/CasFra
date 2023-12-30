@@ -30,7 +30,7 @@ const tenanciesSchema = new mongoose.Schema({
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
 
 
-  
+
 const tenancieEntries = [{
     name: 'Treudler',
 }]
@@ -56,7 +56,6 @@ const saveDefaultTenancieDatabaseData = async () => {
         }
 
         await Promise.all(promises);
-        console.log('Default Tenancies Database Data successfully saved.');
     } catch (error) {
         console.error('Error saving Default Tenancies Database Data:', error);
     }
