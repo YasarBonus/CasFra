@@ -72,26 +72,6 @@ const sendEmail = (email, subject, text) => {
   });
 };
 
-
-
-// Function to send password reset email
-const sendPasswordResetEmail = (email, resetToken) => {
-  const mailOptions = {
-    from: 'your-email@gmail.com',
-    to: email,
-    subject: 'Password Reset',
-    text: `Click the following link to reset your password: http://your-website.com/reset-password?token=${resetToken}`
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
-  });
-};
-
 //#region MongoDB
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casfra', {
@@ -6296,9 +6276,6 @@ async function addNotification(userId, type, transporter, subject, message, time
 }
 
 addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test', 'Test', new Date());
-addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test2', 'Test2', new Date());
-addNotification('65834f6fefa5bb088ca50288', 'info', 'email', 'Test3', 'Test3', new Date());
-
 
 // Function to send notifications from the NotificationQueue using the sendEmail function
 // Get the first notification from the queue, then
