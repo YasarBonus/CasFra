@@ -5,6 +5,10 @@ const path = require('path');
 
 const email = require('./modules/emailService.js');
 
+// Database Engine
+const db = require('./core/database.js');
+
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -37,1131 +41,10 @@ const schedule = require('node-schedule');
 const fs = require('fs');
 const multer = require('multer');
 const ejs = require('ejs');
-const mongoose = require('mongoose');
 
 
 
-//#region MongoDB
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/casfra', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
 
-
-
-// Function to generate a random priority
-function generateRandomPriority() {
-  const random = Math.floor(Math.random() * 100000000000000000000);
-  console.log(random);
-  return random;
-}
-
-// Define GlobalConfiguration schema
-const GlobalEmailConfigurationSchema = new mongoose.Schema({
-  host: String,
-  port: Number,
-  secure: Boolean,
-  auth: {
-    user: String,
-    pass: String
-  },
-  defaultFrom: String,
-});
-
-// Define Language schema
-const languageSchema = new mongoose.Schema({
-  name: String,
-  code: String
-});
-
-const SessionSchema = new mongoose.Schema({
-  userId: String,
-  username: String,
-  ip: String,
-  userAgent: String,
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  socketId: String,
-});
-
-const NotificationEmailsSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  subject: String,
-  message: String,
-  type: {
-    type: String,
-    default: 'info'
-  },
-  transporter: {
-    type: String,
-    default: 'all'
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  read: {
-    type: Boolean,
-    default: false
-  },
-  readDate: {
-    type: Date,
-  },
-  emailDelivered: {
-    type: Boolean,
-    default: false
-  },
-  emailDeliveredDate: {
-    type: Date,
-  },
-  emailDeliveredTo: {
-    type: String,
-  },
-});
-
-const NotificationEmailQueueSchema = new mongoose.Schema({
-  notificationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  allDelivered: {
-    type: Boolean,
-    default: false
-  },
-  allDeliveredDate: {
-    type: Date,
-  },
-  emailDelivered: {
-    type: Boolean,
-  },
-  emailDeliveredDate: {
-    type: Date,
-  },
-  emailDeliveredTo: {
-    type: String,
-  },
-  updateTimestamp: {
-    type: Date,
-    default: Date.now
-  },
-});
-
-const tenanciesSchema = new mongoose.Schema({
-  name: String,
-  notes: String,
-  createdBy: {
-    type: String,
-  },
-  createdDate: {
-    type: Date,
-    default: Date.now
-  },
-  modifiedBy: String,
-  modifiedDate: Date,
-  image: String,
-  admins: [String],
-  active: {
-    type: Boolean,
-    default: true
-  },
-  imageUrl: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  type: String,
-})
-
-// Define tenanciesTypes schema
-const tenanciesTypesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  short: {
-    type: String,
-    required: true,
-  }
-});
-
-// Define User schema
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 10,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8
-  },
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserGroup'
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    match: /.+\@.+\..+/
-  },
-  language: String,
-  nickname: {
-    type: String,
-    default: '',
-    maxlength: 20
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  active: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  banned: {
-    type: Boolean,
-    default: false
-  },
-  registrationKey: String,
-  registrationDate: Date,
-  registrationIp: String,
-  registrationVerificationCode: String,
-  registrationVerificationCodeExpiry: Date,
-  lastLoginDate: Date,
-  lastLoginIp: String,
-  tenancies: [String],
-  tenancy: String,
-});
-
-// Define UserGroup schema
-const userGroupSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  permissions: {
-    type: [String]
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-  active: {
-    type: Boolean,
-    default: true
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  default: {
-    type: Boolean,
-    default: false
-  }
-});
-
-// Define RegistrationKey schema
-const registrationKeySchema = new mongoose.Schema({
-  regkey: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  used: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  usedDate: Date,
-  userId: String,
-  userIp: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-});
-
-const imagesSchema = new mongoose.Schema({
-  name: String,
-  filename: String,
-  originalname: String,
-  imageUrl: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  size: Number,
-  mimetype: String,
-  description: String,
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedUser: String,
-  category: String,
-  description: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: 0
-  },
-  tenancies: [String],
-});
-
-const imagesCategoriesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  tenancies: [String],
-});
-
-// Define Casino schema
-const casinoSchema = new mongoose.Schema({
-  name: String,
-  categories: [String],
-  description: String,
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  active: {
-    type: Boolean,
-    default: false
-  },
-  isNew: {
-    type: Boolean,
-    default: false
-  },
-  label: String,
-  labelLarge: String,
-  individualBonuses: [String],
-  displayBonus: String,
-  maxBet: Number,
-  maxCashout: Number,
-  wager: Number,
-  wagerType: [String],
-  noDeposit: {
-    type: Boolean,
-    default: false
-  },
-  prohibitedGamesProtection: {
-    type: Boolean,
-    default: true
-  },
-  vpn: {
-    type: Boolean,
-    default: false
-  },
-  features: [String],
-  individualFeatures: [String],
-  providers: [String],
-  paymentMethods: [String],
-  reviewTitle: String,
-  review: String,
-  image: String,
-  imageUrl: String,
-  affiliateUrl: String,
-  affiliateShortlink: String,
-  licenses: [String],
-  tags: [String],
-  tenancies: [String],
-});
-
-// Define Casino Review schema
-const casinoReviewSchema = new mongoose.Schema({
-  casinoId: String,
-  addedBy: String,
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  modifiedBy: String,
-  modifiedDate: Date,
-  rating: Number,
-  review: String,
-  tenancies: [String],
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  }
-});
-
-// Define Casino tags schema
-const casinoTagsSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  tenancies: [String],
-});
-
-// Define Casino features schema
-const casinoFeaturesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  tenancies: [String],
-});
-
-// Define Casino individual features schema
-const casinoIndividualFeaturesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  casino: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: 0
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String,
-  tenancies: [String],
-
-});
-
-// Define Casino individual bonuses schema
-const casinoIndividualBonusesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  tenancies: [String],
-
-  casino: String,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino provider schema
-const casinoProviderSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  tenancies: [String],
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino licenses schema
-const casinoLicensesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  imageUrl: String,
-  tenancies: [String],
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino payment methods schema
-const casinoPaymentMethodsSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  tenancies: [String],
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino wager types schema
-const casinoWagerTypesSchema = new mongoose.Schema({
-  name: String,
-  short: String,
-  description: String,
-  tenancies: [String],
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define Casino categories schema
-const casinoCategoriesSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  image: String,
-  tenancies: [String],
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  addedBy: String,
-  modifiedDate: Date,
-  modifiedBy: String
-});
-
-// Define shortLinks Schema
-const shortLinksSchema = new mongoose.Schema({
-  url: {
-    type: String,
-    required: true,
-    minlength: 3,
-    maxlength: 20
-  },
-  shortUrl: String,
-  description: {
-    type: String,
-    maxlength: 100
-  },
-  tenancies: {
-    type: [mongoose.Schema.Types.ObjectId],
-    required: true
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  addedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  modifiedDate: Date,
-  modifiedBy: mongoose.Schema.Types.ObjectId,
-  active: {
-    type: Boolean,
-    default: true
-  },
-  priority: {
-    type: Number,
-    default: generateRandomPriority()
-  },
-  attachedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-  },
-  hits: {
-    type: Number,
-    default: 0
-  }
-});
-
-// Define shortLinksHits Schema
-const shortLinksHitsSchema = new mongoose.Schema({
-  shortLink: String,
-  ip: String,
-  userAgent: String,
-  tenancies: [String],
-
-  timestamp: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-// Define shortLinksStatistics Schema
-const shortLinksStatisticsSchema = new mongoose.Schema({
-  shortLink: String,
-  hits: Number,
-  uniqueHits: Number,
-  hits1h: Number,
-  hits3h: Number,
-  hits6h: Number,
-  hits12h: Number,
-  hits24h: Number,
-  hits7d: Number,
-  hits30d: Number,
-  hits12m: Number,
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  tenancies: [String],
-});
-
-// Define models
-const GlobalEmailConfiguration = mongoose.model('GlobalEmailConfiguration', GlobalEmailConfigurationSchema);
-const Session = mongoose.model('Session', SessionSchema);
-const Language = mongoose.model('Language', languageSchema);
-const NotificationEmails = mongoose.model('NotificationEmails', NotificationEmailsSchema);
-const NotificationEmailQueue = mongoose.model('NotificationEmailQueue', NotificationEmailQueueSchema);
-const Tenancie = mongoose.model('Tenancie', tenanciesSchema)
-const TenanciesTypes = mongoose.model('TenanciesTypes', tenanciesTypesSchema);
-const User = mongoose.model('User', userSchema);
-const UserGroup = mongoose.model('UserGroup', userGroupSchema);
-const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
-const Images = mongoose.model('Images', imagesSchema);
-const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);
-const Casino = mongoose.model('Casino', casinoSchema);
-const CasinoReview = mongoose.model('CasinoReview', casinoReviewSchema);
-const CasinoTags = mongoose.model('CasinoTags', casinoTagsSchema);
-const CasinoFeatures = mongoose.model('CasinoFeatures', casinoFeaturesSchema);
-const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
-const CasinoIndividualFeatures = mongoose.model('CasinoIndividualFeatures', casinoIndividualFeaturesSchema);
-const CasinoIndividualBonuses = mongoose.model('CasinoIndividualBonuses', casinoIndividualBonusesSchema);
-const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
-const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
-const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
-const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
-const ShortLinks = mongoose.model('ShortLinks', shortLinksSchema);
-const ShortLinksHits = mongoose.model('ShortLinksHits', shortLinksHitsSchema);
-const ShortLinksStatistics = mongoose.model('ShortLinksStatistics', shortLinksStatisticsSchema);
-
-const globalEmailConfigurationEntry = {
-  host: 'mail.behindthemars.de',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'system@treudler.net',
-    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
-  },
-  defaultFrom: 'system@treudler.net',
-};
-const languageEntries = [{
-    name: 'English',
-    code: 'en'
-  },
-  {
-    name: 'French',
-    code: 'fr'
-  },
-  {
-    name: 'Spanish',
-    code: 'es'
-  },
-  {
-    name: 'German',
-    code: 'de'
-  },
-];
-
-const tenancieEntries = [{
-  name: 'Treudler',
-}]
-
-const saveDefaultTenancieDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const tenancieEntry of tenancieEntries) {
-      const existingTenancie = await Tenancie.findOne({
-        name: tenancieEntry.name
-      });
-
-      if (!existingTenancie) {
-        const newTenancie = new Tenancie(tenancieEntry);
-        promises.push(newTenancie.save());
-        console.log('Tenancie entry saved:', newTenancie);
-      } else if (existingTenancie.description !== tenancieEntry.description) {
-        existingTenancie.description = tenancieEntry.description;
-        promises.push(existingTenancie.save());
-        console.log('Tenancie entry updated:', existingTenancie);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default Tenancies Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default Tenancies Database Data:', error);
-  }
-};
-
-saveDefaultTenancieDatabaseData();
-
-const tenanciesTypesEntries = [{
-  name: 'Default',
-  short: 'default',
-  description: 'Default Tenancies Type'
-}, {
-  name: 'Hosting',
-  short: 'hosting',
-  description: 'Hosting Tenant'
-}, {
-  name: 'Casino Affiliate',
-  short: 'casinoAffiliate',
-  description: 'Casino Affiliate Tenant'
-}, {
-  name: 'Lagnum',
-  short: 'lagnum',
-  description: 'Lagnum Tenant'
-}];
-
-const saveDefaultTenanciesTypesDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const tenanciesTypesEntry of tenanciesTypesEntries) {
-      const existingTenanciesTypes = await TenanciesTypes.findOne({
-        name: tenanciesTypesEntry.name
-      });
-
-      if (!existingTenanciesTypes) {
-        const newTenanciesTypes = new TenanciesTypes(tenanciesTypesEntry);
-        promises.push(newTenanciesTypes.save());
-        console.log('TenanciesTypes entry saved:', newTenanciesTypes);
-      } else if (existingTenanciesTypes.description !== tenanciesTypesEntry.description) {
-        existingTenanciesTypes.description = tenanciesTypesEntry.description;
-        promises.push(existingTenanciesTypes.save());
-        console.log('TenanciesTypes entry updated:', existingTenanciesTypes);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default TenanciesTypes Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default TenanciesTypes Database Data:', error);
-  }
-};
-
-saveDefaultTenanciesTypesDatabaseData();
-
-const registrationKeyEntries = [{
-  regkey: 'admin',
-  created: new Date(),
-  used: false
-}];
-
-const userAdminGroup = new UserGroup({
-  name: 'Admin',
-  permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageShortLinks', 'manageCasinos',
-    'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-    'manageSessions', 'manageImages', 'manageImagesCategories', 'manageUsers'
-  ]
-});
-
-const userOperatorGroup = new UserGroup({
-  name: 'Operator',
-  permissions: ['authenticate', 'viewDashboard', 'manageCasinos', 'manageLinks', 'manageProvider',
-    'managePaymentMethods', 'manageAccount'
-  ]
-});
-
-const userUserGroup = new UserGroup({
-  name: 'User',
-  permissions: ['authenticate', 'viewDashboard', 'manageAccount']
-});
-
-const saveDefaultUserDatabaseData = async () => {
-  try {
-    const adminGroup = await UserGroup.findOne({
-      name: 'Admin'
-    });
-    const userGroup = await UserGroup.findOne({
-      name: 'User'
-    });
-    const operatorGroup = await UserGroup.findOne({
-      name: 'Operator'
-    });
-
-    const promises = [];
-
-    if (!adminGroup) {
-      promises.push(userAdminGroup.save());
-      console.log('UserGroup "Admin" saved with Permissions:', userAdminGroup.permissions);
-    } else if (adminGroup.permissions.toString() !== userAdminGroup.permissions.toString()) {
-      adminGroup.permissions = userAdminGroup.permissions;
-      promises.push(adminGroup.save());
-      console.log('UserGroup "Admin" permissions updated:', userAdminGroup.permissions);
-    }
-
-    if (!operatorGroup) {
-      promises.push(userOperatorGroup.save());
-      console.log('UserGroup "Operator" saved with Permissions:', userOperatorGroup.permissions);
-    } else if (operatorGroup.permissions.toString() !== userOperatorGroup.permissions.toString()) {
-      operatorGroup.permissions = userOperatorGroup.permissions;
-      promises.push(operatorGroup.save());
-      console.log('UserGroup "Operator" permissions updated:', userOperatorGroup.permissions);
-    }
-
-    if (!userGroup) {
-      promises.push(userUserGroup.save());
-      console.log('UserGroup "User" saved with Permissions:', userUserGroup.permissions);
-    } else if (userGroup.permissions.toString() !== userUserGroup.permissions.toString()) {
-      userGroup.permissions = userUserGroup.permissions;
-      promises.push(userGroup.save());
-      console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
-    }
-
-    for (const languageEntry of languageEntries) {
-      const existingLanguage = await Language.findOne({
-        name: languageEntry.name
-      });
-
-      if (!existingLanguage) {
-        const newLanguage = new Language(languageEntry);
-        promises.push(newLanguage.save());
-        console.log('Language entry saved:', newLanguage);
-      } else if (existingLanguage.code !== languageEntry.code) {
-        existingLanguage.code = languageEntry.code;
-        promises.push(existingLanguage.save());
-        console.log('Language entry updated:', existingLanguage);
-      }
-    }
-
-    for (const registrationKeyEntry of registrationKeyEntries) {
-      const existingRegistrationKey = await RegistrationKey.findOne({
-        regkey: registrationKeyEntry.regkey
-      });
-
-      if (!existingRegistrationKey) {
-        const newRegistrationKey = new RegistrationKey(registrationKeyEntry);
-        promises.push(newRegistrationKey.save());
-        console.log('Registration key entry saved:', newRegistrationKey);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default UserGroups and RegistrationKeys Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default UserGroups and RegistrationKeys Database Data:', error);
-  }
-};
-
-saveDefaultUserDatabaseData();
-
-const CasinoFeaturesEntries = [{
-  name: 'Fast Verification',
-  description: 'This casino offers fast verification of your account.',
-  image: 'https://www.casinofreak.com/images/icons/live-casino.png'
-}, {
-  name: 'Fast Withdrawals',
-  description: 'This casino offers fast withdrawals.',
-  image: 'https://www.casinofreak.com/images/icons/vip-casino.png'
-}];
-
-const CasinoProviderEntries = [{
-  name: 'NetEnt',
-  description: 'NetEnt is a leading provider of premium gaming solutions to the world’s most successful online casino operators. We have been a true pioneer in driving the market with our thrilling games powered by our cutting-edge platform.',
-  image: 'https://www.casinofreak.com/images/providers/netent.png'
-}, {
-  name: 'Microgaming',
-  description: 'Microgaming developed the first true online casino software over 15 years ago, and today its innovative and reliable software is licensed to over 400 online gaming brands worldwide. This unrivalled technology company offers over 600 unique game titles and more than 1,000 game variants, in 24 languages, across online, land-based, and mobile platforms.',
-  image: 'https://www.casinofreak.com/images/providers/microgaming.png'
-}];
-
-const CasinoPaymentMethodsEntries = [{
-  name: 'Visa',
-  description: 'Visa is a global payments technology company working to enable consumers, businesses, banks and governments to use digital currency.',
-  image: 'https://www.casinofreak.com/images/payment-methods/visa.png'
-}, {
-  name: 'Mastercard',
-  description: 'Mastercard is a global payments technology company working to enable consumers, businesses, banks and governments to use digital currency.',
-  image: 'https://www.casinofreak.com/images/payment-methods/mastercard.png'
-}];
-
-const CasinoWagerTypesEntries = [{
-  name: 'Deposit',
-  short: 'D',
-  description: 'A deposit bonus is a bonus that you receive when you make a deposit.',
-}, {
-  name: 'Bonus',
-  short: 'B',
-  description: 'A bonus is a bonus that you receive when you make a deposit.',
-}];
-
-const CasinoCategoriesEntries = [{
-  name: 'Default',
-  description: 'Default Casino Category',
-  image: ''
-}];
-
-const saveDefaultCasinoDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    for (const casinoFeaturesEntry of CasinoFeaturesEntries) {
-      const existingCasinoFeatures = await CasinoFeatures.findOne({
-        name: casinoFeaturesEntry.name
-      });
-
-      if (!existingCasinoFeatures) {
-        const newCasinoFeatures = new CasinoFeatures(casinoFeaturesEntry);
-        promises.push(newCasinoFeatures.save());
-        console.log('CasinoFeatures entry saved:', newCasinoFeatures);
-      } else if (existingCasinoFeatures.description !== casinoFeaturesEntry.description) {
-        existingCasinoFeatures.description = casinoFeaturesEntry.description;
-        promises.push(existingCasinoFeatures.save());
-        console.log('CasinoFeatures entry updated:', existingCasinoFeatures);
-      }
-    }
-
-    for (const casinoProviderEntry of CasinoProviderEntries) {
-      const existingCasinoProvider = await CasinoProvider.findOne({
-        name: casinoProviderEntry.name
-      });
-
-      if (!existingCasinoProvider) {
-        const newCasinoProvider = new CasinoProvider(casinoProviderEntry);
-        promises.push(newCasinoProvider.save());
-        console.log('CasinoProvider entry saved:', newCasinoProvider);
-      } else if (existingCasinoProvider.description !== casinoProviderEntry.description) {
-        existingCasinoProvider.description = casinoProviderEntry.description;
-        promises.push(existingCasinoProvider.save());
-        console.log('CasinoProvider entry updated:', existingCasinoProvider);
-      }
-    }
-
-    for (const casinoPaymentMethodsEntry of CasinoPaymentMethodsEntries) {
-      const existingCasinoPaymentMethods = await CasinoPaymentMethods.findOne({
-        name: casinoPaymentMethodsEntry.name
-      });
-
-      if (!existingCasinoPaymentMethods) {
-        const newCasinoPaymentMethods = new CasinoPaymentMethods(casinoPaymentMethodsEntry);
-        promises.push(newCasinoPaymentMethods.save());
-        console.log('CasinoPaymentMethods entry saved:', newCasinoPaymentMethods);
-      } else if (existingCasinoPaymentMethods.description !== casinoPaymentMethodsEntry.description) {
-        existingCasinoPaymentMethods.description = casinoPaymentMethodsEntry.description;
-        promises.push(existingCasinoPaymentMethods.save());
-        console.log('CasinoPaymentMethods entry updated:', existingCasinoPaymentMethods);
-      }
-    }
-
-    for (const casinoWagerTypesEntry of CasinoWagerTypesEntries) {
-      const existingCasinoWagerTypes = await CasinoWagerTypes.findOne({
-        name: casinoWagerTypesEntry.name
-      });
-
-      if (!existingCasinoWagerTypes) {
-        const newCasino = new CasinoWagerTypes(casinoWagerTypesEntry);
-        promises.push(newCasino.save());
-        console.log('CasinoWagerTypes entry saved:', newCasino);
-      }
-    }
-
-    for (const casinoCategoriesEntry of CasinoCategoriesEntries) {
-      const existingCasinoCategories = await CasinoCategories.findOne({
-        name: casinoCategoriesEntry.name
-      });
-
-      if (!existingCasinoCategories) {
-        const newCasinoCategories = new CasinoCategories(casinoCategoriesEntry);
-        promises.push(newCasinoCategories.save());
-        console.log('CasinoCategories entry saved:', newCasinoCategories);
-      }
-    }
-
-    await Promise.all(promises);
-    console.log('Default Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default Database Data:', error);
-  }
-};
-
-saveDefaultCasinoDatabaseData();
-
-const imagesCategoriesEntry = {
-  name: 'Default',
-  description: 'Default images category',
-  image: 'https://www.casinofreak.com/images/categories/new.png',
-  active: true,
-  priority: 1,
-  addedDate: new Date(),
-  addedBy: 'System',
-};
-
-const saveDefaultImagesCategoriesDatabaseData = async () => {
-  try {
-    const promises = [];
-
-    const existingImagesCategories = await ImagesCategories.findOne({
-      name: imagesCategoriesEntry.name
-    });
-
-    if (!existingImagesCategories) {
-      const newImagesCategories = new ImagesCategories(imagesCategoriesEntry);
-      promises.push(newImagesCategories.save());
-      console.log('ImagesCategories entry saved:', newImagesCategories);
-    }
-
-    await Promise.all(promises);
-    console.log('Default Image Categories Database Data successfully saved.');
-  } catch (error) {
-    console.error('Error saving Default Image Categories Database Data:', error);
-  }
-};
-
-saveDefaultImagesCategoriesDatabaseData();
-
-//#endregion MongoDB
 
 // Middleware
 app.use(express.json());
@@ -1191,7 +74,7 @@ app.use(session({
 
 const getTenancyByUserId = async (userId) => {
   try {
-    const user = await User.findById(userId);
+    const user = await db.db.User.findById(userId);
     if (user) {
       return user.tenancy;
     } else {
@@ -1228,7 +111,7 @@ app.post('/api/auth/login', (req, res) => {
     return;
   }
 
-  User.findOne({
+  db.User.findOne({
       username
     })
     .then((user) => {
@@ -1263,7 +146,7 @@ app.post('/api/auth/login', (req, res) => {
         }
 
         if (result) {
-          UserGroup.findOne({
+          db.UserGroup.findOne({
               _id: user.groupId
             })
             .then((userGroup) => {
@@ -1380,7 +263,7 @@ app.post('/api/auth/loginAs', checkPermissions('manageUsers'), (req, res) => {
     return;
   }
 
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -1389,7 +272,7 @@ app.post('/api/auth/loginAs', checkPermissions('manageUsers'), (req, res) => {
         return;
       }
 
-      UserGroup.findOne({
+      db.UserGroup.findOne({
           _id: user.groupId
         })
         .then((userGroup) => {
@@ -1427,7 +310,7 @@ app.post('/api/auth/loginAs', checkPermissions('manageUsers'), (req, res) => {
 
 // Get all sessions from MongoDB
 app.get('/api/auth/sessions', checkPermissions('manageSessions'), (req, res) => {
-  Session.find()
+  db.Session.find()
     .then((results) => {
       res.json(results);
     })
@@ -1453,7 +336,7 @@ app.post('/api/auth/logout', checkPermissions('authenticate'), (req, res) => {
 
 // Get all tenancies types from MongoDB
 app.get('/api/tenancies/types', checkPermissions('manageTenancies'), (req, res) => {
-  TenanciesTypes.find()
+  db.TenanciesTypes.find()
     .then((results) => {
       res.json(results);
     })
@@ -1467,7 +350,7 @@ app.get('/api/tenancies/types', checkPermissions('manageTenancies'), (req, res) 
 
 // Get all tenancies from MongoDB
 app.get('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
-  Tenancie.find()
+  db.Tenancie.find()
     .then((results) => {
       res.json(results);
     })
@@ -1485,11 +368,11 @@ app.get('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
     id
   } = req.params;
 
-  Tenancie.findById(id)
+  db.Tenancie.findById(id)
     .then((result) => {
       if (!result) {
         res.status(404).json({
-          error: 'Tenancie not found'
+          error: 'db.Tenancie not found'
         });
         return;
       }
@@ -1521,7 +404,7 @@ app.post('/api/tenancies/add', checkPermissions('manageTenancies'), (req, res) =
     return;
   }
 
-  const tenancie = new Tenancie({
+  const tenancie = new db.Tenancie({
     name,
     notes,
     createdBy: userId,
@@ -1567,7 +450,7 @@ app.put('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
     return;
   }
 
-  Tenancie.findByIdAndUpdate(id, {
+  db.Tenancie.findByIdAndUpdate(id, {
       name,
       notes,
       createdBy,
@@ -1595,7 +478,7 @@ app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res)
     id
   } = req.params;
 
-  Tenancie.findByIdAndDelete(id)
+  db.Tenancie.findByIdAndDelete(id)
     .then(() => {
       res.json({
         success: true
@@ -1664,7 +547,7 @@ app.post('/api/users/register', (req, res) => {
     return;
   }
 
-  RegistrationKey.findOne({
+  db.RegistrationKey.findOne({
       regkey: registrationKey
     })
     .then((existingKey) => {
@@ -1677,7 +560,7 @@ app.post('/api/users/register', (req, res) => {
           error: 'Registration key already used'
         });
       } else {
-        User.findOne({
+        db.User.findOne({
             $or: [{
               username: username
             }, {
@@ -1789,7 +672,7 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     userId
   } = req.session.user;
 
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -1814,7 +697,7 @@ app.get('/api/user/tenancies', checkPermissions('authenticate'), (req, res) => {
     userId
   } = req.session.user;
 
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -1827,7 +710,7 @@ app.get('/api/user/tenancies', checkPermissions('authenticate'), (req, res) => {
         tenancies
       } = user;
 
-      Tenancie.find({
+      db.Tenancie.find({
           _id: {
             $in: tenancies
           }
@@ -1856,7 +739,7 @@ app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
     userId
   } = req.session.user;
 
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -1869,7 +752,7 @@ app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
         tenancy
       } = user;
 
-      Tenancie.findById(tenancy)
+      db.Tenancie.findById(tenancy)
         .then((result) => {
           if (!result) {
             res.status(404).json({
@@ -1906,7 +789,7 @@ app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, 
   console.log('User', userId, 'requested changing tenancy to', tenancyId);
 
   // Check if the tenancy exists in the user's tenancies
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -1918,7 +801,7 @@ app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, 
       const {
         tenancies
       } = user;
-      const tenancyExists = Tenancie.exists({
+      const tenancyExists = db.Tenancie.exists({
         _id: tenancyId
       });
 
@@ -1933,7 +816,7 @@ app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, 
       req.session.user.tenancy = tenancyId;
 
       // Update tenancy in database
-      User.findByIdAndUpdate(userId, {
+      db.User.findByIdAndUpdate(userId, {
           tenancy: tenancyId
         })
         .then(() => {
@@ -1968,7 +851,7 @@ const editUserDetails = (req, res) => {
     email
   } = req.body;
 
-  User.findByIdAndUpdate(userId, {
+  db.User.findByIdAndUpdate(userId, {
       username,
       nickname,
       email
@@ -2000,7 +883,7 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
     newPassword
   } = req.body;
 
-  User.findById(userId)
+  db.User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -2065,7 +948,7 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
 
 // Get all users from MongoDB
 app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
-  User.find()
+  db.User.find()
     .then((results) => {
       res.json(results);
     })
@@ -2082,7 +965,7 @@ app.delete('/api/users', checkPermissions('manageUsers'), (req, res) => {
   const {
     id
   } = req.body; // Get the ID from the request body
-  User.deleteOne({
+  db.User.deleteOne({
       _id: id
     })
     .then((result) => {
@@ -2110,7 +993,7 @@ app.get('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     id
   } = req.params;
 
-  User.findById(id)
+  db.User.findById(id)
     .then((result) => {
       if (!result) {
         res.status(404).json({
@@ -2153,7 +1036,7 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     return;
   }
 
-  User.findByIdAndUpdate(id, {
+  db.User.findByIdAndUpdate(id, {
       username,
       nickname,
       email,
@@ -2181,7 +1064,7 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
 //#region Registration Keys
 // Get all registration keys from MongoDB
 app.get('/api/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  RegistrationKey.find()
+  db.RegistrationKey.find()
     .then((results) => {
       res.json(results);
     })
@@ -2243,7 +1126,7 @@ app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys
   const {
     id
   } = req.params.id;
-  RegistrationKey.deleteOne({
+  db.RegistrationKey.deleteOne({
       _id: id
     })
     .then((result) => {
@@ -2274,7 +1157,7 @@ app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys
 app.get('/api/images/categories', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
 
-  ImagesCategories.find({
+  db.ImagesCategories.find({
       tenancies: userTenancy
     })
     .then((results) => {
@@ -2334,7 +1217,7 @@ app.post('/api/images/categories/:id/duplicate', checkPermissions('manageImagesC
     id
   } = req.params;
 
-  ImagesCategories.findOne({
+  db.ImagesCategories.findOne({
       _id: id,
       tenancies: req.session.user.tenancy // Add condition for tenancy
     })
@@ -2390,7 +1273,7 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
     active
   } = req.body;
 
-  ImagesCategories.findOneAndUpdate({
+  db.ImagesCategories.findOneAndUpdate({
         _id: id,
         tenancies: req.session.user.tenancy
       }, // Add condition for tenancy
@@ -2430,7 +1313,7 @@ app.put('/api/images/categories/:id', checkPermissions('manageImagesCategories')
 app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
   const imageCategoryId = req.params.id;
 
-  ImagesCategories.findOneAndDelete({
+  db.ImagesCategories.findOneAndDelete({
       _id: imageCategoryId,
       tenancies: req.session.user.tenancy
     })
@@ -2457,7 +1340,7 @@ app.delete('/api/images/categories/:id', checkPermissions('manageImagesCategorie
 app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res) => {
   const id = req.params.id;
 
-  Images.findById(id)
+  db.Images.findById(id)
     .populate({
       path: 'category',
       match: {
@@ -2493,7 +1376,7 @@ app.get('/api/images/:id/category', checkPermissions('manageImages'), (req, res)
 
 // Get all images from MongoDB
 app.get('/api/images', checkPermissions('manageImages'), (req, res) => {
-  Images.find({
+  db.Images.find({
       tenancies: req.session.user.tenancy
     })
     .then((results) => {
@@ -2518,7 +1401,7 @@ app.get('/api/images/categories/:categoryId/images', checkPermissions('manageIma
   const categoryId = req.params.categoryId;
   const userTenancy = req.session.user.tenancy;
 
-  Images.find({
+  db.Images.find({
       category: categoryId,
       tenancies: userTenancy
     })
@@ -2613,7 +1496,7 @@ app.put('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
   } = req.body;
   console.log(req.body);
 
-  Images.findOne({
+  db.Images.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add condition for tenancies
@@ -2660,7 +1543,7 @@ app.delete('/api/images/:id', checkPermissions('manageImages'), (req, res) => {
     tenancy
   } = req.session.user;
 
-  Images.findOneAndDelete({
+  db.Images.findOneAndDelete({
       _id: id,
       tenancies: tenancy
     })
@@ -2698,7 +1581,7 @@ app.get('/api/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
     tenancy
   } = req.session.user;
 
-  ShortLinks.find({
+  db.ShortLinks.find({
       tenancies: tenancy
     })
     .then((results) => {
@@ -2721,7 +1604,7 @@ app.get('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
     tenancy
   } = req.session.user;
 
-  ShortLinks.findOne({
+  db.ShortLinks.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -2759,7 +1642,7 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
     // Check if an ID is provided
     if (id) {
       // Update existing entry
-      ShortLinks.findById(id)
+      db.ShortLinks.findById(id)
         .then((shortLink) => {
           if (!shortLink) {
             reject({
@@ -2805,7 +1688,7 @@ function alterShortLink(id, description, url, shortUrl, attachedTo, addedBy, add
         });
     } else {
       // Check if the ShortLink already exists for the tenancy
-      ShortLinks.findOne({
+      db.ShortLinks.findOne({
           shortUrl,
           tenancies: tenancies
         })
@@ -2956,7 +1839,7 @@ app.put('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) 
 // Instead, use the endpoint below to get the hits of a specific short link.
 
 app.get('/api/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res) => {
-  ShortLinksHits.find({
+  db.ShortLinksHits.find({
       tenancies: req.session.user.tenancy
     })
     .then((results) => {
@@ -2976,7 +1859,7 @@ app.get('/api/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, 
     id
   } = req.params;
 
-  ShortLinksHits.find({
+  db.ShortLinksHits.find({
       id: id,
       tenancies: req.session.user.tenancy
     })
@@ -3000,7 +1883,7 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
     tenancy
   } = req.session.user;
 
-  ShortLinks.findById(id)
+  db.ShortLinks.findById(id)
     .then((shortLink) => {
       if (!shortLink) {
         throw new Error('Short link not found');
@@ -3010,7 +1893,7 @@ app.get('/api/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), 
       if (!shortLink.tenancies.includes(tenancy)) {
         throw new Error('Unauthorized');
       }
-      return ShortLinksStatistics.find({
+      return db.ShortLinksStatistics.find({
         shortLink: id,
         tenancies: tenancy
       });
@@ -3035,7 +1918,7 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
     tenancy
   } = req.session.user;
 
-  ShortLinks.findById(id)
+  db.ShortLinks.findById(id)
     .then((shortLink) => {
       if (!shortLink) {
         throw new Error('Short link not found');
@@ -3046,7 +1929,7 @@ app.delete('/api/shortlinks/:id', checkPermissions('manageShortLinks'), (req, re
       if (shortLink.attachedTo) {
         throw new Error('Short link is attached to an object and cannot be deleted');
       }
-      return ShortLinks.findByIdAndDelete(id);
+      return db.ShortLinks.findByIdAndDelete(id);
     })
     .then(() => {
       res.json({
@@ -3083,7 +1966,7 @@ app.get('/api/casinos/categories', checkPermissions('manageCasinos'), (req, res)
     tenancy
   } = req.session.user;
 
-  CasinoCategories.find({
+  db.CasinoCategories.find({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3103,7 +1986,7 @@ app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req
     tenancy
   } = req.session.user;
 
-  CasinoCategories.countDocuments({
+  db.CasinoCategories.countDocuments({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3127,7 +2010,7 @@ app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, 
     tenancy
   } = req.session.user;
 
-  CasinoCategories.findOne({
+  db.CasinoCategories.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -3193,7 +2076,7 @@ app.post('/api/casinos/categories/:id/duplicate', checkPermissions('manageCasino
     id
   } = req.params;
 
-  CasinoCategories.findOne({
+  db.CasinoCategories.findOne({
       _id: id,
       tenancies: req.session.user.tenancy // Add tenancy condition
     })
@@ -3249,7 +2132,7 @@ app.put('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, 
     active
   } = req.body;
 
-  CasinoCategories.findOneAndUpdate({
+  db.CasinoCategories.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Add tenancy condition
     }, {
@@ -3283,7 +2166,7 @@ app.delete('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (re
     id
   } = req.params;
 
-  CasinoCategories.findOneAndDelete({
+  db.CasinoCategories.findOneAndDelete({
       _id: id,
       tenancies: req.session.user.tenancy // Add tenancy condition
     })
@@ -3351,7 +2234,7 @@ app.get('/api/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
     tenancy
   } = req.session.user;
 
-  CasinoTags.find({
+  db.CasinoTags.find({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3371,7 +2254,7 @@ app.get('/api/casinos/tags/count', checkPermissions('manageCasinos'), (req, res)
     tenancy
   } = req.session.user;
 
-  CasinoTags.countDocuments({
+  db.CasinoTags.countDocuments({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3394,7 +2277,7 @@ app.get('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
     tenancy
   } = req.session.user;
 
-  CasinoTags.findOne({
+  db.CasinoTags.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -3464,7 +2347,7 @@ app.post('/api/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (
     tenancy
   } = req.session.user;
 
-  CasinoTags.findOne({
+  db.CasinoTags.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -3523,7 +2406,7 @@ app.put('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) =
     tenancy
   } = req.session.user;
 
-  CasinoTags.findOneAndUpdate({
+  db.CasinoTags.findOneAndUpdate({
         _id: id,
         tenancies: tenancy
       }, // Only update if tenancies match
@@ -3562,7 +2445,7 @@ app.delete('/api/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res
     tenancy
   } = req.session.user;
 
-  CasinoTags.findOneAndDelete({
+  db.CasinoTags.findOneAndDelete({
       _id: id,
       tenancies: tenancy
     })
@@ -3591,7 +2474,7 @@ app.get('/api/casinos/features', checkPermissions('manageCasinos'), (req, res) =
     tenancy
   } = req.session.user;
 
-  CasinoFeatures.find({
+  db.CasinoFeatures.find({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3611,7 +2494,7 @@ app.get('/api/casinos/features/count', checkPermissions('manageCasinos'), (req, 
     tenancy
   } = req.session.user;
 
-  CasinoFeatures.countDocuments({
+  db.CasinoFeatures.countDocuments({
       tenancies: tenancy
     })
     .then((results) => {
@@ -3635,7 +2518,7 @@ app.get('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, re
     tenancy
   } = req.session.user;
 
-  CasinoFeatures.findOne({
+  db.CasinoFeatures.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -3701,7 +2584,7 @@ app.post('/api/casinos/features/:id/duplicate', checkPermissions('manageCasinos'
     id
   } = req.params;
 
-  CasinoFeatures.findOne({
+  db.CasinoFeatures.findOne({
       _id: id,
       tenancies: req.session.user.tenancy // Add condition to check tenancies
     })
@@ -3757,7 +2640,7 @@ app.put('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req, re
     active
   } = req.body;
 
-  CasinoFeatures.findOneAndUpdate({
+  db.CasinoFeatures.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Add condition to check tenancies
     }, {
@@ -3794,7 +2677,7 @@ app.delete('/api/casinos/features/:id', checkPermissions('manageCasinos'), (req,
     tenancy
   } = req.session.user;
 
-  CasinoFeatures.findOneAndDelete({
+  db.CasinoFeatures.findOneAndDelete({
       _id: id,
       tenancies: tenancy
     })
@@ -4048,7 +2931,7 @@ app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'),
     id
   } = req.params;
 
-  CasinoIndividualBonuses.find({
+  db.CasinoIndividualBonuses.find({
       casino: id
     })
     .then((results) => {
@@ -4064,7 +2947,7 @@ app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'),
 
 // Get count of all individual bonuses
 app.get('/api/casinos/individualbonuses/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoIndividualBonuses.countDocuments()
+  db.CasinoIndividualBonuses.countDocuments()
     .then((results) => {
       res.json(results);
     })
@@ -4083,7 +2966,7 @@ app.get('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('manageC
     bonusId
   } = req.params;
 
-  CasinoIndividualBonuses.findOne({
+  db.CasinoIndividualBonuses.findOne({
       casino: id,
       _id: bonusId
     })
@@ -4152,7 +3035,7 @@ app.delete('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('mana
     bonusId
   } = req.params;
 
-  CasinoIndividualBonuses.findOneAndDelete({
+  db.CasinoIndividualBonuses.findOneAndDelete({
       _id: bonusId
     })
     .then((deletedCasinoIndividualBonus) => {
@@ -4178,7 +3061,7 @@ app.delete('/api/casinos/:id/individualbonuses/:bonusId', checkPermissions('mana
 app.get('/api/casinos/wagertypes/count', checkPermissions('manageCasinos'), (req, res) => {
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.countDocuments({
+  db.CasinoWagerTypes.countDocuments({
       tenancies: tenancy
     }) // Filter by tenancy
     .then((results) => {
@@ -4199,7 +3082,7 @@ app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
   } = req.params;
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.findOne({
+  db.CasinoWagerTypes.findOne({
       _id: id,
       tenancies: tenancy
     }) // Filter by id and tenancy
@@ -4222,7 +3105,7 @@ app.get('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
 app.get('/api/casinos/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.find({
+  db.CasinoWagerTypes.find({
       tenancies: tenancy
     }) // Filter by tenancy
     .then((results) => {
@@ -4246,7 +3129,7 @@ app.post('/api/casinos/wagertypes/:id/duplicate', checkPermissions('manageCasino
   } = req.params;
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.findOne({
+  db.CasinoWagerTypes.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -4303,7 +3186,7 @@ app.put('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (req, 
   } = req.body;
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.findOneAndUpdate({
+  db.CasinoWagerTypes.findOneAndUpdate({
       _id: id,
       tenancies: tenancy
     }, {
@@ -4338,7 +3221,7 @@ app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (re
   } = req.params;
   const tenancy = req.session.user.tenancy; // Get the user's tenancy from the session
 
-  CasinoWagerTypes.findOneAndDelete({
+  db.CasinoWagerTypes.findOneAndDelete({
       _id: id,
       tenancies: tenancy
     })
@@ -4363,7 +3246,7 @@ app.delete('/api/casinos/wagertypes/:id', checkPermissions('manageCasinos'), (re
 
 // Get count of all casino providers from MongoDB
 app.get('/api/casinos/providers/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoProvider.countDocuments({
+  db.CasinoProvider.countDocuments({
       tenancies: {
         $in: [req.session.user.tenancy]
       }
@@ -4385,7 +3268,7 @@ app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, r
     id
   } = req.params;
 
-  CasinoProvider.findOne({
+  db.CasinoProvider.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     })
@@ -4405,7 +3288,7 @@ app.get('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, r
 
 // Get all casino providers from MongoDB
 app.get('/api/casinos/providers', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoProvider.find({
+  db.CasinoProvider.find({
       tenancies: req.session.user.tenancy
     })
     .then((results) => {
@@ -4466,7 +3349,7 @@ app.post('/api/casinos/providers/:id/duplicate', checkPermissions('manageCasinos
     id,
   } = req.params;
 
-  CasinoProvider.findOne({
+  db.CasinoProvider.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -4522,7 +3405,7 @@ app.put('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req, r
     active
   } = req.body;
 
-  CasinoProvider.findOneAndUpdate({
+  db.CasinoProvider.findOneAndUpdate({
       _id: id,
       tenancies: tenancy
     }, {
@@ -4560,7 +3443,7 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
     tenancy
   } = req.session.user;
 
-  CasinoProvider.findOneAndDelete({
+  db.CasinoProvider.findOneAndDelete({
       _id: id,
       tenancies: tenancy
     })
@@ -4585,7 +3468,7 @@ app.delete('/api/casinos/providers/:id', checkPermissions('manageCasinos'), (req
 
 // Get all casino licenses from MongoDB
 app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoLicenses.find({
+  db.CasinoLicenses.find({
       tenancies: req.session.user.tenancy
     })
     .then((results) => {
@@ -4601,7 +3484,7 @@ app.get('/api/casinos/licenses', checkPermissions('manageCasinos'), (req, res) =
 
 // Get amount of all casino licenses from MongoDB
 app.get('/api/casinos/licenses/count', checkPermissions('manageCasinos'), (req, res) => {
-  CasinoLicenses.countDocuments({
+  db.CasinoLicenses.countDocuments({
       tenancies: req.session.user.tenancy
     })
     .then((results) => {
@@ -4624,7 +3507,7 @@ app.get('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
     tenancy
   } = req.session.user;
 
-  CasinoLicenses.findOne({
+  db.CasinoLicenses.findOne({
       _id: id,
       tenancies: tenancy
     })
@@ -4689,7 +3572,7 @@ app.put('/api/casinos/licenses/swap', checkPermissions('manageCasinos'), (req, r
     id2
   } = req.body;
 
-  CasinoLicenses.findOne({
+  db.CasinoLicenses.findOne({
       _id: id1,
       tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
     })
@@ -4697,7 +3580,7 @@ app.put('/api/casinos/licenses/swap', checkPermissions('manageCasinos'), (req, r
       if (!casinoLicense1) {
         throw new Error('Casino license 1 not found');
       } else {
-        CasinoLicenses.findOne({
+        db.CasinoLicenses.findOne({
             _id: id2,
             tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
           })
@@ -4754,7 +3637,7 @@ app.delete('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req,
     id
   } = req.params;
 
-  CasinoLicenses.findOneAndDelete({
+  db.CasinoLicenses.findOneAndDelete({
       _id: id,
       tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
     })
@@ -4784,7 +3667,7 @@ app.post('/api/casinos/licenses/:id/duplicate', checkPermissions('manageCasinos'
     id
   } = req.params;
 
-  CasinoLicenses.findOne({
+  db.CasinoLicenses.findOne({
       _id: id,
       tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
     })
@@ -4842,7 +3725,7 @@ app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
     active
   } = req.body;
 
-  CasinoLicenses.findOneAndUpdate({
+  db.CasinoLicenses.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Check if tenancies includes req.session.user.tenancy
     }, {
@@ -4877,7 +3760,7 @@ app.put('/api/casinos/licenses/:id', checkPermissions('manageCasinos'), (req, re
 // Get all casino payment methods from MongoDB
 app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
-  CasinoPaymentMethods.find({
+  db.CasinoPaymentMethods.find({
       tenancies: userTenancy
     })
     .then((results) => {
@@ -4894,7 +3777,7 @@ app.get('/api/casinos/paymentmethods', checkPermissions('manageCasinos'), (req, 
 // Get count of all casino payment methods from MongoDB
 app.get('/api/casinos/paymentmethods/count', checkPermissions('manageCasinos'), (req, res) => {
   const userTenancy = req.session.user.tenancy;
-  CasinoPaymentMethods.countDocuments({
+  db.CasinoPaymentMethods.countDocuments({
       tenancies: userTenancy
     })
     .then((results) => {
@@ -4915,7 +3798,7 @@ app.get('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (r
   } = req.params;
   const userTenancy = req.session.user.tenancy;
 
-  CasinoPaymentMethods.findOne({
+  db.CasinoPaymentMethods.findOne({
       _id: id,
       tenancies: userTenancy
     })
@@ -4988,7 +3871,7 @@ app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (r
     active
   } = req.body;
 
-  CasinoPaymentMethods.findOneAndUpdate({
+  db.CasinoPaymentMethods.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Add the condition to check tenancies
     }, {
@@ -5024,7 +3907,7 @@ app.post('/api/casinos/paymentmethods/:id/duplicate', checkPermissions('manageCa
     id
   } = req.params;
 
-  CasinoPaymentMethods.findOne({
+  db.CasinoPaymentMethods.findOne({
       _id: id,
       tenancies: req.session.user.tenancy // Add the condition to check tenancies
     })
@@ -5080,7 +3963,7 @@ app.put('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'), (r
     active
   } = req.body;
 
-  CasinoPaymentMethods.findOneAndUpdate({
+  db.CasinoPaymentMethods.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Add the condition to check tenancies
     }, {
@@ -5114,7 +3997,7 @@ app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'),
     id
   } = req.params;
 
-  CasinoPaymentMethods.findOneAndDelete({
+  db.CasinoPaymentMethods.findOneAndDelete({
       _id: id,
       tenancies: req.session.user.tenancy // Add the condition to check tenancies
     })
@@ -5140,7 +4023,7 @@ app.delete('/api/casinos/paymentmethods/:id', checkPermissions('manageCasinos'),
 // Get all casinos from MongoDB
 app.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) => {
   try {
-    const results = await Casino.find({
+    const results = await db.Casino.find({
       tenancies: req.session.user.tenancy
     }); // Retrieve casinos with matching tenancy
     res.json(results);
@@ -5159,7 +4042,7 @@ app.get('/api/casinos/:id', checkPermissions('manageCasinos'), async (req, res) 
   } = req.params;
 
   try {
-    const casino = await Casino.findOne({
+    const casino = await db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }); // Retrieve casino with matching tenancy
@@ -5221,7 +4104,7 @@ app.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), async 
 
   try {
     const tenancies = await getTenancyByUserId(userId); // Get the tenancyId of the current user
-    const casino = await Casino.findOne({
+    const casino = await db.Casino.findOne({
       _id: id,
       tenancies
     }); // Check if the casino belongs to the user's tenancy
@@ -5317,7 +4200,7 @@ app.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
   console.log("Updating Casino:", req.body);
 
   // Add the condition to check if the user has access to the casino
-  Casino.findOneAndUpdate({
+  db.Casino.findOneAndUpdate({
       _id: id,
       tenancies: req.session.user.tenancy // Check if the user's tenancy is included
     }, {
@@ -5386,7 +4269,7 @@ app.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req
   }
 
   // Find the casino by its ID and tenancy
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     })
@@ -5437,7 +4320,7 @@ app.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, r
   }
 
   // Find the two casinos by their IDs and tenancy
-  Casino.find({
+  db.Casino.find({
       _id: {
         $in: [id1, id2]
       },
@@ -5473,7 +4356,7 @@ app.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'),
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5493,7 +4376,7 @@ app.get('/api/casinos/:id/features', checkPermissions('manageCasinos'), (req, re
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5513,7 +4396,7 @@ app.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) 
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5534,7 +4417,7 @@ app.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, 
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5554,7 +4437,7 @@ app.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, 
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5574,7 +4457,7 @@ app.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, r
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5594,7 +4477,7 @@ app.get('/api/casinos/:id/licenses', checkPermissions('manageCasinos'), (req, re
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5614,7 +4497,7 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
   const {
     id
   } = req.params; // Get the ID from the request params
-  Casino.findOne({
+  db.Casino.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
     }) // Add tenancy check
@@ -5643,7 +4526,7 @@ app.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => 
   }
 
   // Find the casino by its ID and tenancy
-  Casino.findOneAndDelete({
+  db.Casino.findOneAndDelete({
       _id: id,
       tenancies: req.session.user.tenancy
     })
@@ -5675,7 +4558,7 @@ function checkPermissions(requiredPermission) {
     }
     const userId = req.session.user.userId;
 
-    User.findById(userId)
+    db.User.findById(userId)
       .then((user) => {
         if (!user) {
           res.status(403).json({
@@ -5686,7 +4569,7 @@ function checkPermissions(requiredPermission) {
 
         const groupId = user.groupId;
 
-        UserGroup.findById(groupId)
+        db.UserGroup.findById(groupId)
           .then((userGroup) => {
             if (!userGroup) {
               res.status(403).json({
@@ -6035,14 +4918,14 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
 function deleteUnusedRegistrationKeys() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
 
-  RegistrationKey.deleteMany({
+  db.RegistrationKey.deleteMany({
       used: false,
       created: {
         $lt: oneHourAgo
       }
     })
     .then(() => {
-      const deletedKeys = RegistrationKey.deletedCount;
+      const deletedKeys = db.RegistrationKey.deletedCount;
       console.log('Deleted unused registration keys older than 1 hour:' + deletedKeys);
     })
     .catch((error) => {
@@ -6054,16 +4937,16 @@ async function setCasinoImageUrl(casinoId = null) {
   try {
     let casinos;
     if (casinoId) {
-      casinos = await Casino.findOne({
+      casinos = await db.Casino.findOne({
         _id: casinoId
       });
       casinos = [casinos]; // Convert single object to array
     } else {
-      casinos = await Casino.find();
+      casinos = await db.Casino.find();
     }
     for (const casino of casinos) {
       if (casino.image) {
-        const image = await Images.findOne({
+        const image = await db.Images.findOne({
           _id: casino.image
         });
         if (image) {
@@ -6083,16 +4966,16 @@ async function setImageUrl(id = null) {
   try {
     let images;
     if (id) {
-      images = await Images.findOne({
+      images = await db.Images.findOne({
         _id: id
       });
       images = [images]; // Convert single object to array
     } else {
-      images = await Images.find();
+      images = await db.Images.find();
     }
     for (const image of images) {
       if (image.filename) {
-        const foundImage = await Images.findOne({
+        const foundImage = await db.Images.findOne({
           _id: image._id
         });
         if (foundImage) {
@@ -6112,16 +4995,16 @@ async function createShortLinks(casinoId = null) {
   try {
     let casinos;
     if (casinoId) {
-      casinos = await Casino.findOne({
+      casinos = await db.Casino.findOne({
         _id: casinoId
       });
       casinos = [casinos]; // Convert single object to array
     } else {
-      casinos = await Casino.find();
+      casinos = await db.Casino.find();
     }
     for (const casino of casinos) {
       if (casino.affiliateUrl && casino.affiliateShortlink) {
-        const existingShortLink = await ShortLinks.findOne({
+        const existingShortLink = await db.ShortLinks.findOne({
           attachedTo: casino._id,
           tenancies: casino.tenancies,
         });
@@ -6135,7 +5018,7 @@ async function createShortLinks(casinoId = null) {
           await existingShortLink.save();
           console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
         } else {
-          const shortLink = await ShortLinks.create({
+          const shortLink = await db.ShortLinks.create({
             url: casino.affiliateUrl,
             shortUrl: casino.affiliateShortlink,
             description: 'Belongs to Casino ' + casino.name,
@@ -6163,17 +5046,17 @@ async function createShortLinks(casinoId = null) {
 async function updateShortLinksStatistics() {
   try {
     // Get all short links from the database
-    const shortLinks = await ShortLinks.find();
+    const shortLinks = await db.ShortLinks.find();
 
     // Loop through all short links
     for (const shortLink of shortLinks) {
       // Get the number of hits for the short link
-      const shortLinkHits = await ShortLinksHits.countDocuments({
+      const shortLinkHits = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id
       });
 
       // Get the number of hits in the past 1 hour
-      const shortLinkHits1h = await ShortLinksHits.countDocuments({
+      const shortLinkHits1h = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 60 * 60 * 1000),
@@ -6181,7 +5064,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 3 hours
-      const shortLinkHits3h = await ShortLinksHits.countDocuments({
+      const shortLinkHits3h = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 3 * 60 * 60 * 1000),
@@ -6189,7 +5072,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 6 hours
-      const shortLinkHits6h = await ShortLinksHits.countDocuments({
+      const shortLinkHits6h = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 6 * 60 * 60 * 1000),
@@ -6197,7 +5080,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 12 hours
-      const shortLinkHits12h = await ShortLinksHits.countDocuments({
+      const shortLinkHits12h = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 12 * 60 * 60 * 1000),
@@ -6205,7 +5088,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 24 hours
-      const shortLinkHits24h = await ShortLinksHits.countDocuments({
+      const shortLinkHits24h = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -6213,7 +5096,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 7 days
-      const shortLinkHits7d = await ShortLinksHits.countDocuments({
+      const shortLinkHits7d = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -6221,7 +5104,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 30 days
-      const shortLinkHits30d = await ShortLinksHits.countDocuments({
+      const shortLinkHits30d = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
@@ -6229,7 +5112,7 @@ async function updateShortLinksStatistics() {
       });
 
       // Get the number of hits in the past 12 months
-      const shortLinkHits12m = await ShortLinksHits.countDocuments({
+      const shortLinkHits12m = await db.ShortLinksHits.countDocuments({
         shortLink: shortLink._id,
         timestamp: {
           $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
@@ -6248,7 +5131,7 @@ async function updateShortLinksStatistics() {
       shortLink.hits12m = shortLinkHits12m;
 
       // Check if the short link statistics object already exists
-      const shortLinkStatistics = await ShortLinksStatistics.findOne({
+      const shortLinkStatistics = await db.ShortLinksStatistics.findOne({
         shortLink: shortLink._id
       });
 
@@ -6266,7 +5149,7 @@ async function updateShortLinksStatistics() {
         await shortLinkStatistics.save();
       } else {
         // Create a new short link statistics object
-        await ShortLinksStatistics.create({
+        await db.ShortLinksStatistics.create({
           shortLink: shortLink._id,
           hits: shortLinkHits,
           hits1h: shortLinkHits1h,
@@ -6310,7 +5193,7 @@ addNotification('65834f6fefa5bb088ca50288', 'info', 'Test', 'Test', 'email');
 async function addNotificationEmail(userId, type, subject, message) {
   try {
     // Create a new NotificationEmail object
-    const notificationEmail = await NotificationEmails.create({
+    const notificationEmail = await db.NotificationEmails.create({
       userId,
       type,
       subject,
@@ -6321,7 +5204,7 @@ async function addNotificationEmail(userId, type, subject, message) {
     });
 
     // Add the notification email to the queue
-    await NotificationEmailQueue.create({
+    await db.NotificationEmailQueue.create({
       notificationId: notificationEmail._id
     });
   } catch (error) {
@@ -6331,17 +5214,17 @@ async function addNotificationEmail(userId, type, subject, message) {
 
 async function sendNotificationEmails() {
   try {
-    // Get the first entry from the NotificationEmailQueue
-    const notificationEmailQueue = await NotificationEmailQueue.findOne().sort({
+    // Get the first entry from the db.NotificationEmailQueue
+    const notificationEmailQueue = await db.NotificationEmailQueue.findOne().sort({
       _id: 1
     });
 
     if (notificationEmailQueue) {
       // Get the NotificationEmail by its id
-      const notificationEmail = await NotificationEmails.findById(notificationEmailQueue.notificationId);
+      const notificationEmail = await db.NotificationEmails.findById(notificationEmailQueue.notificationId);
 
       // Get the user by its id
-      const user = await User.findById(notificationEmail.userId);
+      const user = await db.User.findById(notificationEmail.userId);
 
       // Send the email to the user's email address
       await email.sendEmail(user.email, notificationEmail.subject, notificationEmail.message);
@@ -6354,8 +5237,8 @@ async function sendNotificationEmails() {
       // Save the NotificationEmail
       await notificationEmail.save();
 
-      // Delete the NotificationEmail from the NotificationEmailQueue
-      await NotificationEmailQueue.deleteOne({
+      // Delete the NotificationEmail from the db.NotificationEmailQueue
+      await db.NotificationEmailQueue.deleteOne({
         notificationId: notificationEmail._id
       });
 
@@ -6416,12 +5299,12 @@ app.get('/:shortUrl', async (req, res) => {
   const {
     shortUrl
   } = req.params;
-  const url = await ShortLinks.findOne({
+  const url = await db.ShortLinks.findOne({
     shortUrl
   });
   if (url) {
     // Record link hit to shortLinksHits table
-    await ShortLinksHits.create({
+    await db.ShortLinksHits.create({
       shortLink: url._id,
       timestamp: new Date(),
       ip: req.ip,
