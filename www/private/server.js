@@ -4550,11 +4550,7 @@ app.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => 
 //#region Routes
 // Routes for rendering views
 app.get('/', (req, res) => {
-  res.render('pages/index');
-});
-
-app.get('/faq', (req, res) => {
-  res.render('pages/faq');
+  res.redirect('/dashboard');
 });
 
 app.get('/login', (req, res) => {
@@ -4569,7 +4565,7 @@ app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/dashboard', {
+    res.render('pages/dashboard', {
       user: user
     });
   } catch (err) {
