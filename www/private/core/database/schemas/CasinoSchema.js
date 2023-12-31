@@ -10,7 +10,8 @@ const casinoSchema = new mongoose.Schema({
   },
   categories: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true
+    required: true,
+    ref: 'CasinoCategories'
   },
   description: {
     type: String,
