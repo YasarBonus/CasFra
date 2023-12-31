@@ -4565,7 +4565,7 @@ app.get('/dashboard', checkPermissions('viewDashboard'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('pages/dashboard', {
+    res.render('admin/dashboard', {
       user: user
     });
   } catch (err) {
