@@ -1,40 +1,76 @@
 <!DOCTYPE html>
 <html>
-  <%- include('../partials/head') %>
-  <%- include('../partials/header') %>
-  <body class="bg-yasarred" >
-    <div class="ui wide container"style="margin-top: 100px !important; padding-bottom: 100px;">
-      <div class="ui segment" >
-  <%- include('./partials/dashboard-menu') %>
-  <div class="ui segment">
-    <h2>Welcome!</h2>
-    <div class="ui message">
-        <div class="header">
-          Information
-        </div>
-        <ul class="list">
-          <li>This is very early stage. Altough all functions are automatically validated in case of core functionality changes, not all features might work as expected.</li>
-          <li>If you find any issues, you may file a issue here.</li>
-            <li>No user data is being collected.</li>
-            <li>Passwords are stored encryped.</li>
-            <li>There is no password recovery.</li>
-        </ul>
-      </div>
-      <div class="ui message">
-        <div class="header">
-          Right now you can...
-        </div>
-        <ul class="list">
-          <li>Casinos: Add, Manage, Delete, Backup</li>
-          <li>FAQ: Add, Manage, Delete, Backup</li>
-            <li>Links: View Basic Statistics</li>
-        </ul>
-      </div>
-      </div>
-    </div>
-    </div>
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
 
-   <%- include('../partials/footer') %>
+<body class="bg-yasarred">
+  <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px;">
+    <div class="ui segment">
+      <%- include('./partials/dashboard-menu') %>
+      <div class="ui segment">
+        <h2>Dashboard</h2>
+        <div class="ui segment">
+          <div class="ui grid">
+            <div class="six wide column">
+              <div class="ui mini loading card" id="casinoCard">
+                <div class="content">
+                  <h2 class="ui header">
+                    <img src="/img/slot-machine.svg" width="60px">
+                    <div class="content">
+                      Casinos
+                    </div>
+                  </h2>
+                  <div class="description">
+                    <div id="casinoActiveAcount">
+                    </div>
+                    <div id="casinoUsed">
+                    </div>
+                  </div>
+                </div>
+                <div class="extra content">
+                  <a href="/casinos">
+                    Manage Casinos <i class="fas fa-arrow-circle-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
 
 </body>
+
 </html>
+
+<script>
+  // call /api/casinos/activeInactiveCount to get active and inactive count of casinos
+  // then assign the values to HTML elements with id="casinoActiveAcount" and id="casinoInactiveAcount"
+  // e.g. document.getElementById("casinoActiveAcount").innerHTML = "68 active";
+
+  function fetchCasinoActiveInactiveCount() {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/api/casinos/activeinactive',
+        type: 'GET',
+        success: function (result) {
+          console.log(result);
+          document.getElementById("casinoActiveAcount").innerHTML = result.activeCount + " active (" + result
+            .inactiveCount + " disabled)";
+          document.getElementById("casinoUsed").innerHTML = result.allCasinos + " used of " +
+            result.maxCasinos + " Casinos (" + result.percentageUsed + "%)";           
+        }
+      });
+      document.getElementById("casinoCard").classList.remove("loading");
+    });
+  }
+
+  $(document).ready(function () {
+    fetchCasinoActiveInactiveCount();
+  });
+</script>
