@@ -1,5 +1,5 @@
 .ui .segment {
-  background-color: beige;
+  background-color: lightgray;
 }
 
 .ui.menu.fixed {
@@ -43,7 +43,7 @@
 
 
 .bg-yasarred {
-  background-color: #BD504E!important;
+  background-color: gray !important;
 }
 
 .bc-yasarred {

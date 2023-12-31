@@ -16,13 +16,11 @@
       }
     </script>
   
-      <a href="/" class="header item">
+      <!-- a href="/" class="header item">
         <img class="logo" src="/img/logo-egon-animated.gif">
         YasarBonus
-      </a>
-      <a href="/" class="item">Home</a>
-      <a href="/store" target="_blank" class="item">Store &nbsp;<i class="external alternate small icon"></i></a>
-      <a href="/faq" class="item">FAQ</a>
+      </a -->
+      <a href="/dashboard" class="item">Dashboard</a>
       <!-- div class="ui simple dropdown item">
         <i class="bars icon"></i>
         <div class="menu">
@@ -42,7 +40,55 @@
         </div>
       </div -->
       <div class="right menu">
-        <a href="/discord" target="_blank" class="item"><i class="fa-brands fa-discord"></i></a>
+        <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
+            || user.permissions.includes('manageSessions')) { %>
+    <div class="ui dropdown item">
+      Super <i class="dropdown icon"></i>
+
+      <div class="menu">
+        <% if (user.permissions.includes('manageTenancies')) { %>
+        <a class="item" href="/dashboard/super/tenancies">Tenancies</a>
+        <% } %>
+        <% if (user.permissions.includes('manageUsers')) { %>
+        <a class="item" href="/dashboard/super/users">Users</a>
+        <% } %>
+        <% if (user.permissions.includes('manageRegistrationKeys')) { %>
+        <a class="item" href="/dashboard/super/registrationkeys">Registration Keys</a>
+        <% } %>
+        <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
+        <a class="item" href="/dashboard/super/sessions">User Sessions</a>
+        <% } %>
+
+      </div>
+    </div>
+
+    <% } %>
+    
+        <% if (user.tenancy) { %>
+          <div class="ui tenancies dropdown item">
+            <i class="building icon"></i>
+            <div id="tenancyMenuName">
+              <div class="ui active inline mini loader"></div>
+            </div> <i class="dropdown icon"></i>
+            <div class="menu">
+              <a href="/dashboard/account" class="item">Manage Account</a>
+            </div>
+          </div>
+          <% } %>
+
+          <div class="ui dropdown item">
+            <i class="user icon"></i>
+            <div id="accountMenuUsername">  <div class="ui active inline mini loader"></div>
+          </div> <i class="dropdown icon"></i>
+            <div class="menu">
+              <a href="/dashboard/account" class="item">Manage Account</a>
+      
+            </div>
+          </div>
+          <div class="item">
+            <div id="logoutButton" class="ui right labeled icon mini button" onclick="callLogoutAPI()">Logout</div>
+          </div>
+
         <a href="/telegram" target="_blank" class="item"><i class="fa-brands fa-telegram"></i></a>
         <a href="/instagram" target="_blank" class="item"><i class="fa-brands fa-instagram"></i></a>
         <!-- a class="item"><i class="fa-brands fa-twitch"></i></a -->
