@@ -25,6 +25,10 @@ const tenanciesSchema = new mongoose.Schema({
         default: generateRandomPriority()
     },
     type: String,
+    maxCasinos: {
+        type: Number,
+        default: 10
+    },
 })
 
 const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
