@@ -71,7 +71,7 @@ app.use(session({
 
 const getTenancyByUserId = async (userId) => {
   try {
-    const user = await db.db.User.findById(userId);
+    const user = await db.User.findById(userId);
     if (user) {
       return user.tenancy;
     } else {
@@ -1999,7 +1999,6 @@ app.get('/api/casinos/categories/count', checkPermissions('manageCasinos'), (req
       });
     });
 });
-
 
 // Get details of a specific casino category
 app.get('/api/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
@@ -4035,6 +4034,49 @@ app.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) => {
   }
 });
 
+// Get amount of active and inactive casinos
+// Get the maxCasinos from the Tenancy and calculate the percentage used from maxCasinos and activeCasinos
+// respond with activeCount, inactiveCount, maxCasinos, remainingCaisnos, percentageUsed, percentageFree, percentageActive, percentageInactive
+app.get('/api/casinos/activeinactive', checkPermissions('manageCasinos'), async (req, res) => {
+  try {
+    const activeCount = await db.Casino.countDocuments({
+      tenancies: req.session.user.tenancy,
+      active: true
+    }); // Get the amount of active casinos
+    const inactiveCount = await db.Casino.countDocuments({
+      tenancies: req.session.user.tenancy,
+      active: false
+    }); // Get the amount of inactive casinos
+    const tenancy = await db.Tenancie.findOne({
+      _id: req.session.user.tenancy
+    }); // Get the tenancy of the current user
+    const maxCasinos = tenancy.maxCasinos; // Get the maxCasinos from the tenancy
+    const remainingCasinos = maxCasinos - activeCount; // Calculate the remaining casinos
+    const percentageUsed = Math.round((activeCount / maxCasinos) * 100); // Calculate the percentage used
+    const percentageFree = Math.round((remainingCasinos / maxCasinos) * 100); // Calculate the percentage free
+    const percentageActive = Math.round((activeCount / (activeCount + inactiveCount)) * 100); // Calculate the percentage active
+    const percentageInactive = Math.round((inactiveCount / (activeCount + inactiveCount)) * 100); // Calculate the percentage inactive
+
+    res.json({
+      allCasinos: activeCount + inactiveCount,
+      activeCount,
+      inactiveCount,
+      maxCasinos,
+      remainingCasinos,
+      percentageUsed,
+      percentageFree,
+      percentageActive,
+      percentageInactive
+    });
+  } catch (error) {
+    console.error('Error retrieving active and inactive casinos:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
+
 // Get the details of a specific casino
 app.get('/api/casinos/:id', checkPermissions('manageCasinos'), async (req, res) => {
   const {
@@ -4059,7 +4101,6 @@ app.get('/api/casinos/:id', checkPermissions('manageCasinos'), async (req, res) 
     });
   }
 });
-
 
 // Create a new casino
 app.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
@@ -4509,6 +4550,8 @@ app.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (r
       });
     });
 });
+
+
 
 // Delete a casino by its ID
 app.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
