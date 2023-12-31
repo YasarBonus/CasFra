@@ -1,0 +1,76 @@
+
+<a href="#" id="scroll" style="display: none; z-index:1000"><span></span></a>
+
+<div class="ui fixed inverted menu">
+    <div class="ui wide container" style="font-size:20px">
+      <div style="display:none; color:white" id="fetchingIndicator" class="ui right aligned active large orange loader">
+         
+    </div>
+    <script>
+      function showFetchingIndicator(x, message) {
+        $('#fetchingIndicator').show();
+      }
+
+      function hideFetchingIndicator() {
+        $('#fetchingIndicator').hide();
+      }
+    </script>
+  
+      <a href="/" class="header item">
+        <img class="logo" src="/img/logo-egon-animated.gif">
+        YasarBonus
+      </a>
+      <a href="/" class="item">Home</a>
+      <a href="/store" target="_blank" class="item">Store &nbsp;<i class="external alternate small icon"></i></a>
+      <a href="/faq" class="item">FAQ</a>
+      <!-- div class="ui simple dropdown item">
+        <i class="bars icon"></i>
+        <div class="menu">
+          <a class="item" href="/store">Store &nbsp;<i class="external alternate small icon"></i></a>
+          <a class="item" href="/faq">FAQ</a>
+          <div class="divider"></div>
+          <div class="header">Header Item</div>
+          <div class="item">
+            <i class="dropdown icon"></i>
+            Sub Menu
+            <div class="menu">
+              <a class="item" href="#">Link Item</a>
+              <a class="item" href="#">Link Item</a>
+            </div>
+          </div>
+          <a class="item" href="#">Link Item</a>
+        </div>
+      </div -->
+      <div class="right menu">
+        <a href="/discord" target="_blank" class="item"><i class="fa-brands fa-discord"></i></a>
+        <a href="/telegram" target="_blank" class="item"><i class="fa-brands fa-telegram"></i></a>
+        <a href="/instagram" target="_blank" class="item"><i class="fa-brands fa-instagram"></i></a>
+        <!-- a class="item"><i class="fa-brands fa-twitch"></i></a -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="ui tiny modal" id="initialDialog" style="display:none;">
+          <i class="close icon"></i>
+          <!-- div class="header">
+          Please confirm that you are 18 years or older.
+          </div -->
+          <div class="image content">
+            <div class="ui medium image">
+              <img src="/img/logo-egon-animated.gif" width="150px">
+            </div>
+            <div class="description">
+              <div class="ui header">You must confirm that you are 18 years or older.</div>
+              <p>By continuing, you accept the use of cookies to keep this website functional. <a href="#">Learn more</a></p>
+            </div>
+          </div>
+          <div class="actions">
+            <a href="https://youtubekids.com" class="ui black deny button">
+              Get me out
+            </a>
+            <button class="ui positive right labeled icon button">
+              Continue
+              <i class="checkmark icon"></i>
+            </button>
+          </div>
+        </div>
