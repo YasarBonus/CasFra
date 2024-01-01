@@ -65,8 +65,12 @@ const UserSchema = new mongoose.Schema({
     registrationIp: String, // TODO: remove this field
     registrationVerificationCode: String, // TODO: remove this field
     registrationVerificationCodeExpiry: Date, // TODO: remove this field
-    lastLoginDate: Date, 
-    lastLoginIp: String,
+    last_login: {
+      type: Date
+    },
+    last_login_ip: {
+      type: String
+    },
     registration: userRegistrationSchema,
   });
   
