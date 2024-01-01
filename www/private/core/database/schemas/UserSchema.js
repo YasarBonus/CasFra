@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const generateRandomPriority = require('../../utils/generateRandomPriority');
 const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAdressesSchema = require('./UserPersonalAddressesSchema');
-
-
+const userEmailsSchema = require('./UserEmailsSchema');
+const userStatusSchema = require('./UserStatusSchema');
 
 // Define User schema
 const UserSchema = new mongoose.Schema({
@@ -11,41 +11,51 @@ const UserSchema = new mongoose.Schema({
       type: String,
       required: true,
       unique: true,
-      trim: true,
-      minlength: 3,
-      maxlength: 10,
+      trim: true
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: 8
-    },
-    groupId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserGroup'
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      match: /.+\@.+\..+/
-    },
-    language: String,
     nickname: {
       type: String,
       default: '',
       maxlength: 20
     },
+    language: {
+      type: String,
+    ref: 'Language'
+    },
+    emails: userEmailsSchema,
+    status: userStatusSchema,
+    password: {
+      type: String,
+      required: true,
+      minlength: 8
+    },
+    groupId: { // TODO: remove this field
+      type: mongoose.Schema.Types.ObjectId
+    },
+    group: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'UserGroup',
+    },
+    tenancies: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Tenancie'
+    },
+    tenancy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenancie'
+    },
+    personalDetails: userPersonalDetailsSchema,
+    personalAddresses: userPersonalAdressesSchema,
     priority: {
       type: Number,
-      default: generateRandomPriority()
+      default: 0
     },
-    active: {
+    active: { // TODO: remove this field
       type: Boolean,
       default: false,
       required: true
     },
-    banned: {
+    banned: { // TODO: remove this field
       type: Boolean,
       default: false
     },
@@ -56,10 +66,7 @@ const UserSchema = new mongoose.Schema({
     registrationVerificationCodeExpiry: Date,
     lastLoginDate: Date,
     lastLoginIp: String,
-    tenancies: [String],
-    tenancy: String,
-    personalDetails: userPersonalDetailsSchema,
-    personalAddresses: userPersonalAdressesSchema,
+
   });
   
   const User = mongoose.model('User', UserSchema);
