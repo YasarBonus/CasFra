@@ -7,25 +7,37 @@ const generateRandomPriority = require('../../utils/generateRandomPriority');
 const casinoLicensesSchema = new mongoose.Schema({
     name: String,
     description: String,
-    image: String,
+    image: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Images'
+    },
     imageUrl: String,
-    tenancies: [String],
-  
+    tenancies: {
+      type: [mongoose.Schema.Types.ObjectId],
+      embed: 'Tenancies'
+    },
     active: {
       type: Boolean,
       default: true
     },
     priority: {
       type: Number,
-      default: generateRandomPriority()
+      default: 0
     },
     addedDate: {
       type: Date,
       default: Date.now
     },
-    addedBy: String,
+    // addedBy user (embedded)
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     modifiedDate: Date,
-    modifiedBy: String
+    modifiedBy: {
+      type: String,
+      ref: 'User'
+    }
   });
   
   const CasinoLicenses = mongoose.model('CasinoLicenses', casinoLicensesSchema);
