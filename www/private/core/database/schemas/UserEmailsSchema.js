@@ -11,10 +11,15 @@ const userEmailsSchema = new mongoose.Schema({
     },
     is_confirmed: {
         type: Boolean,
+        default: false,
         maxlength: 50
     },
     confirmation_code: {
         type: String,
+        maxlength: 50
+    },
+    confirmation_code_sent: {
+        type: Date,
         maxlength: 50
     },
     confirmation_code_expires: {
