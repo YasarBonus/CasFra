@@ -17,9 +17,15 @@ const imagesCategoriesSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    addedBy: String,
+    addedBy: {
+        type: String,
+        ref: 'User'
+    },
     modifiedDate: Date,
-    modifiedBy: String,
+    modifiedBy: {
+        type: String,
+        ref: 'User'
+    },
     tenancies: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenancies'
