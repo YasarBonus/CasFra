@@ -679,7 +679,7 @@ app.get('/api/user', checkPermissions('authenticate'), (req, res) => {
     userId
   } = req.session.user;
 
-  db.User.findById(userId)
+  db.User.findById(userId).populate('group').populate('tenancy').populate('tenancies')
     .then((user) => {
       if (!user) {
         res.status(404).json({
@@ -861,7 +861,11 @@ const editUserDetails = (req, res) => {
   db.User.findByIdAndUpdate(userId, {
       username,
       nickname,
-      email
+      email,
+      emails: {
+        email: email,
+        is_primary: true
+      }
     })
     .then(() => {
       res.json({
@@ -954,7 +958,7 @@ app.post('/api/user/password', checkPermissions('manageAccount'), (req, res) => 
 
 // Get all users from MongoDB
 app.get('/api/users', checkPermissions('manageUsers'), (req, res) => {
-  db.User.find()
+  db.User.find().populate('group').populate('tenancy').populate('tenancies')
     .then((results) => {
       res.json(results);
     })
