@@ -1,29 +1,34 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../utils/generateRandomPriority');
-
 
 // Define Casino categories schema
 const casinoCategoriesSchema = new mongoose.Schema({
     name: String,
     description: String,
     image: String,
-    tenancies: [String],
-  
+    tenancies: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenancies'
+    },
     active: {
       type: Boolean,
       default: true
     },
     priority: {
-      type: Number,
-      default: generateRandomPriority()
+      type: Number
     },
     addedDate: {
       type: Date,
       default: Date.now
     },
-    addedBy: String,
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     modifiedDate: Date,
-    modifiedBy: String
+    modifiedBy: {
+      type: String,
+      ref: 'User'
+    }
   });
   
   const CasinoCategories = mongoose.model('CasinoCategories', casinoCategoriesSchema);
