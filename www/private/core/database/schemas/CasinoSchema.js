@@ -28,10 +28,13 @@ const casinoSchema = new mongoose.Schema({
   },
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    ref: 'User'
   },
   modifiedDate: Date,
-  modifiedBy: mongoose.Schema.Types.ObjectId,
+  modifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   active: {
     type: Boolean,
     default: false
@@ -50,9 +53,12 @@ const casinoSchema = new mongoose.Schema({
   },
   individualBonuses:  {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true
+    ref: 'CasinoIndividualBonuses'
   },
-  // displayBonus: mongoose.Schema.Types.ObjectId,
+  displayBonus: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CasinoIndividualBonuses'
+  },
   maxBet: {
     type: Number,
     default: 0,
@@ -66,7 +72,10 @@ const casinoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  wagerType: [mongoose.Schema.Types.ObjectId],
+  wagerType: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CasinoWagerTypes'
+  },
   noDeposit: {
     type: Boolean,
     default: false
