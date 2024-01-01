@@ -4,6 +4,7 @@ const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAdressesSchema = require('./UserPersonalAddressesSchema');
 const userEmailsSchema = require('./UserEmailsSchema');
 const userStatusSchema = require('./UserStatusSchema');
+const userRegistrationSchema = require('./UserRegistrationSchema');
 
 // Define User schema
 const UserSchema = new mongoose.Schema({
@@ -59,14 +60,14 @@ const UserSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     },
-    registrationKey: String,
-    registrationDate: Date,
-    registrationIp: String,
-    registrationVerificationCode: String,
-    registrationVerificationCodeExpiry: Date,
-    lastLoginDate: Date,
+    registrationKey: String, // TODO: remove this field
+    registrationDate: Date, // TODO: remove this field
+    registrationIp: String, // TODO: remove this field
+    registrationVerificationCode: String, // TODO: remove this field
+    registrationVerificationCodeExpiry: Date, // TODO: remove this field
+    lastLoginDate: Date, 
     lastLoginIp: String,
-
+    registration: userRegistrationSchema,
   });
   
   const User = mongoose.model('User', UserSchema);
