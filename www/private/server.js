@@ -166,6 +166,8 @@ app.post('/api/auth/login', (req, res) => {
 
                   // Update the tenancy in the database
                   user.tenancy = tenancy;
+                  user.last_login = new Date();
+                  user.last_login_ip = req.ip;
                   user.save()
                     .then(() => {
                       // Add notification after successful login
@@ -199,6 +201,9 @@ app.post('/api/auth/login', (req, res) => {
               } else {
                 // No tenancy provided, remove tenancy in the database
                 user.tenancy = undefined;
+                user.last_login = new Date();
+                user.last_login_ip = req.ip;
+                
                 user.save()
                   .then(() => {
                     req.session.user = {
