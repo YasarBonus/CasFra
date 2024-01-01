@@ -618,7 +618,7 @@ app.post('/api/users/register', (req, res) => {
                 const registrationVerificationCode = generateVerificationCode();
                 const registrationDate = new Date(); // Add registration date
 
-                const user = new User({
+                const user = new db.User({
                   username: username,
                   password: hash,
                   email: email,
@@ -627,7 +627,9 @@ app.post('/api/users/register', (req, res) => {
                   registrationVerificationCode: registrationVerificationCode,
                   registrationVerificationCodeExpiry: registrationVerificationCodeExpiry,
                   registrationDate: registrationDate, // Save the registration date
-                  registrationKey: existingKey._id // Save the registrationKey ID to the user
+                  registrationKey: existingKey._id, // Save the registrationKey ID to the user
+                  personalDetails: {},
+                  personalAddresses: {}
                 });
 
                 user.save()
@@ -1085,7 +1087,7 @@ app.post('/api/registrationkeys/add', checkPermissions('manageRegistrationKeys')
     regkey
   } = req.body;
 
-  const registrationKey = new RegistrationKey({
+  const registrationKey = new db.RegistrationKey({
     regkey: regkey
   });
 
@@ -1105,7 +1107,7 @@ app.post('/api/registrationkeys/add', checkPermissions('manageRegistrationKeys')
 app.post('/api/registrationkeys/generate', checkPermissions('manageRegistrationKeys'), (req, res) => {
   const regkey = Math.random().toString(36).substr(2, 10);
 
-  const registrationKey = new RegistrationKey({
+  const registrationKey = new db.RegistrationKey({
     regkey: regkey
   });
 
@@ -3002,7 +3004,7 @@ app.post('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos')
     userId
   } = req.session.user;
 
-  const casinoIndividualBonuses = new CasinoIndividualBonuses({
+  const casinoIndividualBonuses = new db.CasinoIndividualBonuses({
     addedBy: userId,
     casino: id,
     name: name,
@@ -3539,7 +3541,7 @@ app.post('/api/casinos/licenses/add', checkPermissions('manageCasinos'), (req, r
     userId
   } = req.session.user;
 
-  const casinoLicenses = new CasinoLicenses({
+  const casinoLicenses = new db.CasinoLicenses({
     addedBy: userId,
     name: name,
     description: description,

@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const generateRandomPriority = require('../../utils/generateRandomPriority');
+const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
+const userPersonalAdressesSchema = require('./UserPersonalAddressesSchema');
+
 
 
 // Define User schema
@@ -55,6 +58,8 @@ const UserSchema = new mongoose.Schema({
     lastLoginIp: String,
     tenancies: [String],
     tenancy: String,
+    personalDetails: userPersonalDetailsSchema,
+    personalAddresses: userPersonalAdressesSchema,
   });
   
   const User = mongoose.model('User', UserSchema);
