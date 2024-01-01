@@ -19,6 +19,8 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
+addNotification('6592e50e3e88dcf3e2da995d', 'email', 'Test subject', 'Test message', 'email');
+
 async function addNotificationEmail(userId, type, subject, message) {
   try {
     // Create a new NotificationEmail object
@@ -41,6 +43,8 @@ async function addNotificationEmail(userId, type, subject, message) {
   }
 }
 
+
+
 async function sendNotificationEmails() {
   try {
     // Get the first entry from the db.NotificationEmailQueue
@@ -56,7 +60,7 @@ async function sendNotificationEmails() {
       const user = await db.User.findById(notificationEmail.userId);
 
       // Send the email to the user's email address
-      await email.sendEmail(user.email, notificationEmail.subject, notificationEmail.message);
+      await email.sendEmail(user.emails.email, notificationEmail.subject, notificationEmail.message);
 
       // Set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
       notificationEmail.emailDelivered = true;
