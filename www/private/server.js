@@ -203,7 +203,7 @@ app.post('/api/auth/login', (req, res) => {
                 user.tenancy = undefined;
                 user.last_login = new Date();
                 user.last_login_ip = req.ip;
-                
+
                 user.save()
                   .then(() => {
                     req.session.user = {
@@ -626,15 +626,20 @@ app.post('/api/users/register', (req, res) => {
                 const user = new db.User({
                   username: username,
                   password: hash,
-                  email: email,
+                  emails: {
+                    email: email,
+                    is_primary: true
+                  },
                   language: language || 'en', // Set default value to "en" if not provided
-                  registrationIp: req.ip, // Save the registration IP
-                  registrationVerificationCode: registrationVerificationCode,
-                  registrationVerificationCodeExpiry: registrationVerificationCodeExpiry,
-                  registrationDate: registrationDate, // Save the registration date
-                  registrationKey: existingKey._id, // Save the registrationKey ID to the user
                   personalDetails: {},
-                  personalAddresses: {}
+                  personalAddresses: {},
+                  registration: {
+                    registration_date: registrationDate,
+                    registration_ip: req.ip,
+                    registration_key: existingKey._id,
+                    registration_code: registrationVerificationCode,
+                    registration_code_expires: registrationVerificationCodeExpiry
+                  }
                 });
 
                 user.save()
@@ -866,7 +871,6 @@ const editUserDetails = (req, res) => {
   db.User.findByIdAndUpdate(userId, {
       username,
       nickname,
-      email,
       emails: {
         email: email,
         is_primary: true
@@ -1008,7 +1012,7 @@ app.get('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
     id
   } = req.params;
 
-  db.User.findById(id)
+  db.User.findById(id).populate('group').populate('tenancy').populate('tenancies')
     .then((result) => {
       if (!result) {
         res.status(404).json({
@@ -1035,12 +1039,12 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
   const {
     username,
     nickname,
-    email,
     active,
     banned,
     groupId,
     tenancies,
-    tenancy
+    tenancy,
+    email
   } = req.body;
 
   if (!username) {
@@ -1058,7 +1062,11 @@ app.put('/api/users/:id', checkPermissions('manageUsers'), (req, res) => {
       banned,
       groupId,
       tenancies,
-      tenancy
+      tenancy,
+      emails: {
+        email: email,
+        is_primary: true
+      }
     })
     .then(() => {
       res.json({
