@@ -20,7 +20,10 @@ const imagesCategoriesSchema = new mongoose.Schema({
     addedBy: String,
     modifiedDate: Date,
     modifiedBy: String,
-    tenancies: [String],
+    tenancies: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tenancies'
+    }
 });
 
 const ImagesCategories = mongoose.model('ImagesCategories', imagesCategoriesSchema);

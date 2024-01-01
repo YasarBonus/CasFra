@@ -35,6 +35,8 @@ const ShortLinks = require('./schemas/ShortLinksSchema.js');
 const ShortLinksHits = require('./schemas/ShortLinksHitsSchema.js');
 const ShortLinksStatistics = require('./schemas/ShortLinksStatisticsSchema.js');
 
+const HcVms = require('./schemas/HcVmSchema.js');
+
 module.exports = {
     GlobalEmailConfiguration,
     Session,
@@ -60,5 +62,6 @@ module.exports = {
     CasinoCategories,
     ShortLinks,
     ShortLinksHits,
-    ShortLinksStatistics
+    ShortLinksStatistics,
+    HcVms
   };
