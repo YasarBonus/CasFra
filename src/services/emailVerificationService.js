@@ -1,5 +1,5 @@
 const email = require('./emailService.js');
-const db = require('../database/database.js');
+const db = require('../db/database.js');
 
 // Function to check for unverified email addresses in the user database (User.emails)
 // and start the verification process

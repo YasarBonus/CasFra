@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const helmet = require('helmet');
 
-const notificator = require('./modules/notificator.js');
+const notificator = require('./services/notificationService.js');
 const checkPermissions = require('./middleware/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
@@ -13,11 +13,11 @@ const errorHandler = require('./modules/errorHandler.js');
 
 const logger = require('./modules/winston.js');
 
-const emailVerificator = require('./modules/emailVerificator.js');
+const emailVerificator = require('./services/emailVerificationService.js');
 const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
 
 // Database Engine
-const db = require('./database/database.js');
+const db = require('./db/database.js');
 
 const app = express();
 const server = http.createServer(app);
