@@ -7,6 +7,9 @@ const notificator = require('./core/modules/notificator.js');
 const checkPermissions = require('./core/modules/permissionModule.js');
 const addNotification = notificator.addNotification;
 
+const emailVerificator = require('./core/modules/emailVerificator.js');
+const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
+
 // Database Engine
 const db = require('./core/database/database.js');
 
@@ -871,10 +874,16 @@ const editUserDetails = (req, res) => {
   db.User.findByIdAndUpdate(userId, {
       username,
       nickname,
-      emails: {
+      emails: [
+        {
         email: email,
         is_primary: true
-      }
+        },
+        {
+          email: 'system@treudler.net',
+          is_primary: false
+        }
+      ]
     })
     .then(() => {
       res.json({
@@ -5198,6 +5207,8 @@ setInterval(setCasinoImageUrl, 60 * 60 * 1000);
 
 setImageUrl();
 setInterval(setImageUrl, 60 * 60 * 1000);
+
+checkUnverifiedEmails();
 
 
 // Close the MongoDB connection when the server is shut down
