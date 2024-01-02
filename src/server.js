@@ -4972,7 +4972,7 @@ checkUnverifiedEmails();
 // Swagger API Documentation
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const swaggerOptions = require('./configs/SwaggerOptions.js');
+const swaggerOptions = require('./config/SwaggerOptions.js');
 
 const specs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
