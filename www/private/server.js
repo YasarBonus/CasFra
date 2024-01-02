@@ -5228,7 +5228,7 @@ process.on('SIGINT', () => {
 // Route zum Umleiten von kurzen URLs
 app.get('/:shortUrl', async (req, res, next) => {
   try {
-    const { shortUl } = req.params;
+    const { shortUrl } = req.params;
     const url = await db.ShortLinks.findOne({ shortUrl });
     if (url) {
       // Record link hit to shortLinksHits table
@@ -5253,7 +5253,6 @@ app.get('/:shortUrl', async (req, res, next) => {
 
 // Error handler
 app.use(errorHandler);
-
 
 // Start the server
 
