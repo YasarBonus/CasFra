@@ -82,6 +82,7 @@ router.post('/login', (req, res) => {
                                 res.status(500).json({
                                     error: 'User group not found'
                                 });
+                                logger.warn('User group not found for user ' + user.username + '(' + user._id + ')');
                                 return;
                             }
 
