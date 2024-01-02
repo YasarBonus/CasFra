@@ -6,25 +6,37 @@ const tenanciesSchema = new mongoose.Schema({
     notes: String,
     createdBy: {
         type: String,
+        ref: 'User'
     },
     createdDate: {
         type: Date,
         default: Date.now
     },
-    modifiedBy: String,
+    modifiedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     modifiedDate: Date,
-    image: String,
-    admins: [String],
+    image: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Images'
+    },
+    admins: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User'
+    },
     active: {
         type: Boolean,
         default: true
     },
-    imageUrl: String,
     priority: {
         type: Number,
-        default: generateRandomPriority()
+        default: 0
     },
-    type: String,
+    type: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TenanciesTypes'
+    },
     maxCasinos: {
         type: Number,
         default: 10
