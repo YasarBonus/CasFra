@@ -29,7 +29,7 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: "error.log", level: "warn" }),
     new winston.transports.File({ filename: "app.log" }),
     new winston.transports.Console({ format: winston.format.simple() }),
-    new NotificationTransport(),
+    new NotificationTransport( { level: "warn" }),
   ],
 });
 
