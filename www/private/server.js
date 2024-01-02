@@ -5245,7 +5245,6 @@ app.get('/:shortUrl', async (req, res, next) => {
       res.status(404).send({ error: 'Url not found' });
     }
   } catch (err) {
-      // next(err);
     next(err);
     }
 });
