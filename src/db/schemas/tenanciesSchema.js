@@ -5,7 +5,7 @@ const tenanciesSchema = new mongoose.Schema({
     name: String,
     notes: String,
     createdBy: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
     createdDate: {
