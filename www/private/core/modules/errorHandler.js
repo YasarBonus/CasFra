@@ -1,7 +1,6 @@
 const email = require('./emailService.js');
 const fs = require('fs');
 
-
 function errorHandler(err, req, res, next) {
     // Handle the error here
     logError(err, req, res, next);
