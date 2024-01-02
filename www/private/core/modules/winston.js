@@ -13,21 +13,21 @@ const logger = winston.createLogger({
   ],
 });
 
-logger.info("What rolls down stairs");
+//logger.info("What rolls down stairs");//
 
-logger.warn("alone or in pairs");
+//logger.warn("alone or in pairs");//
 
-logger.error("and over your neighbor's dog?");
+//logger.error("and over your neighbor's dog?");//
 
-logger.debug("What's great for a snack");
+//logger.debug("What's great for a snack");//
 
-logger.verbose("And fits on your back?");
+//logger.verbose("And fits on your back?");//
 
-logger.silly("It's log, log, log");
+//logger.silly("It's log, log, log");//
 
-logger.log({
-    level: "info",
-    message: "Pass an object and this works",
-});
+//logger.log({
+//    level: "info",
+//    message: "Pass an object and this works",
+//});
 
 module.exports = logger;
