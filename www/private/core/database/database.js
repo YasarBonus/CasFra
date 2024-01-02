@@ -14,7 +14,7 @@ const Language = require('./schemas/LanguageSchema.js');
 const Session = require('./schemas/SessionSchema.js');
 const NotificationEmails = require('./schemas/NotificationEmailsSchema.js');
 const NotificationEmailQueue = require('./schemas/NotificationEmailQueueSchema.js');
-const Tenancie = require('./schemas/TenanciesSchema.js');
+const Tenancies = require('./schemas/TenanciesSchema.js');
 const TenanciesTypes = require('./schemas/TenanciesTypesSchema.js');
 const User = require('./schemas/UserSchema.js');
 const UserGroup = require('./schemas/UserGroupSchema.js');
@@ -43,7 +43,7 @@ module.exports = {
     Language,
     NotificationEmails,
     NotificationEmailQueue,
-    Tenancie,
+    Tenancies,
     TenanciesTypes,
     User,
     UserGroup,
