@@ -7,7 +7,11 @@ const helmet = require('helmet');
 const notificator = require('./core/modules/notificator.js');
 const checkPermissions = require('./core/modules/permissionModule.js');
 const addNotification = notificator.addNotification;
+
+// Error Handler
 const errorHandler = require('./core/modules/errorHandler.js');
+
+const logger = require('./core/modules/winston.js');
 
 const emailVerificator = require('./core/modules/emailVerificator.js');
 const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
@@ -20,7 +24,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 io.on('connection', (socket) => {
-  console.log('New Websocket Connection:', socket.id);
+  logger.info('New client connected');
 
   socket.emit('notification', {
     message: 'Willkommen beim WebSocket-Server'
@@ -64,7 +68,6 @@ app.use((req, res, next) => {
 
 // Session Storage
 const MongoStore = require('connect-mongo');
-const { error } = require('console');
 
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
@@ -5260,5 +5263,5 @@ app.use(errorHandler);
 const port = 3000;
 
 server.listen(port, () => {
-  console.log(`Server is listening at http://localhost:${port}`);
+  logger.info(`Server is listening at http://localhost:${port}`);
 });
