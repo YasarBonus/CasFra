@@ -1,15 +1,19 @@
 const email = require('./emailService.js');
 const fs = require('fs');
 
-// Error handler middleware
+
 function errorHandler(err, req, res, next) {
     // Handle the error here
     logError(err, req, res, next);
     
     const currentDateTime = new Date();
 
-    // Send an appropriate response to the client
-    res.status(500).json({  code: res.statusCode, type: err.name, message: err.message, date: currentDateTime, stack: err.stack });
+    try {
+        // Send an appropriate response to the client if the error occurred in express
+        res.status(500).json({  code: res.statusCode, type: err.name, message: err.message, date: currentDateTime, stack: err.stack });
+    } catch (error) {
+    }
+
     // email.sendEmail('joshua@treudler.net', 'System Error', 'An error occurred: ' + err.message + '\n\n' + err.stack);
 }
 
