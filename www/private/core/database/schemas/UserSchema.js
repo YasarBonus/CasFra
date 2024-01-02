@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const generateRandomPriority = require('../../utils/generateRandomPriority');
 const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
-const userPersonalAdressesSchema = require('./UserPersonalAddressesSchema');
+const userPersonalAddressesSchema = require('./UserPersonalAddressesSchema');
 const userEmailsSchema = require('./UserEmailsSchema');
 const userStatusSchema = require('./UserStatusSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
@@ -39,14 +39,14 @@ const UserSchema = new mongoose.Schema({
     },
     tenancies: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Tenancie'
+      ref: 'Tenancies'
     },
     tenancy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Tenancie'
+      ref: 'Tenancies'
     },
     personalDetails: userPersonalDetailsSchema,
-    personalAddresses: userPersonalAdressesSchema,
+    personalAddresses: userPersonalAddressesSchema,
     priority: {
       type: Number,
       default: 0
