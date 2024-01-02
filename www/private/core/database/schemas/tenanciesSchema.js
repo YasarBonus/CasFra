@@ -31,31 +31,31 @@ const tenanciesSchema = new mongoose.Schema({
     },
 })
 
-const Tenancie = mongoose.model('Tenancie', tenanciesSchema);
+const Tenancies = mongoose.model('Tenancies', tenanciesSchema);
 
 
 
-const tenancieEntries = [{
+const tenanciesEntries = [{
     name: 'Treudler',
 }]
 
-const saveDefaultTenancieDatabaseData = async () => {
+const saveDefaultTenanciesDatabaseData = async () => {
     try {
         const promises = [];
 
-        for (const tenancieEntry of tenancieEntries) {
-            const existingTenancie = await Tenancie.findOne({
+        for (const tenanciesEntry of tenancieEntries) {
+            const existingTenancie = await Tenancies.findOne({
                 name: tenancieEntry.name
             });
 
-            if (!existingTenancie) {
-                const newTenancie = new Tenancie(tenancieEntry);
+            if (!existingTenancies) {
+                const newTenancies = new Tenancie(tenancieEntry);
                 promises.push(newTenancie.save());
-                console.log('Tenancie entry saved:', newTenancie);
-            } else if (existingTenancie.description !== tenancieEntry.description) {
-                existingTenancie.description = tenancieEntry.description;
-                promises.push(existingTenancie.save());
-                console.log('Tenancie entry updated:', existingTenancie);
+                console.log('Tenancies entry saved:', newTenancies);
+            } else if (existingTenancies.description !== tenanciesEntry.description) {
+                existingTenancies.description = tenanciesEntry.description;
+                promises.push(existingTenancies.save());
+                console.log('Tenancies entry updated:', existingTenancie);
             }
         }
 
@@ -65,6 +65,6 @@ const saveDefaultTenancieDatabaseData = async () => {
     }
 };
 
-saveDefaultTenancieDatabaseData();
+saveDefaultTenanciesDatabaseData();
 
-module.exports = Tenancie;
+module.exports = Tenancies;
