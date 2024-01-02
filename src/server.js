@@ -99,11 +99,12 @@ const getTenancyByUserId = async (userId) => {
   }
 };
 
+const pathV1 = '/api/v1';
 
 //#region Auth 
 
 const authRoutes = require('./routes/authRoutes.js');
-app.use('/api/auth', authRoutes);
+app.use(pathV1 + '/auth', authRoutes);
 
 //#endregion Auth
 
