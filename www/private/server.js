@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const notificator = require('./core/modules/notificator.js');
 const checkPermissions = require('./core/modules/permissionModule.js');
 const addNotification = notificator.addNotification;
+const errorHandler = require('./core/modules/errorHandler.js');
 
 const emailVerificator = require('./core/modules/emailVerificator.js');
 const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
@@ -37,22 +38,7 @@ io.on('connection', (socket) => {
 app.use(express.static(path.join('public')));
 app.use(helmet());
 
-app.use(function (err, req, res, next) {
-  console.error(err.stack); // Log error stack trace to the console
 
-  // Check if the error is a validation error
-  if (err.name === 'ValidationError') {
-    return res.status(400).json({ error: err.message }); // Return a 400 status with the validation error message
-  }
-
-  // Check if the error is a database error
-  if (err.name === 'MongoError') {
-    return res.status(500).json({ error: 'Database error' }); // Return a 500 status with a generic database error message
-  }
-
-  // For other types of errors, return a 500 status with the error message
-  return res.status(500).json({ error: err.message });
-});
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
@@ -78,6 +64,7 @@ app.use((req, res, next) => {
 
 // Session Storage
 const MongoStore = require('connect-mongo');
+const { error } = require('console');
 
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
@@ -5239,35 +5226,38 @@ process.on('SIGINT', () => {
 });
 
 // Route zum Umleiten von kurzen URLs
-app.get('/:shortUrl', async (req, res) => {
-  const {
-    shortUrl
-  } = req.params;
-  const url = await db.ShortLinks.findOne({
-    shortUrl
-  });
-  if (url) {
-    // Record link hit to shortLinksHits table
-    await db.ShortLinksHits.create({
-      shortLink: url._id,
-      timestamp: new Date(),
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      tenancies: url.tenancies
-    });
+app.get('/:shortUrl', async (req, res, next) => {
+  try {
+    const { shortUl } = req.params;
+    const url = await db.ShortLinks.findOne({ shortUrl });
+    if (url) {
+      // Record link hit to shortLinksHits table
+      await db.ShortLinksHits.create({
+        shortLink: url._id,
+        timestamp: new Date(),
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        tenancies: url.tenancies
+      });
 
-    res.redirect(url.url);
-  } else {
-    res.status(404).send({
-      error: 'Url not found'
-    });
-  }
+      res.redirect(url.url);
+    } else {
+      res.status(404).send({ error: 'Url not found' });
+    }
+  } catch (err) {
+      // next(err);
+    next(err);
+    }
 });
 
 // addNotification('65834f6fefa5bb088ca50288', 'info', 'Na', 'Test', 'email');
 
+// Error handler
+app.use(errorHandler);
+
 
 // Start the server
+
 const port = 3000;
 
 server.listen(port, () => {
