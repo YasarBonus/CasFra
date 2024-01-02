@@ -36,6 +36,24 @@ io.on('connection', (socket) => {
 
 app.use(express.static(path.join('public')));
 app.use(helmet());
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack); // Log error stack trace to the console
+
+  // Check if the error is a validation error
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: err.message }); // Return a 400 status with the validation error message
+  }
+
+  // Check if the error is a database error
+  if (err.name === 'MongoError') {
+    return res.status(500).json({ error: 'Database error' }); // Return a 500 status with a generic database error message
+  }
+
+  // For other types of errors, return a 500 status with the error message
+  return res.status(500).json({ error: err.message });
+});
+
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
