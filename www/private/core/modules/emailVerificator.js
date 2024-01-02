@@ -5,22 +5,35 @@ const db = require('../database/database.js');
 // and start the verification process
 
 async function checkUnverifiedEmails() {
+    console.log('Checking unverified emails...');
     try {
         // Get all users with unverified email addresses
         const users = await db.User.find({
-        'emails.is_confirmed': false
+            'emails.is_confirmed': false
         });
-    
+
         // Loop through the users
         for (const user of users) {
-        // Loop through the user's emails
-        for (const email of user.emails) {
-            // Check if the email address is not confirmed and the confirmation code is expired
-            if (!email.is_confirmed && email.confirmation_code_expires < new Date()) {
-            // Start the email verification process
-            await startEmailVerification(user._id, email.email);
+            // Check if user.emails is an array
+            if (Array.isArray(user.emails)) {
+                // Loop through the user's emails
+                for (const email of user.emails) {
+                    // Check if the email address is not confirmed and the confirmation code is expired
+                    if (!email.is_confirmed && email.confirmation_code_expires < new Date()) {
+                        // Start the email verification process
+                        await startEmailVerification(user._id, email.email);
+                    }
+                }
+            } else if (typeof user.emails === 'object' && user.emails !== null) { // Check if user.emails is an object
+                const email = user.emails;
+                // Check if the email address is not confirmed and the confirmation code is expired
+                if (!email.is_confirmed && email.confirmation_code_expires < new Date()) {
+                    // Start the email verification process
+                    await startEmailVerification(user._id, email.email);
+                }
+            } else {
+                console.error(`user.emails is neither an array nor an object for user with id ${user._id}`);
             }
-        }
         }
     } catch (error) {
         console.error('Error checking unverified emails:', error);
@@ -41,20 +54,20 @@ async function startEmailVerification(userId, email) {
     try {
         // Generate a random confirmation code
         const confirmationCode = generateRandomString(50);
-    
+
         // Save the confirmation code to the database
         await db.User.updateOne({
-        _id: userId,
-        'emails.email': email
+            _id: userId,
+            'emails.email': email
         }, {
-        $set: {
-            'emails.$.confirmation_code': confirmationCode,
-            'emails.$.confirmation_code_sent': new Date(),
-            'emails.$.confirmation_code_expires': new Date(Date.now() + 24 * 60 * 60 * 1000),
-            'emails.$.is_confirmed': false
-        }
+            $set: {
+                'emails.$.confirmation_code': confirmationCode,
+                'emails.$.confirmation_code_sent': new Date(),
+                'emails.$.confirmation_code_expires': new Date(Date.now() + 24 * 60 * 60 * 1000),
+                'emails.$.is_confirmed': false
+            }
         });
-    
+
         // Send the verification email
         await email.sendEmail(email, 'Email verification', `Please verify your email address by clicking the link below:<br><br><a href="http://localhost:3000/verify-email?code=${confirmationCode}">Verify email address</a>`);
     } catch (error) {
@@ -68,11 +81,11 @@ function generateRandomString(length) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
-    
+
     for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    
+
     return result;
 }
 
@@ -82,32 +95,32 @@ async function checkEmailVerificationCode(confirmationCode) {
     try {
         // Get the user by the confirmation code
         const user = await db.User.findOne({
-        'emails.confirmation_code': confirmationCode
+            'emails.confirmation_code': confirmationCode
         });
-    
+
         // Check if the user exists
         if (user) {
-        // Check if the confirmation code is expired
-        const email = user.emails.find(email => email.confirmation_code === confirmationCode);
-    
-        if (email.confirmation_code_expires > new Date()) {
-            // Set the email verification status to true
-            await db.User.updateOne({
-            _id: user._id,
-            'emails.confirmation_code': confirmationCode
-            }, {
-            $set: {
-                'emails.$.is_confirmed': true,
-                'emails.$.confirmation_date': new Date()
+            // Check if the confirmation code is expired
+            const email = user.emails.find(email => email.confirmation_code === confirmationCode);
+
+            if (email.confirmation_code_expires > new Date()) {
+                // Set the email verification status to true
+                await db.User.updateOne({
+                    _id: user._id,
+                    'emails.confirmation_code': confirmationCode
+                }, {
+                    $set: {
+                        'emails.$.is_confirmed': true,
+                        'emails.$.confirmation_date': new Date()
+                    }
+                });
+
+                return true;
+            } else {
+                return false;
             }
-            });
-    
-            return true;
         } else {
             return false;
-        }
-        } else {
-        return false;
         }
     } catch (error) {
         console.error('Error checking email verification code:', error);
@@ -119,3 +132,5 @@ module.exports = {
     checkUnverifiedEmails,
     checkEmailVerificationCode
 };
+
+// Compare this snippet from www/private/core/modules/emailVerificator.js:
