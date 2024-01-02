@@ -8,79 +8,16 @@ const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
-// @swagger
-// /api/auth/login:
-//   post:
-//     tags:
-//       - Authentication
-//     summary: Login
-//     description: Login to the application
-//     requestBody:
-//       description: Login details
-//       required: true
-//       content:
-//         application/json:
-//           schema:
-//             type: object
-//             properties:
-//               username:
-//                 type: string
-//                 description: Username
-//                 example: admin
-//               password:
-//                 type: string
-//                 description: Password
-//                 example: admin
-//               tenancy_id:
-//                 type: string
-//                 description: Tenancy Id
-//                 example: 5f9c0b9b9b7e4c2b3c9b0b9b
-//     responses:
-//       200:
-//         description: Login successful
-//         content:
-//           application/json:
-//             schema:
-//               type: object
-//               properties:
-//                 success:
-//                   type: boolean
-//                   description: Success
-//                   example: true
-//       400:
-//         description: Bad request
-//         content:
-//           application/json:
-//             schema:
-//               type: object
-//               properties:
-//                 error:
-//                   type: string
-//                   description: Error message
-//                   example: Password is required and must be a string
-//       401:
-//         description: Unauthorized
-//         content:
-//           application/json:
-//             schema:
-//               type: object
-//               properties:
-//                 error:
-//                   type: string
-//                   description: Error message
-//                   example: Invalid username or password
-//       500:
-//         description: Internal server error
-//         content:
-//           application/json:
-//             schema:
-//               type: object
-//               properties:
-//                 error:
-//                   type: string
-//                   description: Error message
-//                   example: Internal server error
 
+/**
+ * @openapi
+ * /auth/login:
+ *   get:
+ *     summary: Create a new session
+ *     tags: [Authentication]
+ *     security:
+ *       - session: []
+ */
 router.post('/login', (req, res) => {
     const {
         username,
@@ -242,7 +179,15 @@ router.post('/login', (req, res) => {
         });
 });
 
-// Get current session details
+/**
+ * @openapi
+ * /auth/session:
+ *   get:
+ *     summary: Get details of the current session
+ *     tags: [Authentication]
+ *     security:
+ *       - session: []
+ */
 router.get('/session', checkPermissions('authenticate'), (req, res) => {
     const sessionDetails = req.session.user;
 
@@ -255,7 +200,15 @@ router.get('/session', checkPermissions('authenticate'), (req, res) => {
     }
 });
 
-// Login as other user
+/**
+ * @openapi
+ * /auth/loginAs:
+ *   post:
+ *     summary: Login as another user
+ *     tags: [Authentication, Super]
+ *     security:
+ *       - session: []
+ */
 router.post('/loginAs', checkPermissions('manageUsers'), (req, res) => {
     const {
         userId
@@ -313,7 +266,15 @@ router.post('/loginAs', checkPermissions('manageUsers'), (req, res) => {
         });
 });
 
-// Get all sessions from MongoDB
+/**
+ * @openapi
+ * /auth/sessions:
+ *   get:
+ *     summary: Get all sessions of all users
+ *     tags: [Authentication, Super]
+ *     security:
+ *       - session: []
+ */
 router.get('/sessions', checkPermissions('manageSessions'), (req, res) => {
     db.Session.find()
         .then((results) => {
@@ -327,7 +288,21 @@ router.get('/sessions', checkPermissions('manageSessions'), (req, res) => {
         });
 });
 
-// Logout user
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Authentication]
+ *     security:
+ *       - session: []
+ *     responses:
+ *       '200':
+ *         description: Successful logout
+ *       '500':
+ *         description: Internal server error
+ *         
+ */
 router.post('/logout', checkPermissions('authenticate'), (req, res) => {
     const { userId, username } = req.session.user;
 
