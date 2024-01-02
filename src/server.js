@@ -4,6 +4,9 @@ const socketIo = require('socket.io');
 const path = require('path');
 const helmet = require('helmet');
 
+
+
+
 const notificator = require('./services/notificationService.js');
 const checkPermissions = require('./middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
@@ -4965,6 +4968,13 @@ setInterval(setImageUrl, 60 * 60 * 1000);
 
 checkUnverifiedEmails();
 
+// Swagger API Documentation
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const swaggerOptions = require('./configs/SwaggerOptions.js');
+
+const specs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Close the MongoDB connection when the server is shut down
 process.on('SIGINT', () => {
