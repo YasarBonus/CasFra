@@ -28,6 +28,6 @@ logger.silly("It's log, log, log");
 logger.log({
     level: "info",
     message: "Pass an object and this works",
-    });
+});
 
 module.exports = logger;

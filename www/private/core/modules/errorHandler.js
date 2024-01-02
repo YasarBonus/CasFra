@@ -1,35 +1,14 @@
-const email = require('./emailService.js');
-const fs = require('fs');
+const logger = require("./winston");
 
 function errorHandler(err, req, res, next) {
     // Handle the error here
-    logError(err, req, res, next);
+    logger.error(err.message);
     
     const currentDateTime = new Date();
 
-    try {
-        // Send an appropriate response to the client if the error occurred in express
-        res.status(500).json({  code: res.statusCode, type: err.name, message: err.message, date: currentDateTime, stack: err.stack });
-    } catch (error) {
-    }
+    res.status(500).json({  code: res.statusCode, type: err.name, message: err.message, date: currentDateTime, stack: err.stack });
 
     // email.sendEmail('joshua@treudler.net', 'System Error', 'An error occurred: ' + err.message + '\n\n' + err.stack);
 }
-
-function logError(err, req, res, next) {
-    
-    // Handle the error here
-    console.error('ERROR:', err);
-
-
-    
-    // Log error to file
-    fs.appendFile('error.log', err.stack, function (error) {
-        if (error) {
-            console.error('Error logging error:', error);
-        }
-    });
-}
-
 
 module.exports = errorHandler;
