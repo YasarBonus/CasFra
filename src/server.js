@@ -5,7 +5,7 @@ const path = require('path');
 const helmet = require('helmet');
 
 const notificator = require('./modules/notificator.js');
-const checkPermissions = require('./modules/permissionModule.js');
+const checkPermissions = require('./middleware/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
 // Error Handler
