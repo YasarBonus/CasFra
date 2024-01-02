@@ -5,34 +5,26 @@ const db = require('../database/database.js');
 // and start the verification process
 
 async function checkUnverifiedEmails() {
-    console.log('Checking unverified emails...');
     try {
-        // Get all users with unverified email addresses
+        // Get all users with unverified email addresses from the array User.emails which can contain multiple email addresses
         const users = await db.User.find({
             'emails.is_confirmed': false
         });
+        
+        // console.log('Users with unverified emails:', users);
 
         // Loop through the users
         for (const user of users) {
-            // Check if user.emails is an array
-            if (Array.isArray(user.emails)) {
-                // Loop through the user's emails
-                for (const email of user.emails) {
-                    // Check if the email address is not confirmed and the confirmation code is expired
-                    if (!email.is_confirmed && email.confirmation_code_expires < new Date()) {
+            // Loop through the user's email addresses
+            for (const email of user.emails) {
+                // Check if the email address is unverified
+                if (!email.is_confirmed) {
+                    // Check if the confirmation code is expired
+                    if (email.confirmation_code_expires < new Date()) {
                         // Start the email verification process
                         await startEmailVerification(user._id, email.email);
                     }
                 }
-            } else if (typeof user.emails === 'object' && user.emails !== null) { // Check if user.emails is an object
-                const email = user.emails;
-                // Check if the email address is not confirmed and the confirmation code is expired
-                if (!email.is_confirmed && email.confirmation_code_expires < new Date()) {
-                    // Start the email verification process
-                    await startEmailVerification(user._id, email.email);
-                }
-            } else {
-                console.error(`user.emails is neither an array nor an object for user with id ${user._id}`);
             }
         }
     } catch (error) {
@@ -40,8 +32,6 @@ async function checkUnverifiedEmails() {
     }
 }
 
-// call the checkUnverifiedEmails function every 5 seconds
-setInterval(checkUnverifiedEmails, 5000);
 checkUnverifiedEmails();
 
 // Function to start the email verification process:
