@@ -26,4 +26,8 @@ const userEmailsSchema = new mongoose.Schema({
         type: Date,
         maxlength: 50
     },
+    confirmation_date: {
+        type: Date,
+        maxlength: 50
+    },
 });
