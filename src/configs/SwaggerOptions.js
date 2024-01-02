@@ -3,13 +3,13 @@ module.exports = {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'Express API mit Swagger',
-        version: '1.0.0',
-        description: 'Eine einfache Express API',
+        title: 'CasFra API',
+        version: '0.9.0',
+        description: 'CasFra API Documentation',
       },
       servers: [
         {
-          url: 'http://localhost:3000',
+          url: 'http://localhost:3000/api/v1',
         },
       ],
     },
