@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const helmet = require('helmet');
 
 const notificator = require('./core/modules/notificator.js');
 const checkPermissions = require('./core/modules/permissionModule.js');
@@ -34,6 +35,7 @@ io.on('connection', (socket) => {
 });
 
 app.use(express.static(path.join('public')));
+app.use(helmet());
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
