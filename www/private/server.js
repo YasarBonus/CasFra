@@ -366,7 +366,7 @@ app.get('/api/tenancies/types', checkPermissions('manageTenancies'), (req, res) 
 
 // Get all tenancies from MongoDB
 app.get('/api/tenancies', checkPermissions('manageTenancies'), (req, res) => {
-  db.Tenancie.find()
+  db.Tenancies.find()
     .then((results) => {
       res.json(results);
     })
@@ -384,7 +384,7 @@ app.get('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
     id
   } = req.params;
 
-  db.Tenancie.findById(id)
+  db.Tenancies.findById(id)
     .then((result) => {
       if (!result) {
         res.status(404).json({
@@ -466,7 +466,7 @@ app.put('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res) =>
     return;
   }
 
-  db.Tenancie.findByIdAndUpdate(id, {
+  db.Tenancies.findByIdAndUpdate(id, {
       name,
       notes,
       createdBy,
@@ -494,7 +494,7 @@ app.delete('/api/tenancies/:id', checkPermissions('manageTenancies'), (req, res)
     id
   } = req.params;
 
-  db.Tenancie.findByIdAndDelete(id)
+  db.Tenancies.findByIdAndDelete(id)
     .then(() => {
       res.json({
         success: true
@@ -732,7 +732,7 @@ app.get('/api/user/tenancies', checkPermissions('authenticate'), (req, res) => {
         tenancies
       } = user;
 
-      db.Tenancie.find({
+      db.Tenancies.find({
           _id: {
             $in: tenancies
           }
@@ -774,7 +774,7 @@ app.get('/api/user/tenancy', checkPermissions('authenticate'), (req, res) => {
         tenancy
       } = user;
 
-      db.Tenancie.findById(tenancy)
+      db.Tenancies.findById(tenancy)
         .then((result) => {
           if (!result) {
             res.status(404).json({
@@ -823,7 +823,7 @@ app.put('/api/user/tenancy/:tenancyId', checkPermissions('authenticate'), (req, 
       const {
         tenancies
       } = user;
-      const tenancyExists = db.Tenancie.exists({
+      const tenancyExists = db.Tenancies.exists({
         _id: tenancyId
       });
 
@@ -4077,7 +4077,7 @@ app.get('/api/casinos/activeinactive', checkPermissions('manageCasinos'), async 
       tenancies: req.session.user.tenancy,
       active: false
     }); // Get the amount of inactive casinos
-    const tenancy = await db.Tenancie.findOne({
+    const tenancy = await db.Tenancies.findOne({
       _id: req.session.user.tenancy
     }); // Get the tenancy of the current user
     const maxCasinos = tenancy.maxCasinos; // Get the maxCasinos from the tenancy
