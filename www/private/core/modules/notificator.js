@@ -59,9 +59,11 @@ async function sendNotificationEmails() {
       // Get the user by its id
       const user = await db.User.findById(notificationEmail.userId);
 
-      // Send the email to the user's email address
-      await email.sendEmail(user.emails.email, notificationEmail.subject, notificationEmail.message);
+      // Get the primary email address of the user
+      const primaryEmail = user.emails.find(email => email.is_primary);
 
+      // Send the email to the user's primary email address
+      await email.sendEmail(primaryEmail.email, notificationEmail.subject, notificationEmail.message);
       // Set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
       notificationEmail.emailDelivered = true;
       notificationEmail.emailDeliveredDate = new Date();
