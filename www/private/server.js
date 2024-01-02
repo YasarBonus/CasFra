@@ -4973,7 +4973,7 @@ async function setCasinoImageUrl(casinoId = null) {
       }
     }
   } catch (error) {
-    console.error('Error retrieving casinos:', error);
+    errorHandler(error);
   }
 }
 
@@ -5172,7 +5172,7 @@ async function updateShortLinksStatistics() {
           hits24h: shortLinkHits24h,
           hits7d: shortLinkHits7d,
           hits30d: shortLinkHits30d,
-          hits12m: shortLinkHits12m,
+          hits1d2m: shortLinkHits12m,
           tenancies: shortLink.tenancies
         });
       }
@@ -5181,7 +5181,7 @@ async function updateShortLinksStatistics() {
       await shortLink.save();
     }
   } catch (error) {
-    console.error('Error updating short links statistics:', error);
+    errorHandler(error);
   }
 }
 
@@ -5189,6 +5189,7 @@ async function updateShortLinksStatistics() {
 
 
 // Function to generate a random priority
+// TODO: Move this function to a separate file
 function generateRandomPriority() {
   const random = Math.floor(Math.random() * 100000000000000000000);
   return random;
