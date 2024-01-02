@@ -4956,7 +4956,6 @@ function deleteUnusedRegistrationKeys() {
     })
     .then(() => {
       const deletedKeys = db.RegistrationKey.deletedCount;
-      console.log('Deleted unused registration keys older than 1 hour:' + deletedKeys);
     })
     .catch((error) => {
       console.error('Error deleting unused registration keys:', error);
@@ -4983,7 +4982,6 @@ async function setCasinoImageUrl(casinoId = null) {
           casino.imageUrl = `/img/images/${image.filename}`;
           casino.tenancies = casino.tenancies;
           await casino.save();
-          console.log('Image URL for Casino ' + casino.name + '(' + casino._id + ') (' + casino.imageUrl + ') saved');
         }
       }
     }
@@ -5012,7 +5010,6 @@ async function setImageUrl(id = null) {
           foundImage.imageUrl = `/img/images/${foundImage.filename}`;
           foundImage.tenancies = foundImage.tenancies;
           await foundImage.save();
-          console.log('Image URL for Image ' + foundImage.name + '(' + foundImage._id + ') (' + foundImage.imageUrl + ') saved');
         }
       }
     }
@@ -5046,7 +5043,6 @@ async function createShortLinks(casinoId = null) {
           existingShortLink.tenancies = casino.tenancies;
           existingShortLink.attachedTo = casino._id;
           await existingShortLink.save();
-          console.log('ShortLink updated for casino ' + casino.name + ' (' + existingShortLink._id + ')');
         } else {
           const shortLink = await db.ShortLinks.create({
             url: casino.affiliateUrl,
