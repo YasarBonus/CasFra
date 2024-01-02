@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
+const mongooseConfig = require('../config/mongooseConfig.js');
 
-mongoose.connect('mongodb://localhost:27017/casfra', {
-  })
+mongoose.connect(mongooseConfig.url, mongooseConfig.options)
   .then(() => {
     console.log('Connected to MongoDB');
   })
