@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../utils/generateRandomPriority');
+const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
 
-// Define Casino wager types schema
-const casinoWagerTypesSchema = new mongoose.Schema({
+// Define Casino payment methods schema
+const casinoPaymentMethodsSchema = new mongoose.Schema({
     name: String,
-    short: String,
     description: String,
+    image: String,
     tenancies: [String],
   
     active: {
@@ -26,7 +26,7 @@ const casinoWagerTypesSchema = new mongoose.Schema({
     modifiedBy: String
   });
   
-  const CasinoWagerTypes = mongoose.model('CasinoWagerTypes', casinoWagerTypesSchema);
+  const CasinoPaymentMethods = mongoose.model('CasinoPaymentMethods', casinoPaymentMethodsSchema);
 
   
-module.exports = CasinoWagerTypes;
+module.exports = CasinoPaymentMethods;
