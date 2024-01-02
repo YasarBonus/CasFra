@@ -17,7 +17,10 @@ const userGroupSchema = new mongoose.Schema({
       type: Number,
       default: generateRandomPriority()
     },
-    tenancies: [String],
+    tenancies: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Tenancies'
+    },
     active: {
       type: Boolean,
       default: true
@@ -27,9 +30,15 @@ const userGroupSchema = new mongoose.Schema({
       default: Date.now,
       required: true
     },
-    addedBy: String,
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     modifiedDate: Date,
-    modifiedBy: String,
+    modifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     default: {
       type: Boolean,
       default: false
