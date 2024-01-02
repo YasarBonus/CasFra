@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../utils/generateRandomPriority');
 const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAddressesSchema = require('./UserPersonalAddressesSchema');
 const userEmailsSchema = require('./UserEmailsSchema');
