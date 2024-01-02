@@ -43,19 +43,19 @@ const saveDefaultTenanciesDatabaseData = async () => {
     try {
         const promises = [];
 
-        for (const tenanciesEntry of tenancieEntries) {
-            const existingTenancie = await Tenancies.findOne({
-                name: tenancieEntry.name
+        for (const tenanciesEntry of tenanciesEntries) {
+            const existingTenancies = await Tenancies.findOne({
+                name: tenanciesEntry.name
             });
 
             if (!existingTenancies) {
-                const newTenancies = new Tenancie(tenancieEntry);
-                promises.push(newTenancie.save());
+                const newTenancies = new Tenancies(tenanciesEntry);
+                promises.push(newTenancies.save());
                 console.log('Tenancies entry saved:', newTenancies);
             } else if (existingTenancies.description !== tenanciesEntry.description) {
                 existingTenancies.description = tenanciesEntry.description;
                 promises.push(existingTenancies.save());
-                console.log('Tenancies entry updated:', existingTenancie);
+                console.log('Tenancies entry updated:', existingTenancies);
             }
         }
 
