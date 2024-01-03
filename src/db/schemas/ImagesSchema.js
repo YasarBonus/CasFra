@@ -5,7 +5,7 @@ const imagesSchema = new mongoose.Schema({
     name: String,
     filename: String,
     originalname: String,
-    imageUrl: String,
+    image_url: String,
     priority: {
       type: Number,
       default: generateRandomPriority()
@@ -17,9 +17,9 @@ const imagesSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     },
-    addedBy: String,
-    modifiedDate: Date,
-    modifiedUser: String,
+    added_by: String,
+    modified_date: Date,
+    modified_user: String,
     category: String,
     description: String,
     active: {
