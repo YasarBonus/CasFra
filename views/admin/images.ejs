@@ -69,7 +69,7 @@
 
                             var img = document.createElement('img');
                             img.src = image.image_url;
-                            img.style.maxWidth = '200px';
+                            img.style.maxWidth = '100px';
                             imageElement.appendChild(img);
 
                             var content = document.createElement('div');
@@ -125,6 +125,11 @@
                             imageId.textContent = 'ID: ' + image._id;
                             actions.appendChild(imageId);
 
+                            var imageUrl = document.createElement('div');
+                            imageUrl.classList = 'ui tiny blue label';
+                            imageUrl.textContent = 'URL: ' + image.image_url;
+                            actions.appendChild(imageUrl);
+
                             var filesize = document.createElement('div');
                             filesize.classList = 'ui tiny orange label';
                             filesize.textContent = (image.size / 1024).toFixed(2) + ' KB';
@@ -150,6 +155,24 @@
 
                                 // Show a notification or perform any other action to indicate successful copy
                                 showToast('success', 'Image ID copied to clipboard: ', image._id);
+                            });
+
+                            // Add click event listener to copy image URL to clipboard
+                            imageUrl.addEventListener('click', function () {
+                                // Create a temporary input element
+                                var tempInput = document.createElement('input');
+                                tempInput.value = image.image_url;
+                                document.body.appendChild(tempInput);
+
+                                // Copy the value to clipboard
+                                tempInput.select();
+                                document.execCommand('copy');
+
+                                // Remove the temporary input element
+                                document.body.removeChild(tempInput);
+
+                                // Show a notification or perform any other action to indicate successful copy
+                                showToast('success', 'Image URL copied to clipboard: ', image.image_url);
                             });
 
                             var saveButton = document.createElement('button');
