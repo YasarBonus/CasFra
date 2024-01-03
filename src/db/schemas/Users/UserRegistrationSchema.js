@@ -10,8 +10,8 @@ const userRegistrationSchema = new mongoose.Schema({
         maxlength: 50
     },
     registration_key: {
-        type: String,
-        maxlength: 50
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserRegistrationKey'
     },
     registration_code: {
         type: String,
