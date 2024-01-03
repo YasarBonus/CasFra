@@ -7,7 +7,7 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 
 
 // Get all images categories from MongoDB
-router.get('/images/categories', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
+router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
     const userTenancy = req.session.user.tenancy;
   
     db.ImagesCategories.find({
@@ -25,7 +25,7 @@ router.get('/images/categories', checkPermissions('manageImages' || 'manageImage
   });
   
   // Insert image category into MongoDB
-  router.post('/images/categories/add', checkPermissions('manageImagesCategories'), (req, res) => {
+  router.post('/add', checkPermissions('manageImagesCategories'), (req, res) => {
     const {
       name,
       description,
@@ -62,7 +62,7 @@ router.get('/images/categories', checkPermissions('manageImages' || 'manageImage
   });
   
   // Duplicate image category
-  router.post('/images/categories/:id/duplicate', checkPermissions('manageImagesCategories'), (req, res) => {
+  router.post('/:id/duplicate', checkPermissions('manageImagesCategories'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -111,7 +111,7 @@ router.get('/images/categories', checkPermissions('manageImages' || 'manageImage
   });
   
   // Edit image category
-  router.put('/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
+  router.put('/:id', checkPermissions('manageImagesCategories'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -163,7 +163,7 @@ router.get('/images/categories', checkPermissions('manageImages' || 'manageImage
   });
   
   // Delete image category from MongoDB by ID
-  router.delete('/images/categories/:id', checkPermissions('manageImagesCategories'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageImagesCategories'), (req, res) => {
     const imageCategoryId = req.params.id;
   
     db.ImagesCategories.findOneAndDelete({

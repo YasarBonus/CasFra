@@ -184,11 +184,11 @@ app.use(pathV1 + '/casinos/tags', casinosTagsRoutes);
 const casinosRoutes = require('./routes/Casinos/casinosRoutes.js');
 app.use(pathV1 + '/casinos', casinosRoutes);
 
-const imagesRoutes = require('./routes/Images/imagesRoutes.js');
-app.use(pathV1 + '/images', imagesRoutes);
-
 const imagesCategoriesRoutes = require('./routes/Images/imagesCategoriesRoutes.js');
 app.use(pathV1 + '/images/categories', imagesCategoriesRoutes);
+
+const imagesRoutes = require('./routes/Images/imagesRoutes.js');
+app.use(pathV1 + '/images', imagesRoutes);
 
 const shortLinksRoutes = require('./routes/shortLinksRoutes.js');
 app.use(pathV1 + '/shortlinks', shortLinksRoutes);
