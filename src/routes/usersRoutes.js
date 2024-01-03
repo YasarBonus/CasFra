@@ -7,120 +7,123 @@ const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
-// Get all users from MongoDB
+const { editUser } = require('../modules/Users/editUser.js'); // Import the editUser function
+
+/**
+ * @openapi
+ * /:
+ *   get:
+ *     summary: Get all Users
+ *     tags: [Users, Super]
+ */
 router.get('/', checkPermissions('manageUsers'), (req, res) => {
-    db.User.find().populate('group').populate('tenancy').populate('tenancies')
-      .then((results) => {
-        res.json(results);
-      })
-      .catch((error) => {
-        console.error('Error retrieving users:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
+        db.User.find().populate('group').populate('tenancy').populate('personal_details')
+            .then((results) => {
+                res.json(results);
+            })
+            .catch((error) => {
+                console.error('Error retrieving users:', error);
+                res.status(500).json({
+                    error: 'Internal server error'
+                });
+            });
+    });
+    
+/**
+ * @openapi
+ * /{id}:
+ *   get:
+ *     summary: Get details of a User by ID
+ *     tags: [Users, Super]
+ */
+    router.get('/:id', checkPermissions('manageUsers'), (req, res) => {
+        const {
+            id
+        } = req.params;
+    
+        db.User.findById(id).populate('group').populate('tenancy').populate('tenancies')
+            .then((result) => {
+                if (!result) {
+                    res.status(404).json({
+                        error: 'User not found'
+                    });
+                    return;
+                }
+    
+                res.json(result);
+            })
+            .catch((error) => {
+                console.error('Error retrieving user:', error);
+                res.status(500).json({
+                    error: 'Internal server error'
+                });
+            });
+    });
   
-  // Delete user from MongoDB by ID
-  router.delete('/', checkPermissions('manageUsers'), (req, res) => {
-    const {
-      id
-    } = req.body; // Get the ID from the request body
-    db.User.deleteOne({
-        _id: id
-      })
-      .then((result) => {
-        if (result.deletedCount === 0) {
-          throw new Error('User not found');
+/**
+ * @openapi
+ * /{id}:
+ *   put:
+ *     summary: Update a User by ID
+ *     tags: [Users, Super]
+ */
+router.put('/:id', checkPermissions('manageUsers'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            username,
+            nickname,
+            email
+        } = req.body;
+
+        await editUser(req, res);
+
+        // Überprüfen Sie, ob editUser bereits eine Antwort gesendet hat
+        if (result !== undefined) {
+            res.json({
+                success: true
+            });
         }
+
         res.json({
-          success: true,
-          id: id,
-          status: 'deleted'
+            success: true
         });
-        console.log('User deleted');
-      })
-      .catch((error) => {
-        console.error('Error deleting user:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
-  
-  // Get details of a user by ID
-  router.get('/:id', checkPermissions('manageUsers'), (req, res) => {
-    const {
-      id
-    } = req.params;
-  
-    db.User.findById(id).populate('group').populate('tenancy').populate('tenancies')
-      .then((result) => {
-        if (!result) {
-          res.status(404).json({
-            error: 'User not found'
-          });
-          return;
-        }
-  
-        res.json(result);
-      })
-      .catch((error) => {
-        console.error('Error retrieving user:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
-  
-  // Edit user details by ID
-  router.put('/:id', checkPermissions('manageUsers'), (req, res) => {
-    const {
-      id
-    } = req.params;
-    const {
-      username,
-      nickname,
-      active,
-      banned,
-      groupId,
-      tenancies,
-      tenancy,
-      email
-    } = req.body;
-  
-    if (!username) {
-      res.status(400).json({
-        error: 'Username is required'
-      });
-      return;
+    } catch (error) {
+        logger.error(error, error.stack);
     }
-  
-    db.User.findByIdAndUpdate(id, {
-        username,
-        nickname,
-        email,
-        active,
-        banned,
-        groupId,
-        tenancies,
-        tenancy,
-        emails: {
-          email: email,
-          is_primary: true
-        }
-      })
-      .then(() => {
-        res.json({
-          success: true
+});
+
+/**
+ * @openapi
+ * /{id}:
+ *   delete:
+ *     summary: Delete a User by ID
+ *     tags: [Users, Super]
+ */
+router.delete('/:id', checkPermissions('manageUsers'), (req, res) => {
+    const {
+        id
+    } = req.params; // Get the ID from the request body
+    db.User.deleteOne({
+            _id: id
+        })
+        .then((result) => {
+            if (result.deletedCount === 0) {
+                throw new Error('User not found');
+            }
+            res.json({
+                success: true,
+                id: id,
+                status: 'deleted'
+            });
+            console.log('User deleted');
+        })
+        .catch((error) => {
+            console.error('Error deleting user:', error);
+            res.status(500).json({
+                error: 'Internal server error'
+            });
         });
-      })
-      .catch((error) => {
-        console.error('Error updating user:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
+});
 
   module.exports = router;
