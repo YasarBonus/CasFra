@@ -8,7 +8,13 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
 
-// Get all tenancies from MongoDB
+/**
+ * @openapi
+ * /tenancies:
+ *   get:
+ *     summary: Get all tenancies
+ *     tags: [Tenants, Super]
+ */
 router.get('/', checkPermissions('manageTenancies'), (req, res) => {
     db.Tenancies.find().populate('createdBy').populate('type').populate('image')
       .then((tenancies) => {
@@ -23,8 +29,14 @@ router.get('/', checkPermissions('manageTenancies'), (req, res) => {
   } );
 
 
-// Add tenancie to MongoDB
-router.post('/add', checkPermissions('manageTenancies'), (req, res) => {
+/**
+ * @openapi
+ * /tenancies:
+ *   post:
+ *     summary: Create a new Tenant
+ *     tags: [Tenants, Super]
+ */
+router.post('/', checkPermissions('manageTenancies'), (req, res) => {
     const {
       name,
       notes,
@@ -64,7 +76,13 @@ router.post('/add', checkPermissions('manageTenancies'), (req, res) => {
       });
   });
   
-  // Edit tenancie in MongoDB
+  /**
+ * @openapi
+ * /tenancies/{id}:
+ *   put:
+ *     summary: Update a Tenant by ID
+ *     tags: [Tenants, Super]
+ */
   router.put('/:id', checkPermissions('manageTenancies'), (req, res) => {
     const {
       id
@@ -108,7 +126,13 @@ router.post('/add', checkPermissions('manageTenancies'), (req, res) => {
       });
   });
   
-  // Delete tenancie from MongoDB
+/**
+ * @openapi
+ * /tenancies:
+ *   delete:
+ *     summary: Delete a Tenant by ID
+ *     tags: [Tenants, Super]
+ */
   router.delete('/:id', checkPermissions('manageTenancies'), (req, res) => {
     const {
       id
