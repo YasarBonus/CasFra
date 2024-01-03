@@ -3,10 +3,13 @@ const router = express.Router();
 const logger = require('../modules/winston.js');
 const db = require('../db/database.js');
 
-const { addNotification } = require('../services/notificationService.js');
+const {
+    addNotification
+} = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
-
-const { editUser } = require('../modules/Users/editUser.js'); // Import the editUser function
+const {
+    editUser
+} = require('../modules/Users/editUser.js'); // Import the editUser function
 
 /**
  * @openapi
@@ -16,18 +19,18 @@ const { editUser } = require('../modules/Users/editUser.js'); // Import the edit
  *     tags: [Users, Super]
  */
 router.get('/', checkPermissions('manageUsers'), (req, res) => {
-        db.User.find().populate('group').populate('tenancy').populate('personal_details')
-            .then((results) => {
-                res.json(results);
-            })
-            .catch((error) => {
-                console.error('Error retrieving users:', error);
-                res.status(500).json({
-                    error: 'Internal server error'
-                });
+    db.User.find().populate('group').populate('tenancy').populate('personal_details')
+        .then((results) => {
+            res.json(results);
+        })
+        .catch((error) => {
+            console.error('Error retrieving users:', error);
+            res.status(500).json({
+                error: 'Internal server error'
             });
-    });
-    
+        });
+});
+
 /**
  * @openapi
  * /{id}:
@@ -35,30 +38,30 @@ router.get('/', checkPermissions('manageUsers'), (req, res) => {
  *     summary: Get details of a User by ID
  *     tags: [Users, Super]
  */
-    router.get('/:id', checkPermissions('manageUsers'), (req, res) => {
-        const {
-            id
-        } = req.params;
-    
-        db.User.findById(id).populate('group').populate('tenancy').populate('tenancies')
-            .then((result) => {
-                if (!result) {
-                    res.status(404).json({
-                        error: 'User not found'
-                    });
-                    return;
-                }
-    
-                res.json(result);
-            })
-            .catch((error) => {
-                console.error('Error retrieving user:', error);
-                res.status(500).json({
-                    error: 'Internal server error'
+router.get('/:id', checkPermissions('manageUsers'), (req, res) => {
+    const {
+        id
+    } = req.params;
+
+    db.User.findById(id).populate('group').populate('tenancy').populate('tenancies')
+        .then((result) => {
+            if (!result) {
+                res.status(404).json({
+                    error: 'User not found'
                 });
+                return;
+            }
+
+            res.json(result);
+        })
+        .catch((error) => {
+            console.error('Error retrieving user:', error);
+            res.status(500).json({
+                error: 'Internal server error'
             });
-    });
-  
+        });
+});
+
 /**
  * @openapi
  * /{id}:
@@ -68,7 +71,9 @@ router.get('/', checkPermissions('manageUsers'), (req, res) => {
  */
 router.put('/:id', checkPermissions('manageUsers'), async (req, res) => {
     try {
-        const { id } = req.params;
+        const {
+            id
+        } = req.params;
         const {
             username,
             nickname,
@@ -125,4 +130,4 @@ router.delete('/:id', checkPermissions('manageUsers'), (req, res) => {
         });
 });
 
-  module.exports = router;
+module.exports = router;
