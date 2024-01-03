@@ -67,7 +67,7 @@
                 </div>
                 <div class="field">
                   <label>Language</label>
-                  <div class="ui selection dropdown">
+                  <div class="ui selection dropdown language">
                     <input name="language">
                     <i class="dropdown icon"></i>
                     <div class="default text">Select Language</div>
@@ -309,8 +309,7 @@
             $('input[name="country"]').val(data.personal_address.country);
             $('input[name="additional_info"]').val(data.personal_address.additional_info);
             
-
-            $('.ui.dropdown').dropdown(
+            $('.ui.dropdown.language').dropdown(
               'set selected', data.language
             );
 
