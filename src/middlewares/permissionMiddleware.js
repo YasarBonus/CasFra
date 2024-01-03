@@ -20,7 +20,7 @@ function checkPermissions(requiredPermission) {
           });
         }
   
-        const groupId = user.groupId;
+        const groupId = user.group._id;
         const userGroup = await db.UserGroup.findById(groupId);
   
         if (!userGroup) {
