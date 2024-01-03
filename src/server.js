@@ -42,6 +42,10 @@ io.on('connection', (socket) => {
 
 app.use(express.static(path.join('public')));
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload()); // Don't forget this line!
+
+
 app.use(helmet());
 
 const scriptSrcUrls = [
