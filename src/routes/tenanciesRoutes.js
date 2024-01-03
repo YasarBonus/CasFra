@@ -74,6 +74,36 @@ router.get('/', checkPermissions('manageTenancies'), (req, res) => {
       });
   } );
 
+    /**
+ * @openapi
+ * /tenancies/{id}:
+ *   get:
+ *     summary: Get the details of a Tenant by ID
+ *     tags: [Tenants, Super]
+ */
+router.get('/:id', checkPermissions('manageTenancies'), (req, res) => {
+    const {
+      id
+    } = req.params;
+  
+    db.Tenancies.findById(id).populate('createdBy').populate('type').populate('image')
+      .then((tenancie) => {
+        if (!tenancie) {
+          res.status(404).json({
+            error: 'Tenancie not found'
+          });
+          return;
+        }
+  
+        res.json(tenancie);
+      })
+      .catch((error) => {
+        console.error('Error getting tenancie:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  });
   
   /**
  * @openapi
