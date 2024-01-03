@@ -68,7 +68,7 @@
                             card.appendChild(imageElement);
 
                             var img = document.createElement('img');
-                            img.src = image.imageUrl;
+                            img.src = image.image_url;
                             img.style.maxWidth = '200px';
                             imageElement.appendChild(img);
 
@@ -226,19 +226,11 @@
                 // Append the category to the formData object
                 formData.append('categoryId', category);
 
-                // Get the image file from the input
-                var image = document.getElementById('imageInput').files[0];
-                console.log('Image File:', image);
-
-                // Append the image file to the formData object
-                formData.append('image', image);
+            
 
                 fetch('/api/v1/images', {
                         method: 'POST',
                         body: formData,
-                        files: {
-                            image: image
-                        }
                     })
                     .then(response => response.json())
                     .then(newImage => {

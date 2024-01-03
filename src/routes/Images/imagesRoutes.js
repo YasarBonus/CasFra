@@ -90,10 +90,11 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
 
   file.originalname = file.name;
 
-  // generate new name for the image: timestamp_randomnumber.extension
+  // generate new name for the image: timestamp_randomnumber.mime
   const timestamp = Date.now();
   const randomNumber = Math.floor(Math.random() * 10000000000);
-  file.name = timestamp + '_' + randomNumber + '.' + file.name.split('.').pop();
+  const newFilename = timestamp + '_' + randomNumber + '.' + file.originalname.split('.').pop();
+  file.name = newFilename;
 
   // 1. upload image to Minio
   minioClient.putObject('casfra-images', file.name, file.data, function (err, etag) {
@@ -194,6 +195,56 @@ router.put('/:id', checkPermissions('manageImages'), (req, res) => {
     })
     .catch((error) => {
       console.error('Error editing image:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
+// Delete image from MongoDB and Minio storage
+router.delete('/:id', checkPermissions('manageImages'), (req, res) => {
+  const {
+    id
+  } = req.params;
+
+  db.Images.findOne({
+      _id: id,
+      tenancies: req.session.user.tenancy
+    }) // Add condition for tenancies
+    .then((image) => {
+      if (!image) {
+        res.status(404).json({
+          error: 'Image not found'
+        });
+      } else {
+        // Delete image from Minio
+        minioClient.removeObject('casfra-images', image.filename, function (err) {
+          if (err) {
+            console.error('Error deleting image from Minio:', err);
+          } else {
+            console.log('Image ' + image.filename + ' deleted from Minio');
+          }
+        });
+
+        // Delete image from MongoDB
+        db.Images.deleteOne({
+            _id: id
+          })
+          .then(() => {
+            res.status(200).json({
+              message: 'Image ' + image.name + ' deleted successfully'
+            });
+          })
+          .catch((error) => {
+            console.error('Error deleting image from MongoDB:', error);
+            res.status(500).json({
+              error: 'Internal server error'
+            });
+          });
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting image:', error);
       res.status(500).json({
         error: 'Internal server error'
       });
