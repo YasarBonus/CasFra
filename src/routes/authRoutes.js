@@ -3,6 +3,7 @@ const router = express.Router();
 const logger = require('../modules/winston.js');
 const db = require('../db/database.js');
 const bcrypt = require('bcrypt');
+const bodymen = require('bodymen');
 
 const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
@@ -12,77 +13,76 @@ const addNotification = notificator.addNotification;
 /**
  * @openapi
  * /auth/login:
- *   get:
+ *   post:
  *     summary: Create a new session
  *     tags: [Authentication]
  *     security:
  *       - session: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               tenancy:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successful login
+ *       '400':
+ *         description: Invalid request body
+ *       '401':
+ *         description: Invalid username or password
+ *       '500':
+ *         description: Internal server error
  */
-router.post('/login', (req, res) => {
-    const {
-        username,
-        password,
-        tenancy
-    } = req.body;
+router.post('/login', bodymen.middleware({ username: { type: String, required: true }, password: { type: String, required: true }, tenancy: { type: String } }), (req, res) => {
+    const { username, password, tenancy } = req.body;
 
     if (!password || typeof password !== 'string') {
-        res.status(400).json({
-            error: 'Password is required and must be a string'
-        });
+        res.status(400).json({ error: 'Password is required and must be a string' });
         return;
     }
 
     if (!username || typeof username !== 'string') {
-        res.status(400).json({
-            error: 'Username is required and must be a string'
-        });
+        res.status(400).json({ error: 'Username is required and must be a string' });
         return;
     }
 
-    db.User.findOne({
-            username
-        })
+    db.User.findOne({ username })
         .then((user) => {
             if (!user) {
-                res.status(401).json({
-                    error: 'Invalid username or password'
-                });
+                res.status(401).json({ error: 'Invalid username or password' });
                 return;
             }
 
-            if (!user.active) {
-                res.status(401).json({
-                    error: 'User is not active'
-                });
+            if (!user.status.active) {
+                res.status(401).json({ error: 'User is not active' });
                 return;
             }
 
-            if (user.banned) {
-                res.status(401).json({
-                    error: 'User is banned'
-                });
+            if (user.status.banned) {
+                res.status(401).json({ error: 'User is banned' });
                 return;
             }
 
             bcrypt.compare(password, user.password, (err, result) => {
                 if (err) {
-                    console.error('Error comparing passwords:', err);
-                    res.status(500).json({
-                        error: 'Internal server error'
-                    });
+                    logger.error('Error comparing passwords:', err);
+                    res.status(500).json({ error: 'Internal server error' });
                     return;
                 }
 
                 if (result) {
-                    db.UserGroup.findOne({
-                            _id: user.groupId
-                        })
+                    db.UserGroup.findOne({ _id: user.group._id })
                         .then((userGroup) => {
                             if (!userGroup) {
-                                res.status(500).json({
-                                    error: 'User group not found'
-                                });
-                                logger.warn('User group not found for user ' + user.username + '(' + user._id + ')');
+                                res.status(500).json({ error: 'User group not found' });
+                                logger.warn(`User group not found for user ${user.username} (${user._id})`);
                                 return;
                             }
 
@@ -105,15 +105,11 @@ router.post('/login', (req, res) => {
                                             // Add notification after successful login
                                             addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
 
-                                            res.json({
-                                                success: true
-                                            });
+                                            res.json({ success: true });
                                         })
                                         .catch((error) => {
-                                            console.error('Error updating user:', error);
-                                            res.status(500).json({
-                                                error: 'Internal server error'
-                                            });
+                                            logger.error('Error updating user:', error);
+                                            res.status(500).json({ error: 'Internal server error' });
                                         });
                                 } else {
                                     req.session.user = {
@@ -126,9 +122,7 @@ router.post('/login', (req, res) => {
                                     // Add notification after successful login
                                     addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
 
-                                    res.json({
-                                        success: true
-                                    });
+                                    res.json({ success: true });
                                 }
                             } else {
                                 // No tenancy provided, remove tenancy in the database
@@ -147,36 +141,26 @@ router.post('/login', (req, res) => {
                                         // Add notification after successful login
                                         addNotification('Login successful', user._id);
 
-                                        res.json({
-                                            success: true
-                                        });
+                                        res.json({ success: true });
                                     })
                                     .catch((error) => {
-                                        console.error('Error updating user:', error);
-                                        res.status(500).json({
-                                            error: 'Internal server error'
-                                        });
+                                        logger.error('Error updating user:', error);
+                                        res.status(500).json({ error: 'Internal server error' });
                                     });
                             }
                         })
                         .catch((error) => {
-                            console.error('Error retrieving user group:', error);
-                            res.status(500).json({
-                                error: 'Internal server error'
-                            });
+                            logger.error('Error retrieving user group:', error);
+                            res.status(500).json({ error: 'Internal server error' });
                         });
                 } else {
-                    res.status(401).json({
-                        error: 'Invalid username or password'
-                    });
+                    res.status(401).json({ error: 'Invalid username or password' });
                 }
             });
         })
         .catch((error) => {
-            console.error('Error retrieving user:', error);
-            res.status(500).json({
-                error: 'Internal server error'
-            });
+            logger.error('Error retrieving user:', error);
+            res.status(500).json({ error: 'Internal server error' });
         });
 });
 
@@ -188,6 +172,11 @@ router.post('/login', (req, res) => {
  *     tags: [Authentication]
  *     security:
  *       - session: []
+ *     responses:
+ *       '200':
+ *         description: Successful session retrieval
+ *       '401':
+ *         description: No session found
  */
 router.get('/session', checkPermissions('authenticate'), (req, res) => {
     const sessionDetails = req.session.user;
@@ -195,9 +184,7 @@ router.get('/session', checkPermissions('authenticate'), (req, res) => {
     if (sessionDetails) {
         res.json(sessionDetails);
     } else {
-        res.status(401).json({
-            error: 'No session found'
-        });
+        res.status(401).json({ error: 'No session found' });
     }
 });
 
@@ -209,36 +196,43 @@ router.get('/session', checkPermissions('authenticate'), (req, res) => {
  *     tags: [Authentication, Super]
  *     security:
  *       - session: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successful login as another user
+ *       '400':
+ *         description: Invalid request body
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
  */
-router.post('/loginAs', checkPermissions('manageUsers'), (req, res) => {
-    const {
-        userId
-    } = req.body;
+router.post('/loginAs', checkPermissions('manageUsers'), bodymen.middleware({ userId: { type: String, required: true } }), (req, res) => {
+    const { userId } = req.body;
 
     if (!userId) {
-        res.status(400).json({
-            error: 'User ID is required'
-        });
+        res.status(400).json({ error: 'User ID is required' });
         return;
     }
 
-    db.User.findById(userId)
+    User.findById(userId)
         .then((user) => {
             if (!user) {
-                res.status(404).json({
-                    error: 'User not found'
-                });
+                res.status(404).json({ error: 'User not found' });
                 return;
             }
 
-            db.UserGroup.findOne({
-                    _id: user.groupId
-                })
+            db.UserGroup.findOne({ _id: user.groupId })
                 .then((userGroup) => {
                     if (!userGroup) {
-                        res.status(500).json({
-                            error: 'User group not found'
-                        });
+                        res.status(500).json({ error: 'User group not found' });
                         return;
                     }
 
@@ -248,22 +242,16 @@ router.post('/loginAs', checkPermissions('manageUsers'), (req, res) => {
                         permissions: userGroup.permissions
                     };
 
-                    res.json({
-                        success: true
-                    });
+                    res.json({ success: true });
                 })
                 .catch((error) => {
-                    console.error('Error retrieving user group:', error);
-                    res.status(500).json({
-                        error: 'Internal server error'
-                    });
+                    logger.error('Error retrieving user group:', error);
+                    res.status(500).json({ error: 'Internal server error' });
                 });
         })
         .catch((error) => {
-            console.error('Error retrieving user:', error);
-            res.status(500).json({
-                error: 'Internal server error'
-            });
+            logger.error('Error retrieving user:', error);
+            res.status(500).json({ error: 'Internal server error' });
         });
 });
 
@@ -275,17 +263,20 @@ router.post('/loginAs', checkPermissions('manageUsers'), (req, res) => {
  *     tags: [Authentication, Super]
  *     security:
  *       - session: []
+ *     responses:
+ *       '200':
+ *         description: Successful session retrieval
+ *       '500':
+ *         description: Internal server error
  */
 router.get('/sessions', checkPermissions('manageSessions'), (req, res) => {
-    db.Session.find()
+    Session.find()
         .then((results) => {
             res.json(results);
         })
         .catch((error) => {
             logger.error('Error retrieving sessions:', error);
-            res.status(500).json({
-                error: 'Internal server error'
-            });
+            res.status(500).json({ error: 'Internal server error' });
         });
 });
 
@@ -302,23 +293,18 @@ router.get('/sessions', checkPermissions('manageSessions'), (req, res) => {
  *         description: Successful logout
  *       '500':
  *         description: Internal server error
- *         
  */
 router.post('/logout', checkPermissions('authenticate'), (req, res) => {
-    const { userId, username } = req.session.user;
+    const { userId, username } = req.session.user;
 
     req.session.destroy((error) => {
         if (error) {
-            console.error('Error destroying session:', error);
-            res.status(500).json({
-                error: 'Internal server error'
-            });
-            logger.error('Error destroying session for user ' + username + '(' + userId + '):' + error);
+            logger.error('Error destroying session:', error);
+            res.status(500).json({ error: 'Internal server error' });
+            logger.error(`Error destroying session for user ${username} (${userId}): ${error}`);
         } else {
-            res.json({
-                success: true
-            });
-            logger.info('User ' + username + '(' + userId + ') logged out');
+            res.json({ success: true });
+            logger.info(`User ${username} (${userId}) logged out`);
         }
     });
 });
