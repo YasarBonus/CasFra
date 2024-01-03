@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../../modules/winston.js');
 const db = require('../../db/database.js');
+const checkPermissions = require('../../middlewares/permissionMiddleware.js');
+
 
 // Get all casinos from MongoDB
-router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) => {
+router.get('/casinos', checkPermissions('manageCasinos'), async (req, res) => {
     try {
       const results = await db.Casino.find({
         tenancies: req.session.user.tenancy
@@ -21,7 +23,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   // Get amount of active and inactive casinos
   // Get the maxCasinos from the Tenancy and calculate the percentage used from maxCasinos and activeCasinos
   // respond with activeCount, inactiveCount, maxCasinos, remainingCaisnos, percentageUsed, percentageFree, percentageActive, percentageInactive
-  router.get('/api/casinos/activeinactive', checkPermissions('manageCasinos'), async (req, res) => {
+  router.get('/casinos/activeinactive', checkPermissions('manageCasinos'), async (req, res) => {
     try {
       const activeCount = await db.Casino.countDocuments({
         tenancies: req.session.user.tenancy,
@@ -62,7 +64,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   
   
   // Get the details of a specific casino
-  router.get('/api/casinos/:id', checkPermissions('manageCasinos'), async (req, res) => {
+  router.get('/casinos/:id', checkPermissions('manageCasinos'), async (req, res) => {
     const {
       id
     } = req.params;
@@ -87,7 +89,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Create a new casino
-  router.post('/api/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/casinos', checkPermissions('manageCasinos'), (req, res) => {
     const {
       name
     } = req.body; // Get the name and location from the request body
@@ -119,7 +121,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Duplicate a casino
-  router.post('/api/casinos/:id/duplicate', checkPermissions('manageCasinos'), async (req, res) => {
+  router.post('/casinos/:id/duplicate', checkPermissions('manageCasinos'), async (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -185,7 +187,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Edit a casino
-  router.put('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -280,7 +282,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Toggle the active status of a casino by its ID
-  router.put('/api/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/casinos/:id/toggleActive', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID of the casino from the request params
@@ -321,7 +323,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Swap the priority of two casinos by their ID
-  router.put('/api/casinos/priority/swap', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/casinos/priority/swap', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id1,
       id2
@@ -376,7 +378,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get individualbonus of a specific casino by ID
-  router.get('/api/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/individualbonuses', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -396,7 +398,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get features of a specific casino by ID
-  router.get('/api/casinos/:id/features', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/features', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -416,7 +418,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get image of a specific casino by ID
-  router.get('/api/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/image', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -436,7 +438,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get categories of a specific casino by ID
-  router.get('/api/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/categories', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -456,7 +458,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get wagerTypes of a specific casino by ID
-  router.get('/api/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/wagertypes', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -476,7 +478,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get providers of a specific casino by ID
-  router.get('/api/casinos/:id/providers', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/providers', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -496,7 +498,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get licenses of a specific casino by ID
-  router.get('/api/casinos/:id/licenses', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/licenses', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -516,7 +518,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   });
   
   // Get paymentMethods of a specific casino by ID
-  router.get('/api/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/casinos/:id/paymentmethods', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
@@ -538,7 +540,7 @@ router.get('/api/casinos', checkPermissions('manageCasinos'), async (req, res) =
   
   
   // Delete a casino by its ID
-  router.delete('/api/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.delete('/casinos/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params; // Get the ID from the request params
