@@ -60,7 +60,7 @@ router.post('/login', bodymen.middleware({ username: { type: String, required: t
                 return;
             }
 
-            if (!user.status.active) {
+            if (!user.status.active === true) {
                 res.status(401).json({ error: 'User is not active' });
                 return;
             }
