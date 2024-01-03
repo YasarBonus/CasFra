@@ -27,5 +27,7 @@ const userPersonalDetailsSchema = new mongoose.Schema({
     },
 });
 
-module.exports = userPersonalDetailsSchema;
+const UserPersonalDetails = mongoose.model('UserPersonalDetails', userPersonalDetailsSchema);
+
+module.exports = UserPersonalDetails;
 
