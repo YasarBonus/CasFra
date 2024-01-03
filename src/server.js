@@ -87,6 +87,7 @@ app.use(
               "blob:",
               "data:",
               "https://cdn.treudler.net/" ,
+              "http://localhost:9000/"
           ],
           fontSrc: ["'self'", ...fontSrcUrls],
       },
