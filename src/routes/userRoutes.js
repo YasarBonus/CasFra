@@ -22,9 +22,6 @@ router.post('/register', async (req, res) => {
         const {
             username,
             nickname,
-            first_name,
-            last_name,
-            street,
             password,
             passwordRepeat,
             email,
@@ -85,7 +82,9 @@ router.post('/register', async (req, res) => {
             return;
         }
 
-        const existingKey = await db.RegistrationKey.findOne({ regkey: registrationKey });
+        const existingKey = await db.RegistrationKey.findOne({
+            regkey: registrationKey
+        });
         if (!existingKey) {
             res.status(400).json({
                 error: 'Invalid registration key'
@@ -100,7 +99,13 @@ router.post('/register', async (req, res) => {
             return;
         }
 
-        const existingUser = await db.User.findOne({ $or: [{ username: username }, { email: email }] });
+        const existingUser = await db.User.findOne({
+            $or: [{
+                username: username
+            }, {
+                email: email
+            }]
+        });
         if (existingUser) {
             if (existingUser.username === username) {
                 res.status(400).json({
@@ -153,35 +158,29 @@ router.post('/register', async (req, res) => {
             username: username,
             nickname: nickname,
             password: hash,
-            email: email,
             emails: {
                 email: email,
                 is_primary: true,
                 is_confirmed: false,
             },
             language: language || 'en', // Set default value to "en" if not provided
-            personal_details: {
-                first_name: first_name,
-                last_name: last_name,
-            },
-            personal_address: {
-                street: street,
-            },
+            personal_details: {},
+            personal_address: {},
             registration: {
                 registration_date: registrationDate,
                 registration_ip: req.ip,
                 registration_key: existingKey._id,
                 registration_code: registrationVerificationCode,
                 registration_code_link: registrationVerificationLinkCode,
-                registration_code_expires: registrationVerificationCodeExpiry
+                registration_code_expires: registrationVerificationCodeExpiry,
             },
             status: {
-                is_active: false,
-                is_banned: false,
-                is_verified: false,
+                active: false,
+                banned: false,
+                verified: false,
             },
         });
-        console.log('User registered:', user);
+
         await user.save();
 
         // Mark the registration key as used
