@@ -7,6 +7,52 @@ const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
+/**
+ * @openapi
+ * /tenancies:
+ *   post:
+ *     summary: Create a new Tenant
+ *     tags: [Tenants, Super]
+ */
+router.post('/', checkPermissions('manageTenancies'), (req, res) => {
+  const {
+    name,
+    notes,
+    type,
+    image
+  } = req.body;
+  const userId = req.session.user.userId;
+
+  if (!name) {
+    res.status(400).json({
+      error: 'Name is required'
+    });
+    return;
+  }
+
+  const tenancie = new db.Tenancie({
+    name,
+    notes,
+    createdBy: userId,
+    createdDate: new Date(),
+    admins: [userId],
+    image,
+    type
+  });
+
+  tenancie.save()
+    .then(() => {
+      res.status(201).json({
+        success: true
+      });
+    })
+    .catch((error) => {
+      console.error('Error inserting tenancie:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
 
 /**
  * @openapi
@@ -28,53 +74,6 @@ router.get('/', checkPermissions('manageTenancies'), (req, res) => {
       });
   } );
 
-
-/**
- * @openapi
- * /tenancies:
- *   post:
- *     summary: Create a new Tenant
- *     tags: [Tenants, Super]
- */
-router.post('/', checkPermissions('manageTenancies'), (req, res) => {
-    const {
-      name,
-      notes,
-      type,
-      image
-    } = req.body;
-    const userId = req.session.user.userId;
-  
-    if (!name) {
-      res.status(400).json({
-        error: 'Name is required'
-      });
-      return;
-    }
-  
-    const tenancie = new db.Tenancie({
-      name,
-      notes,
-      createdBy: userId,
-      createdDate: new Date(),
-      admins: [userId],
-      image,
-      type
-    });
-  
-    tenancie.save()
-      .then(() => {
-        res.status(201).json({
-          success: true
-        });
-      })
-      .catch((error) => {
-        console.error('Error inserting tenancie:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
   
   /**
  * @openapi
@@ -128,7 +127,7 @@ router.post('/', checkPermissions('manageTenancies'), (req, res) => {
   
 /**
  * @openapi
- * /tenancies:
+ * /tenancies/{id}:
  *   delete:
  *     summary: Delete a Tenant by ID
  *     tags: [Tenants, Super]
