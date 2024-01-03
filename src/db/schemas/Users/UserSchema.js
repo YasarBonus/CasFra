@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
-const userPersonalAddressesSchema = require('./UserPersonalAddressesSchema');
 const userEmailsSchema = require('./UserEmailsSchema');
 const userStatusSchema = require('./UserStatusSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
@@ -44,8 +42,10 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenancies'
     },
-    personalDetails: userPersonalDetailsSchema,
-    personalAddresses: userPersonalAddressesSchema,
+    personal_details: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'UserPersonalDetails'
+    },
     priority: {
       type: Number,
       default: 0
