@@ -73,16 +73,27 @@ router.get('/categories/:categoryId/images', checkPermissions('manageImages'), (
 // 1. upload image to Minio
 router.post('/', checkPermissions('manageImages'), (req, res) => {
   const {
-    userId
+    userId,
+    tenancy
   } = req.session.user;
   const {
-    name,
     description,
-    priority,
     active,
     category,
   } = req.body;
-  const file = req.files.file;
+  let name = req.body.name;
+  const file = req.files.image;
+
+  if (!name) {
+    name = file.name;
+  }
+
+  file.originalname = file.name;
+
+  // generate new name for the image: timestamp_randomnumber.extension
+  const timestamp = Date.now();
+  const randomNumber = Math.floor(Math.random() * 10000000000);
+  file.name = timestamp + '_' + randomNumber + '.' + file.name.split('.').pop();
 
   // 1. upload image to Minio
   minioClient.putObject('casfra-images', file.name, file.data, function (err, etag) {
@@ -97,7 +108,6 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
         name: name,
         filename: file.name,
         originalname: file.originalname,
-        priority: priority,
         size: file.size,
         mimetype: file.mimetype,
         description: description,
@@ -105,13 +115,14 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
         addedBy: userId,
         category: category,
         active: active,
-        tenancies: req.session.user.tenancy
+        tenancies: tenancy,
+        image_url: 'http://localhost:9000/casfra-images/' + file.name
       });
 
       images.save()
         .then(() => {
           res.status(200).json({
-            message: 'Image ' + images.name + ' uploaded successfully'
+            message: 'Image ' + images.originalname + ' uploaded successfully: ' + images.filename
           });
         })
         .catch((error) => {
