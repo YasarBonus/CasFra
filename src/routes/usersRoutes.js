@@ -3,9 +3,8 @@ const router = express.Router();
 const logger = require('../modules/winston.js');
 const db = require('../db/database.js');
 
-const notificator = require('../services/notificationService.js');
+const { addNotification } = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
-const addNotification = notificator.addNotification;
 
 const { editUser } = require('../modules/Users/editUser.js'); // Import the editUser function
 
