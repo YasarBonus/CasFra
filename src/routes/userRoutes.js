@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const logger = require('../modules/winston.js');
 const db = require('../db/database.js');
 
 const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
+
 
 
 /**
