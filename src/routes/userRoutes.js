@@ -413,7 +413,13 @@ const editUserDetails = (req, res) => {
     const {
         username,
         nickname,
-        email
+        email,
+        first_name,
+        second_name,
+        last_name,
+        nationality,
+        date_of_birth,
+        place_of_birth,
     } = req.body;
 
     db.User.findByIdAndUpdate(userId, {
@@ -423,6 +429,14 @@ const editUserDetails = (req, res) => {
                 email: email,
                 is_primary: true,
                 is_confirmed: false,
+            },
+            personal_details: {
+                first_name: first_name,
+                second_name: second_name,
+                last_name: last_name,
+                nationality: nationality,
+                date_of_birth: date_of_birth,
+                place_of_birth: place_of_birth,
             },
             
         })
