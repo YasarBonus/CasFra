@@ -21,6 +21,10 @@ router.post('/register', async (req, res) => {
     try {
         const {
             username,
+            nickname,
+            first_name,
+            last_name,
+            street,
             password,
             passwordRepeat,
             email,
@@ -54,6 +58,20 @@ router.post('/register', async (req, res) => {
         if (!usernameRegex.test(username)) {
             res.status(400).json({
                 error: 'Username must contain only numbers and letters, with a length between 3 and 10 characters'
+            });
+            return;
+        }
+
+        if (!nickname) {
+            res.status(400).json({
+                error: 'Nickname is required'
+            });
+            return;
+        }
+
+        if (!usernameRegex.test(nickname)) {
+            res.status(400).json({
+                error: 'Nickname must contain only numbers and letters, with a length between 3 and 10 characters'
             });
             return;
         }
@@ -117,8 +135,8 @@ router.post('/register', async (req, res) => {
 
         // Generate a random 6-digit verification code
         const generateVerificationCode = () => {
-            const code = Math.floor.toString(100000 + Math.random() * 900000);
-            return code;
+            const code = Math.floor(100000 + Math.random() * 900000);
+            return code.toString();
         };
 
         // Generate a random 20 characters code for verification link
@@ -133,14 +151,22 @@ router.post('/register', async (req, res) => {
 
         const user = new db.User({
             username: username,
+            nickname: nickname,
             password: hash,
+            email: email,
             emails: {
                 email: email,
-                is_primary: true
+                is_primary: true,
+                is_confirmed: false,
             },
             language: language || 'en', // Set default value to "en" if not provided
-            personalDetails: {},
-            personalAddresses: {},
+            personal_details: {
+                first_name: first_name,
+                last_name: last_name,
+            },
+            personal_address: {
+                street: street,
+            },
             registration: {
                 registration_date: registrationDate,
                 registration_ip: req.ip,
@@ -148,9 +174,14 @@ router.post('/register', async (req, res) => {
                 registration_code: registrationVerificationCode,
                 registration_code_link: registrationVerificationLinkCode,
                 registration_code_expires: registrationVerificationCodeExpiry
-            }
+            },
+            status: {
+                is_active: false,
+                is_banned: false,
+                is_verified: false,
+            },
         });
-
+        console.log('User registered:', user);
         await user.save();
 
         // Mark the registration key as used
