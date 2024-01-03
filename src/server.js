@@ -4068,7 +4068,7 @@ async function createShortLinks(casinoId = null) {
       }
     }
   } catch (error) {
-    console.error('Error creating/updating ShortLinks:', error);
+    errorHandler(error);
   }
 }
 
