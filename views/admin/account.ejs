@@ -67,6 +67,37 @@
                   <input type="text" name="email" placeholder="E-Mail">
                 </div>
               </div>
+
+              <h4 class="ui dividing header">Personal Details </h4>
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+
+              <div class="three fields">
+                <div class="field">
+                  <label>Firstname</label>
+                  <input type="text" name="first_name" placeholder="Firstname">
+                </div>
+                <div class="field">
+                  <label>Secondname</label>
+                  <input type="text" name="second_name" placeholder="Secondname">
+                </div>
+                <div class="field">
+                  <label>Lastname</label>
+                  <input type="text" name="last_name" placeholder="Lastname">
+                </div>
+              </div>
+              <div class="three fields">
+                <div class="field">
+                  <label>Nationality</label>
+                  <input type="Text" name="nationality" placeholder="german">
+                </div>
+                <div class="field">
+                  <label>Date of Birth</label>
+                  <input type="date" name="date_of_birth" placeholder="Date of Birth">
+                </div>
+                <div class="field">
+                  <label>Place of Birth</label>
+                  <input type="text" name="place_of_birth" placeholder="Place of Birth">
+                </div>
           </div>
           <button class="ui labeled icon button" id="saveButton">
 
@@ -126,9 +157,6 @@
     </script>
     <script>
       showActionButton('saveButton', 'save');
-      // showLoader('formLoaderPersonalDetails', 'disabled');
-      // showLoader('formLoaderPaymentInformation', 'disabled');
-      // showLoader('formLoaderReceipt', 'disabled');
 
       $('#userForm').submit(function (e) {
         const button = 'saveButton';
@@ -141,6 +169,12 @@
           username: $('input[name="username"]').val(),
           nickname: $('input[name="nickname"]').val(),
           email: $('input[name="email"]').val(),
+          first_name: $('input[name="first_name"]').val(),
+          second_name: $('input[name="second_name"]').val(),
+          last_name: $('input[name="last_name"]').val(),
+          nationality: $('input[name="nationality"]').val(),
+          date_of_birth: $('input[name="date_of_birth"]').val(),
+          place_of_birth: $('input[name="place_of_birth"]').val(),
         };
         console.log('form', formData);
         $.ajax({
@@ -177,33 +211,16 @@
             $('input[name="nickname"]').val(data.nickname);
             $('input[name="email"]').val(data.emails.email);
             $('input[name="language"]').val(data.language);
+            $('input[name="first_name"]').val(data.personal_details.first_name);
+            $('input[name="second_name"]').val(data.personal_details.second_name);
+            $('input[name="last_name"]').val(data.personal_details.last_name);
+            $('input[name="nationality"]').val(data.personal_details.nationality);
+            $('input[name="date_of_birth"]').val(data.personal_details.date_of_birth);
+            $('input[name="place_of_birth"]').val(data.personal_details.place_of_birth);
 
 
             // Hide the dimmer loader
             showLoader('formLoaderAccountDetails', 'success');
-          });
-        });
-      }
-
-      function populateUserPersonalData() {
-        // Show the dimmer loader
-        showLoader('formLoaderPersonalDetails', 'loading');
-
-        $(document).ready(function () {
-          $.get('/api/v1/user/personal', function (data) {
-            console.log(data);
-            $('input[name="personalFirstname"]').val(data.firstname);
-            $('input[name="personalMiddlename"]').val(data.middlename);
-            $('input[name="personalLastname"]').val(data.lastname);
-            $('input[name="personalStreet"]').val(data.street);
-            $('input[name="personalHousenumber"]').val(data.housenumber);
-            $('input[name="personalAddition"]').val(data.addition);
-            $('input[name="personalZipcode"]').val(data.zipcode);
-            $('input[name="personalCity"]').val(data.city);
-
-
-            // Hide the dimmer loader
-            showLoader('formLoaderPersonalDetails', 'success');
           });
         });
       }
