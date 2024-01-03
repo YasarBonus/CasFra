@@ -224,9 +224,7 @@
                 console.log('Category:', category);
 
                 // Append the category to the formData object
-                formData.append('categoryId', category);
-
-            
+                formData.append('categoryId', category);            
 
                 fetch('/api/v1/images', {
                         method: 'POST',
