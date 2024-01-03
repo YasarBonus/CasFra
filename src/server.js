@@ -106,6 +106,9 @@ app.use(pathV1 + '/auth', authRoutes);
 const tenanciesRoutes = require('./routes/tenanciesRoutes.js');
 app.use(pathV1 + '/tenancies', tenanciesRoutes);
 
+const proxmoxRoutes = require('./routes/proxmoxRoutes.js');
+app.use(pathV1 + '/proxmox', proxmoxRoutes);
+
 
 //#region Tenancies
 
