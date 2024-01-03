@@ -95,7 +95,7 @@ const getTenancyByUserId = async (userId) => {
   }
 };
 
-// New Routes
+// API Routes
 
 const pathV1 = '/api/v1';
 
@@ -459,7 +459,6 @@ const swaggerOptions = require('./config/SwaggerOptions.js');
 const specs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
@@ -579,11 +578,6 @@ async function createShortLinks(casinoId = null) {
     errorHandler(error);
   }
 }
-
-// Function to update the statistics of short links
-// The list of short links is retrieved from the database
-// The number of hits for each short link is counted from the shortLinksHits table
-// The statistics are then updated in the shortLinksStatistics table
 
 async function updateShortLinksStatistics() {
   try {
@@ -731,8 +725,6 @@ setImageUrl();
 setInterval(setImageUrl, 60 * 60 * 1000);
 
 checkUnverifiedEmails();
-
-
 
 // Route zum Umleiten von kurzen URLs
 app.get('/:shortUrl', async (req, res, next) => {
