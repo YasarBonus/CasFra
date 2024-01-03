@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const userEmailsSchema = require('./UserEmailsSchema');
+const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
+const userPersonalAddressSchema = require('./UserPersonalAddressSchema');
 const userStatusSchema = require('./UserStatusSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
 
@@ -19,6 +21,9 @@ const UserSchema = new mongoose.Schema({
     language: {
       type: String,
     ref: 'Language'
+    },
+    email: {
+      type: String,
     },
     emails: userEmailsSchema,
     status: userStatusSchema,
@@ -42,10 +47,8 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenancies'
     },
-    personal_details: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserPersonalDetails'
-    },
+    personal_details: userPersonalDetailsSchema,
+    personal_address: userPersonalAddressSchema,
     priority: {
       type: Number,
       default: 0
