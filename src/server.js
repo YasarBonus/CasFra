@@ -41,7 +41,45 @@ io.on('connection', (socket) => {
 // Middleware
 
 app.use(express.static(path.join('public')));
+
 app.use(helmet());
+
+const scriptSrcUrls = [
+    "https://analytics.yasarbonus.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+    "https://cdn.jsdelivr.net",
+];
+const connectSrcUrls = [
+  "https://ka-f.fontawesome.com/",
+
+];
+const fontSrcUrls = [
+  "https://cdn.jsdelivr.net",
+  "https://ka-f.fontawesome.com/",
+  "data:",
+];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://cdn.treudler.net/" ,
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
