@@ -15,179 +15,161 @@ const addNotification = notificator.addNotification;
  *     summary: Register a new user
  *     tags: [User]
  */
-router.post('/register', (req, res) => {
-    const {
-        username,
-        password,
-        passwordRepeat,
-        email,
-        language,
-        registrationKey
-    } = req.body;
+router.post('/register', async (req, res) => {
+    try {
+        const {
+            username,
+            password,
+            passwordRepeat,
+            email,
+            language,
+            registrationKey
+        } = req.body;
 
-    if (!username) {
-        res.status(400).json({
-            error: 'Username is required'
-        });
-        return;
-    }
+        if (!username) {
+            res.status(400).json({
+                error: 'Username is required'
+            });
+            return;
+        }
 
-    if (!email) {
-        res.status(400).json({
-            error: 'Email is required'
-        });
-        return;
-    }
+        if (!email) {
+            res.status(400).json({
+                error: 'Email is required'
+            });
+            return;
+        }
 
-    if (!registrationKey) {
-        res.status(400).json({
-            error: 'Registration key is required'
-        });
-        return;
-    }
+        if (!registrationKey) {
+            res.status(400).json({
+                error: 'Registration key is required'
+            });
+            return;
+        }
 
-    // Validate username format
-    const usernameRegex = /^[a-zA-Z0-9]{3,10}$/;
-    if (!usernameRegex.test(username)) {
-        res.status(400).json({
-            error: 'Username must contain only numbers and letters, with a length between 3 and 10 characters'
-        });
-        return;
-    }
+        // Validate username format
+        const usernameRegex = /^[a-zA-Z0-9]{3,10}$/;
+        if (!usernameRegex.test(username)) {
+            res.status(400).json({
+                error: 'Username must contain only numbers and letters, with a length between 3 and 10 characters'
+            });
+            return;
+        }
 
-    // Validate E-Mail format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        res.status(400).json({
-            error: 'Invalid email format'
-        });
-        return;
-    }
+        // Validate E-Mail format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            res.status(400).json({
+                error: 'Invalid email format'
+            });
+            return;
+        }
 
-    db.RegistrationKey.findOne({
-            regkey: registrationKey
-        })
-        .then((existingKey) => {
-            if (!existingKey) {
+        const existingKey = await db.RegistrationKey.findOne({ regkey: registrationKey });
+        if (!existingKey) {
+            res.status(400).json({
+                error: 'Invalid registration key'
+            });
+            return;
+        }
+
+        if (existingKey.used) {
+            res.status(400).json({
+                error: 'Registration key already used'
+            });
+            return;
+        }
+
+        const existingUser = await db.User.findOne({ $or: [{ username: username }, { email: email }] });
+        if (existingUser) {
+            if (existingUser.username === username) {
                 res.status(400).json({
-                    error: 'Invalid registration key'
-                });
-            } else if (existingKey.used) {
-                res.status(400).json({
-                    error: 'Registration key already used'
+                    error: 'Username already exists'
                 });
             } else {
-                db.User.findOne({
-                        $or: [{
-                            username: username
-                        }, {
-                            email: email
-                        }]
-                    })
-                    .then((existingUser) => {
-                        if (existingUser) {
-                            if (existingUser.username === username) {
-                                res.status(400).json({
-                                    error: 'Username already exists'
-                                });
-                            } else {
-                                res.status(400).json({
-                                    error: 'Email already exists'
-                                });
-                            }
-                        } else {
-                            if (!password) {
-                                res.status(400).json({
-                                    error: 'Password is required'
-                                });
-                                return;
-                            }
-
-                            if (password !== passwordRepeat) {
-                                res.status(400).json({
-                                    error: 'Passwords do not match'
-                                });
-                                return;
-                            }
-
-                            bcrypt.hash(password, 10, (err, hash) => {
-                                if (err) {
-                                    console.error('Error hashing password:', err);
-                                    res.status(500).json({
-                                        error: 'Internal server error'
-                                    });
-                                    return;
-                                }
-
-                                const registrationVerificationCodeExpiry = new Date();
-                                registrationVerificationCodeExpiry.setHours(registrationVerificationCodeExpiry.getHours() + 1);
-
-                                const generateVerificationCode = () => {
-                                    const code = Math.floor(100000 + Math.random() * 900000);
-                                    return code.toString();
-                                };
-
-                                const registrationVerificationCode = generateVerificationCode();
-                                const registrationDate = new Date(); // Add registration date
-
-                                const user = new db.User({
-                                    username: username,
-                                    password: hash,
-                                    emails: {
-                                        email: email,
-                                        is_primary: true
-                                    },
-                                    language: language || 'en', // Set default value to "en" if not provided
-                                    personalDetails: {},
-                                    personalAddresses: {},
-                                    registration: {
-                                        registration_date: registrationDate,
-                                        registration_ip: req.ip,
-                                        registration_key: existingKey._id,
-                                        registration_code: registrationVerificationCode,
-                                        registration_code_expires: registrationVerificationCodeExpiry
-                                    }
-                                });
-
-                                user.save()
-                                    .then(() => {
-                                        // Mark the registration key as used
-                                        existingKey.used = true;
-                                        existingKey.usedDate = new Date();
-                                        existingKey.userId = user._id;
-                                        existingKey.userIp = req.ip;
-                                        existingKey.save();
-
-                                        // Send the verification code by email to the user
-                                        // sendVerificationCodeByEmail(user.email, registrationVerificationCode);
-
-                                        res.status(201).json({
-                                            success: true
-                                        });
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error inserting user:', error);
-                                        res.status(500).json({
-                                            error: 'Internal server error'
-                                        });
-                                    });
-                            });
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error checking existing user:', error);
-                        res.status(500).json({
-                            error: 'Internal server error'
-                        });
-                    });
+                res.status(400).json({
+                    error: 'Email already exists'
+                });
             }
-        })
-        .catch((error) => {
-            console.error('Error checking registration key:', error);
-            res.status(500).json({
-                error: 'Internal server error'
+            return;
+        }
+
+        if (!password) {
+            res.status(400).json({
+                error: 'Password is required'
             });
+            return;
+        }
+
+        if (password !== passwordRepeat) {
+            res.status(400).json({
+                error: 'Passwords do not match'
+            });
+            return;
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+
+        const registrationVerificationCodeExpiry = new Date();
+        registrationVerificationCodeExpiry.setHours(registrationVerificationCodeExpiry.getHours() + 1);
+
+        // Generate a random 6-digit verification code
+        const generateVerificationCode = () => {
+            const code = Math.floor.toString(100000 + Math.random() * 900000);
+            return code;
+        };
+
+        // Generate a random 20 characters code for verification link
+        const generateVerificationLinkCode = () => {
+            const code = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            return code;
+        };
+
+        const registrationVerificationCode = generateVerificationCode();
+        const registrationVerificationLinkCode = generateVerificationLinkCode();
+        const registrationDate = new Date(); // Add registration date
+
+        const user = new db.User({
+            username: username,
+            password: hash,
+            emails: {
+                email: email,
+                is_primary: true
+            },
+            language: language || 'en', // Set default value to "en" if not provided
+            personalDetails: {},
+            personalAddresses: {},
+            registration: {
+                registration_date: registrationDate,
+                registration_ip: req.ip,
+                registration_key: existingKey._id,
+                registration_code: registrationVerificationCode,
+                registration_code_link: registrationVerificationLinkCode,
+                registration_code_expires: registrationVerificationCodeExpiry
+            }
         });
+
+        await user.save();
+
+        // Mark the registration key as used
+        existingKey.used = true;
+        existingKey.usedDate = new Date();
+        existingKey.userId = user._id;
+        existingKey.userIp = req.ip;
+        await existingKey.save();
+
+        // Send the verification code by email to the user
+        // sendVerificationCodeByEmail(user.email, registrationVerificationCode);
+
+        res.status(201).json({
+            success: true
+        });
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).json({
+            error: 'Internal server error'
+        });
+    }
 });
 
 /**
