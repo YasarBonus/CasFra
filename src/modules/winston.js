@@ -12,7 +12,7 @@ class NotificationTransport extends Transport {
     setImmediate(() => {
       this.emit("logged", info);
     });
-    addNotification('6592e50e3e88dcf3e2da995d', 'email', info.level + ': ' + info.message, info.timestamp + ' # ' + info.level + ': ' + info.message, "email");
+    // addNotification('6592e50e3e88dcf3e2da995d', 'email', info.level + ': ' + info.message, info.timestamp + ' # ' + info.level + ': ' + info.message, "email");
     callback();
   }
 }
