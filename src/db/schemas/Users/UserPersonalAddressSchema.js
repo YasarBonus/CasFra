@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userPersonalAddressesSchema = new mongoose.Schema({
+const userPersonalAddressSchema = new mongoose.Schema({
     street: {
         type: String,
         maxlength: 50
@@ -26,5 +26,3 @@ const userPersonalAddressesSchema = new mongoose.Schema({
         maxlength: 1000
     },
 });
-
-module.exports = userPersonalAddressesSchema;
