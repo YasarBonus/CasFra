@@ -53,7 +53,7 @@
         <script>
             function fetchAndPopulateTenancies() {
                 // Fetch tenancies using AJAX
-                fetch('/api/tenancies')
+                fetch('/api/v1/tenancies')
                     .then(response => response.json())
                     .then(data => {
                         // Populate the table with tenancies data
@@ -81,7 +81,7 @@
             fetchAndPopulateTenancies();
 
             // Fetch tenancy types and populate the dropdown
-            fetch('/api/tenancies/types')
+            fetch('/api/v1/tenancies/types')
                 .then(response => response.json())
                 .then(data => {
                     const tenancyTypeDropdown = document.getElementById('tenancyTypeDropdown');
@@ -106,7 +106,7 @@
                 const type = document.querySelector('#addTenancyForm select[name="type"]').value;
                 const data = { name, type };
 
-                fetch('/api/tenancies/add', {
+                fetch('/api/v1/tenancies/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -59,8 +59,8 @@
                     $('#casinoProvidersTable tbody').empty();
 
                     try {
-                        // Fetch available images from /api/images
-                        const imagesResponse = await fetch('/api/images');
+                        // Fetch available images from /api/v1/images
+                        const imagesResponse = await fetch('/api/v1/images');
                         const images = await imagesResponse.json();
 
                         // Call the function to populate the table with data
@@ -77,8 +77,8 @@
                     updateStatus('loading', 'Fetching providers');
 
                     try {
-                        // Fetch providers from /api/casinos/providers
-                        const providersResponse = await fetch('/api/casinos/providers');
+                        // Fetch providers from /api/v1/casinos/providers
+                        const providersResponse = await fetch('/api/v1/casinos/providers');
                         const data = await providersResponse.json();
 
                         // Sort the providers by priority
@@ -89,8 +89,8 @@
                         // Populate the table with data
                         for (const provider of data) {
                             try {
-                                // Fetch provider details from /api/casinos/providers/:id
-                                const providerDetailsResponse = await fetch('/api/casinos/providers/' + provider._id);
+                                // Fetch provider details from /api/v1/casinos/providers/:id
+                                const providerDetailsResponse = await fetch('/api/v1/casinos/providers/' + provider._id);
                                 const providerDetails = await providerDetailsResponse.json();
 
                                 var row = '<tr id="' + provider._id + '">' +
@@ -209,7 +209,7 @@
                 // Function to add a new provider
                 function addProvider(formData) {
                     $.ajax({
-                        url: '/api/casinos/providers/add',
+                        url: '/api/v1/casinos/providers/add',
                         method: 'POST',
                         data: formData,
                         success: function (data) {
@@ -243,7 +243,7 @@
                 // Function to duplicate a provider
                 function duplicateProvider(providerId) {
                     $.ajax({
-                        url: '/api/casinos/providers/' + providerId + '/duplicate',
+                        url: '/api/v1/casinos/providers/' + providerId + '/duplicate',
                         method: 'POST',
                         success: function (data) {
                             loadInitialData();
@@ -257,7 +257,7 @@
                 // Function to save a provider
                 function saveProvider(providerId) {
                     $.ajax({
-                        url: '/api/casinos/providers/' + providerId,
+                        url: '/api/v1/casinos/providers/' + providerId,
                         method: 'PUT',
                         data: {
                             name: $('#' + providerId + ' td:nth-child(2)').text(),
@@ -286,7 +286,7 @@
                 // Function to delete a provider
                 function deleteProvider(providerId) {
                     $.ajax({
-                        url: '/api/casinos/providers/' + providerId,
+                        url: '/api/v1/casinos/providers/' + providerId,
                         method: 'DELETE',
                         success: function (data) {
                             console.log('Provider deleted successfully');

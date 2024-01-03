@@ -53,7 +53,7 @@
                 $('#casinoTagsTable tbody').empty();
 
                 $.ajax({
-                    url: '/api/casinos/tags',
+                    url: '/api/v1/casinos/tags',
                     method: 'GET',
                     success: function (data) {
                         // Sort the tags by priority
@@ -142,7 +142,7 @@
             // Function to add a new tag
             function addTag(formData) {
                 $.ajax({
-                    url: '/api/casinos/tags',
+                    url: '/api/v1/casinos/tags',
                     method: 'POST',
                     data: formData,
                     success: function (data) {
@@ -176,7 +176,7 @@
             // Function to duplicate a tag
             function duplicateTag(tagId) {
                 $.ajax({
-                    url: '/api/casinos/tags/' + tagId + '/duplicate',
+                    url: '/api/v1/casinos/tags/' + tagId + '/duplicate',
                     method: 'POST',
                     success: function (data) {
                         loadInitialData();
@@ -190,7 +190,7 @@
             // Function to save a tag
             function saveTag(tagId) {
                 $.ajax({
-                    url: '/api/casinos/tags/' + tagId,
+                    url: '/api/v1/casinos/tags/' + tagId,
                     method: 'PUT',
                     data: {
                         name: $('#' + tagId + ' td:nth-child(1)').text(),
@@ -218,7 +218,7 @@
             // Function to delete a tag
             function deleteTag(tagId) {
                 $.ajax({
-                    url: '/api/casinos/tags/' + tagId,
+                    url: '/api/v1/casinos/tags/' + tagId,
                     method: 'DELETE',
                     success: function (data) {
                         console.log('Tag deleted successfully');

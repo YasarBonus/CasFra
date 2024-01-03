@@ -87,7 +87,7 @@
                           console.log('form', formData);
                           $.ajax({
                             type: 'POST',
-                            url: '/api/users/register',
+                            url: '/api/v1/users/register',
                             data: formData,
                             success: function(data) {
                               console.log(data);

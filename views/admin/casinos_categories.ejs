@@ -38,7 +38,7 @@
             $('#casinoCategoriesTable tbody').empty();
 
             $.ajax({
-                url: '/api/casinos/categories',
+                url: '/api/v1/casinos/categories',
                 method: 'GET',
                 success: function(data) {
                     // Sort the categories by priority
@@ -89,7 +89,7 @@
         // Function to duplicate a category
         function duplicateCategory(categoryId) {
             $.ajax({
-                url: '/api/casinos/categories/' + categoryId + '/duplicate',
+                url: '/api/v1/casinos/categories/' + categoryId + '/duplicate',
                 method: 'POST',
                 success: function(data) {
                     loadInitialData();
@@ -103,7 +103,7 @@
         // Function to save a category
         function saveCategory(categoryId) {
             $.ajax({
-                url: '/api/casinos/categories/' + categoryId,
+                url: '/api/v1/casinos/categories/' + categoryId,
                 method: 'PUT',
                 data: {
                     name: $('#' + categoryId + ' td:nth-child(1)').text(),
@@ -131,7 +131,7 @@
         // Function to show delete confirmation dialog
         function showDeleteConfirmation(categoryId) {
             $.ajax({
-                url: '/api/casinos/categories/' + categoryId + '/casinos',
+                url: '/api/v1/casinos/categories/' + categoryId + '/casinos',
                 method: 'GET',
                 success: function(casinos) {
                     var dialogExists = $('.ui.modal.confirmDelete').length;
@@ -175,7 +175,7 @@
         // Function to delete a category
         function deleteCategory(categoryId) {
             $.ajax({
-                url: '/api/casinos/categories/' + categoryId,
+                url: '/api/v1/casinos/categories/' + categoryId,
                 method: 'DELETE',
                 success: function(data) {
                     console.log('Category deleted successfully');

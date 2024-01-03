@@ -9,7 +9,7 @@ const multer = require('multer');
 const fs = require('fs');
 
 // Get all images from MongoDB
-router.get('/images', checkPermissions('manageImages'), (req, res) => {
+router.get('/', checkPermissions('manageImages'), (req, res) => {
     db.Images.find({
         tenancies: req.session.user.tenancy
       })
@@ -31,7 +31,7 @@ router.get('/images', checkPermissions('manageImages'), (req, res) => {
   });
   
   // Get all images of a specific category
-  router.get('/images/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
+  router.get('/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
     const categoryId = req.params.categoryId;
     const userTenancy = req.session.user.tenancy;
   
@@ -114,7 +114,7 @@ router.get('/images', checkPermissions('manageImages'), (req, res) => {
   });
   
   // Edit image
-  router.put('/images/:id', checkPermissions('manageImages'), (req, res) => {
+  router.put('/:id', checkPermissions('manageImages'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -170,7 +170,7 @@ router.get('/images', checkPermissions('manageImages'), (req, res) => {
   });
   
   // Delete image from MongoDB and from the file system by ID
-  router.delete('/images/:id', checkPermissions('manageImages'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageImages'), (req, res) => {
     const id = req.params.id;
     const {
       tenancy

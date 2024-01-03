@@ -51,7 +51,7 @@
             $('#casinoPaymentMethodsTable tbody').empty();
 
             $.ajax({
-                url: '/api/casinos/paymentmethods',
+                url: '/api/v1/casinos/paymentmethods',
                 method: 'GET',
                 success: function(data) {
                     // Sort the payment methods by priority
@@ -69,9 +69,9 @@
                             '<div class="default text">Select an image</div>' +
                             '<div class="menu">';
 
-                        // Fetch available images from /api/images
+                        // Fetch available images from /api/v1/images
                         $.ajax({
-                            url: '/api/images',
+                            url: '/api/v1/images',
                             method: 'GET',
                             success: function(images) {
                                 // Add options to the dropdown
@@ -139,7 +139,7 @@
         // Function to duplicate a payment method
         function duplicatePaymentMethod(paymentMethodId) {
             $.ajax({
-                url: '/api/casinos/paymentmethods/' + paymentMethodId + '/duplicate',
+                url: '/api/v1/casinos/paymentmethods/' + paymentMethodId + '/duplicate',
                 method: 'POST',
                 success: function(data) {
                     loadInitialData();
@@ -153,7 +153,7 @@
         // Function to save a payment method
         function savePaymentMethod(paymentMethodId) {
             $.ajax({
-                url: '/api/casinos/paymentmethods/' + paymentMethodId,
+                url: '/api/v1/casinos/paymentmethods/' + paymentMethodId,
                 method: 'PUT',
                 data: {
                     name: $('#' + paymentMethodId + ' td:nth-child(2)').text(),
@@ -182,7 +182,7 @@
         // Function to delete a payment method
         function deletePaymentMethod(paymentMethodId) {
             $.ajax({
-                url: '/api/casinos/paymentmethods/' + paymentMethodId,
+                url: '/api/v1/casinos/paymentmethods/' + paymentMethodId,
                 method: 'DELETE',
                 success: function(data) {
                     console.log('Payment method deleted successfully');

@@ -17,9 +17,9 @@
                             <label for="categoryDropdown">Select a category:</label>
                             <select id="categoryDropdown" name="category">
                                 <option value="" disabled selected>Select a category</option>
-                                <!-- Fetch dropdown data from /api/images/categories -->
+                                <!-- Fetch dropdown data from /api/v1/images/categories -->
                                 <script>
-                                    fetch('/api/images/categories')
+                                    fetch('/api/v1/images/categories')
                                         .then(response => response.json())
                                         .then(categories => {
                                             categories.forEach(category => {
@@ -52,7 +52,7 @@
         <script>
             // Function to fetch and display existing images
             function fetchImages() {
-                fetch('/api/images')
+                fetch('/api/v1/images')
                     .then(response => response.json())
                     .then(data => {
                         // Clear existing cards
@@ -90,8 +90,8 @@
                             categoryDropdown.id = 'categoryDropdown';
                             meta.appendChild(categoryDropdown);
 
-                            // Fetch dropdown data from /api/images/categories
-                            fetch('/api/images/categories')
+                            // Fetch dropdown data from /api/v1/images/categories
+                            fetch('/api/v1/images/categories')
                                 .then(response => response.json())
                                 .then(categories => {
                                     // Add a placeholder option
@@ -108,7 +108,7 @@
                                         option.text = category.name;
                                         categoryDropdown.appendChild(option);
 
-                                        // Pre-select category based on _id from /api/images/:id/category
+                                        // Pre-select category based on _id from /api/v1/images/:id/category
                                         if (category._id === image.category) {
                                             option.selected = true;
                                         }
@@ -161,7 +161,7 @@
                                 // Save the category
                                 var newCategory = categoryDropdown.value;
                                 // Send a request to update the image name and category
-                                fetch('/api/images/' + image._id, {
+                                fetch('/api/v1/images/' + image._id, {
                                         method: 'PUT',
                                         headers: {
                                             'Content-Type': 'application/json'
@@ -191,7 +191,7 @@
                                 // Show a confirm dialog before deleting the image
                                 if (confirm('Are you sure you want to delete this image?')) {
                                     // Send a request to delete the image
-                                    fetch('/api/images/' + image._id, {
+                                    fetch('/api/v1/images/' + image._id, {
                                             method: 'DELETE'
                                         })
                                         .then(response => response.json())
@@ -226,7 +226,7 @@
                 // Append the category to the formData object
                 formData.append('categoryId', category);
 
-                fetch('/api/images', {
+                fetch('/api/v1/images', {
                         method: 'POST',
                         body: formData
                     })

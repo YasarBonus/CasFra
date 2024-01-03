@@ -38,7 +38,7 @@
             $('#imageCategoriesTable tbody').empty();
 
             $.ajax({
-                url: '/api/images/categories',
+                url: '/api/v1/images/categories',
                 method: 'GET',
                 success: function(data) {
                     // Sort the categories by priority
@@ -89,7 +89,7 @@
         // Function to duplicate a category
         function duplicateCategory(categoryId) {
             $.ajax({
-                url: '/api/images/categories/' + categoryId + '/duplicate',
+                url: '/api/v1/images/categories/' + categoryId + '/duplicate',
                 method: 'POST',
                 success: function(data) {
                     loadInitialData();
@@ -103,7 +103,7 @@
         // Function to save a category
         function saveCategory(categoryId) {
             $.ajax({
-                url: '/api/images/categories/' + categoryId,
+                url: '/api/v1/images/categories/' + categoryId,
                 method: 'PUT',
                 data: {
                     name: $('#' + categoryId + ' td:nth-child(1)').text(),
@@ -131,7 +131,7 @@
         // Function to show delete confirmation dialog
         function showDeleteConfirmation(categoryId) {
             $.ajax({
-                url: '/api/images/categories/' + categoryId + '/images',
+                url: '/api/v1/images/categories/' + categoryId + '/images',
                 method: 'GET',
                 success: function(images) {
                     var dialogExists = $('.ui.modal.confirmDelete').length;
@@ -175,7 +175,7 @@
         // Function to delete a category
         function deleteCategory(categoryId) {
             $.ajax({
-                url: '/api/images/categories/' + categoryId,
+                url: '/api/v1/images/categories/' + categoryId,
                 method: 'DELETE',
                 success: function(data) {
                     console.log('Category deleted successfully');
@@ -234,7 +234,7 @@
             var priority = $('input[name="priority"]').val();
 
             $.ajax({
-                url: '/api/images/categories/add',
+                url: '/api/v1/images/categories/add',
                 method: 'POST',
                 data: {
                     name: name,

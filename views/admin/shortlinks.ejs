@@ -83,7 +83,7 @@
             $('#shortlinksTable tbody').empty();
 
             $.ajax({
-                url: '/api/shortlinks',
+                url: '/api/v1/shortlinks',
                 method: 'GET',
                 success: function (data) {
                     // Sort the links by created date
@@ -133,7 +133,7 @@
         // Function to save a link
         function saveLink(id, shortUrl, url, description) {
             $.ajax({
-                url: '/api/shortlinks/' + id,
+                url: '/api/v1/shortlinks/' + id,
                 method: 'PUT',
                 data: {
                     shortUrl: shortUrl,
@@ -164,7 +164,7 @@
         // Function to add a link
         function addLink(shortUrl, url, description) {
             $.ajax({
-                url: '/api/shortlinks',
+                url: '/api/v1/shortlinks',
                 method: 'POST',
                 data: {
                     shortUrl: shortUrl,
@@ -210,7 +210,7 @@
         // Function to delete a link
         function deleteLink(id) {
             $.ajax({
-                url: '/api/shortlinks/' + id,
+                url: '/api/v1/shortlinks/' + id,
                 method: 'DELETE',
                 success: function (data) {
                     console.log('Success:', data);

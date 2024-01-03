@@ -49,7 +49,7 @@
             // Function to load registration keys
             function loadRegistrationKeys() {
                 $.ajax({
-                    url: '/api/registrationkeys',
+                    url: '/api/v1/registrationkeys',
                     type: 'GET',
                     success: function(data) {
                         // Clear existing rows
@@ -74,7 +74,7 @@
                 // Button to generate keys clicked
                 $('#generate-key-button').click(function() {
                     $.ajax({
-                        url: '/api/registrationkeys/generate',
+                        url: '/api/v1/registrationkeys/generate',
                         type: 'POST',
                         success: function(data) {
                             // Reload keys
@@ -94,7 +94,7 @@
 
                     // Delete key
                     $.ajax({
-                        url: '/api/registrationkeys',
+                        url: '/api/v1/registrationkeys',
                         type: 'DELETE',
                         data: {
                             id: id

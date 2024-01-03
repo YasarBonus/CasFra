@@ -19,7 +19,7 @@
 </html>
 
 <script>
-    fetch('/api/shortlinks/<%= shortLink %>/statistics')
+    fetch('/api/v1/shortlinks/<%= shortLink %>/statistics')
         .then(response => response.json())
         .then(data => {
             // Format and display the data

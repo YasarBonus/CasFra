@@ -59,8 +59,8 @@
                     $('#casinoLicensesTable tbody').empty();
 
                     try {
-                        // Fetch available images from /api/images
-                        const imagesResponse = await fetch('/api/images');
+                        // Fetch available images from /api/v1/images
+                        const imagesResponse = await fetch('/api/v1/images');
                         const images = await imagesResponse.json();
 
                         // Call the function to populate the table with data
@@ -77,8 +77,8 @@
                     updateStatus('loading', 'Fetching licenses');
 
                     try {
-                        // Fetch licenses from /api/casinos/licenses
-                        const licensesResponse = await fetch('/api/casinos/licenses');
+                        // Fetch licenses from /api/v1/casinos/licenses
+                        const licensesResponse = await fetch('/api/v1/casinos/licenses');
                         const data = await licensesResponse.json();
 
                         // Sort the licenses by priority
@@ -89,8 +89,8 @@
                         // Populate the table with data
                         for (const license of data) {
                             try {
-                                // Fetch license details from /api/casinos/licenses/:id
-                                const licenseDetailsResponse = await fetch('/api/casinos/licenses/' + license._id);
+                                // Fetch license details from /api/v1/casinos/licenses/:id
+                                const licenseDetailsResponse = await fetch('/api/v1/casinos/licenses/' + license._id);
                                 const licenseDetails = await licenseDetailsResponse.json();
 
                                 var row = '<tr id="' + license._id + '">' +
@@ -205,7 +205,7 @@
                 // Function to add a new license
                 function addLicense(formData) {
                     $.ajax({
-                        url: '/api/casinos/licenses/add',
+                        url: '/api/v1/casinos/licenses/add',
                         method: 'POST',
                         data: formData,
                         success: function (data) {
@@ -240,7 +240,7 @@
                 function duplicateLicense(licenseId) {
                     updateStatus('loading', 'Duplicating license');
                     $.ajax({
-                        url: '/api/casinos/licenses/' + licenseId + '/duplicate',
+                        url: '/api/v1/casinos/licenses/' + licenseId + '/duplicate',
                         method: 'POST',
                         success: function (data) {
                             loadInitialData();
@@ -256,7 +256,7 @@
                 function saveLicense(licenseId) {
                     updateStatus('loading', 'Saving license');
                     $.ajax({
-                        url: '/api/casinos/licenses/' + licenseId,
+                        url: '/api/v1/casinos/licenses/' + licenseId,
                         method: 'PUT',
                         data: {
                             name: $('#' + licenseId + ' td:nth-child(2)').text(),
@@ -287,7 +287,7 @@
                 // Function to delete a license
                 function deleteLicense(licenseId) {
                     $.ajax({
-                        url: '/api/casinos/licenses/' + licenseId,
+                        url: '/api/v1/casinos/licenses/' + licenseId,
                         method: 'DELETE',
                         success: function (data) {
                             console.log('License deleted successfully');

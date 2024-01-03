@@ -38,7 +38,7 @@
             $('#casinoFeaturesTable tbody').empty();
 
             $.ajax({
-                url: '/api/casinos/features',
+                url: '/api/v1/casinos/features',
                 method: 'GET',
                 success: function(data) {
                     // Sort the features by priority
@@ -89,7 +89,7 @@
         // Function to duplicate a feature
         function duplicateFeature(featureId) {
             $.ajax({
-                url: '/api/casinos/features/' + featureId + '/duplicate',
+                url: '/api/v1/casinos/features/' + featureId + '/duplicate',
                 method: 'POST',
                 success: function(data) {
                     loadInitialData();
@@ -103,7 +103,7 @@
         // Function to save a feature
         function saveFeature(featureId) {
             $.ajax({
-                url: '/api/casinos/features/' + featureId,
+                url: '/api/v1/casinos/features/' + featureId,
                 method: 'PUT',
                 data: {
                     name: $('#' + featureId + ' td:nth-child(1)').text(),
@@ -131,7 +131,7 @@
         // Function to show delete confirmation dialog
         function showDeleteConfirmation(featureId) {
             $.ajax({
-                url: '/api/casinos/features/' + featureId + '/casinos',
+                url: '/api/v1/casinos/features/' + featureId + '/casinos',
                 method: 'GET',
                 success: function(casinos) {
                     var dialogExists = $('.ui.modal.confirmDelete').length;
@@ -175,7 +175,7 @@
         // Function to delete a feature
         function deleteFeature(featureId) {
             $.ajax({
-                url: '/api/casinos/features/' + featureId,
+                url: '/api/v1/casinos/features/' + featureId,
                 method: 'DELETE',
                 success: function(data) {
                     console.log('Feature deleted successfully');

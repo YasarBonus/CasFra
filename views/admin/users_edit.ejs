@@ -53,9 +53,9 @@
     <%- include('../partials/footer') %>
 
     <script>
-        // Populate the tenancy dropdown from /api/tenancies
+        // Populate the tenancy dropdown from /api/v1/tenancies
         const tenancyDropdown = document.getElementById('tenancyDropdown');
-        const tenanciesUrl = '/api/tenancies';
+        const tenanciesUrl = '/api/v1/tenancies';
 
         async function populateTenancyDropdown() {
             updateStatus('loading', 'Fetching available tenancies');
@@ -77,9 +77,9 @@
 
         populateTenancyDropdown();
 
-        // Pre-fill the form from /api/users/:userId
+        // Pre-fill the form from /api/v1/users/:userId
         const userId = '<%= userId %>'; // Replace with the actual user ID
-        const apiUrl = `/api/users/${userId}`;
+        const apiUrl = `/api/v1/users/${userId}`;
 
         async function prefillForm() {
             updateStatus('loading', 'Fetching user data');
@@ -107,7 +107,7 @@
         }
 
 
-        // Submit the form fields to /api/users/:userId
+        // Submit the form fields to /api/v1/users/:userId
         const form = document.getElementById('editUserForm');
 
         form.addEventListener('submit', async (event) => {
@@ -124,7 +124,7 @@
                 tenancies: selectedTenancies,
             }
             console.log('Form data:', formData);
-            const submitUrl = `/api/users/${userId}`;
+            const submitUrl = `/api/v1/users/${userId}`;
 
             try {
                 const response = await fetch(submitUrl, {
