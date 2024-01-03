@@ -88,7 +88,7 @@ async function sendNotificationEmails() {
       sendNotificationEmails();
     }
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
     // Handle the error here
   }
 }
