@@ -101,7 +101,7 @@
 
         // AJAX function to POST the new password
         $.ajax({
-          url: '/api/user/password',
+          url: '/api/v1/user/password',
           method: 'POST',
           data: {
             currentPassword: currentPassword,
@@ -145,7 +145,7 @@
         console.log('form', formData);
         $.ajax({
           type: 'POST',
-          url: '/api/user',
+          url: '/api/v1/user',
           data: formData,
           success: function (data) {
             console.log(data);
@@ -171,7 +171,7 @@
         showLoader('formLoaderAccountDetails', 'loading');
 
         $(document).ready(function () {
-          $.get('/api/user', function (data) {
+          $.get('/api/v1/user', function (data) {
             console.log(data);
             $('input[name="username"]').val(data.username);
             $('input[name="nickname"]').val(data.nickname);
@@ -190,7 +190,7 @@
         showLoader('formLoaderPersonalDetails', 'loading');
 
         $(document).ready(function () {
-          $.get('/api/user/personal', function (data) {
+          $.get('/api/v1/user/personal', function (data) {
             console.log(data);
             $('input[name="personalFirstname"]').val(data.firstname);
             $('input[name="personalMiddlename"]').val(data.middlename);
