@@ -419,15 +419,12 @@ const editUserDetails = (req, res) => {
     db.User.findByIdAndUpdate(userId, {
             username,
             nickname,
-            emails: [{
-                    email: email,
-                    is_primary: true
-                },
-                {
-                    email: 'system@treudler.net',
-                    is_primary: false
-                }
-            ]
+            emails: {
+                email: email,
+                is_primary: true,
+                is_confirmed: false,
+            },
+            
         })
         .then(() => {
             res.json({
