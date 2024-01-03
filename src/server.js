@@ -3,10 +3,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const helmet = require('helmet');
+const bodyParser = require('body-parser');
 
-const notificator = require('./services/notificationService.js');
 const checkPermissions = require('./middlewares/permissionMiddleware.js');
-const addNotification = notificator.addNotification;
 
 // Error Handler
 const errorHandler = require('./modules/errorHandler.js');
@@ -44,12 +43,15 @@ io.on('connection', (socket) => {
 app.use(express.static(path.join('public')));
 app.use(helmet());
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
-const session = require('express-session');
-
+// Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -64,6 +66,7 @@ app.use((req, res, next) => {
 
 // Session Storage
 const MongoStore = require('connect-mongo');
+const session = require('express-session');
 
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
@@ -142,14 +145,12 @@ const imagesCategoriesRoutes = require('./routes/Images/imagesCategoriesRoutes.j
 app.use(pathV1 + '/images/categories', imagesCategoriesRoutes);
 
 const shortLinksRoutes = require('./routes/shortLinksRoutes.js');
-app.use(pathV1 + '/shortlinks', shortLinksRoutes);  
+app.use(pathV1 + '/shortlinks', shortLinksRoutes);
 
 
 // const proxmoxRoutes = require('./routes/proxmoxRoutes.js');
 // app.use(pathV1 + '/proxmox', proxmoxRoutes);
 
-
-//#region Routes
 // Routes for rendering views
 app.get('/', (req, res) => {
   res.redirect('/dashboard');
@@ -450,8 +451,14 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
   }
 });
 
+// Swagger API Documentation
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const swaggerOptions = require('./config/SwaggerOptions.js');
 
-//#endregion Routes
+const specs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 
 // Function to delete unused registration keys older than 1 hour
 function deleteUnusedRegistrationKeys() {
@@ -707,14 +714,6 @@ async function updateShortLinksStatistics() {
   }
 }
 
-// Function to generate a random priority
-// TODO: Move this function to a separate file
-function generateRandomPriority() {
-  const random = Math.floor(Math.random() * 100000000000000000000);
-  return random;
-}
-
-
 // Call the function on startup, then every hour
 updateShortLinksStatistics();
 setInterval(updateShortLinksStatistics, 60 * 60 * 1000);
@@ -733,24 +732,7 @@ setInterval(setImageUrl, 60 * 60 * 1000);
 
 checkUnverifiedEmails();
 
-// Swagger API Documentation
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-const swaggerOptions = require('./config/SwaggerOptions.js');
 
-const specs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
-// Close the MongoDB connection when the server is shut down
-process.on('SIGINT', () => {
-  mongoose.connection.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Closed the MongoDB connection.');
-    process.exit(0);
-  });
-});
 
 // Route zum Umleiten von kurzen URLs
 app.get('/:shortUrl', async (req, res, next) => {
@@ -787,10 +769,19 @@ app.get('/:shortUrl', async (req, res, next) => {
 // Error handler
 app.use(errorHandler);
 
+// Close the MongoDB connection when the server is shut down
+process.on('SIGINT', () => {
+  mongoose.connection.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Closed the MongoDB connection.');
+    process.exit(0);
+  });
+});
+
 // Start the server
-
 const port = 3000;
-
 server.listen(port, () => {
   logger.info(`Server is listening at http://localhost:${port}`);
 });
