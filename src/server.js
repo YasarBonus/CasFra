@@ -45,11 +45,17 @@ app.use(express.static(path.join('public')));
 app.use(helmet());
 
 const scriptSrcUrls = [
-    "https://analytics.yasarbonus.com/",
-    "https://kit.fontawesome.com/",
-    "https://cdn.jsdelivr.net/",
-    "https://cdn.socket.io/"
+  "https://analytics.yasarbonus.com/",
+  "https://kit.fontawesome.com/",
+  "https://cdn.jsdelivr.net/",
+  "https://cdn.socket.io/",
+  "'unsafe-inline'"
 ];
+
+const scriptSrcAttr = [
+  "'unsafe-inline'"
+];
+
 const styleSrcUrls = [
     "https://cdn.jsdelivr.net/",
 ];
@@ -63,23 +69,24 @@ const fontSrcUrls = [
   "data:",
 ];
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: [],
-            connectSrc: ["'self'", ...connectSrcUrls],
-            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-            workerSrc: ["'self'", "blob:"],
-            objectSrc: [],
-            imgSrc: [
-                "'self'",
-                "blob:",
-                "data:",
-                "https://cdn.treudler.net/" ,
-            ],
-            fontSrc: ["'self'", ...fontSrcUrls],
-        },
-    })
+  helmet.contentSecurityPolicy({
+      directives: {
+          defaultSrc: [],
+          connectSrc: ["'self'", ...connectSrcUrls],
+          scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+          scriptSrcAttr: ["'self'", "'unsafe-inline'", ...scriptSrcAttr],
+          styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+          workerSrc: ["'self'", "blob:"],
+          objectSrc: [],
+          imgSrc: [
+              "'self'",
+              "blob:",
+              "data:",
+              "https://cdn.treudler.net/" ,
+          ],
+          fontSrc: ["'self'", ...fontSrcUrls],
+      },
+  })
 );
 
 app.use(bodyParser.json());
