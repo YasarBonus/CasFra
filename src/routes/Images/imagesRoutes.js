@@ -60,11 +60,10 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
   // Set up multer storage
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'public/img/images'); // Set the destination folder for uploaded images
+      cb(null, '../../../public/img/images');
     },
     filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop()); // Set the filename for the uploaded image
+      cb(null, Date.now() + '-' + file.originalname);
     }
   });
   
@@ -74,7 +73,7 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
   });
   
   // Upload image and save it to the database
-  router.post('/images', checkPermissions('manageImages'), upload.single('image'), (req, res) => {
+  router.post('/', checkPermissions('manageImages'), upload.single('image'), (req, res) => {
     const image = req.file;
   
     if (!image) {
@@ -188,7 +187,7 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
         }
   
         // Delete the image from the file system
-        fs.unlinkSync(`public/img/images/${deletedImage.filename}`);
+        fs.unlinkSync(`../../../public/img/images/${deletedImage.filename}`);
   
         res.json({
           message: 'Image deleted successfully'
