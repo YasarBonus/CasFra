@@ -46,7 +46,7 @@
             const name = document.querySelector('input[name="newCasinoName"]').value;
 
             // Send a POST request to the API to add the new casino
-            fetch('/api/casinos', {
+            fetch('/api/v1/casinos', {
                     method: 'POST',
                     body: JSON.stringify({
                         name,
@@ -69,7 +69,7 @@
         }
 
         function fetchCasinos() {
-            fetch('/api/casinos')
+            fetch('/api/v1/casinos')
                 .then(response => response.json())
                 .then(casinos => {
                     // Sort the casinos by priority
@@ -140,7 +140,7 @@
             console.log('ID2:' + id2);
 
             // Send a POST request to swap the priorities
-            fetch('/api/casinos/priority/swap', {
+            fetch('/api/v1/casinos/priority/swap', {
                 method: 'PUT',
                 body: JSON.stringify({
                     id1,
@@ -170,7 +170,7 @@
 
         function duplicateCasino(casinoId) {
             // Send a POST request to duplicate the casino
-            fetch(`/api/casinos/${casinoId}/duplicate`, {
+            fetch(`/api/v1/casinos/${casinoId}/duplicate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -215,7 +215,7 @@
 
         function deleteCasino(casinoId) {
             // Send a DELETE request to the API
-            fetch(`/api/casinos/` + casinoId, {
+            fetch(`/api/v1/casinos/` + casinoId, {
                     method: 'DELETE',
                 })
                 .then(response => response.json())
@@ -234,7 +234,7 @@
 
         function toggleActive(casinoId, active) {
             // Send a PUT request to the API to toggle the active state
-            fetch(`/api/casinos/${casinoId}/toggleActive`, {
+            fetch(`/api/v1/casinos/${casinoId}/toggleActive`, {
                     method: 'PUT',
                     body: JSON.stringify({
                         active: !active
