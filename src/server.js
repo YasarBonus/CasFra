@@ -47,17 +47,18 @@ app.use(helmet());
 const scriptSrcUrls = [
     "https://analytics.yasarbonus.com/",
     "https://kit.fontawesome.com/",
-    "https://cdn.jsdelivr.net",
+    "https://cdn.jsdelivr.net/",
+    "https://cdn.socket.io/"
 ];
 const styleSrcUrls = [
-    "https://cdn.jsdelivr.net",
+    "https://cdn.jsdelivr.net/",
 ];
 const connectSrcUrls = [
   "https://ka-f.fontawesome.com/",
 
 ];
 const fontSrcUrls = [
-  "https://cdn.jsdelivr.net",
+  "https://cdn.jsdelivr.net/",
   "https://ka-f.fontawesome.com/",
   "data:",
 ];
