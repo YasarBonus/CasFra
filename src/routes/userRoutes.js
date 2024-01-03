@@ -415,7 +415,8 @@ const editUserDetails = (req, res) => {
         email,
         first_name, second_name, last_name,
         nationality, date_of_birth, place_of_birth,
-        mobile, phone, fax
+        mobile_phone, landline_phone, telefax,
+        street, street_number, city, country, zip_code, additional_info,
     } = req.body;
 
     db.User.findByIdAndUpdate(userId, {
@@ -433,12 +434,17 @@ const editUserDetails = (req, res) => {
                 nationality: nationality,
                 date_of_birth: date_of_birth,
                 place_of_birth: place_of_birth,
-                mobile: mobile,
-                phone: phone,
-                fax: fax,
+                mobile_phone: mobile_phone,
+                landline_phone: landline_phone,
+                telefax: telefax,
             },
             personal_address: {
-
+                street: street,
+                street_number: street_number,
+                city: city,
+                country: country,
+                zip_code: zip_code,
+                additional_info: additional_info,
             },
             
         })
