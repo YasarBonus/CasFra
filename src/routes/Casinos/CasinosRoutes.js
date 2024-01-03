@@ -89,7 +89,7 @@ router.get('/', checkPermissions('manageCasinos'), async (req, res) => {
   });
   
   // Create a new casino
-  router.post('/casinos', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/', checkPermissions('manageCasinos'), (req, res) => {
     const {
       name
     } = req.body; // Get the name and location from the request body
