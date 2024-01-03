@@ -24,7 +24,7 @@
 
         function getCasino(casinoId) {
             // Fetch the casino details from the API
-            fetch(`/api/casinos/${casinoId}`)
+            fetch(`/api/v1/casinos/${casinoId}`)
                 .then(response => response.json())
                 .then(casino => {
                     const selectedCategories = casino.categories;
@@ -240,7 +240,7 @@
         }
 
         function getAvailableImages(selectedImage) {
-            fetch('/api/images')
+            fetch('/api/v1/images')
                 .then(response => response.json())
                 .then(images => {
                     const imageDropdown = document.getElementById('imageDropdown');
@@ -274,7 +274,7 @@
         }
 
         function getAvailableCategories(selectedCategories) {
-            fetch('/api/casinos/categories')
+            fetch('/api/v1/casinos/categories')
                 .then(response => response.json())
                 .then(categories => {
                     const categoriesDropdown = document.getElementById('categoriesDropdown');
@@ -299,7 +299,7 @@
 
 
         function getAvailableWagerTypes(selectedWagerTypes) {
-            fetch('/api/casinos/wagertypes')
+            fetch('/api/v1/casinos/wagertypes')
                 .then(response => response.json())
                 .then(wagerTypes => {
                     const wagerTypeDropdown = document.getElementById('wagerTypeDropdown');
@@ -323,7 +323,7 @@
         }
 
         function getAvailableFeatures(selectedFeatures) {
-            fetch('/api/casinos/features')
+            fetch('/api/v1/casinos/features')
                 .then(response => response.json())
                 .then(features => {
                     const featuresDropdown = document.getElementById('featuresDropdown');
@@ -347,7 +347,7 @@
         }
 
         function getAvailableTags(selectedTags) {
-            fetch('/api/casinos/tags')
+            fetch('/api/v1/casinos/tags')
                 .then(response => response.json())
                 .then(tags => {
                     const tagsDropdown = document.getElementById('tagsDropdown');
@@ -371,7 +371,7 @@
         }
 
         function getAvailableProviders(selectedProviders) {
-            fetch('/api/casinos/providers')
+            fetch('/api/v1/casinos/providers')
                 .then(response => response.json())
                 .then(providers => {
                     const providersDropdown = document.getElementById('providersDropdown');
@@ -395,7 +395,7 @@
         }
 
         function getAvailableLicenses(selectedLicenses) {
-            fetch('/api/casinos/licenses')
+            fetch('/api/v1/casinos/licenses')
                 .then(response => response.json())
                 .then(licenses => {
                     const licensesDropdown = document.getElementById('licensesDropdown');
@@ -419,7 +419,7 @@
         }
 
         function getAvailablePaymentMethods(selectedPaymentMethods) {
-            fetch('/api/casinos/paymentmethods')
+            fetch('/api/v1/casinos/paymentmethods')
                 .then(response => response.json())
                 .then(paymentMethods => {
                     const paymentMethodsDropdown = document.getElementById('paymentMethodsDropdown');
@@ -444,7 +444,7 @@
         }
 
         function getAvailableIndividualFeatures(casinoId, selectedIndividualFeatures) {
-            fetch('/api/casinos/' + casinoId + '/individualfeatures')
+            fetch('/api/v1/casinos/' + casinoId + '/individualfeatures')
                 .then(response => response.json())
                 .then(individualFeatures => {
                     const individualFeaturesDropdown = document.getElementById('individualFeaturesDropdown');
@@ -469,7 +469,7 @@
         }
 
         function getAvailableIndividualBonuses(casinoId, selectedIndividualBonuses, selectedDisplayBonus) {
-            fetch('/api/casinos/' + casinoId + '/individualbonuses')
+            fetch('/api/v1/casinos/' + casinoId + '/individualbonuses')
                 .then(response => response.json())
                 .then(individualBonuses => {
                     const individualBonusesDropdown = document.getElementById('individualBonusesDropdown');
@@ -572,7 +572,7 @@
 
 
             // Send a PUT request to the API with the updated casino data
-            fetch(`/api/casinos/${casinoId}`, {
+            fetch(`/api/v1/casinos/${casinoId}`, {
                     method: 'PUT',
                     body: JSON.stringify({
                         name,
@@ -653,7 +653,7 @@
             const description = document.querySelector('textarea[name="description"]').value;
 
             // Send a POST request to the API to add the new casino
-            fetch('/api/casinos', {
+            fetch('/api/v1/casinos', {
                     method: 'POST',
                     body: JSON.stringify({
                         name,
@@ -698,7 +698,7 @@
 
         function deleteCasino(casinoId) {
             // Send a DELETE request to the API
-            fetch(`/api/casinos`, {
+            fetch(`/api/v1/casinos`, {
                     method: 'DELETE',
                     body: JSON.stringify({
                         id: casinoId
@@ -722,7 +722,7 @@
 
         function toggleActive(casinoId, active) {
             // Send a PUT request to the API to toggle the active state
-            fetch(`/api/casinos/${casinoId}/toggleActive`, {
+            fetch(`/api/v1/casinos/${casinoId}/toggleActive`, {
                     method: 'PUT',
                     body: JSON.stringify({
                         active: !active
@@ -780,7 +780,7 @@
 
 
             // Fetch individual features for the specific casino
-            fetch(`/api/casinos/${casinoId}/individualfeatures`)
+            fetch(`/api/v1/casinos/${casinoId}/individualfeatures`)
                 .then(response => response.json())
                 .then(features => {
                     const tbody = modal.querySelector('tbody');
@@ -805,7 +805,7 @@
                             const description = tr.querySelector('td:nth-child(2)').textContent;
 
                             // Send a PUT request to update the individual feature
-                            fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                            fetch(`/api/v1/casinos/${casinoId}/individualfeatures/${featureId}`, {
                                     method: 'PUT',
                                     body: JSON.stringify({
                                         name: name,
@@ -834,7 +834,7 @@
                             const featureId = tr.dataset.featureId;
 
                             // Send a DELETE request to delete the individual feature
-                            fetch(`/api/casinos/${casinoId}/individualfeatures/${featureId}`, {
+                            fetch(`/api/v1/casinos/${casinoId}/individualfeatures/${featureId}`, {
                                     method: 'DELETE',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -903,7 +903,7 @@
         // Function to add an individual feature to a casino
         function addIndividualCasinoFeature(casinoId, featureName) {
             $.ajax({
-                url: '/api/casinos/' + casinoId + '/individualfeatures',
+                url: '/api/v1/casinos/' + casinoId + '/individualfeatures',
                 method: 'POST',
                 data: {
                     name: featureName
@@ -949,7 +949,7 @@
 
 
             // Fetch individual bonuses for the specific casino
-            fetch(`/api/casinos/${casinoId}/individualbonuses`)
+            fetch(`/api/v1/casinos/${casinoId}/individualbonuses`)
                 .then(response => response.json())
                 .then(bonuses => {
                     const tbody = modal.querySelector('tbody');
@@ -974,7 +974,7 @@
                             const description = tr.querySelector('td:nth-child(2)').textContent;
 
                             // Send a PUT request to update the individual bonus
-                            fetch(`/api/casinos/${casinoId}/individualbonuses/${bonusId}`, {
+                            fetch(`/api/v1/casinos/${casinoId}/individualbonuses/${bonusId}`, {
                                     method: 'PUT',
                                     body: JSON.stringify({
                                         name: name,
@@ -1003,7 +1003,7 @@
                             const bonusId = tr.dataset.bonusId;
 
                             // Send a DELETE request to delete the individual bonus
-                            fetch(`/api/casinos/${casinoId}/individualbonuses/${bonusId}`, {
+                            fetch(`/api/v1/casinos/${casinoId}/individualbonuses/${bonusId}`, {
                                     method: 'DELETE',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -1071,7 +1071,7 @@
 
         // Function to add an individual bonus to a casino
         function addIndividualCasinoBonus(casinoId, bonusName) {
-            fetch(`/api/casinos/${casinoId}/individualbonuses`, {
+            fetch(`/api/v1/casinos/${casinoId}/individualbonuses`, {
                 method: 'POST',
                 body: JSON.stringify({
                     name: bonusName
