@@ -5,7 +5,7 @@ const userPersonalAddressSchema = new mongoose.Schema({
         type: String,
         maxlength: 50
     },
-    street_number: {
+    house_number: {
         type: String,
         maxlength: 50
     },
