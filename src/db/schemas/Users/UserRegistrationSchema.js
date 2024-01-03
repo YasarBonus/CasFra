@@ -17,8 +17,15 @@ const userRegistrationSchema = new mongoose.Schema({
         type: String,
         maxlength: 50
     },
+    registration_code_link: {
+        type: String,
+        maxlength: 20
+    },
     registration_code_expires: {
         type: Date,
         maxlength: 50
+    },
+    registration_completed: {
+        type: Date,
     },
 });
