@@ -41,7 +41,6 @@ io.on('connection', (socket) => {
 
 // Middleware
 
-
 app.use(express.static(path.join('public')));
 app.use(helmet());
 
