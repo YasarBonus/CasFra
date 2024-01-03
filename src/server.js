@@ -153,9 +153,6 @@ app.use(pathV1 + '/user', userRoutes);
 const usersRoutes = require('./routes/usersRoutes.js');
 app.use(pathV1 + '/users', usersRoutes);
 
-const casinosRoutes = require('./routes/Casinos/casinosRoutes.js');
-app.use(pathV1 + '/casinos', casinosRoutes);
-
 const casinosCategoriesRoutes = require('./routes/Casinos/casinosCategoriesRoutes.js');
 app.use(pathV1 + '/casinos/categories', casinosCategoriesRoutes);
 
@@ -176,6 +173,9 @@ app.use(pathV1 + '/casinos/wagertypes', casinosWagerTypesRoutes);
 
 const casinosTagsRoutes = require('./routes/Casinos/casinosTagsRoutes.js');
 app.use(pathV1 + '/casinos/tags', casinosTagsRoutes);
+
+const casinosRoutes = require('./routes/Casinos/casinosRoutes.js');
+app.use(pathV1 + '/casinos', casinosRoutes);
 
 const imagesRoutes = require('./routes/Images/imagesRoutes.js');
 app.use(pathV1 + '/images', imagesRoutes);
