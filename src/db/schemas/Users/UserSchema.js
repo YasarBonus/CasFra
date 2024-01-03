@@ -32,9 +32,6 @@ const UserSchema = new mongoose.Schema({
       required: true,
       minlength: 8
     },
-    groupId: { // TODO: remove this field
-      type: mongoose.Schema.Types.ObjectId
-    },
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'UserGroup',
@@ -53,20 +50,6 @@ const UserSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
-    active: { // TODO: remove this field
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    banned: { // TODO: remove this field
-      type: Boolean,
-      default: false
-    },
-    registrationKey: String, // TODO: remove this field
-    registrationDate: Date, // TODO: remove this field
-    registrationIp: String, // TODO: remove this field
-    registrationVerificationCode: String, // TODO: remove this field
-    registrationVerificationCodeExpiry: Date, // TODO: remove this field
     last_login: {
       type: Date
     },
