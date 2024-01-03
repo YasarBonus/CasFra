@@ -18,7 +18,6 @@ const Tenancies = require('./schemas/TenanciesSchema.js');
 const TenanciesTypes = require('./schemas/TenanciesTypesSchema.js');
 const User = require('./schemas/Users/UserSchema.js');
 const UserGroup = require('./schemas/Users/UserGroupSchema.js');
-const UserPersonalDetails = require('./schemas/Users/UserPersonalDetailsSchema.js');
 const RegistrationKey = require('./schemas/RegistrationKeySchema.js');
 const Images = require('./schemas/ImagesSchema.js');
 const ImagesCategories = require('./schemas/ImagesCategoriesSchema.js');
@@ -51,7 +50,6 @@ module.exports = {
     TenanciesTypes,
     User,
     UserGroup,
-    UserPersonalDetails,
     RegistrationKey,
     Images,
     ImagesCategories,
