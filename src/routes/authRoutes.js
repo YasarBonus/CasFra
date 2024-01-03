@@ -190,20 +190,12 @@ router.get('/session', checkPermissions('authenticate'), (req, res) => {
 
 /**
  * @openapi
- * /auth/loginAs:
+ * /auth/loginAs/{userId}:
  *   post:
  *     summary: Login as another user
  *     tags: [Authentication, Super]
  *     security:
  *       - session: []
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
  *     responses:
  *       '200':
  *         description: Successful login as another user
@@ -214,8 +206,8 @@ router.get('/session', checkPermissions('authenticate'), (req, res) => {
  *       '500':
  *         description: Internal server error
  */
-router.post('/loginAs', checkPermissions('manageUsers'), bodymen.middleware({ userId: { type: String, required: true } }), (req, res) => {
-    const { userId } = req.body;
+router.post('/loginAs/:userId', checkPermissions('manageUsers'), bodymen.middleware({ userId: { type: String, required: true } }), (req, res) => {
+    const { userId } = req.params;
 
     if (!userId) {
         res.status(400).json({ error: 'User ID is required' });
