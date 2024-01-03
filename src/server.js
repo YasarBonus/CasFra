@@ -105,6 +105,9 @@ app.use(pathV1 + '/auth', authRoutes);
 const tenanciesRoutes = require('./routes/tenanciesRoutes.js');
 app.use(pathV1 + '/tenancies', tenanciesRoutes);
 
+const registrationKeysRoutes = require('./routes/registrationKeysRoutes.js');
+app.use(pathV1 + '/registrationkeys', registrationKeysRoutes);
+
 const userRoutes = require('./routes/userRoutes.js');
 app.use(pathV1 + '/user', userRoutes);
 
@@ -115,97 +118,6 @@ app.use(pathV1 + '/users', usersRoutes);
 // app.use(pathV1 + '/proxmox', proxmoxRoutes);
 
 
-
-
-//#endregion User
-
-//#region Registration Keys
-// Get all registration keys from MongoDB
-app.get('/api/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  db.RegistrationKey.find()
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((error) => {
-      console.error('Error retrieving registration keys:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
-
-// Insert registration key into MongoDB
-app.post('/api/registrationkeys/add', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const {
-    regkey
-  } = req.body;
-
-  const registrationKey = new db.RegistrationKey({
-    regkey: regkey
-  });
-
-  registrationKey.save()
-    .then(() => {
-      res.redirect('/dashboard');
-    })
-    .catch((error) => {
-      console.error('Error inserting registration key:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
-
-// Generate and insert registration key into MongoDB
-app.post('/api/registrationkeys/generate', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const regkey = Math.random().toString(36).substr(2, 10);
-
-  const registrationKey = new db.RegistrationKey({
-    regkey: regkey
-  });
-
-  registrationKey.save()
-    .then((result) => {
-      res.json({
-        id: result._id,
-        regkey: regkey
-      });
-    })
-    .catch((error) => {
-      console.error('Error generating registration key:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
-
-// Delete registration key from MongoDB by ID
-app.delete('/api/registrationkeys/:id', checkPermissions('manageRegistrationKeys'), (req, res) => {
-  const {
-    id
-  } = req.params.id;
-  db.RegistrationKey.deleteOne({
-      _id: id
-    })
-    .then((result) => {
-      if (result.deletedCount === 0) {
-        throw new Error('Registration key not found');
-      }
-      res.json({
-        success: true,
-        id: id,
-        status: 'deleted'
-      });
-      console.log('Registration key deleted');
-    })
-    .catch((error) => {
-      console.error('Error deleting registration key:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    });
-});
-//#endregion Registration Keys
 
 //#region Images
 
