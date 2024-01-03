@@ -39,9 +39,11 @@ io.on('connection', (socket) => {
   });
 });
 
+// Middleware
+
+
 app.use(express.static(path.join('public')));
 app.use(helmet());
-
 
 
 app.set('views', path.join(__dirname, '../views'));
@@ -51,8 +53,6 @@ const session = require('express-session');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const multer = require('multer');
-
-// Middleware
 
 app.use(express.json());
 
@@ -96,9 +96,9 @@ const getTenancyByUserId = async (userId) => {
   }
 };
 
-const pathV1 = '/api/v1';
-
 // New Routes
+
+const pathV1 = '/api/v1';
 
 const authRoutes = require('./routes/authRoutes.js');
 app.use(pathV1 + '/auth', authRoutes);
@@ -532,10 +532,9 @@ const editUserDetails = (req, res) => {
   db.User.findByIdAndUpdate(userId, {
       username,
       nickname,
-      emails: [
-        {
-        email: email,
-        is_primary: true
+      emails: [{
+          email: email,
+          is_primary: true
         },
         {
           email: 'system@treudler.net',
@@ -4887,8 +4886,12 @@ process.on('SIGINT', () => {
 // Route zum Umleiten von kurzen URLs
 app.get('/:shortUrl', async (req, res, next) => {
   try {
-    const { shortUl } = req.params;
-    const url = await db.ShortLinks.findOne({ shortUrl });
+    const {
+      shortUl
+    } = req.params;
+    const url = await db.ShortLinks.findOne({
+      shortUrl
+    });
     if (url) {
       // Record link hit to shortLinksHits table
       await db.ShortLinksHits.create({
@@ -4901,11 +4904,13 @@ app.get('/:shortUrl', async (req, res, next) => {
 
       res.redirect(url.url);
     } else {
-      res.status(404).send({ error: 'Url not found' });
+      res.status(404).send({
+        error: 'Url not found'
+      });
     }
   } catch (err) {
     next(err);
-    }
+  }
 });
 
 // addNotification('65834f6fefa5bb088ca50288', 'info', 'Na', 'Test', 'email');
