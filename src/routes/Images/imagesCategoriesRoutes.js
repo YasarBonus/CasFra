@@ -38,7 +38,7 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       tenancy
     } = req.session.user;
   
-    const imagesCategories = new ImagesCategories({
+    const imagesCategories = new db.ImagesCategories({
       addedBy: userId,
       name: name,
       description: description,
