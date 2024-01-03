@@ -2,6 +2,7 @@ const email = require('./emailService.js');
 const db = require('../db/database.js');
 const generateRandomPriority = require('../utils/generateRandomPriority.js')
 const errorHandler = require('../modules/errorHandler.js');
+const logger = require('../modules/winston.js');
 
 // Function to hand over notifications to the different handlers
 // This function will check the transporter types and call the appropriate handler
@@ -87,7 +88,7 @@ async function sendNotificationEmails() {
       sendNotificationEmails();
     }
   } catch (error) {
-    errorHandler(error);
+    logger.error(error);
     // Handle the error here
   }
 }
