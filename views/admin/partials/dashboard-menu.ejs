@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
   function getUserDetails() {
-    fetch('/api/user')
+    fetch('/api/v1/user')
       .then(response => response.json())
       .then(data => {
         const user = data;
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   function getUserTenancy() {
-    fetch('/api/user/tenancy')
+    fetch('/api/v1/user/tenancy')
       .then(response => response.json())
       .then(data => {
         const tenancy = data;
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   function fetchTenancies() {
-    fetch('/api/user/tenancies')
+    fetch('/api/v1/user/tenancies')
       .then(response => response.json())
       .then(data => {
         const dropdownMenu = document.querySelector('.tenancies.dropdown .menu');
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function switchTenancy(tenancyId) {
     return () => {
-      fetch(`/api/user/tenancy/${tenancyId}`, {
+      fetch(`/api/v1/user/tenancy/${tenancyId}`, {
           method: 'PUT'
         })
         .then(response => response.json())
