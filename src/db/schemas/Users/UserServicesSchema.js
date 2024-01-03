@@ -6,10 +6,10 @@ const UserServicesSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     },
-    service: [{
+    service: {
         type: Schema.Types.ObjectId,
         ref: 'services'
-    }],
+    },
     creation_date: {
         type: Date,
     },
