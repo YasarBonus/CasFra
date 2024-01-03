@@ -61,12 +61,29 @@
                 </div>
               </div>
               <div class="two fields">
-
                 <div class="field">
                   <label>E-Mail</label>
                   <input type="text" name="email" placeholder="E-Mail">
                 </div>
+                <div class="field">
+                  <label>Language</label>
+                  <div class="ui selection dropdown">
+                    <input name="language">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select Language</div>
+                    <div class="menu">
+                      <div class="item" data-value="en">English</div>
+                      <div class="item" data-value="de">German</div>
+                      <div class="item" data-value="fr">French</div>
+                      <div class="item" data-value="es">Spanish</div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <script>
+                </script>
+                
 
               <h4 class="ui dividing header">Personal Details </h4>
               <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
@@ -98,6 +115,62 @@
                   <label>Place of Birth</label>
                   <input type="text" name="place_of_birth" placeholder="Place of Birth">
                 </div>
+              </div>
+              
+              <h4 class="ui dividing header">Phone Numbers </h4>
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+
+              <div class="three fields">
+                <div class="field">
+                  <label>Mobile Phone</label>
+                  <input type="text" name="mobile_phone" placeholder="Mobile Phone">
+                </div>
+                <div class="field">
+                  <label>Landline Phone</label>
+                  <input type="text" name="landline_phone" placeholder="Landline Phone">
+                </div>
+                <div class="field">
+                  <label>Telefax</label>
+                  <input type="text" name="telefax" placeholder="Telefax">
+                </div>
+              </div>
+
+              <h4 class="ui dividing header">Personal Address </h4>
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+
+              <div class="two fields">
+                <div class="twelve wide field">
+                  <label>Street</label>
+                  <input type="text" name="street" placeholder="Street">
+                </div>
+                <div class="four wide field">
+                  <label>House Number</label>
+                  <input type="text" name="house_number" placeholder="House Number">
+                </div>
+              </div>
+
+              <div class="three fields">
+                <div class="field">
+                  <label>Zip Code</label>
+                  <input type="text" name="zip_code" placeholder="Zip Code">
+                </div>
+                <div class="field">
+                  <label>City</label>
+                  <input type="text" name="city" placeholder="City">
+                </div>
+                <div class="field">
+                  <label>Country</label>
+                  <input type="text" name="country" placeholder="Country">
+                </div>
+              </div>
+
+              <div class="one field">
+                <div class="field">
+                  <label>Additional Info</label>
+                  <input type="text" name="additional_info" placeholder="Additional Info">
+                </div>
+              </div>
+
           </div>
           <button class="ui labeled icon button" id="saveButton">
 
@@ -169,12 +242,22 @@
           username: $('input[name="username"]').val(),
           nickname: $('input[name="nickname"]').val(),
           email: $('input[name="email"]').val(),
+          language: $('input[name="language"]').val(),
           first_name: $('input[name="first_name"]').val(),
           second_name: $('input[name="second_name"]').val(),
           last_name: $('input[name="last_name"]').val(),
           nationality: $('input[name="nationality"]').val(),
           date_of_birth: $('input[name="date_of_birth"]').val(),
           place_of_birth: $('input[name="place_of_birth"]').val(),
+          mobile_phone: $('input[name="mobile_phone"]').val(),
+          landline_phone: $('input[name="landline_phone"]').val(),
+          telefax: $('input[name="telefax"]').val(),
+          street: $('input[name="street"]').val(),
+          house_number: $('input[name="house_number"]').val(),
+          zip_code: $('input[name="zip_code"]').val(),
+          city: $('input[name="city"]').val(),
+          country: $('input[name="country"]').val(),
+          additional_info: $('input[name="additional_info"]').val()
         };
         console.log('form', formData);
         $.ajax({
@@ -210,13 +293,26 @@
             $('input[name="username"]').val(data.username);
             $('input[name="nickname"]').val(data.nickname);
             $('input[name="email"]').val(data.emails.email);
-            $('input[name="language"]').val(data.language);
             $('input[name="first_name"]').val(data.personal_details.first_name);
             $('input[name="second_name"]').val(data.personal_details.second_name);
             $('input[name="last_name"]').val(data.personal_details.last_name);
             $('input[name="nationality"]').val(data.personal_details.nationality);
             $('input[name="date_of_birth"]').val(data.personal_details.date_of_birth);
             $('input[name="place_of_birth"]').val(data.personal_details.place_of_birth);
+            $('input[name="mobile_phone"]').val(data.personal_details.mobile_phone);
+            $('input[name="landline_phone"]').val(data.personal_details.landline_phone);
+            $('input[name="telefax"]').val(data.personal_details.telefax);
+            $('input[name="street"]').val(data.personal_address.street);
+            $('input[name="house_number"]').val(data.personal_address.house_number);
+            $('input[name="zip_code"]').val(data.personal_address.zip_code);
+            $('input[name="city"]').val(data.personal_address.city);
+            $('input[name="country"]').val(data.personal_address.country);
+            $('input[name="additional_info"]').val(data.personal_address.additional_info);
+            
+
+            $('.ui.dropdown').dropdown(
+              'set selected', data.language
+            );
 
 
             // Hide the dimmer loader
