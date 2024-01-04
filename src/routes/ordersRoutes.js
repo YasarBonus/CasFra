@@ -71,7 +71,32 @@ router.get('/available-services/:type', async (req, res) => {
 // order.status = 'pending', order.completed = false
 // creation_date = now, creation_ip = req.ip
 // service: :id, user: req.user.id
-//
+
+router.post('/service/:id', bodymen.middleware({}), async (req, res) => {
+    try {
+        const service = await db.Services.findOne({ _id: req.params.id, orderable: true, active: true });
+        if (!service) {
+            return res.status(404).json({ message: 'Service not found' });
+        }
+        const order = await db.ServicesOrders.create({
+            user: req.user.id,
+            service: req.params.id,
+            creation_date: Date.now(),
+            creation_ip: req.ip,
+            status: {
+                status: 'pending',
+                date: Date.now(),
+            },
+            completed: false,
+        });
+        res.json(order);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
+
 // Get all orders for the current user
 // Permissions: orderServices
 // GET /
