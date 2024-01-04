@@ -68,23 +68,6 @@ const Services = mongoose.model('Services', ServicesSchema);
 
 // Default data
 
-const ServicesTypes = require('../Services/ServicesTypesSchema');
-
-const ServicesTypesData = [
-    {
-        name: 'VPS',
-    },
-    {
-        name: 'Web Hosting',
-    },
-    {
-        name: 'Domain',
-    },
-    {
-        name: 'SSL',
-    },
-];
-
 const ServicesData = [
     {
         name: 'VPS 1',
@@ -136,12 +119,7 @@ const ServicesData = [
     },
 ];
 
-ServicesTypesData.forEach(async (item) => {
-    const serviceType = await ServicesTypes.findOne({ name: item.name });
-    if (!serviceType) {
-        ServicesTypes.create(item);
-    }
-} );
+
 
 ServicesData.forEach(async (item) => {
     const service = await Services.findOne({ name: item.name });
