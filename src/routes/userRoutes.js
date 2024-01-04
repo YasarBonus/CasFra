@@ -154,6 +154,8 @@ router.post('/register', async (req, res) => {
         const registrationVerificationLinkCode = generateVerificationLinkCode();
         const registrationDate = new Date(); // Add registration date
 
+        
+
         const user = new db.User({
             username: username,
             nickname: nickname,
@@ -179,6 +181,9 @@ router.post('/register', async (req, res) => {
                 banned: false,
                 verified: false,
             },
+            tenancy: existingKey.assign_tenancy,
+            tenancies: [existingKey.assign_tenancy],
+            group: existingKey.assign_group,
         });
 
         await user.save();
