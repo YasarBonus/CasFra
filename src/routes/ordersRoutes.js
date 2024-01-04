@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../modules/winston.js');
 const db = require('../db/database.js');
+const bodymen = require('bodymen'); 
 
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 
@@ -19,6 +20,7 @@ router.get('/available-services', async (req, res) => {
         services.forEach((service) => {
             service.orderable = undefined;
             service.active = undefined;
+            service.type.active = undefined;
         });
         res.json(services);
     } catch (err) {
@@ -27,13 +29,37 @@ router.get('/available-services', async (req, res) => {
     }
 } );
 
-//
 // Get all services that can be ordered (orderable = true and active = true) of a specific type
 // Permissions: none
 // GET /available-services/:type
-// This will return all services that can be ordered of the type :type
+// This will return all services that can be ordered of the type :type,
+// filtered by :type = service.type.name
 // The type needs to be the name of the type, not the id
 // The type needs to be active = true
+
+router.get('/available-services/:type', async (req, res) => {
+    try {
+
+        const services = await db.Services.find({ orderable: true, active: true }).populate('type');
+        
+        // filter the services by type name
+        const filteredServices = services.filter((service) => {
+            return service.type.name === req.params.type;
+        } );
+        
+        // do not return orderable and active fields
+        filteredServices.forEach((service) => {
+            service.orderable = undefined;
+            service.active = undefined;
+            service.type.active = undefined;
+        });
+        res.json(filteredServices);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
 //
 // Create a new order for a service for the current user
 // Permissions: orderServices
