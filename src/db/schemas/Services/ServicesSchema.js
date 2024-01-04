@@ -43,6 +43,10 @@ const ServicesSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    orderable: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const Services = mongoose.model('Services', ServicesSchema);
