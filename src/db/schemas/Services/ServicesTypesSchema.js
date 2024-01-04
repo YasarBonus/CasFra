@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const ServicesTypesSchema = new Schema({
+const ServicesTypesSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -10,5 +9,6 @@ const ServicesTypesSchema = new Schema({
     },
 });
 
-module.exports = ServicesTypes = mongoose.model('servicesTypes', ServicesTypesSchema);
+const ServicesTypes = mongoose.model('ServicesTypes', ServicesTypesSchema);
 
+module.exports = ServicesTypes;

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const ServicesPricingSchema = new Schema({
+const ServicesPricingSchema = new mongoose.Schema({
     recurring: {
         type: Boolean,
         default: false,
@@ -26,13 +25,13 @@ const ServicesPricingSchema = new Schema({
     },
 });
 
-const ServicesSchema = new Schema({
+const ServicesSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
     },
     type: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'ServicesTypes'
     },
     description: {
@@ -46,4 +45,6 @@ const ServicesSchema = new Schema({
     },
 });
 
-module.exports = Services = mongoose.model('Services', ServicesSchema);
+const Services = mongoose.model('Services', ServicesSchema);
+
+module.exports = Services;

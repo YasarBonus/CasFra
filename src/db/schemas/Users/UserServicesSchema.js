@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const UserServicesSchema = new Schema({
+const UserServicesSchema = new mongoose.Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
     service: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'services'
     },
     creation_date: {
@@ -22,4 +21,6 @@ const UserServicesSchema = new Schema({
     },
 });
 
-module.exports = UserServices = mongoose.model('userServices', UserServicesSchema);
+const UserServices = mongoose.model('UserServices', UserServicesSchema);
+
+module.exports = UserServices;
