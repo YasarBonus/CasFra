@@ -1,5 +1,6 @@
 {
   "name": "casfra",
+  "main": "src/server.js",
   "version": "0.1.0",
   "author": "Joshua Tobias Treudler <joshua@treudler.net>",
   "repository": {
