@@ -2,40 +2,59 @@
 <!DOCTYPE html>
 <html>
     <%- include('../partials/head') %>
+    <style type="text/css">
+      body {
+        background-color: #DADADA;
+      }
+      body > .grid {
+        height: 100%;
+      }
+      .image {
+        margin-top: -100px;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+    <body>
+      <div class="ui middle aligned center aligned grid">
+        <div class="column">
+          <h2 class="ui image header">
+            <img src="https://cdn.treudler.net/web/logo/256x256.png" class="image">
+            <div class="content">
+              Log-in to your account
+            </div>
+          </h2>
+          <form class="ui large form" id="userForm">
+            <div class="ui stacked segment">
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="user icon"></i>
+                  <input type="text" name="username" placeholder="Username">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="password" name="password" placeholder="Password">
+                </div>
+              </div>
+              <button id="saveButton" class="ui fluid large submit button">Login</button>
+            </div>
+      
+            <div class="ui error message"></div>
+      
+          </form>
+      
+          <div class="ui message">
+            No user? <a href="/register">Sign Up</a>
+          </div>
+        </div>
+      </div>
 
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
-            <div class="ui segment">
-                <div class="ui segment">
-                    <div class="ui container">
-                        <h2>Login</h2>
-                 
-                        <div class="ui divider"></div>                      
-                        <form class="ui form" id="userForm">
-                            <div class="ui blurring segment">
-                                <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
-                                <h4 class="ui dividing header">Account Details </h4>
-                                <div class="field">
-                                  <label>Tenancy (obsolete)</label>
-                                  <input type="text" name="tenancy" placeholder="Tenancy ID" value="65874079a5a4f802408f7ca5"></input>
-                                </div>
-                          <div class="field">
-                            <label>Username</label>
-                            <input type="text" name="username" placeholder="Username">
-                          </div>
-                          <div class="field">
-                            <label>Password</label>
-                            <input type="password" name="password" placeholder="Password">
-                          </div>
-                          
-                        </div>
-                        
-                        </div>
-                          <button class="ui labeled icon button" id="saveButton">
-                          </button>
-                        </form>
-                      </div>
-                      
+
+                  
                       <script>
                         showActionButton('saveButton','login');
                         // showLoader('formLoaderPersonalDetails', 'disabled');

@@ -52,10 +52,10 @@
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Save';
       } else if (status === 'login') {
-          icon.classList.add('user');
+          icon.classList.add('lock');
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
-          actionButton.textContent = 'Login';
+          actionButton.textContent = 'Login ';
       } else if (status === 'loginError') {
           icon.classList.add('close');
           actionButton.classList.replace('yellow', 'red');
@@ -85,7 +85,7 @@
           icon.classList.remove('lock');
           icon.classList.add('check');
           actionButton.classList.add('green', 'disabled');
-          actionButton.textContent = 'Saved';
+          actionButton.textContent = 'Success ';
           setTimeout(function() {
               showActionButton(button, 'save');
           }, 2000);
