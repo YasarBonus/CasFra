@@ -32,7 +32,10 @@ const ServicesOrdersSchema = new mongoose.Schema({
     completed: {
         type: Boolean,
         default: false,
-    }, 
+    },
+    completed_date: {
+        type: Date,
+    },
 });
 
 const ServicesOrders = mongoose.model('ServicesOrders', ServicesOrdersSchema);
