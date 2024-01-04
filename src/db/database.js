@@ -38,6 +38,11 @@ const ShortLinksStatistics = require('./schemas/ShortLinksStatisticsSchema.js');
 const ProxmoxServers = require('./schemas/Proxmox/ProxmoxServersSchema.js');
 const ProxmoxServersLogs = require('./schemas/Proxmox/ProxmoxServersSchema.js');
 
+// Services and Orders
+const Services = require('./schemas/Services/ServicesSchema.js');
+const ServicesTypes = require('./schemas/Services/ServicesTypesSchema.js');
+const ServicesOrders = require('./schemas/Services/ServicesOrdersSchema.js');
+
 const HcVms = require('./schemas/HcVmSchema.js');
 
 module.exports = {
@@ -68,5 +73,8 @@ module.exports = {
     ShortLinksStatistics,
     ProxmoxServers,
     ProxmoxServersLogs,
-    HcVms
+    HcVms,
+    Services,
+    ServicesTypes,
+    ServicesOrders,
   };
