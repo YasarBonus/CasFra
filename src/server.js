@@ -5,6 +5,8 @@ const path = require('path');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 
+const mongoose = require('mongoose');
+
 const checkPermissions = require('./middlewares/permissionMiddleware.js');
 
 // Error Handler

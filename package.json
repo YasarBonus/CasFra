@@ -1,4 +1,15 @@
 {
+  "name": "casfra",
+  "main": "src/server.js",
+  "version": "0.1.0",
+  "author": "Joshua Tobias Treudler <joshua@treudler.net>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joshua2504/casfra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Joshua2504/casfra/issues"
+  },
   "dependencies": {
     "axios": "^1.6.3",
     "bcrypt": "^5.1.1",
