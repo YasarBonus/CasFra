@@ -147,6 +147,62 @@
                     }
                 });
             }
+
+            function rejectWish(wishId) {
+                $.ajax({
+                    url: '/api/v1/casinowishlistbot/' + wishId + '/reject',
+                    method: 'POST',
+                    success: function (response) {
+                        showToast('success', 'Wish rejected',
+                            'The wish has been rejected successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error rejecting wish:', error);
+                        showToast('error', 'Error rejecting wish',
+                            'There was an error rejecting the wish. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            }
+
+            function pendWish(wishId) {
+                $.ajax({
+                    url: '/api/v1/casinowishlistbot/' + wishId + '/pend',
+                    method: 'POST',
+                    success: function (response) {
+                        showToast('success', 'Wish set back to pending',
+                            'The wish has been set back to pending successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error setting wish back to pending:', error);
+                        showToast('error', 'Error setting wish back to pending',
+                            'There was an error setting the wish back to pending. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            }
+
+            function playWish(wishId) {
+                $.ajax({
+                    url: '/api/v1/casinowishlistbot/' + wishId + '/play',
+                    method: 'POST',
+                    success: function (response) {
+                        showToast('success', 'Wish set to playing',
+                            'The wish has been set to playing successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error setting wish to playing:', error);
+                        showToast('error', 'Error setting wish to playing',
+                            'There was an error setting the wish to playing. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            }
+
+            
         });
     </script>
 </body>
