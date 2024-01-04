@@ -25,6 +25,20 @@ const ServicesPricingSchema = new mongoose.Schema({
     },
 });
 
+const ServicesDetailsSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    value: {
+        type: String,
+        required: true,
+    },
+    unit: {
+        type: String,
+    },
+});
+
 const ServicesSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -38,6 +52,7 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    details: [ServicesDetailsSchema],
     pricing: ServicesPricingSchema,
     active: {
         type: Boolean,
@@ -75,6 +90,28 @@ const ServicesData = [
         name: 'VPS 1',
         type: 'VPS',
         description: 'VPS 1 description',
+        details: [
+            {
+                name: 'CPU',
+                value: '1',
+                unit: 'Core',
+            },
+            {
+                name: 'RAM',
+                value: '1',
+                unit: 'GB',
+            },
+            {
+                name: 'SSD',
+                value: '10',
+                unit: 'GB',
+            },
+            {
+                name: 'Bandwidth',
+                value: '1',
+                unit: 'TB',
+            },
+        ],
         pricing: {
             recurring: true,
             price: 5,
