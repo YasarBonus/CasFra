@@ -512,6 +512,20 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
   }
 });
 
+app.get('/dashboard/utils/twitch/casinowishlistbot', checkPermissions('manageCasinoWishListBot'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed casino wishlist bot');
+    const user = req.session.user;
+
+    res.render('admin/utils_twitch_casinowishlistbot', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Swagger API Documentation
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
