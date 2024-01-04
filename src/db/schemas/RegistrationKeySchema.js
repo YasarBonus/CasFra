@@ -26,6 +26,9 @@ const registrationKeySchema = new mongoose.Schema({
       default: generateRandomPriority()
     },
     tenancies: [String],
+    assign_tenancy: String,
+    assign_tenancies: [String],
+    assign_group: String,
   });
   
   const RegistrationKey = mongoose.model('RegistrationKey', registrationKeySchema);
@@ -34,7 +37,10 @@ const registrationKeySchema = new mongoose.Schema({
   const registrationKeyEntries = [{
     regkey: 'admin',
     created: new Date(),
-    used: false
+    used: false,
+    assign_group: '658361b4cd18680f4d0f4eb7',
+    assign_tenancy: '65874079a5a4f802408f7ca5',
+    assign_tenancies: ['65874079a5a4f802408f7ca5'],
   }];
 
     const saveDefaultRegistrationKeyDatabaseData = async () => {
