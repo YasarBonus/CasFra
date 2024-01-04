@@ -19,6 +19,10 @@
                             <input type="text" name="username" placeholder="Username">
                           </div>
                           <div class="field">
+                            <label>Nickname</label>
+                            <input type="text" name="nickname" placeholder="Nickname">
+                          </div>
+                          <div class="field">
                             <label>E-Mail</label>
                             <input type="text" name="email" placeholder="E-Mail">
                           </div>
@@ -82,12 +86,13 @@
                             password: $('input[name="password"]').val(),
                             passwordRepeat: $('input[name="passwordRepeat"]').val(),
                             registrationKey: $('input[name="registrationKey"]').val(),
-                            language: "en"
+                            language: "en",
+                            nickname: $('input[name="nickname"]').val(),
                           };
                           console.log('form', formData);
                           $.ajax({
                             type: 'POST',
-                            url: '/api/v1/users/register',
+                            url: '/api/v1/user/register',
                             data: formData,
                             success: function(data) {
                               console.log(data);
