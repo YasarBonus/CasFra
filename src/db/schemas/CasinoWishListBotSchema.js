@@ -28,6 +28,7 @@ const CasinoWishListBotSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    added_manually: Boolean,
 });
 
 const CasinoWishListBot = mongoose.model('CasinoWishListBot', CasinoWishListBotSchema);
