@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const generateRandomPriority = require('../../utils/generateRandomPriority');
-
+ 
 const tenanciesSchema = new mongoose.Schema({
     name: String,
     notes: String,
