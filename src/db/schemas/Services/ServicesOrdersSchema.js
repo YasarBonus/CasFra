@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const ServicesOrdersStatusSchema = new Schema({
+const ServicesOrdersStatusSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
@@ -14,13 +13,13 @@ const ServicesOrdersStatusSchema = new Schema({
     },
 });
 
-const ServicesOrders = new Schema({
+const ServicesOrdersSchema = new mongoose.Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
     service: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'services'
     },
     creation_date: {
@@ -36,4 +35,6 @@ const ServicesOrders = new Schema({
     }, 
 });
 
-module.exports = ServicesOrders = mongoose.model('servicesOrders', ServicesOrders);
+const ServicesOrders = mongoose.model('ServicesOrders', ServicesOrdersSchema);
+
+module.exports = ServicesOrders;
