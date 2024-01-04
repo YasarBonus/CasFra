@@ -22,6 +22,10 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const api = require('./services/casinoWishListBot.js');
+
+
+
 io.on('connection', (socket) => {
   logger.info('New client connected');
 
