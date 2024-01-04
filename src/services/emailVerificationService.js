@@ -14,25 +14,25 @@ async function checkUnverifiedEmails() {
         // console.log('Users with unverified emails:', users);
 
         // Loop through the users
-        for (const user of users) {
-            // Loop through the user's email addresses
-            for (const email of user.emails) {
-                // Check if the email address is unverified
-                if (!email.is_confirmed) {
-                    // Check if the confirmation code is expired
-                    if (email.confirmation_code_expires < new Date()) {
-                        // Start the email verification process
-                        await startEmailVerification(user._id, email.email);
-                    }
-                }
-            }
-        }
+        // for (const user of users) {
+        //     // Loop through the user's email addresses
+        //     for (const email of user.emails) {
+        //         // Check if the email address is unverified
+        //         if (!email.is_confirmed) {
+        //             // Check if the confirmation code is expired
+        //             if (email.confirmation_code_expires < new Date()) {
+        //                 // Start the email verification process
+        //                 await startEmailVerification(user._id, email.email);
+        //             }
+        //         }
+        //     }
+        // }
     } catch (error) {
         console.error('Error checking unverified emails:', error);
     }
 }
 
-checkUnverifiedEmails();
+// checkUnverifiedEmails();
 
 // Function to start the email verification process:
 // 1. Generate a random confirmation code and save it to the database (db.User.emails.confirmation_code)
