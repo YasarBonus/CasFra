@@ -7,9 +7,6 @@ const userRegistrationSchema = require('./UserRegistrationSchema');
 const bcrypt = require('bcrypt');
 
 
-
-
-
 // Define User schema
 const UserSchema = new mongoose.Schema({
     username: {
