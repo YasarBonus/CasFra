@@ -1,92 +1,154 @@
 <!-- media.ejs -->
 <!DOCTYPE html>
 <html>
-    <%- include('../partials/head') %>
-    <%- include('../partials/header') %>
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+        <div class="ui segment">
+            <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
-                <%- include('./partials/dashboard-menu') %>
-                <div class="ui segment">
-                    <div class="ui container">
-                        <h2>Casino Wish List Bot</h2>
-                        <table id="wishListTable" class="ui celled table">
-                            <thead>
-                                <tr>
-                                    <th>Wish</th>
-                                    <th>Twitch User</th>
-                                    <th>Added</th>
-                                    <th>Status</th>
-                                    <th>Completed</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                <div class="ui container">
+                    <h2>Casino Wish List Bot</h2>
+                    <table id="wishListTable" class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Wish</th>
+                                <th>Twitch User</th>
+                                <th>Added</th>
+                                <th>Status</th>
+                                <th>Completed</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <%- include('../partials/footer') %>
-        <script>
-            $(document).ready(function() {
-                // Function to get Casino Wish List Bot Items from the API
-                // and populate the table with them.
-                function getWishList() {
-                    $.ajax({
-                        url: '/api/v1/casinowishlistbot/',
-                        method: 'GET',
-                        success: function(response) {
-                            // Clear the table
-                            $('#wishListTable tbody').empty();
-                            // Loop through the response and add each item to the table
-                            response.forEach(function(item) {
-                                // Create a new row
-                                var row = $('<tr>');
-                                // Add the item data to the row
-                                row.append($('<td>').text(item.wish));
-                                row.append($('<td>').text(item.twitch_user));
-                                row.append($('<td>').text(item.created_at));
-                                row.append($('<td>').text(item.status));
-                                row.append($('<td>').text(item.completed_at));
+    </div>
+    <%- include('../partials/footer') %>
+    <script>
+        $(document).ready(function () {
+            // Function to get Casino Wish List Bot Items from the API
+            // and populate the table with them.
+            function getWishList() {
+                $.ajax({
+                    url: '/api/v1/casinowishlistbot/',
+                    method: 'GET',
+                    success: function (response) {
+                        // Clear the table
+                        $('#wishListTable tbody').empty();
+                        // Loop through the response and add each item to the table
+                        response.forEach(function (item) {
+                            // Create a new row
+                            var row = $('<tr>');
+                            // Add the item data to the row
+                            row.append($('<td>').text(item.wish));
+                            row.append($('<td>').text(item.twitch_user));
+                            row.append($('<td>').text(item.created_at));
+                            row.append($('<td>').text(item.status));
+                            row.append($('<td>').text(item.completed_at));
 
-                                // Create a new cell for the actions
+                            if (item.status === 'pending') {
+                                $(row).addClass('yellow');
+
                                 var actionsCell = $('<td>');
-                                var completeButton = $('<button>').addClass('ui button').text('Complete');
-                                completeButton.click(function() {
+
+                                var playButton = $('<button>').addClass(
+                                    'ui green button').text('Play');
+                                playButton.click(function () {
+                                    playWish(item._id);
+                                });
+                                actionsCell.append(playButton);
+
+                                var rejectButton = $('<button>').addClass('ui red button')
+                                    .text('Reject');
+                                rejectButton.click(function () {
+                                    rejectWish(item._id);
+                                });
+                                actionsCell.append(rejectButton);
+
+                                row.append(actionsCell);
+                            } else if (item.status === 'playing') {
+                                $(row).addClass('blue');
+
+                                var actionsCell = $('<td>');
+
+                                var completeButton = $('<button>').addClass(
+                                    'ui green button').text('Complete');
+                                completeButton.click(function () {
                                     completeWish(item._id);
                                 });
                                 actionsCell.append(completeButton);
+
+                                var rejectButton = $('<button>').addClass('ui red button')
+                                    .text('Reject');
+                                rejectButton.click(function () {
+                                    rejectWish(item._id);
+                                });
+                                actionsCell.append(rejectButton);
+
                                 row.append(actionsCell);
+                            } else if (item.status === 'completed') {
+                                $(row).addClass('green');
 
-                                // Add the row to the table
-                                $('#wishListTable tbody').append(row);
-                            });
-                        },
-                        error: function(error) {
-                            console.log('Error getting Casino Wish List Bot items:', error);
-                            showToast('error', 'Error getting Casino Wish List Bot items', 'There was an error getting the Casino Wish List Bot items. Please try again. This incident has been logged.');
-                        }
-                    });
-                }
+                                var actionsCell = $('<td>');
+                                var pendingButton = $('<button>').addClass('ui gray tiny button')
+                                    .text('Set back to pending');
+                                pendingButton.click(function () {
+                                    pendWish(item._id);
+                                });
+                                actionsCell.append(pendingButton);
+                                row.append(actionsCell);
+                            } else if (item.status === 'rejected') {
+                                $(row).addClass('red');
 
-                getWishList();
+                                var actionsCell = $('<td>');
+                                var pendingButton = $('<button>').addClass('ui gray tiny button')
+                                    .text('Set back to pending');
+                                pendingButton.click(function () {
+                                    pendWish(item._id);
+                                });
+                                actionsCell.append(pendingButton);
+                                row.append(actionsCell);
+                            }
 
-                function completeWish(wishId) {
-                    $.ajax({
-                        url: '/api/v1/casinowishlistbot/' + wishId + '/complete',
-                        method: 'POST',
-                        success: function(response) {
-                            showToast('success', 'Wish completed', 'The wish has been completed successfully.');
-                            getWishList();
-                        },
-                        error: function(error) {
-                            console.log('Error completing wish:', error);
-                            showToast('error', 'Error completing wish', 'There was an error completing the wish. Please try again. This incident has been logged.');
-                        }
-                    });
-                }
-            });
-        </script>
-    </body>
+                            // Add the row to the table
+                            $('#wishListTable tbody').append(row);
+                        });
+                    },
+                    error: function (error) {
+                        console.log('Error getting Casino Wish List Bot items:', error);
+                        showToast('error', 'Error getting Casino Wish List Bot items',
+                            'There was an error getting the Casino Wish List Bot items. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            }
+
+            getWishList();
+
+            function completeWish(wishId) {
+                $.ajax({
+                    url: '/api/v1/casinowishlistbot/' + wishId + '/complete',
+                    method: 'POST',
+                    success: function (response) {
+                        showToast('success', 'Wish completed',
+                            'The wish has been completed successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error completing wish:', error);
+                        showToast('error', 'Error completing wish',
+                            'There was an error completing the wish. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
 </html>
