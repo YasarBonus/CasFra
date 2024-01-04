@@ -15,6 +15,11 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 router.get('/available-services', async (req, res) => {
     try {
         const services = await db.Services.find({ orderable: true, active: true }).populate('type');
+        // do not return orderable and active fields
+        services.forEach((service) => {
+            service.orderable = undefined;
+            service.active = undefined;
+        });
         res.json(services);
     } catch (err) {
         logger.error(err);
