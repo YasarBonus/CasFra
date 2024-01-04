@@ -125,6 +125,16 @@ app.use((req, res, next) => {
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
 
+let mongooseUrl = '';
+
+console.log('process.env.MODE_ENV', process.env.NODE_ENV)
+
+if (process.env.NODE_ENV === 'development') {
+  mongooseUrl = process.env.MONGOOSE_DEV_URL;
+} else if (process.env.NODE_ENV === 'production') {
+  mongooseUrl = process.env.MONGOOSE_PROD_URL;
+}
+
 app.use(session({
   secret: 'aisei0aeb9ba4vahgohC5heeke5Rohs5oi9ohyuepadaeGhaeP2lahkaecae',
   resave: false,
@@ -133,7 +143,7 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
   },
   store: MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/casfra'
+    mongoUrl: mongooseUrl,
   })
 }));
 //
