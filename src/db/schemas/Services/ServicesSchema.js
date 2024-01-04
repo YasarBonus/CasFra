@@ -51,4 +51,69 @@ const ServicesSchema = new mongoose.Schema({
 
 const Services = mongoose.model('Services', ServicesSchema);
 
+// Default data
+
+const ServicesTypes = require('../Services/ServicesTypesSchema');
+
+const ServicesTypesData = [
+    {
+        name: 'VPS',
+    },
+    {
+        name: 'Web Hosting',
+    },
+    {
+        name: 'Domain',
+    },
+    {
+        name: 'SSL',
+    },
+];
+
+const ServicesData = [
+    {
+        name: 'VPS 1',
+        type: 'VPS',
+        description: 'VPS 1 description',
+        pricing: {
+            recurring: true,
+            price: 5,
+            price_1_month: 5,
+            price_3_months: 15,
+            price_6_months: 30,
+            price_12_months: 60,
+        },
+    },
+    {
+        name: 'VPS 2',
+        type: 'VPS',
+        description: 'VPS 2 description',
+        pricing: {
+            recurring: true,
+            price: 10,
+            price_1_month: 10,
+            price_3_months: 30,
+            price_6_months: 60,
+            price_12_months: 120,
+        },
+    },
+];
+
+ServicesTypesData.forEach(async (item) => {
+    const serviceType = await ServicesTypes.findOne({ name: item.name });
+    if (!serviceType) {
+        ServicesTypes.create(item);
+    }
+} );
+
+ServicesData.forEach(async (item) => {
+    const service = await Services.findOne({ name: item.name });
+    if (!service) {
+        const serviceType = await ServicesTypes.findOne({ name: item.type });
+        item.type = serviceType._id;
+        Services.create(item);
+    }
+} );
+
+
 module.exports = Services;
