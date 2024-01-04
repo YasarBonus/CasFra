@@ -198,6 +198,9 @@ app.use(pathV1 + '/images', imagesRoutes);
 const shortLinksRoutes = require('./routes/shortLinksRoutes.js');
 app.use(pathV1 + '/shortlinks', shortLinksRoutes);
 
+const ordersRoutes = require('./routes/ordersRoutes.js');
+app.use(pathV1 + '/order', ordersRoutes);
+
 
 // const proxmoxRoutes = require('./routes/proxmoxRoutes.js');
 // app.use(pathV1 + '/proxmox', proxmoxRoutes);
