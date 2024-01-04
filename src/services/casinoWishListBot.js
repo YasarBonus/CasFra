@@ -39,7 +39,9 @@ client.on('message', (channel, tags, message, self) => {
         const wish = commandName.slice(6).trim();
 
         if (wish.length === 0) {
-            client.say(channel, `@${tags.username}, you need to specify a wish!`);
+            client.say(channel, `@${tags.username}, du musst einen Wunsch angeben!`);
+        } else if (wish.length < 5) {
+            client.say(channel, `@${tags.username}, dein Wunsch ist zu kurz!`);
         } else {
             console.log('Wish:', wish);
             addWish(channel, tags, wish);
