@@ -38,6 +38,10 @@ router.post('/', checkPermissions('manageCasinoWishListBot'), async (req, res) =
 router.get('/', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
     try {
         const wishList = await db.CasinoWishListBot.find().populate('round');
+
+        // sort the wish list by created_at date in descending order
+        wishList.sort((a, b) => b.created_at - a.created_at);
+
         res.json(wishList);
     } catch (err) {
         logger.error(err);
