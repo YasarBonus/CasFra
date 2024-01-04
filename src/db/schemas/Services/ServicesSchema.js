@@ -119,7 +119,7 @@ const ServicesData = [
     },
 ];
 
-
+const ServicesTypes = require('./ServicesTypesSchema');
 
 ServicesData.forEach(async (item) => {
     const service = await Services.findOne({ name: item.name });
