@@ -69,7 +69,7 @@ router.get('/pending', async (req, res) => {
 // POST /:id/playing
 // This will change the status of the wish list item with id :id to playing
 
-router.post('/:id/playing', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
+router.post('/:id/play', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
     try {
         const wishList = await db.CasinoWishListBot.findById(req.params.id);
         wishList.status = 'playing';
@@ -86,7 +86,7 @@ router.post('/:id/playing', checkPermissions('manageCasinoWishListBot'), async (
 // POST /:id/completed
 // This will change the status of the wish list item with id :id to completed
 
-router.post('/:id/completed', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
+router.post('/:id/complete', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
     try {
         const wishList = await db.CasinoWishListBot.findById(req.params.id);
         wishList.status = 'completed';
@@ -104,7 +104,7 @@ router.post('/:id/completed', checkPermissions('manageCasinoWishListBot'), async
 // POST /:id/rejected
 // This will change the status of the wish list item with id :id to rejected
 
-router.post('/:id/rejected', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
+router.post('/:id/reject', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
     try {
         const wishList = await db.CasinoWishListBot.findById(req.params.id);
         wishList.status = 'rejected';
@@ -122,7 +122,7 @@ router.post('/:id/rejected', checkPermissions('manageCasinoWishListBot'), async 
 // POST /:id/pending
 // This will change the status of the wish list item with id :id to pending
 
-router.post('/:id/pending', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
+router.post('/:id/pend', checkPermissions('manageCasinoWishListBot'), async (req, res) => {
     try {
         const wishList = await db.CasinoWishListBot.findById(req.params.id);
         wishList.status = 'pending';
