@@ -49,6 +49,16 @@
                                 row.append($('<td>').text(item.created_at));
                                 row.append($('<td>').text(item.status));
                                 row.append($('<td>').text(item.completed_at));
+
+                                // Create a new cell for the actions
+                                var actionsCell = $('<td>');
+                                var completeButton = $('<button>').addClass('ui button').text('Complete');
+                                completeButton.click(function() {
+                                    completeWish(item._id);
+                                });
+                                actionsCell.append(completeButton);
+                                row.append(actionsCell);
+
                                 // Add the row to the table
                                 $('#wishListTable tbody').append(row);
                             });
@@ -61,6 +71,21 @@
                 }
 
                 getWishList();
+
+                function completeWish(wishId) {
+                    $.ajax({
+                        url: '/api/v1/casinowishlistbot/' + wishId + '/complete',
+                        method: 'POST',
+                        success: function(response) {
+                            showToast('success', 'Wish completed', 'The wish has been completed successfully.');
+                            getWishList();
+                        },
+                        error: function(error) {
+                            console.log('Error completing wish:', error);
+                            showToast('error', 'Error completing wish', 'There was an error completing the wish. Please try again. This incident has been logged.');
+                        }
+                    });
+                }
             });
         </script>
     </body>
