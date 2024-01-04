@@ -27,6 +27,15 @@
     </div>
   </div>
   <% } %>
+  <% if (user.permissions.includes('manageCasinoWishListBot')) { %>
+    <div class="ui dropdown item">
+      Utils <i class="dropdown icon"></i>
+      <div class="menu">
+        <a href="/dashboard/utils/twitch/casinowishlistbot" class="item">Casino Wish List Bot</a>
+        <a href="/dashboard/shortlinks/hits" class="disabled item">Hits</a>
+      </div>
+    </div>
+    <% } %>
   <% if (user.permissions.includes('manageImages') || user.permissions.includes('manageImagesCategories')) { %>
   <div class="ui dropdown item">
     Images <i class="dropdown icon"></i>
@@ -110,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function() {
   callLogoutAPI = () => {
     showActionButton('logoutButton', 'loading');
     $.ajax({
-      url: '/api/auth/logout',
+      url: '/api/v1/auth/logout',
       type: 'POST',
       success: function (result) {
         window.location.href = '/login';
