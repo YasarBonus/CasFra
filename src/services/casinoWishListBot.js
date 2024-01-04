@@ -22,7 +22,7 @@ const client = new tmi.Client({
         password: 'oauth:b4mhxfwoqnwnf7amlstwgzu8j4xayn'
     },
     channels: ['yasar92']
-    });
+});
 
 client.connect();
 
@@ -33,7 +33,7 @@ client.on('message', (channel, tags, message, self) => {
 
     if (commandName.startsWith('!wishlist')) {
         listWishes(channel, tags);
-        
+
     } else if (commandName.startsWith('!wish')) {
         const wish = commandName.slice(6).trim();
 
@@ -44,38 +44,50 @@ client.on('message', (channel, tags, message, self) => {
             addWish(channel, tags, wish);
         }
     }
-} );
+});
 
 // addWish function
-// a user can only add one wish at a time
-// and only one wish per 10 minutes
+// 1. get all wishes of the user from the db
+// 2. check if the user has a pending wish
+// 3. if yes, send a message to the chat that the user already has a pending wish
+// 4. if no, check if the user has a completed wish in the last 10 minutes
+// 5. if yes, send a message to the chat that the user already has a completed wish in the last 10 minutes
+// 6. if no, add the wish to the db with the twitch_user, status "pending" and the current date
+// 7. send a message to the chat that the wish has been added to the wishlist
+
 async function addWish(channel, tags, wish) {
     try {
-        // Check if the user already has a wish in the db
-        const casinoWishListBot = await db.CasinoWishListBot.findOne({
-            twitch_user: tags.username
-        });
+        // Get all the wishes of the user from the db
+        const casinoWishListBot = await db.CasinoWishListBot.find({ twitch_user: tags.username });
 
-        // Check if the user has a wish in the db and if it's been 10 minutes since the last wish
-        if (casinoWishListBot && (Date.now() - casinoWishListBot.created_at) < 600000) {
-            client.say(channel, `@${tags.username}, you can only add one wish per 10 minutes! Please wait ${Math.round((600000 - (Date.now() - casinoWishListBot.created_at)) / 60000)} minutes and ${Math.round((600000 - (Date.now() - casinoWishListBot.created_at)) / 1000) % 60} seconds!`);
-        } else
-        if (casinoWishListBot) {
-            client.say(channel, `@${tags.username}, you already have a pending wish in the wishlist: ${casinoWishListBot.wish}!`);
+        // Check if the user has a pending wish
+        const pendingWish = casinoWishListBot.find(wish => wish.status === 'pending');
+
+        if (pendingWish) {
+            client.say(channel, `@${tags.username}, you already have a pending wish!`);
         } else {
-            // Create a new wish in the db
-            await db.CasinoWishListBot.create({
-                twitch_user: tags.username,
-                wish,
-                created_at: Date.now(),
-                status: 'pending',
-                status_changed: Date.now(),
-            });
+            // Check if the user has a completed wish in the last 10 minutes
+            const completedWish = casinoWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
 
-            client.say(channel, `@${tags.username}, your wish has been added to the wishlist!`);
+            if (completedWish) {
+                client.say(channel, `@${tags.username}, you already have a completed wish in the last 10 minutes!`);
+            } else {
+                // Add the wish to the db with the twitch_user, status "pending" and the current date
+                const newWish = new db.CasinoWishListBot({
+                    wish: wish,
+                    twitch_user: tags.username,
+                    created_at: Date.now(),
+                    status: 'pending',
+                    status_changed: Date.now(),
+                    added_manually: true,
+                });
+                await newWish.save();
+
+                // Send a message to the chat that the wish has been added to the wishlist
+                client.say(channel, `@${tags.username}, your wish has been added to the wishlist!`);
+            }
         }
-    }
-    catch (error) {
+    } catch (error) {
         logger.error('Error adding wish:', error);
     }
 }
