@@ -8,6 +8,8 @@
 const db = require('../db/database.js');
 const logger = require('../modules/winston.js');
 
+require('dotenv').config();
+
 const errorHandler = require('../modules/errorHandler.js');
 
 const tmi = require('tmi.js');
@@ -18,10 +20,10 @@ const client = new tmi.Client({
         reconnect: true
     },
     identity: {
-        username: 'yasaramadeusslotzart',
-        password: 'oauth:b4mhxfwoqnwnf7amlstwgzu8j4xayn'
+        username: process.env.YASAR_TWITCH_BOT_USERNAME,
+        password: process.env.YASAR_TWITCH_BOT_PASSWORD,
     },
-    channels: ['yasar92']
+    channels: [process.env.YASAR_TWITCH_BOT_CHANNEL]
 });
 
 client.connect();
