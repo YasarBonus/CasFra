@@ -31,9 +31,10 @@ client.on('message', (channel, tags, message, self) => {
 
     const commandName = message.trim();
 
-    if (commandName.startsWith('!wishlist')) {
+    if (commandName.startsWith('!allwishes')) {
         listWishes(channel, tags);
-
+    } else if (commandName.startsWith('!wishes')) {
+        listUserWishes(channel, tags);
     } else if (commandName.startsWith('!wish')) {
         const wish = commandName.slice(6).trim();
 
@@ -64,13 +65,13 @@ async function addWish(channel, tags, wish) {
         const pendingWish = casinoWishListBot.find(wish => wish.status === 'pending');
 
         if (pendingWish) {
-            client.say(channel, `@${tags.username}, you already have a pending wish!`);
+            client.say(channel, `@${tags.username}, in deiner Wunschliste befindet sich bereits ein Wunsch!`);
         } else {
             // Check if the user has a completed wish in the last 10 minutes
             const completedWish = casinoWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
 
             if (completedWish) {
-                client.say(channel, `@${tags.username}, you already have a completed wish in the last 10 minutes!`);
+                client.say(channel, `@${tags.username}, dir wurde bereits ein Wunsch in den letzten 10 Minuten erfüllt!`);
             } else {
                 // Add the wish to the db with the twitch_user, status "pending" and the current date
                 const newWish = new db.CasinoWishListBot({
@@ -84,7 +85,7 @@ async function addWish(channel, tags, wish) {
                 await newWish.save();
 
                 // Send a message to the chat that the wish has been added to the wishlist
-                client.say(channel, `@${tags.username}, your wish has been added to the wishlist!`);
+                // client.say(channel, `@${tags.username}, dein Wunsch wurde zur Wunschliste hinzugefügt!`);
             }
         }
     } catch (error) {
@@ -99,11 +100,31 @@ async function listWishes(channel, tags) {
 
         // Check if there are any wishes
         if (casinoWishListBot.length === 0) {
-            client.say(channel, `@${tags.username}, there are no wishes in the wishlist!`);
+            client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
             casinoWishListBot.forEach(wish => {
-                client.say(channel, `@${tags.username}, ${wish.twitch_user} wishes for ${wish.wish}!`);
+                client.say(channel, `@${tags.username}, ${wish.twitch_user} wünscht sich ${wish.wish}!`);
+            });
+        }
+    } catch (error) {
+        logger.error('Error listing wishes:', error);
+    }
+}
+
+// list user wishes by twitch username
+async function listUserWishes(channel, tags) {
+    try {
+        // Get all the wishes from the db
+        const casinoWishListBot = await db.CasinoWishListBot.find({ twitch_user: tags.username, status: 'pending' });
+
+        // Check if there are any wishes
+        if (casinoWishListBot.length === 0) {
+            client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
+        } else {
+            // Loop through the wishes and send them to the chat
+            casinoWishListBot.forEach(wish => {
+                client.say(channel, `@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
             });
         }
     } catch (error) {
