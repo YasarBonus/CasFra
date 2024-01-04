@@ -4,6 +4,11 @@ const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAddressSchema = require('./UserPersonalAddressSchema');
 const userStatusSchema = require('./UserStatusSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
+const bcrypt = require('bcrypt');
+
+
+
+
 
 // Define User schema
 const UserSchema = new mongoose.Schema({
@@ -62,3 +67,23 @@ const UserSchema = new mongoose.Schema({
   const User = mongoose.model('User', UserSchema);
 
   module.exports = User;
+
+    // function to set a new password for a user based on the user Id
+
+    async function setPassword(userId, newPassword) {
+      try {
+        const user = await User.findById(userId);
+        if (!user) {
+          throw new Error('User not found');
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    }
+  
