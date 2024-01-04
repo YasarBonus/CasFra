@@ -6,6 +6,10 @@ const ServicesTypesSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
+        active: {
+            type: Boolean,
+            default: true,
+        },
     },
 });
 
