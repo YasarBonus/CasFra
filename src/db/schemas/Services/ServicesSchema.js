@@ -59,6 +59,11 @@ const ServicesSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    shortname: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     type: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ServicesTypes'
