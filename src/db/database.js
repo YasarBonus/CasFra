@@ -46,6 +46,10 @@ const ServicesTypes = require('./schemas/Services/ServicesTypesSchema.js');
 const ServicesOrders = require('./schemas/Services/ServicesOrdersSchema.js');
 const ServicesActive = require('./schemas/Services/ServicesActiveSchema.js');
 
+// User Points
+const UserPoints = require('./schemas/Users/UserPointsSchema.js');
+const UserPointsHistory = require('./schemas/Users/UserPointsHistorySchema.js');
+
 const HcVms = require('./schemas/HcVmSchema.js');
 
 module.exports = {
@@ -82,4 +86,6 @@ module.exports = {
     ServicesOrders,
     ServicesActive,
     CasinoWishListBot,
+    UserPoints,
+    UserPointsHistory,
   };
