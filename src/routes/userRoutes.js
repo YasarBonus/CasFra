@@ -85,19 +85,19 @@ router.post('/register', async (req, res) => {
         const existingKey = await db.RegistrationKey.findOne({
             regkey: registrationKey
         });
-        if (!existingKey) {
-            res.status(400).json({
-                error: 'Invalid registration key'
-            });
-            return;
-        }
-
-        if (existingKey.used) {
-            res.status(400).json({
-                error: 'Registration key already used'
-            });
-            return;
-        }
+        //if (!existingKey) {
+        //    res.status(400).json({
+        //        error: 'Invalid registration key'
+        //    });
+        //    return;
+        //}
+//
+        //if (existingKey.used) {
+        //    res.status(400).json({
+        //        error: 'Registration key already used'
+        //    });
+        //    return;
+        //}
 
         const existingUser = await db.User.findOne({
             $or: [{
@@ -154,8 +154,6 @@ router.post('/register', async (req, res) => {
         const registrationVerificationLinkCode = generateVerificationLinkCode();
         const registrationDate = new Date(); // Add registration date
 
-        
-
         const user = new db.User({
             username: username,
             nickname: nickname,
@@ -186,6 +184,18 @@ router.post('/register', async (req, res) => {
             group: existingKey.assign_group,
         });
 
+        await user.save();
+
+        // Get the user's ID from the database and add 0 points to the user,
+        // assign the userPoints to the user
+        const userPoints = new db.UserPoints({
+            user: user._id,
+            points: 0,
+        });
+        await userPoints.save();
+
+        // Assign the userPoints to the user
+        user.points = userPoints._id;
         await user.save();
 
         // Mark the registration key as used
