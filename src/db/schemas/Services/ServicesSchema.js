@@ -88,6 +88,7 @@ const Services = mongoose.model('Services', ServicesSchema);
 const ServicesData = [
     {
         name: 'VPS 1',
+        shortname: 'vps1',
         type: 'VPS',
         description: 'VPS 1 description',
         details: [
@@ -127,8 +128,31 @@ const ServicesData = [
     },
     {
         name: 'VPS 2',
+        shortname: 'vps2',
         type: 'VPS',
         description: 'VPS 2 description',
+        details: [
+            {
+                name: 'CPU',
+                value: '1',
+                unit: 'Core',
+            },
+            {
+                name: 'RAM',
+                value: '1',
+                unit: 'GB',
+            },
+            {
+                name: 'SSD',
+                value: '10',
+                unit: 'GB',
+            },
+            {
+                name: 'Bandwidth',
+                value: '1',
+                unit: 'TB',
+            },
+        ],
         pricing: {
             available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
             price: 5,
@@ -152,6 +176,7 @@ ServicesData.forEach(async (item) => {
         const serviceType = await ServicesTypes.findOne({ name: item.type });
         item.type = serviceType._id;
         Services.create(item);
+        console.log(`Service ${item.name} created`);
     }
 } );
 
