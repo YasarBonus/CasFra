@@ -14,6 +14,11 @@ const UserPointsSchema = new mongoose.Schema({
 const UserPoints = mongoose.model('UserPoints', UserPointsSchema);
 
 const UserPointsHistorySchema = new mongoose.Schema({
+    tx_id: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -41,6 +46,9 @@ const UserPointsHistorySchema = new mongoose.Schema({
     by: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    by_ip: {
+        type: String,
     },
 });
 
