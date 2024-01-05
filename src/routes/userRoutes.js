@@ -231,7 +231,7 @@ router.get('/', checkPermissions('authenticate'), (req, res) => {
         userId
     } = req.session.user;
 
-    db.User.findById(userId).populate('group').populate('tenancy').populate('tenancies')
+    db.User.findById(userId).populate('group').populate('tenancy').populate('tenancies').populate('points')
         .then((user) => {
             if (!user) {
                 res.status(404).json({
