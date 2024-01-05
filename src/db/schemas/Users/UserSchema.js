@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     },
     emails: userEmailsSchema,
     status: userStatusSchema,
+    points: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'UserPoints'
+    },
     password: {
       type: String,
       required: true,
