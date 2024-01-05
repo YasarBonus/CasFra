@@ -47,6 +47,9 @@ const ServicesActiveSchema = new mongoose.Schema({
     end_date: {
         type: Date,
     },
+    interval: {
+        type: Number,
+    },
     next_due_date: {
         type: Date,
     },
