@@ -83,7 +83,7 @@ router.get('/available-services/:type', async (req, res) => {
 // The order number will be unique
 // The order number will be 10 characters long
 
-router.post('/place', bodymen.middleware({
+router.post('/place', checkPermissions('orderServices'), bodymen.middleware({
     service: db.Services.schema
 }), async (req, res) => {
     const userId = req.session.user.userId;
@@ -166,7 +166,7 @@ router.post('/place', bodymen.middleware({
 // if completed = true, completed_date needs to be younger than 30 days
 // The orders will be sorted by order.creation_date descending
 
-router.get('/user', async (req, res) => {
+router.get('/user', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
     try {
         const orders = await db.ServicesOrders.find({
@@ -192,7 +192,7 @@ router.get('/user', async (req, res) => {
 // if completed = true, completed_date needs to be younger than 30 days
 // The orders will be sorted by order.creation_date descending
 
-router.get('/tenant', async (req, res) => {
+router.get('/tenant', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
     const userTenant = req.session.user.tenancy;
     try {
@@ -212,7 +212,7 @@ router.get('/tenant', async (req, res) => {
     }
 } );
 
-router.get('/', async (req, res) => {
+router.get('/', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
     const userTenant = req.session.user.tenancy;
 
@@ -256,7 +256,7 @@ router.get('/', async (req, res) => {
 // Check if the order belongs to the tenant or the user
 // This will return the details of the order with the id :id
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
     const orderId = req.params.id;
     const userTenant = req.session.user.tenancy;
