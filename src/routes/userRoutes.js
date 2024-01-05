@@ -341,6 +341,40 @@ router.get('/tenancy', checkPermissions('authenticate'), (req, res) => {
         });
 });
 
+
+/**
+ * @openapi
+ * /tenancy/leave
+ *   delete:
+ *     summary: Change the active tenancy of the current user to none
+ *     tags: [User]
+ */
+router.delete('/tenancy', checkPermissions('authenticate'), (req, res) => {
+    const {
+        userId
+    } = req.session.user;
+
+    // Update tenancy in session
+    req.session.user.tenancy = null;
+
+    // Update tenancy in database
+    db.User.findByIdAndUpdate(userId, {
+            tenancy: null
+        })
+        .then(() => {
+            console.log('Tenancy changed to none for user', userId);
+            res.json({
+                success: true
+            });
+        })
+        .catch((error) => {
+            console.error('Error updating user details:', error);
+            res.status(500).json({
+                error: 'Internal server error'
+            });
+        });
+}   );
+
 /**
  * @openapi
  * /tenancy/{tenancyId}:

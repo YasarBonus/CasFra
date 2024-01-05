@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const leaveTenancyItem = document.createElement('a');
         leaveTenancyItem.classList.add('item');
-        leaveTenancyItem.onclick = switchTenancy(null);
+        leaveTenancyItem.onclick = leaveTenancy();
         leaveTenancyItem.textContent = 'Leave current Tenant';
         dropdownMenu.appendChild(leaveTenancyItem);
 
@@ -202,7 +202,20 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }
 
- 
+ function leaveTenancy() {
+    return () => {
+      fetch(`/api/v1/user/tenancy`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Error leaving tenancy:', error);
+        });
+    };
+  }
 
   function switchTenancy(tenancyId) {
     return () => {
