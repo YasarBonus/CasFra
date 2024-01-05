@@ -26,6 +26,15 @@ const io = socketIo(server);
 
 const api = require('./services/casinoWishListBot.js');
 
+// 
+const { processOrders } = require('./modules/Orders/servicesOrderHandler.js');
+
+const cron = require('node-cron');
+cron.schedule('*/10 * * * * *', () => {
+  console.log('Calling processOrders()');
+    processOrders();
+});
+
 
 
 io.on('connection', (socket) => {
