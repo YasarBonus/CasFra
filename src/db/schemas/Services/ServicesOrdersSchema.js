@@ -36,11 +36,20 @@ const ServicesOrdersSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'services'
     },
+    interval: {
+        type: String,
+        required: true,
+        enum: ['once', 'hourly', 'daily', 'weekly', 'monthly', 'yearly'],
+    },
     creation_date: {
         type: Date,
     },
     creation_ip: {
         type: String,
+    },
+    creation_user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users'
     },
     status: ServicesOrdersStatusSchema,
     completed: {
