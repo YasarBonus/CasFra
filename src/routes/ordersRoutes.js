@@ -16,7 +16,6 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 router.get('/available-services', async (req, res) => {
     try {
         const services = await db.Services.find({
-            orderable: true,
             status: 'active'
         }).populate('type');
         // do not return orderable and active fields
@@ -84,7 +83,7 @@ router.get('/available-services/:type', async (req, res) => {
 // The order number will be unique
 // The order number will be 10 characters long
 
-router.post('/service', bodymen.middleware({
+router.post('/place', bodymen.middleware({
     service: db.Services.schema
 }), async (req, res) => {
     const userId = req.session.user.userId;
@@ -162,12 +161,12 @@ router.post('/service', bodymen.middleware({
 
 // Get all orders for the current user
 // Permissions: orderServices
-// GET /
+// GET /user
 // This will return all orders with order.completed = false.
 // if completed = true, completed_date needs to be younger than 30 days
 // The orders will be sorted by order.creation_date descending
 
-router.get('/', async (req, res) => {
+router.get('/user', async (req, res) => {
     const userId = req.session.user.userId;
     try {
         const orders = await db.ServicesOrders.find({
@@ -186,12 +185,69 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get the details of an order
+// Get all orders for the current tenant
+// Permissions: orderServices
+// GET /
+// This will return all orders with order.completed = false.
+// if completed = true, completed_date needs to be younger than 30 days
+// The orders will be sorted by order.creation_date descending
+
+router.get('/tenant', async (req, res) => {
+    const userId = req.session.user.userId;
+    const userTenant = req.session.user.tenancy;
+    try {
+        const orders = await db.ServicesOrders.find({
+            tenant: userTenant,
+            completed: false
+        })
+        .sort({
+            creation_date: -1
+        });
+        res.json(orders);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+} );
+
+router.get('/', async (req, res) => {
+    const userId = req.session.user.userId;
+    const userTenant = req.session.user.tenancy;
+
+    try {
+        const order = await db.ServicesOrders.find({
+            $or: [{
+                    user: userId
+                },
+                {
+                    tenant: userTenant
+                }
+            ]
+        }).populate('service').populate('tenant').populate('user');
+        if (!order) {
+            res.status(404).json({
+                message: 'Order not found'
+            });
+            return;
+        }
+        res.json(order);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+
+// Get the details of an order for a user
 // Permissions: orderServices
 // GET /:id
 // This will return the details of the order with the id :id
 
-router.get('/:id', async (req, res) => {
+router.get('/user/:id', async (req, res) => {
     const userId = req.session.user.userId;
     const orderId = req.params.id;
 
@@ -216,6 +272,8 @@ router.get('/:id', async (req, res) => {
 });
 
 
+
+
 //
 // Cancel an order
 // Permissions: manageOrders
@@ -223,5 +281,42 @@ router.get('/:id', async (req, res) => {
 // This will set:
 // order.status.status to 'cancelled', order.status.date to now
 // order.completed to true, order.completed_date to now
+
+// Get the details of an order
+// Permissions: orderServices
+// GET /:id
+// Check if the order belongs to the tenant or the user
+// This will return the details of the order with the id :id
+
+router.get('/:id', async (req, res) => {
+    const userId = req.session.user.userId;
+    const orderId = req.params.id;
+    const userTenant = req.session.user.tenancy;
+
+    try {
+        const order = await db.ServicesOrders.findOne({
+            _id: orderId,
+            $or: [{
+                    user: userId
+                },
+                {
+                    tenant: userTenant
+                }
+            ]
+        }).populate('service').populate('tenant').populate('user');
+        if (!order) {
+            res.status(404).json({
+                message: 'Order not found'
+            });
+            return;
+        }
+        res.json(order);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
 
 module.exports = router;

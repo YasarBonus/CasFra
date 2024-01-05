@@ -215,7 +215,7 @@ const shortLinksRoutes = require('./routes/shortLinksRoutes.js');
 app.use(pathV1 + '/shortlinks', shortLinksRoutes);
 
 const ordersRoutes = require('./routes/ordersRoutes.js');
-app.use(pathV1 + '/order', ordersRoutes);
+app.use(pathV1 + '/orders', ordersRoutes);
 
 const casinoWishListBotRoutes = require('./routes/casinoWishListBotRoutes.js');
 app.use(pathV1 + '/casinowishlistbot', casinoWishListBotRoutes);
