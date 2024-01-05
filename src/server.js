@@ -223,6 +223,9 @@ app.use(pathV1 + '/casinowishlistbot', casinoWishListBotRoutes);
 const servicesRoutes = require('./routes/servicesRoutes.js');
 app.use(pathV1 + '/services', servicesRoutes);
 
+const pointsRoutes = require('./routes/pointsRoutes.js');
+app.use(pathV1 + '/points', pointsRoutes);
+
 
 // const proxmoxRoutes = require('./routes/proxmoxRoutes.js');
 // app.use(pathV1 + '/proxmox', proxmoxRoutes);
