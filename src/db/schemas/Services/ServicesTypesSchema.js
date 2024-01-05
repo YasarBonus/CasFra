@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 
-const ServicesTypesSchema = new mongoose.Schema({
+const ServicesTypesAdapterSchema = new mongoose.Schema({
     name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
+    internal_name: {
         type: String,
         required: true,
         unique: true,
@@ -13,11 +19,32 @@ const ServicesTypesSchema = new mongoose.Schema({
     },
 });
 
+const ServicesTypesSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
+    internal_name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    adapter: ServicesTypesAdapterSchema,
+});
+
 const ServicesTypes = mongoose.model('ServicesTypes', ServicesTypesSchema);
 
 const ServicesTypesData = [
     {
         name: 'Nothing',
+        internal_name: 'nothing',
         active: true,
     },
     {
