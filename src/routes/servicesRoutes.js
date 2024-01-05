@@ -14,7 +14,7 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 
 router.get('/', checkPermissions('manageServices'), async (req, res) => {
     try {
-        const services = await db.Services.find();
+        const services = await db.Services.find().populate('type');
         res.json(services);
     } catch (err) {
         logger.error(err);
