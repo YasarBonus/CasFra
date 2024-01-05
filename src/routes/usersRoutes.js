@@ -19,7 +19,7 @@ const {
  *     tags: [Users, Super]
  */
 router.get('/', checkPermissions('manageUsers'), (req, res) => {
-    db.User.find().populate('group').populate('tenancy').populate('personal_details')
+    db.User.find().populate('group').populate('tenancy').populate('personal_details').populate('points')
         .then((results) => {
             res.json(results);
         })
