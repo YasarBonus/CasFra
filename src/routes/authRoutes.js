@@ -140,7 +140,7 @@ router.post('/login', (req, res) => {
                                     req.session.user = {
                                         userId: user._id,
                                         username: user.username,
-                                        tenancy: user.tenancy,
+                                        tenancy: user.default_tenancy,
                                         permissions: userGroup.permissions
                                     };
 
