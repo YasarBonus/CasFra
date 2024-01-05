@@ -26,7 +26,7 @@ const ServicesOrdersSchema = new mongoose.Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: 'User'
     },
     tenant: {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +34,7 @@ const ServicesOrdersSchema = new mongoose.Schema({
     },
     service: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'services'
+        ref: 'Services'
     },
     interval: {
         type: String,
@@ -49,7 +49,7 @@ const ServicesOrdersSchema = new mongoose.Schema({
     },
     creation_user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: 'User'
     },
     status: ServicesOrdersStatusSchema,
     completed: {
