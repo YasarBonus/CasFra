@@ -9,7 +9,7 @@
       <%- include('./partials/dashboard-menu') %>
       <div class="ui segment">
         <h1>Dashboard</h1>
-          <h2>Overview of your activity</h2>
+          <h2>Your activity</h2>
           <div class="ui grid">
             <div class="six wide column">
               <div class="ui mini loading card" id="casinoCard">
@@ -58,7 +58,27 @@
               </div>
             </!-->
           </div>
+          <h2>Your services</h2>
+          <div class="ui basic segment">
+            <div class="ui active inverted dimmer">
+              <div class="ui loader"></div>
+            </div>
+            <div class="ui table">
+                <table class="ui celled table">
+                  <thead>
+                    <tr>
+                      <th>Owner</th>
+                      <th>Service</th>
+                      <th>Active since</th>
+                      <th>Renewal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+                  </tbody>
+                </table>
     </div>
+          </div>
   </div>
 
   <%- include('../partials/footer') %>
