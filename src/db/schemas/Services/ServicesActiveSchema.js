@@ -25,11 +25,11 @@ const ServicesActiveStatus = new mongoose.Schema({
 });
 
 const ServicesActiveSchema = new mongoose.Schema({
-    user_id: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
-    tenant_id: {
+    tenant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenancies'
     },
