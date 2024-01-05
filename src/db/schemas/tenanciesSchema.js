@@ -49,6 +49,7 @@ const Tenancies = mongoose.model('Tenancies', tenanciesSchema);
 
 const tenanciesEntries = [{
     name: 'Treudler',
+    active: true,
 }]
 
 const saveDefaultTenanciesDatabaseData = async () => {
