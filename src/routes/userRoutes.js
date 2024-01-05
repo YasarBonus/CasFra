@@ -181,7 +181,7 @@ router.post('/register', async (req, res) => {
                 banned: false,
                 verified: false,
             },
-            tenancy: existingKey.assign_tenancy,
+            default_tenancy: existingKey.assign_tenancy,
             tenancies: [existingKey.assign_tenancy],
             group: existingKey.assign_group,
         });
