@@ -184,6 +184,17 @@ document.addEventListener("DOMContentLoaded", function() {
           dropdownMenu.appendChild(item);
         });
 
+        const divider = document.createElement('div');
+        divider.classList.add('divider');
+        dropdownMenu.appendChild(divider);
+
+
+        const leaveTenancyItem = document.createElement('a');
+        leaveTenancyItem.classList.add('item');
+        leaveTenancyItem.onclick = switchTenancy(null);
+        leaveTenancyItem.textContent = 'Leave current Tenant';
+        dropdownMenu.appendChild(leaveTenancyItem);
+
         $('.tenancies.dropdown').dropdown();
       })
       .catch(error => {
