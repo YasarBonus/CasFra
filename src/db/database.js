@@ -44,6 +44,7 @@ const ProxmoxServersLogs = require('./schemas/Proxmox/ProxmoxServersSchema.js');
 const Services = require('./schemas/Services/ServicesSchema.js');
 const ServicesTypes = require('./schemas/Services/ServicesTypesSchema.js');
 const ServicesOrders = require('./schemas/Services/ServicesOrdersSchema.js');
+const ServicesActive = require('./schemas/Services/ServicesActiveSchema.js');
 
 const HcVms = require('./schemas/HcVmSchema.js');
 
@@ -79,5 +80,6 @@ module.exports = {
     Services,
     ServicesTypes,
     ServicesOrders,
+    ServicesActive,
     CasinoWishListBot,
   };
