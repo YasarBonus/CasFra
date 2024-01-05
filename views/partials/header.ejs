@@ -6,15 +6,7 @@
       <div style="display:none; color:white" id="fetchingIndicator" class="ui right aligned active large orange loader">
          
     </div>
-    <script>
-      function showFetchingIndicator(x, message) {
-        $('#fetchingIndicator').show();
-      }
 
-      function hideFetchingIndicator() {
-        $('#fetchingIndicator').hide();
-      }
-    </script>
   
       <!-- a href="/" class="header item">
         <img class="logo" src="/img/logo-egon-animated.gif">
@@ -41,7 +33,7 @@
       </div -->
       <div class="right menu">
         <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
-            || user.permissions.includes('manageSessions')) { %>
+            || user.permissions.includes('manageSessions') || user.permissions.include ('manageServices')) { %>
     <div class="ui dropdown item">
       Super <i class="dropdown icon"></i>
 
@@ -57,6 +49,9 @@
         <% } %>
         <% if (user.permissions.includes('manageSessions') || user.permissions.includes('superAdmin')) { %>
         <a class="item" href="/dashboard/super/sessions">User Sessions</a>
+        <% } %>
+        <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
+          <a class="item" href="/dashboard/super/services">Services</a>
         <% } %>
 
       </div>
@@ -93,3 +88,12 @@
     </div>
   </div>
 
+  <script>
+    function showFetchingIndicator(x, message) {
+      $('#fetchingIndicator').show();
+    }
+
+    function hideFetchingIndicator() {
+      $('#fetchingIndicator').hide();
+    }
+  </script>
