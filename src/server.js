@@ -265,7 +265,7 @@ app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistratio
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/registrationkeys', {
+    res.render('admin/super_registrationkeys', {
       user: user
     });
   } catch (err) {
@@ -277,7 +277,7 @@ app.get('/dashboard/super/sessions', checkPermissions('manageSessions'), (req, r
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/sessions', {
+    res.render('admin/super_sessions', {
       user: user
     });
   } catch (err) {
@@ -289,7 +289,7 @@ app.get('/dashboard/super/users', checkPermissions('manageUsers'), (req, res, ne
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
     const user = req.session.user;
-    res.render('admin/users', {
+    res.render('admin/super_users', {
       user: user
     });
   } catch (err) {
@@ -304,7 +304,7 @@ app.get('/dashboard/super/users/:userId/edit', checkPermissions('manageUsers'), 
     const user = req.session.user;
     const userId = req.params.userId;
 
-    res.render('admin/users_edit', {
+    res.render('admin/super_users_edit', {
       user: user,
       userId: userId
     });
@@ -318,7 +318,7 @@ app.get('/dashboard/super/tenancies', checkPermissions('manageTenancies'), (req,
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
       ') accessed tenancies');
     const user = req.session.user;
-    res.render('admin/tenancies', {
+    res.render('admin/super_tenancies', {
       user: user
     });
   } catch (err) {
