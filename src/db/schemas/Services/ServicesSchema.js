@@ -11,31 +11,25 @@ const ServicesPricingSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
-    price_1_second: {
+    second: {
         type: Number,
     },
-    price_1_minute: {
+    minute: {
         type: Number,
     },
-    price_1_hour: {
+    hour: {
         type: Number,
     },
-    price_1_day: {
+    day: {
         type: Number,
     },
-    price_1_week: {
+    week: {
         type: Number,
     },
-    price_1_month: {
+    month: {
         type: Number,
     },
-    price_3_months: {
-        type: Number,
-    },
-    price_6_months: {
-        type: Number,
-    },
-    price_12_months: {
+    year: {
         type: Number,
     },
 });
@@ -77,7 +71,7 @@ const ServicesSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['active', 'inactive'],
-        default: 'inactive',
+        default: 'active',
     },
     orderable: {
         type: Boolean,
@@ -119,15 +113,13 @@ const ServicesData = [
         pricing: {
             recurring: true,
             price: 5,
-            price_1_second: 0.000005787,
-            price_1_minute: 0.00034722,
-            price_1_hour: 0.0208333,
-            price_1_day: 0.5,
-            price_1_week: 3.5,
-            price_1_month: 5,
-            price_3_months: 15,
-            price_6_months: 30,
-            price_12_months: 60,
+            second: 0.000005787,
+            minute: 0.00034722,
+            hour: 0.0208333,
+            day: 0.5,
+            week: 3.5,
+            month: 5,
+            year: 60,
         },
     },
     {
