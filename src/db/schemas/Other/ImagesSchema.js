@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../utils/generateRandomPriority');
+const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
 const imagesSchema = new mongoose.Schema({
     name: String,

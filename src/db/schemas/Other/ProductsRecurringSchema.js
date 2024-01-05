@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../utils/generateRandomPriority');
+const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
-const ContractsSchema = new mongoose.Schema({
+const ProductsSchema = new mongoose.Schema({
     name: {
         type: String,
         minlength: 3,
@@ -15,15 +15,14 @@ const ContractsSchema = new mongoose.Schema({
         type: Number,
         default: generateRandomPriority()
     },
-    orderDate: {
+    addedDate: {
         type: Date,
         default: Date.now,
         required: true
     },
-    tenancy: {
+    addedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'Tenancies'
+        required: true
     },
     modifiedDate: Date,
     modifiedBy: mongoose.Schema.Types.ObjectId,
@@ -31,13 +30,7 @@ const ContractsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    startDate: {
-        type: Date,
-        default: Date.now,
-        required: true
-    },
-    endDate: Date,
-    recurringProduct: {
+    newProduct: {
         type: Boolean,
         default: false
     },
@@ -46,3 +39,7 @@ const ContractsSchema = new mongoose.Schema({
         maxlength: 100
     },
 });
+
+const ProductsRecurring = mongoose.model('Products', ProductsSchema);
+
+module.exports = ProductsRecurring;
