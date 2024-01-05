@@ -104,7 +104,7 @@ router.post('/service', bodymen.middleware({
                     shortname: service
                 }
             ]
-            
+
         });
         if (!serviceData) {
             res.status(404).json({
@@ -160,17 +160,62 @@ router.post('/service', bodymen.middleware({
 });
 
 
-
-
 // Get all orders for the current user
 // Permissions: orderServices
 // GET /
-// This will return all orders with order.completed = false or order not older than 30 days
-//
-// Get the status of an order
+// This will return all orders with order.completed = false.
+// if completed = true, completed_date needs to be younger than 30 days
+// The orders will be sorted by order.creation_date descending
+
+router.get('/', async (req, res) => {
+    const userId = req.session.user.userId;
+    try {
+        const orders = await db.ServicesOrders.find({
+            user: userId,
+            completed: false
+        })
+        .sort({
+            creation_date: -1
+        });
+        res.json(orders);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+// Get the details of an order
 // Permissions: orderServices
 // GET /:id
-// This will return the order.status and order.completed
+// This will return the details of the order with the id :id
+
+router.get('/:id', async (req, res) => {
+    const userId = req.session.user.userId;
+    const orderId = req.params.id;
+
+    try {
+        const order = await db.ServicesOrders.findOne({
+            _id: orderId,
+            user: userId,
+        }).populate('service').populate('tenant').populate('user');
+        if (!order) {
+            res.status(404).json({
+                message: 'Order not found'
+            });
+            return;
+        }
+        res.json(order);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+
 //
 // Cancel an order
 // Permissions: manageOrders
