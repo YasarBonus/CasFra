@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // find the tenancy dropdown
         const accountMenuUsername = document.getElementById('accountMenuUsername');
-        accountMenuUsername.textContent = user.nickname;
+        accountMenuUsername.textContent = user.username + " (" + user.points.points + " Points)";
       })
       .catch(error => {
         console.error('Error fetching user details:', error);
