@@ -6,11 +6,9 @@ function checkPermissions(requiredPermission) {
     return async function (req, res, next) {
       try {
         if (!req.session.user) {
-          return res.status(401).json({
-            error: 'Unauthorized'
-          });
-        }
-  
+          return res.redirect('/login');
+        };
+      
         const userId = req.session.user.userId;
         const user = await db.User.findById(userId);
   
