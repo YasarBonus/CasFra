@@ -6,19 +6,39 @@ const ServicesActiveStatus = new mongoose.Schema({
         default: false,
         required: false
     },
+    active_date: {
+        type: Date,
+        maxlength: 50
+    },
     locked: {
         type: Boolean,
         default: false
     },
-    online: {
-        type: Boolean,
-        default: false
+    locked_date: {
+        type: Date,
+        maxlength: 50
     },
     abused: {
         type: Boolean,
         default: false
     },
-    updated: {
+    abused_date: {
+        type: Date,
+        maxlength: 50
+    },
+    cancelled: {
+        type: Boolean,
+        default: false
+    },
+    cancelled_date: {
+        type: Date,
+        maxlength: 50
+    },
+    terminated: {
+        type: Boolean,
+        default: false
+    },
+    terminated_date: {
         type: Date,
         maxlength: 50
     },
@@ -48,7 +68,8 @@ const ServicesActiveSchema = new mongoose.Schema({
         type: Date,
     },
     interval: {
-        type: Number,
+        type: String,
+        enum: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
     },
     next_due_date: {
         type: Date,

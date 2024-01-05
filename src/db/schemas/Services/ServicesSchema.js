@@ -1,15 +1,17 @@
 const mongoose = require('mongoose');
 
 const ServicesPricingSchema = new mongoose.Schema({
-    recurring: {
-        type: Boolean,
-        default: false,
-        required: true,
+    available_intervals: {
+        type: [String],
+        enum: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
     },
     price: {
         type: Number,
         required: true,
         default: 0,
+    },
+    once: {
+        type: Number,
     },
     second: {
         type: Number,
@@ -111,8 +113,9 @@ const ServicesData = [
             },
         ],
         pricing: {
-            recurring: true,
+            available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
             price: 5,
+            once: 5,
             second: 0.000005787,
             minute: 0.00034722,
             hour: 0.0208333,
@@ -127,12 +130,16 @@ const ServicesData = [
         type: 'VPS',
         description: 'VPS 2 description',
         pricing: {
-            recurring: true,
-            price: 10,
-            price_1_month: 10,
-            price_3_months: 30,
-            price_6_months: 60,
-            price_12_months: 120,
+            available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
+            price: 5,
+            once: 5,
+            second: 0.000005787,
+            minute: 0.00034722,
+            hour: 0.0208333,
+            day: 0.5,
+            week: 3.5,
+            month: 5,
+            year: 60,
         },
     },
 ];
