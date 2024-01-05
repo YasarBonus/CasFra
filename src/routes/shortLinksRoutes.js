@@ -6,7 +6,7 @@ const db = require('../db/database.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 
 // Get all short links from MongoDB
-router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+router.get('/', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -26,7 +26,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   });
   
   // Get short link by ID from MongoDB
-  router.get('/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  router.get('/:id', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       id
     } = req.params;
@@ -132,7 +132,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   
             // Create a new ShortLink entry
   
-            const newShortLink = new ShortLinks({
+            const newShortLink = new db.ShortLinks({
               description,
               url,
               shortUrl,
@@ -202,7 +202,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   }
   
   // Add short link to MongoDB
-  router.post('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
+  router.post('/', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       description,
       url,
@@ -232,7 +232,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   
   
   // Edit short link in MongoDB
-  router.put('/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  router.put('/:id', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       id
     } = req.params;
@@ -268,7 +268,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   // Therefore, it is not recommended to use this endpoint.
   // Instead, use the endpoint below to get the hits of a specific short link.
   
-  router.get('/shortlinks/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  router.get('/hits', checkPermissions('manageShortLinks'), (req, res) => {
     db.ShortLinksHits.find({
         tenancies: req.session.user.tenancy
       })
@@ -284,7 +284,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   });
   
   // Get short link hits by short link ID from MongoDB
-  router.get('/shortlinks/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
+  router.get('/:id/hits', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       id
     } = req.params;
@@ -305,7 +305,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   });
   
   // Get short link statistics by short link ID from MongoDB
-  router.get('/shortlinks/:id/statistics', checkPermissions('manageShortLinks'), (req, res) => {
+  router.get('/:id/statistics', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       id
     } = req.params;
@@ -338,7 +338,7 @@ router.get('/shortlinks', checkPermissions('manageShortLinks'), (req, res) => {
   });
   
   // Delete short link from MongoDB
-  router.delete('/shortlinks/:id', checkPermissions('manageShortLinks'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageShortLinks'), (req, res) => {
     const {
       id
     } = req.params;
