@@ -60,9 +60,6 @@
         </div>
         <h2>Your services</h2>
         <div class="ui basic segment">
-          <div class="ui active inverted dimmer">
-            <div class="ui loader"></div>
-          </div>
           <div class="ui table">
             <table class="ui celled table">
               <thead>
@@ -82,18 +79,15 @@
         </div>
         <h2>Your orders</h2>
         <div class="ui basic segment">
-          <div class="ui active inverted dimmer">
-            <div class="ui loader"></div>
-          </div>
           <div class="ui table">
-            <table class="ui celled table">
+            <table class="ui celled table" id="ordersTable">
               <thead>
                 <tr>
                   <th>Owner</th>
                   <th>Service</th>
+                  <th>Interval</th>
                   <th>Created</th>
                   <th>Status</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,7 +126,57 @@
     });
   }
 
+  function fetchOrders() {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/api/v1/orders',
+        type: 'GET',
+        success: function (response) {
+          $('#ordersTable tbody').empty();
+
+          response.forEach(function (item) {
+            var row = $('<tr>');
+              if (item.user) {
+                row.append($('<td>').text(item.user.nickname));
+              } else {
+                row.append($('<td>').text(item.tenant.name));
+              }
+
+            row.append($('<td>').text(item.service.name));
+            row.append($('<td>').text(item.interval));
+            row.append($('<td>').text(item.creation_date));
+            
+              // display status and date in one column with linebreak (e.g. "pending (X X ago)") 
+              var statusCell = $('<td>');
+              statusCell.append($('<div>').text(item.status.status));
+              if (item.status !== 'completed') {
+                statusCell.append($('<span class="ui small text">').text('(' + item.status.date + ')'));
+              }
+              row.append(statusCell);
+
+
+            var actionsCell = $('<td>');
+
+            var detailsButton = $('<button>').addClass('ui blue button').text('Details');
+            detailsButton.click(function () {
+              window.location.href = '/orders/' + item._id;
+            });
+
+            // actionsCell.append(detailsButton);
+
+
+            row.append(actionsCell);
+
+            $('#ordersTable tbody').append(row);
+
+          });
+        }
+      });
+    });
+  }
+
   $(document).ready(function () {
     fetchCasinoActiveInactiveCount();
+    fetchOrders();
   });
 </script>
