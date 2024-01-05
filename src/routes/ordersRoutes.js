@@ -21,8 +21,6 @@ router.get('/available-services', async (req, res) => {
         }).populate('type');
         // do not return orderable and active fields
         services.forEach((service) => {
-            service.orderable = undefined;
-            service.active = undefined;
             service.type.active = undefined;
         });
         res.json(services);
@@ -92,19 +90,21 @@ router.post('/service', bodymen.middleware({
     const userId = req.session.user.userId;
     const {
         service,
+        service_id,
         interval,
-        tenant
+        tenant_id
     } = req.body;
 
     try {
         const serviceData = await db.Services.findOne({
             $or: [{
-                    _id: service
+                    _id: service_id
                 },
                 {
                     shortname: service
                 }
             ]
+            
         });
         if (!serviceData) {
             res.status(404).json({
@@ -112,7 +112,7 @@ router.post('/service', bodymen.middleware({
             });
             return;
         }
-        if (!serviceData.orderable || !serviceData.active) {
+        if (!serviceData.orderable || !serviceData.status === 'active') {
             res.status(400).json({
                 message: 'Service not orderable'
             });
@@ -120,9 +120,9 @@ router.post('/service', bodymen.middleware({
         }
 
         let tenantData;
-        if (tenant) {
+        if (tenant_id) {
             tenantData = await db.Tenancies.findOne({
-                _id: tenant,
+                _id: tenant_id,
                 active: true,
             });
             if (!tenantData) {
@@ -142,6 +142,7 @@ router.post('/service', bodymen.middleware({
             creation_date: Date.now(),
             creation_ip: req.ip,
             creation_user: userId,
+            interval: interval,
             status: {
                 status: 'new',
                 date: Date.now(),
