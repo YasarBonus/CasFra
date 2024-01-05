@@ -12,7 +12,7 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 // GET /
 // This will return all services
 
-router.get('/', checkPermissions('manageServices'), async (req, res) => {
+router.get('/super', checkPermissions('manageServices'), async (req, res) => {
     try {
         const services = await db.Services.find().populate('type');
         res.json(services);
