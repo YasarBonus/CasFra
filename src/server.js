@@ -878,6 +878,7 @@ app.use(errorHandler);
 
 // Close the MongoDB connection when the server is shut down
 process.on('SIGINT', () => {
+  const mongoose = require('mongoose');
   mongoose.connection.close((err) => {
     if (err) {
       console.error(err.message);
