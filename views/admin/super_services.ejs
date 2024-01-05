@@ -16,6 +16,7 @@
                             <tr>
                                 <th>Service</th>
                                 <th>Type</th>
+                                <th>Pricing</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -48,7 +49,8 @@
                     $.each(data, function (i, item) {
                         var row = $('<tr></tr>');
                         row.append('<td>' + item.name + '</td>');
-                        row.append('<td>' + item.type + '</td>');
+                        row.append('<td>' + item.type.name + '</td>');
+                        row.append('<td>Price: ' + item.pricing.price + '<br>hourly: ' + item.pricing.price_1_hour + ', monthly: ' + item.pricing.price + '</div></td>');
                         row.append('<td>' + item.status + '</td>');
                         var actions = $('<td></td>');
                         actions.append('<button class="ui button" onclick="editService(\'' + item._id + '\')">Edit</button>');
