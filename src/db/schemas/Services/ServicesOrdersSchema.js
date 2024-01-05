@@ -4,6 +4,11 @@ const ServicesOrdersStatusSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
+        enum: ['new', 'confirmed', 'awaitingVerification', 'verificationInProgres',
+        'awaitingManualVerification', 'manualVerificationInProgress',
+        'verified', 'awaitingPayment', 'paid',
+        'processing', 'completed', 'cancelled'
+        ],
         default: 'new',
     },
     date: {
@@ -17,6 +22,10 @@ const ServicesOrdersSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
+    },
+    tenant: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tenancies'
     },
     service: {
         type: mongoose.Schema.Types.ObjectId,
