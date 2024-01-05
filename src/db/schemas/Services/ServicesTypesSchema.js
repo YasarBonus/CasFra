@@ -49,11 +49,22 @@ const ServicesTypesData = [
     },
     {
         name: 'VPS',
+        internal_name: 'vps',
         active: true,
+        adapter: {
+            name: 'VPS',
+            internal_name: 'vps',
+            active: true,
+        },
     },
     {
         name: 'Web Hosting',
         active: true,
+        adapter: {
+            name: 'Web Hosting',
+            internal_name: 'plesk',
+            active: true,
+        },
     },
     {
         name: 'Domain',
