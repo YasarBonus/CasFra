@@ -2,8 +2,6 @@ require('dotenv').config();
 
 let mongooseUrl = '';
 
-console.log('process.env.MODE_ENV', process.env.NODE_ENV)
-
 if (process.env.NODE_ENV === 'development') {
   mongooseUrl = process.env.MONGOOSE_DEV_URL;
 } else if (process.env.NODE_ENV === 'production') {

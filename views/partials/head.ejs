@@ -1,11 +1,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="/img/favicon.png" type="image/png">
+    <link rel="icon" href="/img/treudler_favicon.png" type="image/png">
 
     <title>CasFra</title>
-    <meta name="description" content="Yasarbonus is a website that compares online casinos and their bonuses.">
-    <meta name="keywords" content="yasarbonus, yasarbonus, yasar, bonus, casino, online casino, online casinos, casino bonus, casino bonuses, bonus comparison, casino comparison, casino reviews, casino review, casino bonus comparison, casino bonus comparisons, casino bonus comparison, casino bonus comparison">
+    <meta name="description" content="CasFra Admin">
+    <meta name="keywords" content="">
     
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -52,10 +52,10 @@
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Save';
       } else if (status === 'login') {
-          icon.classList.add('user');
+          icon.classList.add('lock');
           actionButton.classList.add('green');
           actionButton.classList.remove('disabled');
-          actionButton.textContent = 'Login';
+          actionButton.textContent = 'Login ';
       } else if (status === 'loginError') {
           icon.classList.add('close');
           actionButton.classList.replace('yellow', 'red');
@@ -85,7 +85,7 @@
           icon.classList.remove('lock');
           icon.classList.add('check');
           actionButton.classList.add('green', 'disabled');
-          actionButton.textContent = 'Saved';
+          actionButton.textContent = 'Success ';
           setTimeout(function() {
               showActionButton(button, 'save');
           }, 2000);
