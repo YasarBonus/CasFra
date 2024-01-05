@@ -114,6 +114,7 @@ router.post('/login', (req, res) => {
                                         userId: user._id,
                                         username: user.username,
                                         tenancy: tenancy,
+                                        tenancies: user.tenancies,
                                         permissions: userGroup.permissions
                                     };
 
@@ -140,8 +141,8 @@ router.post('/login', (req, res) => {
                                     req.session.user = {
                                         userId: user._id,
                                         username: user.username,
-                                        tenancy: user.default_tenancy,
-                                        permissions: userGroup.permissions
+                                        permissions: userGroup.permissions,
+                                        tenancies: user.tenancies,
                                     };
 
                                     // Add notification after successful login
@@ -162,7 +163,8 @@ router.post('/login', (req, res) => {
                                         req.session.user = {
                                             userId: user._id,
                                             username: user.username,
-                                            permissions: userGroup.permissions
+                                            permissions: userGroup.permissions,
+                                            tenancies: user.tenancies,
                                         };
 
                                         // Add notification after successful login
