@@ -1,0 +1,73 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<body>
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+        <div class="ui segment">
+            <%- include('./partials/dashboard-menu') %>
+            <div class="ui segment">
+                <div class="ui container">
+                    <h2>Super: Services</h2>
+                    <table id="serviceListTable" class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../partials/footer') %>
+    <script>
+        $(document).ready(function () {
+            getServices();
+        });
+
+        // Function to get all products from the API
+        // and populate the table with them.
+        // Each product will have a button to edit or delete it ot toggle its status.
+
+        function getServices() {
+            $.ajax({
+                url: '/api/services',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    var table = $('#serviceListTable tbody');
+                    table.empty();
+                    $.each(data, function (i, item) {
+                        var row = $('<tr></tr>');
+                        row.append('<td>' + item.name + '</td>');
+                        row.append('<td>' + item.type + '</td>');
+                        row.append('<td>' + item.status + '</td>');
+                        var actions = $('<td></td>');
+                        actions.append('<button class="ui button" onclick="editService(\'' + item._id + '\')">Edit</button>');
+                        actions.append('<button class="ui button" onclick="deleteService(\'' + item._id + '\')">Delete</button>');
+                        actions.append('<button class="ui button" onclick="toggleService(\'' + item._id + '\')">Toggle</button>');
+                        row.append(actions);
+                        table.append(row);
+                    });
+                },
+                error: function (request, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function editService(id) {
+            window.location.href = '/dashboard/super/services/' + id + '/edit';
+        }
+    </script>
+</body>
+
+</html>
