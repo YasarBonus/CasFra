@@ -9,6 +9,10 @@ const UserPointsSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    last_update: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 const UserPoints = mongoose.model('UserPoints', UserPointsSchema);
