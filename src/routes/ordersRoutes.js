@@ -62,39 +62,20 @@ router.get('/available-services/:type', async (req, res) => {
 
 //
 // Create a new order for a service for the current user
+// if the service is orderable = true and active = true.
+// If a tenant is specified, the tenant needs to be active = true,
+// the tenant needs to be in the user's tenants list
 // Permissions: orderServices
 // POST /service/:id
 // This will create a new order for the service with the id :id
-// The service needs to be orderable = true and active = true
-// The order will be created for the current user
+// The order will be created for the current user (user_id),
+// if a tenant is specified, the order will be created for the tenant (tenant_id)
 // The order will be created with:
 // order.status = 'pending', order.completed = false
 // creation_date = now, creation_ip = req.ip
 // service: :id, user: req.user.id
 
-router.post('/service/:id', bodymen.middleware({}), async (req, res) => {
-    try {
-        const service = await db.Services.findOne({ _id: req.params.id, orderable: true, active: true });
-        if (!service) {
-            return res.status(404).json({ message: 'Service not found' });
-        }
-        const order = await db.ServicesOrders.create({
-            user: req.user.id,
-            service: req.params.id,
-            creation_date: Date.now(),
-            creation_ip: req.ip,
-            status: {
-                status: 'pending',
-                date: Date.now(),
-            },
-            completed: false,
-        });
-        res.json(order);
-    } catch (err) {
-        logger.error(err);
-        res.status(500).json({ message: err.message });
-    }
-} );
+
 
 
 // Get all orders for the current user
