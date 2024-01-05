@@ -42,6 +42,10 @@ const ServicesActiveStatus = new mongoose.Schema({
         type: Date,
         maxlength: 50
     },
+    adapter: {
+        type: String,
+        enum: ['none', 'nothing', 'vps', 'webhosting', 'domain', 'ssl'],
+    },
 });
 
 const ServicesActiveSchema = new mongoose.Schema({
