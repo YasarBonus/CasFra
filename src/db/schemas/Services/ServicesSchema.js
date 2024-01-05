@@ -11,6 +11,21 @@ const ServicesPricingSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
+    price_1_second: {
+        type: Number,
+    },
+    price_1_minute: {
+        type: Number,
+    },
+    price_1_hour: {
+        type: Number,
+    },
+    price_1_day: {
+        type: Number,
+    },
+    price_1_week: {
+        type: Number,
+    },
     price_1_month: {
         type: Number,
     },
