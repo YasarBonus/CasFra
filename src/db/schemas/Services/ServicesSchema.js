@@ -114,6 +114,11 @@ const ServicesData = [
         pricing: {
             recurring: true,
             price: 5,
+            price_1_second: 0.000005787,
+            price_1_minute: 0.00034722,
+            price_1_hour: 0.0208333,
+            price_1_day: 0.5,
+            price_1_week: 3.5,
             price_1_month: 5,
             price_3_months: 15,
             price_6_months: 30,
