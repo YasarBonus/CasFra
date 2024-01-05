@@ -17,7 +17,7 @@ router.get('/available-services', async (req, res) => {
     try {
         const services = await db.Services.find({
             orderable: true,
-            active: true
+            status: 'active'
         }).populate('type');
         // do not return orderable and active fields
         services.forEach((service) => {
