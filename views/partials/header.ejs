@@ -32,6 +32,26 @@
         </div>
       </div -->
       <div class="right menu">
+        <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
+    <div class="ui dropdown item">
+      Services <i class="dropdown icon"></i>
+
+      <div class="menu">
+        <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
+          <a class="item" href="/dashboard/super/services">Services</a>
+        <% } %>
+        <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
+          <a class="item" href="/dashboard/super/activeservices">Active Services</a>
+        <% } %>
+        <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
+          <a class="item" href="/dashboard/super/orders">Orders</a>
+        <% } %>
+
+      </div>
+    </div>
+
+    <% } %>
+
         <% if (user.permissions.includes('superAdmin') || user.permissions.includes('manageRegistrationKeys') 
             || user.permissions.includes('manageSessions') || user.permissions.include ('manageServices')) { %>
     <div class="ui dropdown item">
