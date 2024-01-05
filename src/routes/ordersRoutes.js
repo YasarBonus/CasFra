@@ -242,38 +242,6 @@ router.get('/', async (req, res) => {
 });
 
 
-// Get the details of an order for a user
-// Permissions: orderServices
-// GET /:id
-// This will return the details of the order with the id :id
-
-router.get('/user/:id', async (req, res) => {
-    const userId = req.session.user.userId;
-    const orderId = req.params.id;
-
-    try {
-        const order = await db.ServicesOrders.findOne({
-            _id: orderId,
-            user: userId,
-        }).populate('service').populate('tenant').populate('user');
-        if (!order) {
-            res.status(404).json({
-                message: 'Order not found'
-            });
-            return;
-        }
-        res.json(order);
-    } catch (err) {
-        logger.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-    }
-});
-
-
-
-
 //
 // Cancel an order
 // Permissions: manageOrders
