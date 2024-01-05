@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenancies'
     },
+    default_tenancy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenancies'
+    },
     personal_details: userPersonalDetailsSchema,
     personal_address: userPersonalAddressSchema,
     priority: {
