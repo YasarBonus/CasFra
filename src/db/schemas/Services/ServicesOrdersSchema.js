@@ -19,6 +19,10 @@ const ServicesOrdersStatusSchema = new mongoose.Schema({
 });
 
 const ServicesOrdersSchema = new mongoose.Schema({
+    order_number: {
+        type: String,
+        required: true,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
