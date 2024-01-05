@@ -10,6 +10,11 @@ const ServicesPricingSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
+    currency: {
+        type: String,
+        required: true,
+        default: 'POINTS',
+    },
     once: {
         type: Number,
     },
@@ -116,6 +121,7 @@ const ServicesData = [
         pricing: {
             available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
             price: 5,
+            currency: 'POINTS',
             once: 5,
             second: 0.000005787,
             minute: 0.00034722,
@@ -156,6 +162,7 @@ const ServicesData = [
         pricing: {
             available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
             price: 5,
+            currency: 'POINTS',
             once: 5,
             second: 0.000005787,
             minute: 0.00034722,
