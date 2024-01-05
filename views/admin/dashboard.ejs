@@ -9,32 +9,32 @@
       <%- include('./partials/dashboard-menu') %>
       <div class="ui segment">
         <h1>Dashboard</h1>
-          <h2>Your activity</h2>
-          <div class="ui grid">
-            <div class="six wide column">
-              <div class="ui mini loading card" id="casinoCard">
-                <div class="content">
-                  <h2 class="ui header">
-                    <img src="/img/slot-machine.svg" width="60px">
-                    <div class="content">
-                      Casinos
-                    </div>
-                  </h2>
-                  <div class="description">
-                    <div id="casinoActiveAcount">
-                    </div>
-                    <div id="casinoUsed">
-                    </div>
+        <h2>Your activity</h2>
+        <div class="ui grid">
+          <div class="six wide column">
+            <div class="ui mini loading card" id="casinoCard">
+              <div class="content">
+                <h2 class="ui header">
+                  <img src="/img/slot-machine.svg" width="60px">
+                  <div class="content">
+                    Casinos
+                  </div>
+                </h2>
+                <div class="description">
+                  <div id="casinoActiveAcount">
+                  </div>
+                  <div id="casinoUsed">
                   </div>
                 </div>
-                <div class="extra content">
-                  <a href="/casinos">
-                    Manage Casinos <i class="fas fa-arrow-circle-right"></i>
-                  </a>
-                </div>
+              </div>
+              <div class="extra content">
+                <a href="/casinos">
+                  Manage Casinos <i class="fas fa-arrow-circle-right"></i>
+                </a>
               </div>
             </div>
-            <!-- div class="six wide column">
+          </div>
+          <!-- div class="six wide column">
               <div class="ui mini loading card" id="imagesCard">
                 <div class="content">
                   <h2 class="ui header">
@@ -57,31 +57,54 @@
                 </div>
               </div>
             </!-->
+        </div>
+        <h2>Your services</h2>
+        <div class="ui basic segment">
+          <div class="ui active inverted dimmer">
+            <div class="ui loader"></div>
           </div>
-          <h2>Your services</h2>
-          <div class="ui basic segment">
-            <div class="ui active inverted dimmer">
-              <div class="ui loader"></div>
-            </div>
-            <div class="ui table">
-                <table class="ui celled table">
-                  <thead>
-                    <tr>
-                      <th>Owner</th>
-                      <th>Service</th>
-                      <th>Active since</th>
-                      <th>Renewal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    
-                  </tbody>
-                </table>
-    </div>
-          </div>
-  </div>
+          <div class="ui table">
+            <table class="ui celled table">
+              <thead>
+                <tr>
+                  <th>Owner</th>
+                  <th>Service</th>
+                  <th>Active since</th>
+                  <th>Renewal</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
 
-  <%- include('../partials/footer') %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <h2>Your orders</h2>
+        <div class="ui basic segment">
+          <div class="ui active inverted dimmer">
+            <div class="ui loader"></div>
+          </div>
+          <div class="ui table">
+            <table class="ui celled table">
+              <thead>
+                <tr>
+                  <th>Owner</th>
+                  <th>Service</th>
+                  <th>Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <%- include('../partials/footer') %>
 
 </body>
 
@@ -102,7 +125,7 @@
           document.getElementById("casinoActiveAcount").innerHTML = result.activeCount + " active (" + result
             .inactiveCount + " disabled)";
           document.getElementById("casinoUsed").innerHTML = result.allCasinos + " used of " +
-            result.maxCasinos + " Casinos (" + result.percentageUsed + "%)";           
+            result.maxCasinos + " Casinos (" + result.percentageUsed + "%)";
         }
       });
       document.getElementById("casinoCard").classList.remove("loading");
