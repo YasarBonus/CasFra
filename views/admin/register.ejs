@@ -2,71 +2,89 @@
 <!DOCTYPE html>
 <html>
     <%- include('../partials/head') %>
-    <body class="bg-yasarred">
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
-            <div class="ui segment">
-                <div class="ui segment">
-                    <div class="ui container">
-                        <h2>Create Account</h2>
-                 
-                        <div class="ui divider"></div>                      
-                        <form class="ui form" id="userForm">
-                            <div class="ui blurring segment">
-                                <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
-                                <h4 class="ui dividing header">Account Details </h4>
-                          <div class="field">
-                            <label>Username</label>
-                            <input type="text" name="username" placeholder="Username">
-                          </div>
-                          <div class="field">
-                            <label>Nickname</label>
-                            <input type="text" name="nickname" placeholder="Nickname">
-                          </div>
-                          <div class="field">
-                            <label>E-Mail</label>
-                            <input type="text" name="email" placeholder="E-Mail">
-                          </div>
-                          <div class="field">
-                            <label>Password</label>
-                            <input type="password" name="password" placeholder="Password">
-                          </div>
-                          <div class="field">
-                            <label>Repeat Password</label>
-                            <input type="password" name="passwordRepeat" placeholder="Repeat password">
-                          </div>
-                          <div class="field">
-                            <label>Registration Key</label>
-                            <input type="text" name="registrationKey" placeholder="HE8GH6">
-                          </div>
-                          <!-- div class="field">
-                            <label>Language:</label>
-                            <div class="ui fluid multiple search selection dropdown">
-                              <input type="hidden" name="receipt">
-                              <i class="dropdown icon"></i>
-                              <div class="default text">Select Language</div>
-                              <div class="menu">
-                                <div class="item" data-value="en" data-text="English">
-                                  <img class="ui mini avatar image" src="/images/avatar/small/jenny.jpg">
-                                  Jenny Hess
-                                </div>
-                                <div class="item" data-value="de" data-text="German">
-                                  <img class="ui mini avatar image" src="/images/avatar/small/elliot.jpg">
-                                  Elliot Fu
-                                </div>
-                
-                              </div>
-                            </div>
-                          </div -->
-                        </div>
-                        
-                        </div>
-                          <button class="ui labeled icon button" id="saveButton">
-                          </button>
-                        </form>
-                      </div>
+    <style type="text/css">
+      body {
+        background-color: #DADADA;
+      }
+      body > .grid {
+        height: 100%;
+      }
+      .image {
+        margin-top: -100px;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+    <body>
+      <div class="ui middle aligned center aligned grid">
+        <div class="column">
+          <h2 class="ui image header">
+            <img src="https://cdn.treudler.net/web/logo/256x256.png" class="image">
+            <div class="content">
+              Register new account
+            </div>
+          </h2>
+          <form class="ui large form" id="userForm">
+            <div class="ui stacked segment">
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="user icon"></i>
+                  <input type="text" name="username" placeholder="Username">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="user icon"></i>
+                  <input type="text" name="nickname" placeholder="Nickname">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="mail icon"></i>
+                  <input type="text" name="email" placeholder="Email">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="password" name="password" placeholder="Password">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="password" name="passwordRepeat" placeholder="Password Repeat">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="key icon"></i>
+                  <input type="password" name="registrationKey" placeholder="Registration Key">
+                </div>
+              </div>
+              <button id="saveButton" class="ui fluid large submit button">Login</button>
+            </div>
+      
+            <div class="ui error message"></div>
+      
+          </form>
+      
+          <div class="ui message">
+            Existing user? <a href="/login">Login</a>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
                       
                       <script>
-                        showActionButton('saveButton','save');
+                        showActionButton('saveButton','register');
                         // showLoader('formLoaderPersonalDetails', 'disabled');
                         // showLoader('formLoaderPaymentInformation', 'disabled');
                         // showLoader('formLoaderReceipt', 'disabled');
