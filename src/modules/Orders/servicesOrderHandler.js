@@ -1,30 +1,31 @@
-const cron = require('node-cron');
 const mongoose = require('mongoose');
-const db = require('../db/database.js');
+const db = require('../../db/database.js');
 
-// Aufgabe, die alle 5 Sekunden ausgeführt wird
-cron.schedule('*/5 * * * * *', () => {
-    processOrders();
-  console.log('Diese Aufgabe wird alle 5 Sekunden ausgeführt');
-});
+const { fork } = require('child_process');
+const async = require('async');
 
 
-async function updateOrderStatus(orderId, status) {
-    const ServicesOrders = mongoose.model('ServicesOrders');
-    const order = await ServicesOrders.findOne({ _id: orderId });
-    if (order) {
+// Maximale Anzahl von gleichzeitig laufenden Prozessen
+const MAX_PROCESSES = 1;
 
-        order.status.status = status;
-        order.status.date = Date.now();
-        await order.save();
-        console.log(`Order ${orderId} status changed to ${status}`);
-    } else {
-        console.log(`Order ${orderId} not found`);
-    }
+// Warteschlange mit einer Begrenzung von maximal gleichzeitig laufenden Prozessen
+const queue = async.queue((task, callback) => {
+    const process = fork('./src/modules/Orders/updateOrderStatus.js');
+    console.log('Spawned child process:' + process.pid);
+    process.send({ orderId: task.order._id, status: task.status });
+
+    process.on('exit', function (code, signal) {
+        console.log('child process exited with ' +
+                    `code ${code} and signal ${signal}`);
+        callback();
+    });
+}, MAX_PROCESSES);
+
+async function updateOrderStatus(order, status) {
+    queue.push({ order: order, status: status });
 }
 
-// confirm orders
-
+// function to process uncompleted orders and decide what to do with them
 async function processOrders() {
     // connect to the database and populate the models, then:
     const ServicesOrders = mongoose.model('ServicesOrders');
@@ -38,26 +39,28 @@ async function processOrders() {
     
     const newOrders = orders.filter(order => order.status.status === 'new' && order.creation_date < Date.now() - 30);
     newOrders.forEach(async (order) => {
-        updateOrderStatus(order._id, 'awaitingConfirmation');
+        updateOrderStatus(order, 'awaitingConfirmation'); 
     });
 
     const awaitingConfirmationOrders = orders.filter(order => order.status.status === 'awaitingConfirmation' && order.status.date < Date.now() - 10);
     awaitingConfirmationOrders.forEach(async (order) => {
-        updateOrderStatus(order._id, 'confirming');
+        updateOrderStatus(order, 'confirming'); 
+
     });
 
     const confirmingOrders = orders.filter(order => order.status.status === 'confirming' && order.status.date < Date.now() - 10);
     confirmingOrders.forEach(async (order) => {
-        updateOrderStatus(order._id, 'confirmed');
+        updateOrderStatus(order, 'confirmed'); 
+
+        
     });
 
     const confirmedOrders = orders.filter(order => order.status.status === 'confirmed' && order.status.date < Date.now() - 10);
     confirmedOrders.forEach(async (order) => {
-        updateOrderStatus(order._id, 'new');
+        updateOrderStatus(order, 'new'); 
+
     });
 }
-
-
 
 module.exports = {
     processOrders,
