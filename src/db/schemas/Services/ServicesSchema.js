@@ -54,9 +54,10 @@ const ServicesSchema = new mongoose.Schema({
     },
     details: [ServicesDetailsSchema],
     pricing: ServicesPricingSchema,
-    active: {
-        type: Boolean,
-        default: true,
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'inactive',
     },
     orderable: {
         type: Boolean,
