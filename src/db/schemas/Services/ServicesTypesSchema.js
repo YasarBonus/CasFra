@@ -17,6 +17,10 @@ const ServicesTypes = mongoose.model('ServicesTypes', ServicesTypesSchema);
 
 const ServicesTypesData = [
     {
+        name: 'Nothing',
+        active: true,
+    },
+    {
         name: 'VPS',
         active: true,
     },
