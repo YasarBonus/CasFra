@@ -344,7 +344,7 @@ router.get('/tenancy', checkPermissions('authenticate'), (req, res) => {
 
 /**
  * @openapi
- * /tenancy/leave
+ * /tenancy:
  *   delete:
  *     summary: Change the active tenancy of the current user to none
  *     tags: [User]
