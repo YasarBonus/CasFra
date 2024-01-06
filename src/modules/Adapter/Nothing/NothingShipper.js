@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const db = require('../../../db/database.js');
 
+const logger = require('../../winston.js');
+
+
 async function shipNothing(orderId) {
 
     const ServicesOrders = mongoose.model('ServicesOrders');
@@ -10,9 +13,9 @@ async function shipNothing(orderId) {
         order.status.date = Date.now();
         await new Promise(resolve => setTimeout(resolve, 1000));
         await order.save();
-        console.log(`Order ${orderId} processed`);
+        logger.info(`shipNothing: Order ${order._id} shipped`);
     } else {
-        console.log(`Order ${orderId} not found`);
+        logger.error(`shipNothing: Order ${orderId} not found`);
     }
 
     // close the database connection
