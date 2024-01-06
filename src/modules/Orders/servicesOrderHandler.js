@@ -4,10 +4,14 @@ const db = require('../../db/database.js');
 const { fork } = require('child_process');
 const async = require('async');
 
+const dotenv = require('dotenv');
 
-// Maximale Anzahl von gleichzeitig laufenden Prozessen
-const MAX_PROCESSES_UPDATE_ORDER_STATUS = 1;
-const MAX_PROCESSES_SHIP_ORDERS = 1;
+// load environment variables from .env file
+dotenv.config();
+
+// get the maximum number of processes from the environment variables
+const MAX_PROCESSES_UPDATE_ORDER_STATUS = process.env.MAX_PROCESSES_UPDATE_ORDER_STATUS || 1;
+const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
 // Warteschlange mit einer Begrenzung von maximal gleichzeitig laufenden Prozessen
 const queueUpdateOrderStatus = async.queue((task, callback) => {
