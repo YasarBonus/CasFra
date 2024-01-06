@@ -26,20 +26,41 @@ async function updateOrderStatus(order, status) {
 
 // order status queue
 const queueUpdateOrderStatus = async.queue(async (task, callback) => {
+    Object.assign(task.taskInfo, {
+        status: 'starting',
+        completed: false,
+        date: Date.now(),
+    });
+    task.taskInfo.logs.push({ message: 'Task starting' , level: 'info', date: Date.now() });
+    await task.taskInfo.save();
+
     const process = fork('./src/modules/Tasks/Orders/updateOrderStatus.js', [], {
         detached: true,
     });
-    // Speichern Sie die PID des Prozesses in der Datenbank
-    task.taskInfo.pid = process.pid;
+
+    Object.assign(task.taskInfo, {
+        status: 'running',
+        completed: false,
+        date: Date.now(),
+        pid: process.pid,
+    });
+    task.taskInfo.logs.push({ message: 'Task running' , level: 'info', date: Date.now() });
     await task.taskInfo.save();
+    
 
     console.log('Spawned child process:' + process.pid);
     process.send({ orderId: task.order._id, status: task.status });
 
     process.on('exit', async (code, signal) => {
         // Aktualisieren Sie die Prozessinformationen in der Datenbank, wenn der Prozess beendet wird
-        task.taskInfo.exitCode = code;
-        task.taskInfo.exitSignal = signal;
+        Object.assign(task.taskInfo, {
+            exitCode: code,
+            exitSignal: signal,
+            status: 'completed',
+            completed: true,
+            date: Date.now(),
+        });
+        task.taskInfo.logs.push({ message: 'Task completed' , level: 'info', date: Date.now() });
         await task.taskInfo.save();
         console.log('child process exited with ' + `code ${code} and signal ${signal}`);
     });
