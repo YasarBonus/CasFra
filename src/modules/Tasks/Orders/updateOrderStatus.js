@@ -14,7 +14,7 @@ async function updateOrderStatus(orderId, status) {
         await order.save();
         logger.info(`updateOrderStatus: Order ${order._id} updated to ${status}`);
     } else {
-        console.log(`updateOrderStatus: Order ${orderId} not found`);
+        logger.error(`updateOrderStatus: Order ${orderId} not found`);
     }
 }
 
