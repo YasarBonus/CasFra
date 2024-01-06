@@ -13,9 +13,9 @@ dotenv.config();
 const MAX_PROCESSES_UPDATE_ORDER_STATUS = process.env.MAX_PROCESSES_UPDATE_ORDER_STATUS || 1;
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
-// Warteschlange mit einer Begrenzung von maximal gleichzeitig laufenden Prozessen
+// order status queue
 const queueUpdateOrderStatus = async.queue((task, callback) => {
-    const process = fork('./src/modules/Orders/updateOrderStatus.js');
+    const process = fork('./src/modules/Tasks/Orders/updateOrderStatus.js');
     console.log('Spawned child process:' + process.pid);
     process.send({ orderId: task.order._id, status: task.status });
 
@@ -30,9 +30,9 @@ async function updateOrderStatus(order, status) {
     queueUpdateOrderStatus.push({ order: order, status: status });
 }
 
-// Warteschlange mit einer Begrenzung von maximal gleichzeitig laufenden Prozessen
+// order shipping queue
 const queueShipOrders = async.queue((task, callback) => {
-    const process = fork('./src/modules/Adapter/Nothing.js');
+    const process = fork('./src/modules/Adapter/Nothing/NothingShipper.js');
     console.log('Spawned child process:' + process.pid);
     process.send({ orderId: task.order._id, status: task.status });
 
@@ -47,6 +47,8 @@ const queueShipOrders = async.queue((task, callback) => {
 async function shipOrder(order, status) {
     queueShipOrders.push({ order: order, status: status });
 }
+
+
 
 // function to process uncompleted orders and decide what to do with them
 async function processOrders() {

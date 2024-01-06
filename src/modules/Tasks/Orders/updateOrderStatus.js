@@ -1,25 +1,22 @@
 const mongoose = require('mongoose');
-const db = require('../../db/database.js');
+const db = require('../../../db/database.js');
 
-async function shipNothing(orderId) {
-
+// function to update the order status
+async function updateOrderStatus(orderId, status) {
     const ServicesOrders = mongoose.model('ServicesOrders');
     const order = await ServicesOrders.findOne({ _id: orderId });
     if (order) {
-        order.status.status = 'confirmed';
+        order.status.status = status;
         order.status.date = Date.now();
         await order.save();
-        console.log(`Order ${orderId} processed`);
+        console.log(`Order ${orderId} status changed to ${status}`);
     } else {
         console.log(`Order ${orderId} not found`);
     }
-
-    // close the database connection
-    mongoose.connection.close();
 }
 
 process.on('message', (message) => {
-    const run = shipNothing(message.orderId);
+    const run = updateOrderStatus(message.orderId, message.status);
 
     run.then(() => {
         process.exit(0, 'success');
@@ -29,4 +26,3 @@ process.on('message', (message) => {
         process.exit(1, 'error:' + err);
     });
 } );
-
