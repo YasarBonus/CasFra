@@ -11,6 +11,8 @@ async function shipNothing(orderId) {
     if (order) {
         order.status.status = 'delivered';
         order.status.date = Date.now();
+        order.completed = true;
+        order.logs.push({ message: 'shipNothing: Order delivered', level: 'info', date: Date.now() });
         await new Promise(resolve => setTimeout(resolve, 1000));
         await order.save();
         logger.info(`shipNothing: Order ${order._id} shipped`);
