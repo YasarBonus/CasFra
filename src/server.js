@@ -354,6 +354,19 @@ app.get('/dashboard/super/services', checkPermissions('manageServices'), (req, r
   }
 } );
 
+app.get('/dashboard/super/orders', checkPermissions('manageOrders'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed orders');
+    const user = req.session.user;
+    res.render('admin/super_orders', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 app.get('/dashboard/casinos', checkPermissions('manageCasinos'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);
