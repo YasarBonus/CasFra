@@ -7,7 +7,7 @@ const bodymen = require('bodymen');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 
 // We need the following API router endpoints:
-//
+
 // Get all services that can be ordered (orderable = true and active = true)
 // Permissions: none
 // GET /available-services
@@ -245,8 +245,52 @@ router.get('/', checkPermissions('orderServices'), async (req, res) => {
     }
 });
 
+// Super: Get all orders for all tenants and users
+// Permissions: manageOrders
+// GET /super
+// This will return all orders.
+// The orders will be sorted by order.creation_date descending.
+// The page size will be 50 orders per page.
+// The page number will be specified in the query parameter page.
+// The page number will be 1-based.
+// The response will contain the following headers:
+// X-Page-Size: the page size
+// X-Page-Number: the page number
+// X-Total-Count: the total number of orders
+// X-Total-Pages: the total number of pages
+// If the page number is invalid, the endpoint will return a 404 error.
 
-//
+router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
+    const pageSize = 5;
+    const pageNumber = req.query.page;
+    const skip = pageSize * (pageNumber - 1);
+
+    try {
+        const orders = await db.ServicesOrders.find()
+        .sort({
+            creation_date: -1
+        }).populate('service').populate('tenant').populate('user').skip(skip).limit(pageSize);
+        if (!orders) {
+            res.status(404).json({
+                message: 'Order not found'
+            });
+            return;
+        }
+        const count = await db.ServicesOrders.countDocuments();
+        const pages = Math.ceil(count / pageSize);
+        res.set('X-Page-Size', pageSize);
+        res.set('X-Page-Number', pageNumber);
+        res.set('X-Total-Count', count);
+        res.set('X-Total-Pages', pages);
+        res.json(orders);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
 // Cancel an order
 // Permissions: manageOrders
 // PUT /:id/cancel
