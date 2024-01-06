@@ -4,6 +4,8 @@ const db = require('../../db/database.js');
 const { fork } = require('child_process');
 const async = require('async');
 
+logger = require('../winston.js');
+
 
 const updateOrderStatus = require('./Orders/updateOrderStatus.js');
 
@@ -26,9 +28,9 @@ async function shipOrder(order, status) {
 
         await new Promise(resolve => setTimeout(resolve, 10000));
         await queueShipOrders.push(task);
-        console.log(`Order ${order._id} queued`);
+        logger.info(`shipOrder: Order ${order._id} queued`);
     } else {
-        console.log(`Order ${order._id} already queued`);
+        logger.warn(`shipOrder: Order ${order._id} already in queue`);
     }
 }
 
