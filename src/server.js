@@ -104,7 +104,9 @@ app.use(
               "blob:",
               "data:",
               "https://cdn.treudler.net/" ,
-              "http://localhost:9000/"
+              "http://localhost:9000/",
+              "https://cdn.datatables.net/",
+
           ],
           fontSrc: ["'self'", ...fontSrcUrls],
       },
