@@ -35,7 +35,7 @@ const ShortLinks = require('./schemas/Other/ShortLinksSchema.js');
 const ShortLinksHits = require('./schemas/Other/ShortLinksHitsSchema.js');
 const ShortLinksStatistics = require('./schemas/Other/ShortLinksStatisticsSchema.js');
 
-const CasinoWishListBot = require('./schemas/Other/CasinoWishListBotSchema.js');
+const TwitchWishListBot = require('./schemas/Other/TwitchWishListBotSchema.js');
 
 const ProxmoxServers = require('./schemas/Proxmox/ProxmoxServersSchema.js');
 const ProxmoxServersLogs = require('./schemas/Proxmox/ProxmoxServersSchema.js');
@@ -85,7 +85,7 @@ module.exports = {
     ServicesTypes,
     ServicesOrders,
     ServicesActive,
-    CasinoWishListBot,
+    TwitchWishListBot,
     UserPoints,
     UserPointsHistory,
   };

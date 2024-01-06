@@ -24,7 +24,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const api = require('./services/casinoWishListBot.js');
+const api = require('./services/TwitchWishListBot.js');
 
 // 
 const { processOrders } = require('./modules/Orders/servicesOrderHandler.js');
@@ -226,8 +226,8 @@ app.use(pathV1 + '/shortlinks', shortLinksRoutes);
 const ordersRoutes = require('./routes/ordersRoutes.js');
 app.use(pathV1 + '/orders', ordersRoutes);
 
-const casinoWishListBotRoutes = require('./routes/casinoWishListBotRoutes.js');
-app.use(pathV1 + '/casinowishlistbot', casinoWishListBotRoutes);
+const twitchWishListBotRoutes = require('./routes/twitchWishListBotRoutes.js');
+app.use(pathV1 + '/TwitchWishListBot', twitchWishListBotRoutes);
 
 const servicesRoutes = require('./routes/servicesRoutes.js');
 app.use(pathV1 + '/services', servicesRoutes);
@@ -552,13 +552,13 @@ app.get('/dashboard/shortlinks/:id/statistics', checkPermissions('manageShortLin
   }
 });
 
-app.get('/dashboard/utils/twitch/casinowishlistbot', checkPermissions('manageCasinoWishListBot'), (req, res, next) => {
+app.get('/dashboard/utils/twitch/wishlistbot', checkPermissions('manageTwitchWishListBot'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
       ') accessed casino wishlist bot');
     const user = req.session.user;
 
-    res.render('admin/utils_twitch_casinowishlistbot', {
+    res.render('admin/utils_twitch_wishlistbot', {
       user: user
     });
   } catch (err) {

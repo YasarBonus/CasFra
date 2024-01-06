@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-const CasinoWishListBotSchema = new mongoose.Schema({
-    round: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'CasinoWishListRound',
-    },
+const TwitchWishListBotSchema = new mongoose.Schema({
     twitch_user: {
         type: String,
         },
@@ -31,6 +27,6 @@ const CasinoWishListBotSchema = new mongoose.Schema({
     added_manually: Boolean,
 });
 
-const CasinoWishListBot = mongoose.model('CasinoWishListBot', CasinoWishListBotSchema);
+const TwitchWishListBot = mongoose.model('TwitchWishListBot', TwitchWishListBotSchema);
 
-module.exports = CasinoWishListBot;
+module.exports = TwitchWishListBot;

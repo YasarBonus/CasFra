@@ -63,7 +63,7 @@ client.on('message', (channel, tags, message, self) => {
 async function addWish(channel, tags, wish) {
     try {
         // Get all the wishes of the user from the db
-        const casinoWishListBot = await db.CasinoWishListBot.find({ twitch_user: tags.username });
+        const casinoWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username });
 
         // Check if the user has a pending wish
         const pendingWish = casinoWishListBot.find(wish => wish.status === 'pending');
@@ -78,7 +78,7 @@ async function addWish(channel, tags, wish) {
                 client.say(channel, `@${tags.username}, dir wurde bereits ein Wunsch in den letzten 10 Minuten erfüllt!`);
             } else {
                 // Add the wish to the db with the twitch_user, status "pending" and the current date
-                const newWish = new db.CasinoWishListBot({
+                const newWish = new db.TwitchWishListBot({
                     wish: wish,
                     twitch_user: tags.username,
                     created_at: Date.now(),
@@ -100,7 +100,7 @@ async function addWish(channel, tags, wish) {
 async function listWishes(channel, tags) {
     try {
         // Get all the wishes from the db
-        const casinoWishListBot = await db.CasinoWishListBot.find();
+        const casinoWishListBot = await db.TwitchWishListBot.find();
 
         // Check if there are any wishes
         if (casinoWishListBot.length === 0) {
@@ -120,7 +120,7 @@ async function listWishes(channel, tags) {
 async function listUserWishes(channel, tags) {
     try {
         // Get all the wishes from the db
-        const casinoWishListBot = await db.CasinoWishListBot.find({ twitch_user: tags.username, status: 'pending' });
+        const casinoWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username, status: 'pending' });
 
         // Check if there are any wishes
         if (casinoWishListBot.length === 0) {
