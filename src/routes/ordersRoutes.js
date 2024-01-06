@@ -248,45 +248,65 @@ router.get('/', checkPermissions('orderServices'), async (req, res) => {
 // Super: Get all orders for all tenants and users
 // Permissions: manageOrders
 // GET /super
-// This will return all orders.
-// The orders will be sorted by order.creation_date descending.
-// The page size will be 50 orders per page.
-// The page number will be specified in the query parameter page.
-// The page number will be 1-based.
-// The response will contain the following headers:
-// X-Page-Size: the page size
-// X-Page-Number: the page number
-// X-Total-Count: the total number of orders
-// X-Total-Pages: the total number of pages
-// If the page number is invalid, the endpoint will return a 404 error.
+// This will return all orders with pagination for all tenants and users
 
 router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
-    const pageSize = 5;
-    const pageNumber = req.query.page;
-    const skip = pageSize * (pageNumber - 1);
-
     try {
-        const orders = await db.ServicesOrders.find()
-        .sort({
-            creation_date: -1
-        }).populate('service').populate('tenant').populate('user').skip(skip).limit(pageSize);
-        if (!orders) {
-            res.status(404).json({
-                message: 'Order not found'
-            });
-            return;
-        }
-        const count = await db.ServicesOrders.countDocuments();
-        const pages = Math.ceil(count / pageSize);
-        res.set('X-Page-Size', pageSize);
-        res.set('X-Page-Number', pageNumber);
-        res.set('X-Total-Count', count);
-        res.set('X-Total-Pages', pages);
-        res.json(orders);
+        console.log('Query:', req.query);
+        const draw = parseInt(req.query.draw);
+        const start = parseInt(req.query.start);
+        const length = parseInt(req.query.length);
+        const search = req.query.search;
+
+        console.log('Search:', search); 
+
+        const searchQuery = {
+            $or: [
+                {
+                    order_number: {
+                        $regex: search,
+                        $options: 'i'
+                    }
+                },
+                {
+                    'user.username': {
+                        $regex: search,
+                        $options: 'i'
+                    }
+                },
+            ],
+        };
+
+        console.log('SearchQuery:', searchQuery);
+
+        const orders = await db.ServicesOrders.find(searchQuery)
+            .populate('service')
+            .populate('tenant')
+            .populate('user')
+            .skip(start)
+            .limit(length);
+
+        console.log('Orders:', orders);
+
+        const totalOrders = await db.ServicesOrders.countDocuments(searchQuery);
+        console.log('TotalOrders:', totalOrders);
+
+        res.send({
+            draw: draw,
+            recordsTotal: totalOrders,
+            recordsFiltered: totalOrders,
+            search: search,
+            data: orders.map(order => ({
+                order_number: order.order_number,
+                status: order.status,
+                user: order.user,
+                tenant: order.tenant,
+                creation_date: order.creation_date
+            })),
+        });
     } catch (err) {
-        logger.error(err);
-        res.status(500).json({
-            message: err.message
+        res.status(500).send({
+            error: 'An error occurred while retrieving orders: ' + err
         });
     }
 });
