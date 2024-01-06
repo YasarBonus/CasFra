@@ -46,6 +46,8 @@ const ServicesTypes = require('./schemas/Services/ServicesTypesSchema.js');
 const ServicesOrders = require('./schemas/Services/ServicesOrdersSchema.js');
 const ServicesActive = require('./schemas/Services/ServicesActiveSchema.js');
 
+const Tasks = require('./schemas/Services/TasksSchema.js');
+
 // User Points
 const UserPoints = require('./schemas/Users/UserPointsSchema.js');
 const UserPointsHistory = require('./schemas/Users/UserPointsHistorySchema.js');
@@ -85,6 +87,7 @@ module.exports = {
     ServicesTypes,
     ServicesOrders,
     ServicesActive,
+    Tasks,
     TwitchWishListBot,
     UserPoints,
     UserPointsHistory,
