@@ -15,7 +15,7 @@ dotenv.config();
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
 async function shipOrder(order, status) {
-    const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queueingDelivery', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
+    const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queueing', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
     await taskInfo.save();
 
     // create the task
