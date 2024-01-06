@@ -27,7 +27,7 @@ const io = socketIo(server);
 const api = require('./services/TwitchWishListBot.js');
 
 // 
-const { processOrders } = require('./modules/Orders/servicesOrderHandler.js');
+const { processOrders } = require('./modules/Tasks/servicesOrderHandler.js');
 
 const cron = require('node-cron');
 cron.schedule('*/10 * * * * *', () => {
@@ -227,7 +227,7 @@ const ordersRoutes = require('./routes/ordersRoutes.js');
 app.use(pathV1 + '/orders', ordersRoutes);
 
 const twitchWishListBotRoutes = require('./routes/twitchWishListBotRoutes.js');
-app.use(pathV1 + '/TwitchWishListBot', twitchWishListBotRoutes);
+app.use(pathV1 + '/utils/twitch/wishlistbot', twitchWishListBotRoutes);
 
 const servicesRoutes = require('./routes/servicesRoutes.js');
 app.use(pathV1 + '/services', servicesRoutes);
