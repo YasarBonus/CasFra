@@ -18,6 +18,24 @@ const ServicesOrdersStatusSchema = new mongoose.Schema({
     },
 });
 
+const ServicesOrdersLogSchema = new mongoose.Schema({
+    message: {
+        type: String,
+        required: true,
+    },
+    level: {
+        type: String,
+        required: true,
+        enum: ['info', 'warning', 'error'],
+    },
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now,
+    },
+});
+
+
 const ServicesOrdersSchema = new mongoose.Schema({
     order_number: {
         type: String,
@@ -52,6 +70,7 @@ const ServicesOrdersSchema = new mongoose.Schema({
         ref: 'User'
     },
     status: ServicesOrdersStatusSchema,
+    logs: [ServicesOrdersLogSchema],
     completed: {
         type: Boolean,
         default: false,
