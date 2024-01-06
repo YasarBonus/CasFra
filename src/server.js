@@ -68,6 +68,7 @@ const scriptSrcUrls = [
   "https://kit.fontawesome.com/",
   "https://cdn.jsdelivr.net/",
   "https://cdn.socket.io/",
+  "https://cdn.datatables.net/",
   "'unsafe-inline'"
 ];
 
@@ -77,6 +78,7 @@ const scriptSrcAttr = [
 
 const styleSrcUrls = [
     "https://cdn.jsdelivr.net/",
+    "https://cdn.datatables.net/",
 ];
 const connectSrcUrls = [
   "https://ka-f.fontawesome.com/",
