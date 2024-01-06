@@ -170,12 +170,12 @@ router.get('/user', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
     try {
         const orders = await db.ServicesOrders.find({
-            user: userId,
-            completed: false
-        })
-        .sort({
-            creation_date: -1
-        });
+                user: userId,
+                completed: false
+            })
+            .sort({
+                creation_date: -1
+            });
         res.json(orders);
     } catch (err) {
         logger.error(err);
@@ -197,12 +197,12 @@ router.get('/tenant', checkPermissions('orderServices'), async (req, res) => {
     const userTenant = req.session.user.tenancy;
     try {
         const orders = await db.ServicesOrders.find({
-            tenant: userTenant,
-            completed: false
-        })
-        .sort({
-            creation_date: -1
-        });
+                tenant: userTenant,
+                completed: false
+            })
+            .sort({
+                creation_date: -1
+            });
         res.json(orders);
     } catch (err) {
         logger.error(err);
@@ -210,7 +210,7 @@ router.get('/tenant', checkPermissions('orderServices'), async (req, res) => {
             message: err.message
         });
     }
-} );
+});
 
 router.get('/', checkPermissions('orderServices'), async (req, res) => {
     const userId = req.session.user.userId;
@@ -219,17 +219,17 @@ router.get('/', checkPermissions('orderServices'), async (req, res) => {
     try {
         // find all orders that belong to the user or the tenant
         const orders = await db.ServicesOrders.find({
-            $or: [{
-                    user: userId
-                },
-                {
-                    tenant: userTenant
-                }
-            ]
-        })
-        .sort({
-            creation_date: -1
-        }).populate('service').populate('tenant').populate('user');
+                $or: [{
+                        user: userId
+                    },
+                    {
+                        tenant: userTenant
+                    }
+                ]
+            })
+            .sort({
+                creation_date: -1
+            }).populate('service').populate('tenant').populate('user');
         if (!orders) {
             res.status(404).json({
                 message: 'Order not found'
@@ -258,20 +258,51 @@ router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
         const length = parseInt(req.query.length);
         const search = req.query.search;
 
-        console.log('Search:', search); 
+        // Erstellen Sie eine Liste der Spaltennamen
+        const columns = ['order_number', 'status', 'user', 'tenant', 'creation_date'];
+
+        // Erstellen Sie die Sortieroptionen
+        const sort = {};
+        if (req.query.order) {
+            req.query.order.forEach(order => {
+                const columnName = columns[order.column];
+                sort[columnName] = order.dir === 'asc' ? 1 : -1;
+            });
+        }
+
+        // Suchen Sie zuerst in der User-Sammlung
+        const users = await db.User.find({
+            username: {
+                $regex: search,
+                $options: 'i'
+            }
+        });
+
+        const tenants = await db.Tenancies.find({
+            name: {
+                $regex: search,
+                $options: 'i'
+            }
+        });
+
+        // Extrahieren Sie die IDs der gefundenen Benutzer
+        const userIds = users.map(user => user._id);
 
         const searchQuery = {
-            $or: [
-                {
+            $or: [{
                     order_number: {
                         $regex: search,
                         $options: 'i'
                     }
                 },
                 {
-                    'user.username': {
-                        $regex: search,
-                        $options: 'i'
+                    user: {
+                        $in: userIds // Verwenden Sie die IDs der gefundenen Benutzer
+                    }
+                },
+                {
+                    tenant: {
+                        $in: tenants.map(tenant => tenant._id) // Verwenden Sie die IDs der gefundenen Benutzer
                     }
                 },
             ],
@@ -283,6 +314,7 @@ router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
             .populate('service')
             .populate('tenant')
             .populate('user')
+            .sort(sort)
             .skip(start)
             .limit(length);
 
