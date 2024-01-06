@@ -4,16 +4,28 @@ const db = require('../../db/database.js');
 const { fork } = require('child_process');
 const async = require('async');
 
-const dotenv = require('dotenv');
 
 const updateOrderStatus = require('./Orders/updateOrderStatus.js');
 
 // load environment variables from .env file
+const dotenv = require('dotenv');
 dotenv.config();
 
 // get the maximum number of processes from the environment variables
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
+async function shipOrder(order, status) {
+    const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queueingDelivery', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
+    await taskInfo.save();
+
+    // create the task
+    const task = { order: order, status: status, taskInfo: taskInfo };
+
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    await queueShipOrders.push(task);
+    console.log(`Order ${order._id} queued`);
+
+}
 
 // order shipping queue
 const queueShipOrders = async.queue(async (task, callback) => {
@@ -56,20 +68,7 @@ const queueShipOrders = async.queue(async (task, callback) => {
 }, MAX_PROCESSES_SHIP_ORDERS);
 
 
-async function shipOrder(order, status) {
-    // queueShipOrders.push({ order: order, status: status });
 
-    const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queued', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
-    await taskInfo.save();
-
-    // create the task
-    const task = { order: order, status: status, taskInfo: taskInfo };
-
-    await new Promise(resolve => setTimeout(resolve, 10000));
-    await queueShipOrders.push(task);
-    console.log(`Order ${order._id} queued`);
-
-}
 
 
 
