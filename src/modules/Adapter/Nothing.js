@@ -13,6 +13,9 @@ async function shipNothing(orderId) {
     } else {
         console.log(`Order ${orderId} not found`);
     }
+
+    // close the database connection
+    mongoose.connection.close();
 }
 
 process.on('message', (message) => {
