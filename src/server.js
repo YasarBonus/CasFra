@@ -69,6 +69,7 @@ const scriptSrcUrls = [
   "https://cdn.jsdelivr.net/",
   "https://cdn.socket.io/",
   "https://cdn.datatables.net/",
+  "https://cdnjs.cloudflare.com/",
   "'unsafe-inline'"
 ];
 
