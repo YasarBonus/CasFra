@@ -39,7 +39,7 @@ const TasksSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['queued', 'running', 'completed', 'failed'],
+        enum: ['queued', 'starting', 'running', 'completed', 'failed'],
         default: 'queued'
     },
     pid: {
