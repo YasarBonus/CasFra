@@ -17,16 +17,16 @@ dotenv.config();
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
 async function shipOrder(order, status) {
-    const isOrderInQueue = queueShipOrders.some(task => task.order._id.equals(order._id));
+    const isOrderInQueue = queueShipOrders.workersList().some(worker => worker.data.order._id === order._id);
 
     if (!isOrderInQueue) {
-        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queueing', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
+        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'starting', logs: [{ message: 'Starting task' , level: 'info', date: Date.now() }] });
         await taskInfo.save();
 
         // create the task
         const task = { order: order, status: status, taskInfo: taskInfo };
 
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await queueShipOrders.push(task);
         logger.info(`shipOrder: Order ${order._id} queued`);
     } else {
