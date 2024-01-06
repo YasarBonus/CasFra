@@ -8,6 +8,8 @@ async function shipNothing(orderId) {
     if (order) {
         order.status.status = 'confirmed';
         order.status.date = Date.now();
+        // sleep for 10 seconds
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await order.save();
         console.log(`Order ${orderId} processed`);
     } else {
