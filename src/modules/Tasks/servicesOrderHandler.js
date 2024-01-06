@@ -13,22 +13,39 @@ dotenv.config();
 const MAX_PROCESSES_UPDATE_ORDER_STATUS = process.env.MAX_PROCESSES_UPDATE_ORDER_STATUS || 1;
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
+async function updateOrderStatus(order, status) {
+    const taskInfo = new db.Tasks({ name: 'updateOrderStatus', description: 'Update order status', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queued', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
+    await taskInfo.save();
+
+    // create the task
+    const task = { order: order, status: status, taskInfo: taskInfo };
+
+    // que the task
+    await queueUpdateOrderStatus.push(task);
+}
+
 // order status queue
-const queueUpdateOrderStatus = async.queue((task, callback) => {
-    const process = fork('./src/modules/Tasks/Orders/updateOrderStatus.js');
+const queueUpdateOrderStatus = async.queue(async (task, callback) => {
+    const process = fork('./src/modules/Tasks/Orders/updateOrderStatus.js', [], {
+        detached: true,
+    });
+    // Speichern Sie die PID des Prozesses in der Datenbank
+    task.taskInfo.pid = process.pid;
+    await task.taskInfo.save();
+
     console.log('Spawned child process:' + process.pid);
     process.send({ orderId: task.order._id, status: task.status });
 
-    process.on('exit', function (code, signal) {
-        console.log('child process exited with ' +
-                    `code ${code} and signal ${signal}`);
-        callback();
+    process.on('exit', async (code, signal) => {
+        // Aktualisieren Sie die Prozessinformationen in der Datenbank, wenn der Prozess beendet wird
+        task.taskInfo.exitCode = code;
+        task.taskInfo.exitSignal = signal;
+        await task.taskInfo.save();
+        console.log('child process exited with ' + `code ${code} and signal ${signal}`);
     });
 }, MAX_PROCESSES_UPDATE_ORDER_STATUS);
 
-async function updateOrderStatus(order, status) {
-    queueUpdateOrderStatus.push({ order: order, status: status });
-}
+
 
 // order shipping queue
 const queueShipOrders = async.queue((task, callback) => {
