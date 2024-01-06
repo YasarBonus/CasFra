@@ -6,9 +6,8 @@ async function shipNothing(orderId) {
     const ServicesOrders = mongoose.model('ServicesOrders');
     const order = await ServicesOrders.findOne({ _id: orderId });
     if (order) {
-        order.status.status = 'confirmed';
+        order.status.status = 'delivered';
         order.status.date = Date.now();
-        // sleep for 10 seconds
         await new Promise(resolve => setTimeout(resolve, 1000));
         await order.save();
         console.log(`Order ${orderId} processed`);

@@ -9,20 +9,11 @@ async function updateOrderStatus(orderId, status) {
         order.status.status = status;
         order.status.date = Date.now();
         await order.save();
-        console.log(`Order ${orderId} status changed to ${status}`);
+        console.log(`Order ${orderId} updated to ${status}`);
     } else {
         console.log(`Order ${orderId} not found`);
     }
 }
 
-process.on('message', (message) => {
-    const run = updateOrderStatus(message.orderId, message.status);
-
-    run.then(() => {
-        process.exit(0, 'success');
-    }
-    ).catch((err) => {
-        console.log(err);
-        process.exit(1, 'error:' + err);
-    });
-} );
+// export the function to be used in other modules
+module.exports = updateOrderStatus;

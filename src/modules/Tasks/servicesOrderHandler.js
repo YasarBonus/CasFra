@@ -6,26 +6,17 @@ const async = require('async');
 
 const dotenv = require('dotenv');
 
+const updateOrderStatus = require('./Orders/updateOrderStatus.js');
+
 // load environment variables from .env file
 dotenv.config();
 
 // get the maximum number of processes from the environment variables
-const MAX_PROCESSES_UPDATE_ORDER_STATUS = process.env.MAX_PROCESSES_UPDATE_ORDER_STATUS || 1;
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
-async function updateOrderStatus(order, status) {
-    const taskInfo = new db.Tasks({ name: 'updateOrderStatus', description: 'Update order status', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queued', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
-    await taskInfo.save();
 
-    // create the task
-    const task = { order: order, status: status, taskInfo: taskInfo };
-
-    // que the task
-    await queueUpdateOrderStatus.push(task);
-}
-
-// order status queue
-const queueUpdateOrderStatus = async.queue(async (task, callback) => {
+// order shipping queue
+const queueShipOrders = async.queue(async (task, callback) => {
     Object.assign(task.taskInfo, {
         status: 'starting',
         completed: false,
@@ -34,7 +25,7 @@ const queueUpdateOrderStatus = async.queue(async (task, callback) => {
     task.taskInfo.logs.push({ message: 'Task starting' , level: 'info', date: Date.now() });
     await task.taskInfo.save();
 
-    const process = fork('./src/modules/Tasks/Orders/updateOrderStatus.js', [], {
+    const process = fork('./src/modules/Adapter/Nothing/NothingShipper.js', [], {
         detached: true,
     });
 
@@ -48,7 +39,6 @@ const queueUpdateOrderStatus = async.queue(async (task, callback) => {
     await task.taskInfo.save();
     
 
-    console.log('Spawned child process:' + process.pid);
     process.send({ orderId: task.order._id, status: task.status });
 
     process.on('exit', async (code, signal) => {
@@ -62,28 +52,23 @@ const queueUpdateOrderStatus = async.queue(async (task, callback) => {
         });
         task.taskInfo.logs.push({ message: 'Task completed' , level: 'info', date: Date.now() });
         await task.taskInfo.save();
-        console.log('child process exited with ' + `code ${code} and signal ${signal}`);
-    });
-}, MAX_PROCESSES_UPDATE_ORDER_STATUS);
-
-
-
-// order shipping queue
-const queueShipOrders = async.queue((task, callback) => {
-    const process = fork('./src/modules/Adapter/Nothing/NothingShipper.js');
-    console.log('Spawned child process:' + process.pid);
-    process.send({ orderId: task.order._id, status: task.status });
-
-    process.on('exit', function (code, signal) {
-        console.log('child process exited with ' +
-                    `code ${code} and signal ${signal}`);
-        callback();
     });
 }, MAX_PROCESSES_SHIP_ORDERS);
 
 
 async function shipOrder(order, status) {
-    queueShipOrders.push({ order: order, status: status });
+    // queueShipOrders.push({ order: order, status: status });
+
+    const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'queued', logs: [{ message: 'Task queued' , level: 'info', date: Date.now() }] });
+    await taskInfo.save();
+
+    // create the task
+    const task = { order: order, status: status, taskInfo: taskInfo };
+
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    await queueShipOrders.push(task);
+    console.log(`Order ${order._id} queued`);
+
 }
 
 
