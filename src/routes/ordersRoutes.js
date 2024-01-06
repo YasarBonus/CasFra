@@ -217,7 +217,8 @@ router.get('/', checkPermissions('orderServices'), async (req, res) => {
     const userTenant = req.session.user.tenancy;
 
     try {
-        const order = await db.ServicesOrders.find({
+        // find all orders that belong to the user or the tenant
+        const orders = await db.ServicesOrders.find({
             $or: [{
                     user: userId
                 },
@@ -225,14 +226,17 @@ router.get('/', checkPermissions('orderServices'), async (req, res) => {
                     tenant: userTenant
                 }
             ]
+        })
+        .sort({
+            creation_date: -1
         }).populate('service').populate('tenant').populate('user');
-        if (!order) {
+        if (!orders) {
             res.status(404).json({
                 message: 'Order not found'
             });
             return;
         }
-        res.json(order);
+        res.json(orders);
     } catch (err) {
         logger.error(err);
         res.status(500).json({

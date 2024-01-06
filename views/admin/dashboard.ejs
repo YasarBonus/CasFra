@@ -58,7 +58,7 @@
               </div>
             </!-->
         </div>
-        <h2>Your services</h2>
+        <h2>Your <% if (user.tenancy) { %> and your tenants <% } %> services </h2>
         <div class="ui basic segment">
           <div class="ui table">
             <table class="ui celled table">
@@ -77,7 +77,7 @@
             </table>
           </div>
         </div>
-        <h2>Your orders</h2>
+        <h2>Your <% if (user.tenancy) { %> and your tenants <% } %> orders </h2>
         <div class="ui basic segment">
           <div class="ui table">
             <table class="ui celled table" id="ordersTable">
