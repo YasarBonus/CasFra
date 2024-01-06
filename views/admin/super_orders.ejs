@@ -8,6 +8,10 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 
+<!-- those 2 belong together! -->
+<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.13.7/dataRender/datetime.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
 
 <body>
     <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
@@ -66,7 +70,7 @@
                         data: 'order_number'
                     },
                     {
-                        data: 'status.status'
+                        data: 'status.status',
                     },
                     {
                         data: function (row) {
@@ -78,7 +82,10 @@
                         }
                     },
                     {
-                        data: 'creation_date'
+                        data: 'created_at',
+                        render: function (data, type, row) {
+                            return moment(data).format('DD.MM.YYYY HH:mm:ss');
+                        }
                     },
                     {
                         data: 'id',
