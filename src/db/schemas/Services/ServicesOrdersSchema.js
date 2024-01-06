@@ -6,7 +6,7 @@ const ServicesOrdersStatusSchema = new mongoose.Schema({
         required: true,
         enum: ['new', 'awaitingConfirmation', 'confirming', 'confirmed', 'awaitingAutomatedVerification', 'automatedVerificationInProgres',
         'awaitingManualVerification', 'manualVerificationInProgress',
-        'verified', 'awaitingPayment', 'processingPayment', 'paid', 'awaitingDelivery',
+        'verified', 'awaitingPayment', 'processingPayment', 'paid', 'awaitingDelivery', 'deliveryQueued',
         'processing', 'completed', 'cancelled'
         ],
         default: 'new',
