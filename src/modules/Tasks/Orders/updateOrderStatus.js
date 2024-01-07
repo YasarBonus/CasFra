@@ -9,8 +9,8 @@ async function updateOrderStatus(orderId, status) {
     const order = await ServicesOrders.findOne({ _id: orderId });
     if (order) {
         order.status.status = status;
-        order.logs.push({ message: 'Order status changed to ' + status, level: 'info', date: Date.now() });
         order.status.date = Date.now();
+        order.logs.push({ message: 'Order status changed to ' + status, level: 'info', date: Date.now() });
         await order.save();
         logger.info(`updateOrderStatus: Order ${order._id} updated to ${status}`);
     } else {

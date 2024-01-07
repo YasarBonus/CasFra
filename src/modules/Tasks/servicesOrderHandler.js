@@ -20,7 +20,7 @@ async function shipOrder(order, status) {
     const isOrderInQueue = queueShipOrders.workersList().some(worker => worker.data.order._id === order._id);
 
     if (!isOrderInQueue) {
-        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: 'starting', logs: [{ message: 'Starting task' , level: 'info', date: Date.now() }] });
+        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: { status: 'starting', date: Date.now() },  logs: ({ message: 'Starting task' , level: 'info', date: Date.now() }) });
         await taskInfo.save();
 
         // create the task
@@ -37,7 +37,7 @@ async function shipOrder(order, status) {
 // order shipping queue
 const queueShipOrders = async.queue(async (task, callback) => {
     Object.assign(task.taskInfo, {
-        status: 'starting',
+        status: { status: 'starting', date: Date.now()},
         completed: false,
         date: Date.now(),
     });
@@ -49,7 +49,7 @@ const queueShipOrders = async.queue(async (task, callback) => {
     });
 
     Object.assign(task.taskInfo, {
-        status: 'running',
+        status: { status: 'running', date: Date.now()},
         completed: false,
         date: Date.now(),
         pid: process.pid,
@@ -65,7 +65,7 @@ const queueShipOrders = async.queue(async (task, callback) => {
         Object.assign(task.taskInfo, {
             exitCode: code,
             exitSignal: signal,
-            status: 'completed',
+            status: { status: 'completed', date: Date.now()},
             completed: true,
             date: Date.now(),
         });
