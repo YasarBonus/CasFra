@@ -73,6 +73,9 @@
         <% if (user.permissions.includes('manageServices') || user.permissions.includes('superAdmin')) { %>
           <a class="item" href="/dashboard/super/services">Services</a>
         <% } %>
+        <% if (user.permissions.includes('manageTasks') || user.permissions.includes('superAdmin')) { %>
+          <a class="item" href="/dashboard/super/tasks">Tasks</a>
+        <% } %>
 
       </div>
     </div>
