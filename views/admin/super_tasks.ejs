@@ -157,7 +157,7 @@
                     tr.removeClass('shown');
                 } else {
                     // Otherwise, fetch the details and show them
-                    $.get('/api/v1/tasks/' + row.data()._id, function (taskDetails) {
+                    $.get('/api/v1/tasks/super/' + row.data()._id, function (taskDetails) {
                         row.child(format(taskDetails)).show();
                         tr.addClass('shown');
                     });

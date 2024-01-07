@@ -113,4 +113,23 @@ router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
     }
 });
 
+// get the details of a specific task
+router.get('/super/:id', checkPermissions('manageTasks'), async (req, res) => {
+    try {
+        const task = await db.Tasks.findOne({
+            _id: req.params.id
+        }).populate('user').populate('tenant').populate('service').populate('order');
+        if (!task) {
+            return res.status(404).send({
+                error: 'Task not found'
+            });
+        }
+        res.send(task);
+    } catch (err) {
+        res.status(500).send({
+            error: 'An error occurred while retrieving task: ' + err
+        });
+    }
+});
+
 module.exports = router;
