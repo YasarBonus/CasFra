@@ -17,6 +17,9 @@ const TasksLogsSchema = new mongoose.Schema({
 });
 
 const TasksSchema = new mongoose.Schema({
+    id: {
+        type: String,
+    },
     name: {
         type: String,
     },
@@ -32,6 +35,14 @@ const TasksSchema = new mongoose.Schema({
     tenant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenants'
+    },
+    service: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Services'
+    },
+    order: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ServicesOrders'
     },
     date: {
         type: Date,
