@@ -32,8 +32,9 @@
                         <thead>
                             <tr>
                                 <th>Task ID</th>
+                                <th>Name</th>
                                 <th>Status</th>
-                                <th>Service</th>
+                                <th>Attached to</th>
                                 <th>Created by</th>
                                 <th>Creation Date</th>
                                 <th>Actions</th>
@@ -96,18 +97,19 @@
                         }
                     },
                     {
+                        data: 'name',
+                    },
+                    {
                         data: function (row) {
-                            if (row.status) {
-                                return row.status.status;
-                            } else {
-                                return 'unknown';
-                            }
+                            return row.status.status + '<br>(' + moment(row.status.date).format('DD.MM.YYYY HH:mm:ss') + ')';
                         }
                     },
                     {
                         data: function (row) {
                             if (row.service) {
-                                return row.service.name;
+                                return 'Service:<br>' + row.service.name;
+                            } else if (row.order) {
+                                return 'Order:<br>' + row.order.service.name;
                             } else {
                                 return 'unknown';
                             }
