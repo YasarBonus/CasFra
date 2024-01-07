@@ -6,22 +6,20 @@
 
 <!-- Fügen Sie die DataTables CSS und JavaScript Bibliotheken hinzu -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/js/dataTables.semanticui.min.js">
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
 
 <!-- those 2 belong together! -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.3.0/css/scroller.dataTables.min.css">
 <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.3.0/js/dataTables.scroller.min.js"></script>
 
+
 <!-- those 2 belong together! -->
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.13.7/dataRender/datetime.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
-<script type="text/javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
-
+<!-- those 2 belong together! -->
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-
 
 <body>
     <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px;">
@@ -30,8 +28,7 @@
             <div class="ui segment">
                 <div class="ui container">
                     <h2>Super: All Orders</h2>
-                    <div id="demo-output" style="margin-bottom: 1em;" class="chart-display"></div>
-                    <table id="ordersTable" class="display">
+                    <table id="ordersTable" class="stripe row-border nowrap hover compact" style="width:100%">
                         <thead>
                             <tr>
                                 <th>Order ID</th>
@@ -70,24 +67,28 @@
                 serverSide: true,
                 processing: true,
                 scrollY: 600,
+                scrollCollapse: true,
+                fixedHeader: true,
                 deferRender: true,
                 scroller: {
                     loadingIndicator: true,
                     displayBuffer: 5,
+                    serverWait: 100
                 },
                 pageLength: 10,
                 ajax: {
                     url: '/api/v1/orders/super',
                     data: function (d) {
-                        return {
-                            draw: d.draw,
-                            start: d.start,
-                            length: d.length,
-                            search: d.search.value,
-                            sort: d.columns[d.order[0].column].data
-                        };
+                        d.page = d.start / d.length + 1;
+                        d.search = d.search.value;
+                        d.sort = d.columns[d.order[0].column].data;
+                        d.sort = d.columns[d.order[0].column].data;
                     },
                 },
+                columnDefs: [{
+                    targets: '_all',
+                    className: 'dt-body-center'
+                }],
                 columns: [
 
                     {
@@ -106,7 +107,7 @@
                         }
                     },
                     {
-                        data: 'created_at',
+                        data: 'creation_date',
                         render: function (data, type, row) {
                             return moment(data).format('DD.MM.YYYY HH:mm:ss');
                         }
@@ -143,19 +144,19 @@
                 }
             });
 
-// Eine Funktion, um die Bestelldetails zu formatieren
-function format(orderDetails) {
-    return '<div>' +
-        '<p>Order Number: ' + orderDetails.order_number + '</p>' +
-        '<p>Status: ' + orderDetails.status + '</p>' +
-        // Fügen Sie hier weitere Details hinzu...
-        '</div>';
-}
+            // Eine Funktion, um die Bestelldetails zu formatieren
+            function format(orderDetails) {
+                return '<div>' +
+                    '<p>Order Number: ' + orderDetails.order_number + '</p>' +
+                    '<p>Status: ' + orderDetails.status + '</p>' +
+                    // Fügen Sie hier weitere Details hinzu...
+                    '</div>';
+            }
 
         }
 
         function editService(id) {
-            window.location.href = '/dashboard/super/services/' + id + '/edit';
+            window.location.href = '/dashboard/super/order/' + id + '/edit';
         }
     </script>
 </body>
