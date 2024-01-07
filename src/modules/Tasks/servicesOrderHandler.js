@@ -90,27 +90,27 @@ async function processOrders() {
     
     const newOrders = orders.filter(order => order.status.status === 'new' && order.creation_date < Date.now() - 30);
     newOrders.forEach(async (order) => {
-        updateOrderStatus(order, 'awaitingConfirmation'); 
-    });
-
-    const awaitingConfirmationOrders = orders.filter(order => order.status.status === 'awaitingConfirmation' && order.status.date < Date.now() - 10);
-    awaitingConfirmationOrders.forEach(async (order) => {
-        updateOrderStatus(order, 'confirming'); 
-
-    });
-
-    const confirmingOrders = orders.filter(order => order.status.status === 'confirming' && order.status.date < Date.now() - 10);
-    confirmingOrders.forEach(async (order) => {
-        updateOrderStatus(order, 'confirmed'); 
-
-        
-    });
-
-    const confirmedOrders = orders.filter(order => order.status.status === 'confirmed' && order.status.date < Date.now() - 10);
-    confirmedOrders.forEach(async (order) => {
         updateOrderStatus(order, 'awaitingDelivery'); 
-
     });
+
+    //const awaitingConfirmationOrders = orders.filter(order => order.status.status === 'awaitingConfirmation' && order.status.date < Date.now() - 10);
+    //awaitingConfirmationOrders.forEach(async (order) => {
+    //    updateOrderStatus(order, 'confirming'); 
+//
+    //});
+//
+    //const confirmingOrders = orders.filter(order => order.status.status === 'confirming' && order.status.date < Date.now() - 10);
+    //confirmingOrders.forEach(async (order) => {
+    //    updateOrderStatus(order, 'confirmed'); 
+//
+    //    
+    //});
+//
+    //const confirmedOrders = orders.filter(order => order.status.status === 'confirmed' && order.status.date < Date.now() - 10);
+    //confirmedOrders.forEach(async (order) => {
+    //    updateOrderStatus(order, 'awaitingDelivery'); 
+//
+    //});
 
     const awaitingDeliveryOrders = orders.filter(order => order.status.status === 'awaitingDelivery' && order.status.date < Date.now() - 10);
     awaitingDeliveryOrders.forEach(async (order) => {
