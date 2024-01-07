@@ -166,10 +166,53 @@
 
             // A function to format the task details
             function format(taskDetails) {
-                return '<div>' +
-                    '<p>Task Number: ' + taskDetails.id + '</p>' +
-                    '<p>Status: ' + taskDetails.status + '</p>' +
-                    // Add more details here...
+                // for each task.logs entry, create a new displayable log entry
+                let logs = '';
+                for (let i = 0; i < taskDetails.logs.length; i++) {
+                    logs += '<p>' + taskDetails.logs[i].date + ': ' + taskDetails.logs[i].message + '</p>';
+                }
+                return '<div class="ui segment">' +
+                    '<h4>Task Details</h4>' +
+                    '<div class="ui small cards">' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + taskDetails._id + '</div>' +
+                                '<div class="description">Task ID</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + taskDetails.name + '</div>' +
+                                '<div class="description">Task Name</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + taskDetails.status.status + '</div>' +
+                                '<div class="description">Status</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + taskDetails.service + '</div>' +
+                                '<div class="description">Attached to</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + (taskDetails.user ? 'User<br>' + taskDetails.user.username : taskDetails.tenant.name + '<br><small>(Tenant)</small>') + '</div>' +
+                                '<div class="description">Created by</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="card">' +
+                            '<div class="content">' +
+                                '<div class="header">' + moment(taskDetails.date).format('DD.MM.YYYY HH:mm:ss') + '</div>' +
+                                '<div class="description">Creation Date</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<h4>Logs</h4>' +
+                    logs +
                     '</div>';
             }
 
