@@ -70,6 +70,7 @@ const scriptSrcUrls = [
   "https://cdn.socket.io/",
   "https://cdn.datatables.net/",
   "https://cdnjs.cloudflare.com/",
+  "code.highcharts.com/",
   "'unsafe-inline'"
 ];
 
@@ -80,6 +81,7 @@ const scriptSrcAttr = [
 const styleSrcUrls = [
     "https://cdn.jsdelivr.net/",
     "https://cdn.datatables.net/",
+    "https://code.highcharts.com/",
 ];
 const connectSrcUrls = [
   "https://ka-f.fontawesome.com/",
