@@ -1,5 +1,19 @@
 const mongoose = require('mongoose');
 
+const TasksStatusSchema = new mongoose.Schema({
+    status: {
+        type: String,
+        required: true,
+        enum: ['queued', 'starting', 'running', 'completed', 'failed'],
+        default: 'queued',
+    },
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now,
+    },
+});
+
 const TasksLogsSchema = new mongoose.Schema({
     date: {
         type: Date,
@@ -30,11 +44,11 @@ const TasksSchema = new mongoose.Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
+        ref: 'User'
     },
     tenant: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Tenants'
+        ref: 'Tenancies'
     },
     service: {
         type: mongoose.Schema.Types.ObjectId,
@@ -48,11 +62,7 @@ const TasksSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    status: {
-        type: String,
-        enum: ['queued', 'starting', 'running', 'completed', 'failed'],
-        default: 'queued'
-    },
+    status: TasksStatusSchema,
     pid: {
         type: Number,
     },
