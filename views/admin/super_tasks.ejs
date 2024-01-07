@@ -107,9 +107,9 @@
                     {
                         data: function (row) {
                             if (row.service) {
-                                return 'Service:<br>' + row.service.name;
+                                return 'Service<br>' + row.service.name;
                             } else if (row.order) {
-                                return 'Order:<br>' + row.order.order_number;
+                                return 'Order<br>' + row.order.order_number;
                             } else {
                                 return 'unknown';
                             }
@@ -118,9 +118,9 @@
                     {
                         data: function (row) {
                             if (row.user) {
-                                return row.user.username;
+                                return 'User<br>' + row.user.username;
                             } else if (row.tenant) {
-                                return row.tenant.name;
+                                return 'Tenant<br>' + row.tenant.name;
                             } else {
                                 return 'unknown';
                             }
