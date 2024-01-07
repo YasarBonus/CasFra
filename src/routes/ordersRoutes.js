@@ -310,13 +310,15 @@ router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
 
         console.log('SearchQuery:', searchQuery);
 
+        console.log('Sort:', sort);
         const orders = await db.ServicesOrders.find(searchQuery)
             .populate('service')
             .populate('tenant')
             .populate('user')
-            .sort(sort)
             .skip(start)
-            .limit(length);
+            .limit(length)
+            .sort(sort)
+
 
         const totalOrders = await db.ServicesOrders.countDocuments(searchQuery);
         console.log('TotalOrders:', totalOrders);
