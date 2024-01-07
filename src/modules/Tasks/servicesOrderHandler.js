@@ -97,11 +97,11 @@ async function processOrders() {
         updateOrderStatus(order, 'awaitingDelivery'); 
     });
 
-    //const awaitingConfirmationOrders = orders.filter(order => order.status.status === 'awaitingConfirmation' && order.status.date < Date.now() - 10);
-    //awaitingConfirmationOrders.forEach(async (order) => {
-    //    updateOrderStatus(order, 'confirming'); 
-//
-    //});
+    const awaitingConfirmationOrders = orders.filter(order => order.status.status === 'delivered' && order.status.date < Date.now() - 10);
+    awaitingConfirmationOrders.forEach(async (order) => {
+        updateOrderStatus(order, 'confirming'); 
+
+    });
 //
     //const confirmingOrders = orders.filter(order => order.status.status === 'confirming' && order.status.date < Date.now() - 10);
     //confirmingOrders.forEach(async (order) => {
