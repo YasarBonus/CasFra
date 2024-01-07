@@ -100,6 +100,8 @@ router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
                 status: task.status,
                 user: task.user,
                 tenant: task.tenant,
+                service: task.service,
+                order: task.order,
                 date: task.date,
                 logs: task.logs,
             })),
