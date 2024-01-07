@@ -177,9 +177,13 @@
                 // for each task.logs entry, create a new displayable log entry
                 let logs = '';
                 for (let i = 0; i < taskDetails.logs.length; i++) {
-                    logs += '<p>' + moment(taskDetails.logs[i].date).format('DD.MM.YYYY HH:mm:ss') + ': ' + taskDetails.logs[i].message + '</p>';
+                    logs += '<tr>' +
+                        '<td>' + moment(taskDetails.logs[i].date).format('DD.MM.YYYY HH:mm:ss') + '</td>' +
+                        '<td>' + taskDetails.logs[i].level + '</td>' +
+                        '<td>' + taskDetails.logs[i].message + '</td>' +
+                        '</tr>';
                 }
-                return '<div class="ui segment">' +
+                return '<div class="">' +
                     '<h4>Task Details</h4>' +
                     '<div class="ui small cards">' +
                         '<div class="card">' +
@@ -202,13 +206,13 @@
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + taskDetails.service + '</div>' +
+                                '<div class="header">' + (taskDetails.service ? taskDetails.service.name : taskDetails.order.name) + '</div>' +
                                 '<div class="description">Attached to</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + (taskDetails.user ? 'User<br>' + taskDetails.user.username : taskDetails.tenant.name + '<br><small>(Tenant)</small>') + '</div>' +
+                                '<div class="header">' + (taskDetails.user ? taskDetails.user.username : taskDetails.tenant.name + '<br><small>(Tenant)</small>') + '</div>' +
                                 '<div class="description">Created by</div>' +
                             '</div>' +
                         '</div>' +
@@ -220,7 +224,17 @@
                         '</div>' +
                     '</div>' +
                     '<h4>Logs</h4>' +
-                    logs +
+                    '<table class="ui celled collapsing table">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th>Date</th>' +
+                                '<th>Level</th>' +
+                                '<th>Message</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody>' +
+                            logs +
+                        '</tbody>' +
                     '</div>';
             }
 
