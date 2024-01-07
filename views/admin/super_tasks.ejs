@@ -4,22 +4,30 @@
 <%- include('../partials/head') %>
 <%- include('../partials/header') %>
 
-<!-- Fügen Sie die DataTables CSS und JavaScript Bibliotheken hinzu -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-<script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-
-
-<!-- those 2 belong together! -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.3.0/css/scroller.dataTables.min.css">
-<script type="text/javascript" src="https://cdn.datatables.net/scroller/2.3.0/js/dataTables.scroller.min.js"></script>
-
+<link href="https://cdn.datatables.net/1.13.8/css/dataTables.semanticui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.semanticui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.semanticui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/datetime/1.5.1/css/dataTables.dateTime.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/rowreorder/1.4.1/css/rowReorder.semanticui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/searchbuilder/1.6.0/css/searchBuilder.semanticui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/select/1.7.0/css/select.semanticui.min.css" rel="stylesheet">
+ 
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.semanticui.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.semanticui.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+<script src="https://cdn.datatables.net/rowreorder/1.4.1/js/dataTables.rowReorder.min.js"></script>
+<script src="https://cdn.datatables.net/searchbuilder/1.6.0/js/dataTables.searchBuilder.min.js"></script>
+<script src="https://cdn.datatables.net/searchbuilder/1.6.0/js/searchBuilder.semanticui.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 
 <!-- those 2 belong together! -->
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.13.7/dataRender/datetime.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
-<!-- those 2 belong together! -->
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
 
 <body>
     <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px;">
@@ -28,7 +36,7 @@
             <div class="ui segment">
                 <div class="ui container">
                     <h2>Super: All Tasks</h2>
-                    <table id="tasksTable" class="stripe row-border nowrap hover compact" style="width:100%">
+                    <table id="tasksTable" class="ui celled table nowrap" style="width:100%">
                         <thead>
                             <tr>
                                 <th>Task ID</th>
@@ -73,7 +81,7 @@
                 fixedHeader: true,
                 deferRender: true,
                 pageLength: 10,
-                order: [[4, 'desc']],
+                order: [[5, 'desc']],
                 ajax: {
                     url: '/api/v1/tasks/super',
                     data: function (d) {
@@ -98,12 +106,12 @@
                         }
                     },
                     {
-                        data: 'name',
-                    },
-                    {
                         data: function (row) {
                             return row.status.status + '<br>(' + moment(row.status.date).format('DD.MM.YYYY HH:mm:ss') + ')';
                         }
+                    },
+                    {
+                        data: 'name',
                     },
                     {
                         data: function (row) {
