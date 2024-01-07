@@ -16,7 +16,7 @@ router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
         const search = req.query.search;
 
         // Create a list of column names
-        const columns = ['id', 'status', 'user', 'tenant', 'creation_date'];
+        const columns = ['id', 'status', 'user', 'tenant', 'date'];
 
         // Create the sort options
         const sort = {};
