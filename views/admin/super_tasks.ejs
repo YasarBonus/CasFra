@@ -27,16 +27,17 @@
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
                 <div class="ui container">
-                    <h2>Super: All Orders</h2>
-                    <table id="ordersTable" class="stripe row-border nowrap hover compact" style="width:100%">
+                    <h2>Super: All Tasks</h2>
+                    <table id="tasksTable" class="stripe row-border nowrap hover compact" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Order ID</th>
+                                <th>Task ID</th>
                                 <th>Status</th>
+                                <th>Service</th>
                                 <th>Created by</th>
                                 <th>Creation Date</th>
                                 <th>Actions</th>
-                                <!-- Fügen Sie hier weitere Spalten hinzu, je nachdem, welche Daten Sie anzeigen möchten -->
+                                <!-- Add more columns here based on the data you want to display -->
                             </tr>
                         </thead>
                     </table>
@@ -47,23 +48,23 @@
     <%- include('../partials/footer') %>
     <script>
         $(document).ready(function () {
-            getOrders();
+            getTasks();
         });
 
-        let ordersTable;
+        let tasksTable;
 
-        function getOrders() {
+        function getTasks() {
             // Show the loading indicator
             $('#fetchingIndicator').show();
 
-            // Wenn die Tabelle bereits initialisiert wurde, aktualisieren Sie sie einfach
-            if (ordersTable) {
-                ordersTable.ajax.reload();
+            // If the table has already been initialized, simply update it
+            if (tasksTable) {
+                tasksTable.ajax.reload();
                 return;
             }
 
-            // Initialisieren Sie die DataTable und füllen Sie sie mit Daten von Ihrem API-Endpunkt
-            ordersTable = $('#ordersTable').DataTable({
+            // Initialize the DataTable and populate it with data from your API endpoint
+            tasksTable = $('#tasksTable').DataTable({
                 serverSide: true,
                 processing: true,
                 scrollY: 600,
@@ -72,12 +73,12 @@
                 deferRender: true,
                 scroller: {
                     loadingIndicator: true,
-                    displayBuffer: 5,
+                    displayBuffer: 20,
                     serverWait: 100
                 },
-                pageLength: 10,
+                pageLength: 50,
                 ajax: {
-                    url: '/api/v1/orders/super',
+                    url: '/api/v1/tasks/super',
                     data: function (d) {
                         d.page = d.start / d.length + 1;
                         d.search = d.search.value;
@@ -90,12 +91,32 @@
                     className: 'dt-body-center'
                 }],
                 columns: [
-
                     {
-                        data: 'order_number'
+                        data: function (row) {
+                            if (row.id) {
+                                return row.id;
+                            } else if (row._id) {
+                                return row._id;
+                            }
+                        }
                     },
                     {
-                        data: 'status.status',
+                        data: function (row) {
+                            if (row.status) {
+                                return row.status.status;
+                            } else {
+                                return 'unknown';
+                            }
+                        }
+                    },
+                    {
+                        data: function (row) {
+                            if (row.service) {
+                                return row.service.name;
+                            } else {
+                                return 'unknown';
+                            }
+                        }
                     },
                     {
                         data: function (row) {
@@ -103,11 +124,13 @@
                                 return row.user.username;
                             } else if (row.tenant) {
                                 return row.tenant.name;
+                            } else {
+                                return 'unknown';
                             }
                         }
                     },
                     {
-                        data: 'creation_date',
+                        data: 'date',
                         render: function (data, type, row) {
                             return moment(data).format('DD.MM.YYYY HH:mm:ss');
                         }
@@ -115,48 +138,48 @@
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            return '<button class="ui button" onclick="editService(' + data +
+                            return '<button class="ui button" onclick="editTask(' + data +
                                 ')">Edit</button>';
                         }
                     }
-                    // Fügen Sie hier weitere Spalten hinzu, je nachdem, welche Daten Sie anzeigen möchten
+                    // Add more columns here based on the data you want to display
                 ],
                 drawCallback: function () {
                     $('#fetchingIndicator').hide();
                 }
             });
 
-            // Fügen Sie einen Klick-Event-Handler zu den Zeilen hinzu
-            $('#ordersTable tbody').on('click', 'tr', function () {
+            // Add a click event handler to the rows
+            $('#tasksTable tbody').on('click', 'tr', function () {
                 var tr = $(this);
-                var row = ordersTable.row(tr);
+                var row = tasksTable.row(tr);
 
                 if (row.child.isShown()) {
-                    // Wenn die Detailzeile bereits angezeigt wird, verstecken Sie sie
+                    // If the detail row is already shown, hide it
                     row.child.hide();
                     tr.removeClass('shown');
                 } else {
-                    // Andernfalls holen Sie die Details und zeigen Sie sie an
-                    $.get('/api/v1/orders/' + row.data()._id, function (orderDetails) {
-                        row.child(format(orderDetails)).show();
+                    // Otherwise, fetch the details and show them
+                    $.get('/api/v1/tasks/' + row.data()._id, function (taskDetails) {
+                        row.child(format(taskDetails)).show();
                         tr.addClass('shown');
                     });
                 }
             });
 
-            // Eine Funktion, um die Bestelldetails zu formatieren
-            function format(orderDetails) {
+            // A function to format the task details
+            function format(taskDetails) {
                 return '<div>' +
-                    '<p>Order Number: ' + orderDetails.order_number + '</p>' +
-                    '<p>Status: ' + orderDetails.status + '</p>' +
-                    // Fügen Sie hier weitere Details hinzu...
+                    '<p>Task Number: ' + taskDetails.id + '</p>' +
+                    '<p>Status: ' + taskDetails.status + '</p>' +
+                    // Add more details here...
                     '</div>';
             }
 
         }
 
-        function editService(id) {
-            window.location.href = '/dashboard/super/order/' + id + '/edit';
+        function editTask(id) {
+            window.location.href = '/dashboard/super/task/' + id + '/edit';
         }
     </script>
 </body>
