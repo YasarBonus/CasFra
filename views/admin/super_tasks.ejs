@@ -67,16 +67,11 @@
             tasksTable = $('#tasksTable').DataTable({
                 serverSide: true,
                 processing: true,
-                scrollY: 600,
                 scrollCollapse: true,
                 fixedHeader: true,
                 deferRender: true,
-                scroller: {
-                    loadingIndicator: true,
-                    displayBuffer: 20,
-                    serverWait: 100
-                },
-                pageLength: 50,
+                pageLength: 10,
+                order: [[4, 'desc']],
                 ajax: {
                     url: '/api/v1/tasks/super',
                     data: function (d) {
