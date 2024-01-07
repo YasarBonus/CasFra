@@ -177,7 +177,7 @@
                 // for each task.logs entry, create a new displayable log entry
                 let logs = '';
                 for (let i = 0; i < taskDetails.logs.length; i++) {
-                    logs += '<p>' + taskDetails.logs[i].date + ': ' + taskDetails.logs[i].message + '</p>';
+                    logs += '<p>' + moment(taskDetails.logs[i].date).format('DD.MM.YYYY HH:mm:ss') + ': ' + taskDetails.logs[i].message + '</p>';
                 }
                 return '<div class="ui segment">' +
                     '<h4>Task Details</h4>' +
