@@ -17,10 +17,14 @@ dotenv.config();
 const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
 async function shipOrder(order, status) {
+    const orderDetails = await db.ServicesOrders.findOne({ _id: order });
+    console.log('HIIIIII' + orderDetails);
+
     const isOrderInQueue = queueShipOrders.workersList().some(worker => worker.data.order._id === order._id);
 
     if (!isOrderInQueue) {
-        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: order.user, tenant: order.tenant, date: Date.now(), status: { status: 'starting', date: Date.now() },  logs: ({ message: 'Starting task' , level: 'info', date: Date.now() }) });
+
+        const taskInfo = new db.Tasks({ name: 'shipOrder', description: 'Ship order', user: orderDetails.user, tenant: orderDetails.tenant, order: orderDetails._id, date: Date.now(), status: { status: 'starting', date: Date.now() },  logs: ({ message: 'Starting task' , level: 'info', date: Date.now() }) });
         await taskInfo.save();
 
         // create the task
