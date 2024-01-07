@@ -242,6 +242,8 @@ app.use(pathV1 + '/services', servicesRoutes);
 const pointsRoutes = require('./routes/pointsRoutes.js');
 app.use(pathV1 + '/points', pointsRoutes);
 
+const tasksRoutes = require('./routes/tasksRoutes.js');
+app.use(pathV1 + '/tasks', tasksRoutes);
 
 // const proxmoxRoutes = require('./routes/proxmoxRoutes.js');
 // app.use(pathV1 + '/proxmox', proxmoxRoutes);
@@ -367,6 +369,19 @@ app.get('/dashboard/super/orders', checkPermissions('manageOrders'), (req, res, 
       ') accessed orders');
     const user = req.session.user;
     res.render('admin/super_orders', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
+app.get('/dashboard/super/tasks', checkPermissions('manageTasks'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed tasks');
+    const user = req.session.user;
+    res.render('admin/super_tasks', {
       user: user
     });
   } catch (err) {
