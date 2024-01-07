@@ -68,6 +68,7 @@
             tasksTable = $('#tasksTable').DataTable({
                 serverSide: true,
                 processing: true,
+                loadingIndicator: true,
                 scrollCollapse: true,
                 fixedHeader: true,
                 deferRender: true,
@@ -156,11 +157,15 @@
                     row.child.hide();
                     tr.removeClass('shown');
                 } else {
+                    $('#fetchingIndicator').show();
                     // Otherwise, fetch the details and show them
                     $.get('/api/v1/tasks/super/' + row.data()._id, function (taskDetails) {
                         row.child(format(taskDetails)).show();
                         tr.addClass('shown');
+                    $('#fetchingIndicator').hide();
+
                     });
+
                 }
             });
 
