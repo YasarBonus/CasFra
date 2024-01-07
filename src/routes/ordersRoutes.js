@@ -318,10 +318,10 @@ router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
             .skip(start)
             .limit(length);
 
-        console.log('Orders:', orders);
-
         const totalOrders = await db.ServicesOrders.countDocuments(searchQuery);
         console.log('TotalOrders:', totalOrders);
+        console.log('Amount of filtered Orders:', orders.length);
+
 
         res.send({
             draw: draw,
@@ -329,6 +329,7 @@ router.get('/super', checkPermissions('manageOrders'), async (req, res) => {
             recordsFiltered: totalOrders,
             search: search,
             data: orders.map(order => ({
+                _id: order._id,
                 order_number: order.order_number,
                 status: order.status,
                 user: order.user,
