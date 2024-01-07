@@ -45,7 +45,6 @@
                                 <th>Attached to</th>
                                 <th>Created by</th>
                                 <th>Creation Date</th>
-                                <th>Actions</th>
                                 <!-- Add more columns here based on the data you want to display -->
                             </tr>
                         </thead>
@@ -95,7 +94,7 @@
                     targets: '_all',
                     className: 'dt-body-center'
                 }, {
-                    targets: [0, 1, 3, 4, 6],
+                    targets: [0, 1, 3, 4],
                     orderable: false
                 }],
                 columns: [
@@ -144,13 +143,6 @@
                             return moment(data).format('DD.MM.YYYY HH:mm:ss');
                         }
                     },
-                    {
-                        data: 'id',
-                        render: function (data, type, row) {
-                            return '<button class="ui button" onclick="editTask(' + data +
-                                ')">Edit</button>';
-                        }
-                    }
                     // Add more columns here based on the data you want to display
                 ],
                 drawCallback: function () {
