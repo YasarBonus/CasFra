@@ -75,7 +75,7 @@
             // Initialize the DataTable and populate it with data from your API endpoint
             tasksTable = $('#tasksTable').DataTable({
                 serverSide: true,
-                processing: true,
+                // processing: true,
                 loadingIndicator: true,
                 scrollCollapse: true,
                 fixedHeader: true,
@@ -243,7 +243,7 @@
 
         setInterval( function () {
                 tasksTable.ajax.reload( null, false ); // user paging is not reset on reload
-}, 1000 );
+        }, 1000 );
 
         function editTask(id) {
             window.location.href = '/dashboard/super/task/' + id + '/edit';
