@@ -66,7 +66,7 @@ async function addWish(channel, tags, wish) {
         const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username });
 
         // Check if the user has a pending wish
-        const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending');
+        const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending' || wish.status === 'playing');
 
         if (pendingWish) {
             client.say(channel, `@${tags.username}, in deiner Wunschliste befindet sich bereits ein Wunsch!`);
