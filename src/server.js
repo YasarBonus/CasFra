@@ -234,7 +234,7 @@ const ordersRoutes = require('./routes/ordersRoutes.js');
 app.use(pathV1 + '/orders', ordersRoutes);
 
 const twitchWishListBotRoutes = require('./routes/twitchWishListBotRoutes.js');
-app.use(pathV1 + '/utils/twitch/wishlistbot', twitchWishListBotRoutes);
+app.use(pathV1 + '/utils/twitchwishlistbot', twitchWishListBotRoutes);
 
 const servicesRoutes = require('./routes/servicesRoutes.js');
 app.use(pathV1 + '/services', servicesRoutes);

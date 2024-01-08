@@ -35,7 +35,7 @@
             // and populate the table with them.
             function getWishList() {
                 $.ajax({
-                    url: '/api/v1/casinowishlistbot/',
+                    url: '/api/v1/utils/twitchwishlistbot/',
                     method: 'GET',
                     success: function (response) {
                         // Clear the table
@@ -132,7 +132,7 @@
 
             function completeWish(wishId) {
                 $.ajax({
-                    url: '/api/v1/casinowishlistbot/' + wishId + '/complete',
+                    url: '/api/v1/utils/twitchwishlistbot/' + wishId + '/complete',
                     method: 'POST',
                     success: function (response) {
                         showToast('success', 'Wish completed',
@@ -150,7 +150,7 @@
 
             function rejectWish(wishId) {
                 $.ajax({
-                    url: '/api/v1/casinowishlistbot/' + wishId + '/reject',
+                    url: '/api/v1/utils/twitchwishlistbot/' + wishId + '/reject',
                     method: 'POST',
                     success: function (response) {
                         showToast('success', 'Wish rejected',
@@ -168,7 +168,7 @@
 
             function pendWish(wishId) {
                 $.ajax({
-                    url: '/api/v1/casinowishlistbot/' + wishId + '/pend',
+                    url: '/api/v1/utils/twitchwishlistbot/' + wishId + '/pend',
                     method: 'POST',
                     success: function (response) {
                         showToast('success', 'Wish set back to pending',
@@ -186,7 +186,7 @@
 
             function playWish(wishId) {
                 $.ajax({
-                    url: '/api/v1/casinowishlistbot/' + wishId + '/play',
+                    url: '/api/v1/utils/twitchwishlistbot/' + wishId + '/play',
                     method: 'POST',
                     success: function (response) {
                         showToast('success', 'Wish set to playing',
