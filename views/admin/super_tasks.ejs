@@ -37,7 +37,7 @@
                 <div class="ui container">
                     <h2>Super: All Tasks</h2>
                     <table id="tasksTable" class="ui compact celled table nowrap" style="width:100%">
-                        <thead>
+                        <thead class="center aligned">
                             <tr>
                                 <th>Task ID</th>
                                 <th>Name</th>
@@ -150,6 +150,7 @@
                 }
             });
 
+
             // Add a click event handler to the rows
             $('#tasksTable tbody').on('click', 'tr', function () {
                 var tr = $(this);
@@ -239,6 +240,10 @@
             }
 
         }
+
+        setInterval( function () {
+                tasksTable.ajax.reload( null, false ); // user paging is not reset on reload
+}, 1000 );
 
         function editTask(id) {
             window.location.href = '/dashboard/super/task/' + id + '/edit';
