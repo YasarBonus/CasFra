@@ -37,7 +37,7 @@ router.post('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =
 
 router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.find().populate('round');
+        const wishList = await db.TwitchWishListBot.find()
 
         // sort the wish list by created_at date in descending order
         wishList.sort((a, b) => b.created_at - a.created_at);
