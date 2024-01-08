@@ -54,7 +54,7 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
 // GET /
 // This will return all wish list items with status = pending
 
-router.get('/pending', async (req, res) => {
+router.get('/pending', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
     try {
         const wishList = await db.TwitchWishListBot.find({ status: 'pending' }).populate('round');
         res.json(wishList);
