@@ -31,3 +31,6 @@ this will use the ``minio`` directory. the admin login is default (``minioadmin`
 
 * have a name and categorie
 * upload and delete images
+
+###### TODO
+* clearly seperate images between tenants and users
