@@ -94,7 +94,7 @@ const ServicesData = [
     {
         name: 'VPS 1',
         shortname: 'vps1',
-        type: 'VPS',
+        type: 'nothing',
         description: 'VPS 1 description',
         details: [
             {
@@ -135,7 +135,7 @@ const ServicesData = [
     {
         name: 'VPS 2',
         shortname: 'vps2',
-        type: 'VPS',
+        type: 'nothing',
         description: 'VPS 2 description',
         details: [
             {
@@ -171,19 +171,47 @@ const ServicesData = [
             week: 3.5,
             month: 5,
             year: 60,
-        },
+        },           
+    },
+    {
+        name: 'Twitch Wishlist Bot',
+        shortname: 'twb1',
+        type: 'twitch-wishlist-bot',
+        description: 'VPS 2 description',
+        details: [
+            {
+                name: 'CPU',
+                value: '1',
+                unit: 'Core',
+            },
+        ],
+        pricing: {
+            available_intervals: ['once', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
+            price: 5,
+            currency: 'POINTS',
+            once: 5,
+            second: 0.000005787,
+            minute: 0.00034722,
+            hour: 0.0208333,
+            day: 0.5,
+            week: 3.5,
+            month: 5,
+            year: 60,
+        },           
     },
 ];
 
 const ServicesTypes = require('./ServicesTypesSchema');
 
 ServicesData.forEach(async (item) => {
-    const service = await Services.findOne({ name: item.name });
+    const service = await Services.findOne({ internal_name: item.internal_name });
     if (!service) {
-        const serviceType = await ServicesTypes.findOne({ name: item.type });
+        const serviceType = await ServicesTypes.findOne({ internal_name: item.type });
         item.type = serviceType._id;
         Services.create(item);
         console.log(`Service ${item.name} created`);
+    } else {
+        console.log(`Service ${item.name} already exists: ${service._id}`);
     }
 } );
 
