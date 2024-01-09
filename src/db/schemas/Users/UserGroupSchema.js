@@ -51,7 +51,7 @@ const userGroupSchema = new mongoose.Schema({
     name: 'Admin',
     permissions: ['authenticate', 'viewDashboard', 'manageTenancies', 'manageRegistrationKeys', 'manageUsers', 'manageShortLinks', 'manageCasinos',
       'manageLinks', 'manageProvider', 'managePaymentMethods', 'manageAccount', 'manageRegistrationKeys',
-      'manageSessions', 'manageImages', 'manageImagesCategories', 'manageUsers', 'manageProxmoxServers', 'manageTwitchWishListBot', 'manageServices', 'orderServices', 'managePoints', 'manageOrders', 'manageTasks',
+      'manageSessions', 'manageImages', 'manageImagesCategories', 'manageUsers', 'manageProxmoxServers', 'manageTwitchWishListBotEntries', 'manageServices', 'orderServices', 'managePoints', 'manageOrders', 'manageTasks',
     ]
   });
   
