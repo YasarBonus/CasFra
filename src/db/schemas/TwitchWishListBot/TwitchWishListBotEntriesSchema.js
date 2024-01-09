@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 const TwitchWishListBotSchema = new mongoose.Schema({
     twitch_user: {
         type: String,
@@ -25,7 +27,6 @@ const TwitchWishListBotSchema = new mongoose.Schema({
         required: true,
     },
     added_manually: Boolean,
-    
 });
 
 const TwitchWishListBot = mongoose.model('TwitchWishListBot', TwitchWishListBotSchema);
