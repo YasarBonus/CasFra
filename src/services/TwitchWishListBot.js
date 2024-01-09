@@ -63,22 +63,22 @@ client.on('message', (channel, tags, message, self) => {
 async function addWish(channel, tags, wish) {
     try {
         // Get all the wishes of the user from the db
-        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username });
+        const TwitchWishListBotEntries = await db.TwitchWishListBotEntries.find({ twitch_user: tags.username });
 
         // Check if the user has a pending wish
-        const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending' || wish.status === 'playing');
+        const pendingWish = TwitchWishListBotEntries.find(wish => wish.status === 'pending' || wish.status === 'playing');
 
         if (pendingWish) {
             client.say(channel, `@${tags.username}, in deiner Wunschliste befindet sich bereits ein Wunsch!`);
         } else {
             // Check if the user has a completed wish in the last 10 minutes
-            const completedWish = twitchWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
+            const completedWish = TwitchWishListBotEntries.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
 
             if (completedWish) {
                 client.say(channel, `@${tags.username}, dir wurde bereits ein Wunsch in den letzten 10 Minuten erfüllt!`);
             } else {
                 // Add the wish to the db with the twitch_user, status "pending" and the current date
-                const newWish = new db.TwitchWishListBot({
+                const newWish = new db.TwitchWishListBotEntries({
                     wish: wish,
                     twitch_user: tags.username,
                     created_at: Date.now(),
@@ -100,14 +100,14 @@ async function addWish(channel, tags, wish) {
 async function listWishes(channel, tags) {
     try {
         // Get all the wishes from the db
-        const twitchWishListBot = await db.TwitchWishListBot.find();
+        const TwitchWishListBotEntries = await db.TwitchWishListBotEntries.find();
 
         // Check if there are any wishes
-        if (twitchWishListBot.length === 0) {
+        if (TwitchWishListBotEntries.length === 0) {
             client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
-            twitchWishListBot.forEach(wish => {
+            TwitchWishListBotEntries.forEach(wish => {
                 client.say(channel, `@${tags.username}, ${wish.twitch_user} wünscht sich ${wish.wish}!`);
             });
         }
@@ -120,14 +120,14 @@ async function listWishes(channel, tags) {
 async function listUserWishes(channel, tags) {
     try {
         // Get all the wishes from the db
-        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username, status: 'pending' });
+        const TwitchWishListBotEntries = await db.TwitchWishListBotEntries.find({ twitch_user: tags.username, status: 'pending' });
 
         // Check if there are any wishes
-        if (twitchWishListBot.length === 0) {
+        if (TwitchWishListBotEntries.length === 0) {
             client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
-            twitchWishListBot.forEach(wish => {
+            TwitchWishListBotEntries.forEach(wish => {
                 client.say(channel, `@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
             });
         }

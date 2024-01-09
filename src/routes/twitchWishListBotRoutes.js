@@ -8,13 +8,13 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 // We need the following API router endpoints:
 
 // Add a wish list item
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // POST /
 // This will add a wish list item
 
-router.post('/', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.post('/', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = new db.TwitchWishListBot({
+        const wishList = new db.TwitchWishListBotEntries({
             wish: req.body.wish,
             twitch_user: req.body.twitch_user,
             created_at: Date.now(),
@@ -31,13 +31,13 @@ router.post('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =
 } );
 
 // Get all wish list items
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // GET /
 // This will return all wish list items
 
-router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.get('/', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.find()
+        const wishList = await db.TwitchWishListBotEntries.find()
 
         // sort the wish list by created_at date in descending order
         wishList.sort((a, b) => b.created_at - a.created_at);
@@ -54,9 +54,9 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
 // GET /
 // This will return all wish list items with status = pending
 
-router.get('/pending', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.get('/pending', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.find().sort({ status: { $in: ['playing', 'pending'] }, created_at: -1 });
+        const wishList = await db.TwitchWishListBotEntries.find().sort({ status: { $in: ['playing', 'pending'] }, created_at: -1 });
 
         res.json(wishList);
     } catch (err) {
@@ -66,13 +66,13 @@ router.get('/pending', checkPermissions('manageTwitchWishListBot'), async (req, 
 } );
 
 // Change the status of a wish list item to playing
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // POST /:id/playing
 // This will change the status of the wish list item with id :id to playing
 
-router.post('/:id/play', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.post('/:id/play', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.findById(req.params.id);
+        const wishList = await db.TwitchWishListBotEntries.findById(req.params.id);
         wishList.status = 'playing';
         await wishList.save();
         res.json(wishList);
@@ -83,13 +83,13 @@ router.post('/:id/play', checkPermissions('manageTwitchWishListBot'), async (req
 } );
 
 // Change the status of a wish list item to completed
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // POST /:id/completed
 // This will change the status of the wish list item with id :id to completed
 
-router.post('/:id/complete', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.post('/:id/complete', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.findById(req.params.id);
+        const wishList = await db.TwitchWishListBotEntries.findById(req.params.id);
         wishList.status = 'completed';
         wishList.completed_at = Date.now();
         await wishList.save();
@@ -101,13 +101,13 @@ router.post('/:id/complete', checkPermissions('manageTwitchWishListBot'), async 
 } );
 
 // Change the status of a wish list item to rejected
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // POST /:id/rejected
 // This will change the status of the wish list item with id :id to rejected
 
-router.post('/:id/reject', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.post('/:id/reject', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.findById(req.params.id);
+        const wishList = await db.TwitchWishListBotEntries.findById(req.params.id);
         wishList.status = 'rejected';
         wishList.completed_at = Date.now();
         await wishList.save();
@@ -119,13 +119,13 @@ router.post('/:id/reject', checkPermissions('manageTwitchWishListBot'), async (r
 } );
 
 // Change the status of a wish list item to pending
-// Permissions: manageTwitchWishListBot
+// Permissions: manageTwitchWishListBotEntries
 // POST /:id/pending
 // This will change the status of the wish list item with id :id to pending
 
-router.post('/:id/pend', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+router.post('/:id/pend', checkPermissions('manageTwitchWishListBotEntries'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.findById(req.params.id);
+        const wishList = await db.TwitchWishListBotEntries.findById(req.params.id);
         wishList.status = 'pending';
         wishList.completed_at = undefined;
         await wishList.save();
