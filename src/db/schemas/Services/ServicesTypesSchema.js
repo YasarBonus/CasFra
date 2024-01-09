@@ -48,7 +48,7 @@ const ServicesTypesData = [
         active: true,
         adapter: {
             name: 'Nothing',
-            internal_name: 'nothing',
+            internal_name: 'Nothing',
             active: true,
         },
     },

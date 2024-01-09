@@ -18,7 +18,6 @@ const MAX_PROCESSES_SHIP_ORDERS = process.env.MAX_PROCESSES_SHIP_ORDERS || 1;
 
 async function shipOrder(order, status) {
     const orderDetails = await db.ServicesOrders.findOne({ _id: order });
-    console.log('HIIIIII' + orderDetails);
 
     const isOrderInQueue = queueShipOrders.workersList().some(worker => worker.data.order._id === order._id);
 
@@ -40,42 +39,67 @@ async function shipOrder(order, status) {
 
 // order shipping queue
 const queueShipOrders = async.queue(async (task, callback) => {
-    Object.assign(task.taskInfo, {
-        status: { status: 'starting', date: Date.now()},
-        completed: false,
-        date: Date.now(),
-    });
-    task.taskInfo.logs.push({ message: 'Task starting' , level: 'info', date: Date.now() });
-    await task.taskInfo.save();
-
-    const process = fork('./src/modules/Adapter/Nothing/NothingShipper.js', [], {
-        detached: true,
-    });
-
-    Object.assign(task.taskInfo, {
-        status: { status: 'running', date: Date.now()},
-        completed: false,
-        date: Date.now(),
-        pid: process.pid,
-    });
-    task.taskInfo.logs.push({ message: 'Task running' , level: 'info', date: Date.now() });
-    await task.taskInfo.save();
-    
-
-    process.send({ orderId: task.order._id, status: task.status });
-
-    process.on('exit', async (code, signal) => {
-        // Aktualisieren Sie die Prozessinformationen in der Datenbank, wenn der Prozess beendet wird
+    try {
         Object.assign(task.taskInfo, {
-            exitCode: code,
-            exitSignal: signal,
-            status: { status: 'completed', date: Date.now()},
-            completed: true,
+            status: { status: 'starting', date: Date.now()},
+            completed: false,
             date: Date.now(),
         });
-        task.taskInfo.logs.push({ message: 'Task completed' , level: 'info', date: Date.now() });
+        task.taskInfo.logs.push({ message: 'Task starting' , level: 'info', date: Date.now() });
         await task.taskInfo.save();
-    });
+
+        console.log('queueShipOrders');
+
+        
+        // the internal_name for the adapter is stored in order.service.adapter.internal_name
+        // we will get it from the database
+
+        const orderDetails = await db.ServicesOrders.findOne({ _id: task.order._id });
+
+        const serviceDetails = await db.Services.findOne({ _id: orderDetails.service });
+        console.log('Service Type:' + serviceDetails.type);
+
+        const serviceTypeDetails = await db.ServicesTypes.findOne({ _id: serviceDetails.type });
+        console.log('serviceTypeDetails:' + serviceTypeDetails);
+
+        const adapterName = serviceTypeDetails.adapter.internal_name;
+        console.log('adapterName:' + adapterName);
+
+        const adapter = require(`../Adapter/${adapterName}/${adapterName}Shipper.js`);
+        console.log('adapter:' + adapter);
+
+        const process = fork(`./src/modules/Adapter/${adapterName}/${adapterName}Shipper.js`, [], {
+            detached: true,
+        });
+
+        Object.assign(task.taskInfo, {
+            status: { status: 'running', date: Date.now()},
+            completed: false,
+            date: Date.now(),
+            pid: process.pid,
+        });
+        task.taskInfo.logs.push({ message: 'Task running' , level: 'info', date: Date.now() });
+        await task.taskInfo.save();
+        
+
+        process.send({ orderId: task.order._id, status: task.status });
+
+        process.on('exit', async (code, signal) => {
+            // Aktualisieren Sie die Prozessinformationen in der Datenbank, wenn der Prozess beendet wird
+            Object.assign(task.taskInfo, {
+                exitCode: code,
+                exitSignal: signal,
+                status: { status: 'completed', date: Date.now()},
+                completed: true,
+                date: Date.now(),
+            });
+            task.taskInfo.logs.push({ message: 'Task completed' , level: 'info', date: Date.now() });
+            await task.taskInfo.save();
+        });
+    } catch (error) {
+        console.error('Error in queueShipOrders:', error);
+        // Handle the error here
+    }
 }, MAX_PROCESSES_SHIP_ORDERS);
 
 

@@ -9,7 +9,6 @@ const checkPermissions = require('../middlewares/permissionMiddleware.js');
 
 router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
     try {
-        console.log('Query:', req.query);
         const draw = parseInt(req.query.draw);
         const start = parseInt(req.query.start);
         const length = parseInt(req.query.length);
@@ -70,10 +69,6 @@ router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
                 },
             ],
         };
-
-        console.log('SearchQuery:', searchQuery);
-
-        console.log('Sort:', sort);
         const tasks = await db.Tasks.find(searchQuery)
             .populate('user')
             .populate('tenant')
@@ -85,8 +80,7 @@ router.get('/super', checkPermissions('manageTasks'), async (req, res) => {
 
 
         const totalTasks = await db.Tasks.countDocuments(searchQuery);
-        console.log('TotalTasks:', totalTasks);
-        console.log('Amount of filtered Tasks:', tasks.length);
+
 
 
         res.send({
