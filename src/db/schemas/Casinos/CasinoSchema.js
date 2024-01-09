@@ -5,8 +5,6 @@ const generateRandomPriority = require('../../../utils/generateRandomPriority');
 const casinoSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 3,
-    maxlength: 30
   },
   categories: {
     type: [mongoose.Schema.Types.ObjectId],
