@@ -24,6 +24,10 @@ const imagesCategoriesSchema = new mongoose.Schema({
     tenancies: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenancies'
+    },
+    users: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 

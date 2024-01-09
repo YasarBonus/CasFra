@@ -25,6 +25,7 @@ const imagesSchema = new mongoose.Schema({
       default: 0
     },
     tenancies: [String],
+    users: [String]
   });
   
   const Images = mongoose.model('Images', imagesSchema);

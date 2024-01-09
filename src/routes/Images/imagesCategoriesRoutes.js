@@ -9,10 +9,11 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 // Get all images categories from MongoDB
 router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (req, res) => {
     const userTenancy = req.session.user.tenancy;
+    const userId = req.session.user.userId;
   
-    db.ImagesCategories.find({
-        tenancies: userTenancy
-      })
+    const query = userTenancy ? { tenancies: userTenancy } : { users: userId };
+  
+    db.ImagesCategories.find(query)
       .then((results) => {
         res.json(results);
       })
@@ -37,6 +38,8 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       tenancy
     } = req.session.user;
   
+    const query = tenancy ? { tenancies: tenancy } : { users: userId };
+  
     const imagesCategories = new db.ImagesCategories({
       addedBy: userId,
       name: name,
@@ -44,7 +47,7 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       image: image,
       active: active,
       addedDate: Date.now(),
-      tenancies: tenancy // Add tenancy field
+      ...query
     });
   
     imagesCategories.save()
@@ -61,92 +64,35 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       });
   });
   
-  // Duplicate image category
-  router.post('/:id/duplicate', checkPermissions('manageImagesCategories'), (req, res) => {
-    const {
-      userId
-    } = req.session.user;
-    const {
-      id
-    } = req.params;
-  
-    db.ImagesCategories.findOne({
-        _id: id,
-        tenancies: req.session.user.tenancy // Add condition for tenancy
-      })
-      .then((imagesCategories) => {
-        if (!imagesCategories) {
-          throw new Error('Image category not found');
-        } else {
-          const newImagesCategories = new db.ImagesCategories({
-            addedBy: userId,
-            name: imagesCategories.name + ' (Copy)',
-            description: imagesCategories.description,
-            image: imagesCategories.image,
-            active: imagesCategories.active,
-            addedDate: Date.now(),
-            tenancies: req.session.user.tenancy // Set tenancy for duplicated object
-          });
-  
-          newImagesCategories.save()
-            .then(() => {
-              res.status(200).json({
-                success: 'Image category duplicated successfully'
-              });
-            })
-            .catch((error) => {
-              console.error('Error duplicating image category:', error);
-              res.status(500).json({
-                error: 'Internal server error'
-              });
-            });
-        }
-      })
-      .catch((error) => {
-        console.error('Error duplicating image category:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
-  
   // Edit image category
   router.put('/:id', checkPermissions('manageImagesCategories'), (req, res) => {
-    const {
-      userId
-    } = req.session.user;
-    const {
-      id
-    } = req.params;
-    const {
-      name,
-      description,
-      image,
-      active
-    } = req.body;
-  
-    db.ImagesCategories.findOneAndUpdate({
-          _id: id,
-          tenancies: req.session.user.tenancy
-        }, // Add condition for tenancy
-        {
-          name,
-          description,
-          image,
-          active,
-          modifiedDate: Date.now(),
-          modifiedBy: userId
-        }, {
-          new: true
-        } // Return the updated document
-      )
+    const { userId } = req.session.user;
+    const { id } = req.params;
+    const { name, description, image, active } = req.body;
+
+    const query = req.session.user.tenancy
+      ? { _id: id, tenancies: req.session.user.tenancy }
+      : { _id: id, users: userId };
+
+    db.ImagesCategories.findOneAndUpdate(
+      query,
+      {
+        name,
+        description,
+        image,
+        active,
+        modifiedDate: Date.now(),
+        modifiedBy: userId
+      },
+      { new: true }
+    )
       .then((updatedImageCategory) => {
         if (!updatedImageCategory) {
           return res.status(404).json({
             error: 'Image category not found'
           });
         }
-  
+
         res.status(200).json({
           success: 'Image category updated',
           imageCategory: updatedImageCategory
