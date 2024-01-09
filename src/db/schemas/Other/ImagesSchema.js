@@ -1,21 +1,15 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
 const imagesSchema = new mongoose.Schema({
     name: String,
     filename: String,
     originalname: String,
     image_url: String,
-    priority: {
-      type: Number,
-      default: generateRandomPriority()
-    },
     size: Number,
     mimetype: String,
     description: String,
     addedDate: {
       type: Date,
-      default: Date.now
     },
     added_by: String,
     modified_date: Date,
