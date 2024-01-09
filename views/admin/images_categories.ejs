@@ -94,9 +94,11 @@
         },
         success: function (data) {
           console.log("Success:", data);
+          showToast("success", "Category saved successfully: " + data.imageCategory.name);
         },
         error: function (error) {
           console.log("Error:", error);
+          showToast("error", "Error saving category: " + error.responseText);
         },
       });
     }
