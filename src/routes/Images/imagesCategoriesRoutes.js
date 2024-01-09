@@ -30,7 +30,6 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       name,
       description,
       image,
-      priority,
       active
     } = req.body;
     const {
@@ -43,7 +42,6 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       name: name,
       description: description,
       image: image,
-      priority: priority,
       active: active,
       addedDate: Date.now(),
       tenancies: tenancy // Add tenancy field
@@ -51,7 +49,9 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
   
     imagesCategories.save()
       .then(() => {
-        res.redirect('/dashboard');
+        res.status(200).json({
+          success: 'Image category added successfully'
+        });
       })
       .catch((error) => {
         console.error('Error inserting image category:', error);
@@ -78,13 +78,11 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
         if (!imagesCategories) {
           throw new Error('Image category not found');
         } else {
-          const newPriority = generateRandomPriority();
-          const newImagesCategories = new ImagesCategories({
+          const newImagesCategories = new db.ImagesCategories({
             addedBy: userId,
             name: imagesCategories.name + ' (Copy)',
             description: imagesCategories.description,
             image: imagesCategories.image,
-            priority: newPriority,
             active: imagesCategories.active,
             addedDate: Date.now(),
             tenancies: req.session.user.tenancy // Set tenancy for duplicated object
@@ -92,7 +90,9 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
   
           newImagesCategories.save()
             .then(() => {
-              res.redirect('/dashboard');
+              res.status(200).json({
+                success: 'Image category duplicated successfully'
+              });
             })
             .catch((error) => {
               console.error('Error duplicating image category:', error);
@@ -122,7 +122,6 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
       name,
       description,
       image,
-      priority,
       active
     } = req.body;
   
@@ -134,7 +133,6 @@ router.get('/', checkPermissions('manageImages' || 'manageImagesCategories'), (r
           name,
           description,
           image,
-          priority,
           active,
           modifiedDate: Date.now(),
           modifiedBy: userId

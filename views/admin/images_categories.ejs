@@ -13,7 +13,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Description</th>
-                                    <th>Priority (Sorting)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -51,7 +50,6 @@
                         var row = '<tr id="' + category._id + '">' +
                             '<td contenteditable="true">' + category.name + '</td>' +
                             '<td contenteditable="true">' + category.description + '</td>' +
-                            '<td contenteditable="true">' + category.priority + '</td>' +
                             '<td>' +
                             '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                             '<button class="ui small red button delete-btn">Delete</button>' +
@@ -108,7 +106,6 @@
                 data: {
                     name: $('#' + categoryId + ' td:nth-child(1)').text(),
                     description: $('#' + categoryId + ' td:nth-child(2)').text(),
-                    priority: $('#' + categoryId + ' td:nth-child(3)').text()
                 },
                 success: function(data) {
                     console.log('Success:', data);
@@ -123,6 +120,7 @@
         function saveAllCategories() {
             $('#imageCategoriesTable tbody tr').each(function() {
                 var categoryId = $(this).attr('id');
+                var description = $(this).find('td:nth-child(2)').text();
                 saveCategory(categoryId);
             });
             loadInitialData();
