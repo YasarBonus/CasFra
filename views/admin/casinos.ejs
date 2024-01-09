@@ -47,25 +47,30 @@
 
             // Send a POST request to the API to add the new casino
             fetch('/api/v1/casinos', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        name,
-                        active: false
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('New casino added:', result);
-                    // Close the modal and fetch the updated casinos
-                    $('.ui.modal').modal('hide');
-                    fetchCasinos();
-                })
-                .catch(error => {
-                    console.error('Error adding new casino:', error);
-                });
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    active: false
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    showToast('error', 'Error adding new casino', 'Error adding new casino: ' + response.status + ' ');
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('New casino added:', result);
+                // Close the modal and fetch the updated casinos
+                $('.ui.modal').modal('hide');
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error adding new casino:', error);
+            });
         }
 
         function fetchCasinos() {
