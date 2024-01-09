@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
-
-
-const TwitchWishListBotSchema = new mongoose.Schema({
+const TwitchWishListBotEntriesSchema = new mongoose.Schema({
     twitch_user: {
         type: String,
         },
@@ -27,8 +25,12 @@ const TwitchWishListBotSchema = new mongoose.Schema({
         required: true,
     },
     added_manually: Boolean,
+    bot: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TwitchWishListBot',
+    },
 });
 
-const TwitchWishListBot = mongoose.model('TwitchWishListBot', TwitchWishListBotSchema);
+const TwitchWishListBotEntries = mongoose.model('TwitchWishListBotEntries', TwitchWishListBotEntriesSchema);
 
-module.exports = TwitchWishListBot;
+module.exports = TwitchWishListBotEntries;
