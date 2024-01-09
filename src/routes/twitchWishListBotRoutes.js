@@ -56,7 +56,8 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
 
 router.get('/pending', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.find({ status: 'pending' }).populate('round');
+        const wishList = await db.TwitchWishListBot.find().sort({ status: { $in: ['playing', 'pending'] }, created_at: -1 });
+
         res.json(wishList);
     } catch (err) {
         logger.error(err);
