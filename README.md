@@ -33,4 +33,9 @@ this will use the ``minio`` directory. the admin login is default (``minioadmin`
 * upload and delete images
 
 ###### TODO
-* clearly seperate images between tenants and users
+* [DONE] clearly seperate images between tenants and users
+* what to do with the images in a category that is being deleted?
+* permissions in general are not clear
+* editing images for users is not possible, probably due to tenancies check.
+
+#### 

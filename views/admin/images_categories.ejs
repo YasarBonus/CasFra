@@ -7,6 +7,18 @@
         <%- include('./partials/dashboard-menu') %>
         <div class="ui segment">
           <h2>Image Categories</h2>
+          <% if (user.tenancy) { %>
+          <div class="ui info message">
+            <div class="header">You are editing your tenants Image Categories.</div>
+            <p>To edit your images, please leave your current tenant in the right upper menu.</p>
+          </div>
+          <% } else { %>
+          <div class="ui info message">
+            <div class="header">You are editing your personal images.</div>
+            <p>To edit the images of a tenant, please select a tenant in the right upper menu.</p>
+          </div>
+          <% } %> 
+          
           <table id="imageCategoriesTable" class="ui celled table">
             <thead>
               <tr>

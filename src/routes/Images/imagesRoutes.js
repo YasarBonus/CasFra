@@ -23,7 +23,7 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 // Get all images from MongoDB
 router.get('/', checkPermissions('manageImages'), (req, res) => {
   const { tenancy, userId } = req.session.user;
-  const query = tenancy ? { tenancies: tenancy } : { addedBy: userId };
+  const query = tenancy ? { tenancies: tenancy } : { users: userId };
 
   db.Images.find(query)
     .then((results) => {
@@ -122,7 +122,8 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
         addedBy: userId,
         category: category,
         active: active,
-        tenancies: tenancy ? tenancy : userId,
+        tenancies: tenancy ? [tenancy] : [],
+        users: tenancy ? [] : [userId],
         image_url: 'http://localhost:9000/casfra-images/' + file.name
       });
 
