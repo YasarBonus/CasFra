@@ -13,7 +13,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Description</th>
-                                    <th>Priority (Sorting)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -22,6 +21,7 @@
                             </tbody>
                         </table>
                         <div class="ui green button" id="saveAllBtn">Save All</div>
+                        <div class="ui blue button" id="addNewBtn">Add New</div>
                     </div>
                 </div>
             </div>
@@ -41,17 +41,11 @@
                 url: '/api/v1/casinos/categories',
                 method: 'GET',
                 success: function(data) {
-                    // Sort the categories by priority
-                    data.sort(function(a, b) {
-                        return a.priority - b.priority;
-                    });
-
                     // Populate the table with data
                     data.forEach(function(category) {
                         var row = '<tr id="' + category._id + '">' +
                             '<td contenteditable="true">' + category.name + '</td>' +
                             '<td contenteditable="true">' + category.description + '</td>' +
-                            '<td contenteditable="true">' + category.priority + '</td>' +
                             '<td>' +
                             '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                             '<button class="ui small red button delete-btn">Delete</button>' +
@@ -86,6 +80,65 @@
             saveAllCategories();
         });
 
+        // Event listener for add new button to show modal for adding new category with api call POST /api/v1/casinos/categories
+        $(document).on('click', '#addNewBtn', function() {
+            var dialogExists = $('.ui.modal.addNew').length;
+            if (dialogExists) {
+                $('.ui.modal.addNew').remove();
+            }
+            var dialogContent = '<div class="ui small modal addNew">' +
+                '<div class="header">Add New Category</div>' +
+                '<div class="content">' +
+                '<div class="ui form">' +
+                '<div class="field">' +
+                '<label>Name</label>' +
+                '<input type="text" id="newCategoryName" placeholder="Name">' +
+                '</div>' +
+                '<div class="field">' +
+                '<label>Description</label>' +
+                '<input type="text" id="newCategoryDescription" placeholder="Description">' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="actions">' +
+                '<div class="ui red button">Cancel</div>' +
+                '<div class="ui green button addNewBtnFinal">Add New</div>' +
+                '</div>' +
+                '</div>';
+
+            $('body').append(dialogContent);
+            $('.ui.modal.addNew').modal('show');
+        });
+
+        // Event listener for add new button in modal
+        $(document).on('click', '.addNewBtnFinal', function() {
+            var name = $('#newCategoryName').val();
+            var description = $('#newCategoryDescription').val();
+            addNewCategory(name, description);
+            $('.ui.modal.addNew').modal('hide');
+        });
+
+        // Function to add new category
+        function addNewCategory(name, description) {
+            $.ajax({
+                url: '/api/v1/casinos/categories',
+                method: 'POST',
+                data: {
+                    name: name,
+                    description: description
+                },
+                success: function(data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Category added successfully');
+                    loadInitialData();
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+
         // Function to duplicate a category
         function duplicateCategory(categoryId) {
             $.ajax({
@@ -108,7 +161,6 @@
                 data: {
                     name: $('#' + categoryId + ' td:nth-child(1)').text(),
                     description: $('#' + categoryId + ' td:nth-child(2)').text(),
-                    priority: $('#' + categoryId + ' td:nth-child(3)').text()
                 },
                 success: function(data) {
                     console.log('Success:', data);

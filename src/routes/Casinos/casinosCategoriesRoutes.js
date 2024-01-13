@@ -7,7 +7,7 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 
 
 // Get all casino categories from MongoDB
-router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) => {
+router.get('/', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -25,9 +25,44 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
         });
       });
   });
-  
+
+// Insert casino category into MongoDB
+router.post('/', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    name,
+    description,
+    image,
+    active
+  } = req.body;
+  const {
+    userId
+  } = req.session.user;
+
+  const casinoCategories = new db.CasinoCategories({
+    addedBy: userId,
+    name: name,
+    description: description,
+    image: image,
+    active: active,
+    addedDate: Date.now(),
+    tenancies: req.session.user.tenancy // Add tenancy condition
+  });
+
+  casinoCategories.save()
+    .then(() => {
+      logger.info('Casino category inserted: ' + name);
+      res.status(201).json(casinoCategories);
+    })
+    .catch((error) => {
+      console.error('Error inserting casino category:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
   // Get amount of all categories
-  router.get('/casinos/categories/count', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/count', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -45,9 +80,9 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
         });
       });
   });
-  
+
   // Get details of a specific casino category
-  router.get('/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params;
@@ -75,37 +110,31 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
         });
       });
   });
-  
-  // Insert casino category into MongoDB
-  router.post('/casinos/categories/add', checkPermissions('manageCasinos'), (req, res) => {
+
+  // Get all casinos from a specific category
+  router.get('/:id/casinos', checkPermissions('manageCasinos'), (req, res) => {
     const {
-      name,
-      description,
-      image,
-      priority,
-      active
-    } = req.body;
+      id
+    } = req.params;
     const {
-      userId
+      tenancy
     } = req.session.user;
+
+    db.Casino.find({
+        casinoCategories: id,
+        tenancies: tenancy
+      })
+      .then((casinos) => {
+        if (!casinos) {
+          return res.status(404).json({
+            error: 'Casinos not found'
+          });
+        }
   
-    const casinoCategories = new CasinoCategories({
-      addedBy: userId,
-      name: name,
-      description: description,
-      image: image,
-      priority: priority,
-      active: active,
-      addedDate: Date.now(),
-      tenancies: req.session.user.tenancy // Add tenancy condition
-    });
-  
-    casinoCategories.save()
-      .then(() => {
-        res.redirect('/dashboard');
+        res.json(casinos);
       })
       .catch((error) => {
-        console.error('Error inserting casino category:', error);
+        console.error('Error retrieving casinos:', error);
         res.status(500).json({
           error: 'Internal server error'
         });
@@ -113,7 +142,7 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
   });
   
   // Duplicate casino category
-  router.post('/casinos/categories/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -129,13 +158,11 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
         if (!casinoCategories) {
           throw new Error('Casino category not found');
         } else {
-          newPriority = generateRandomPriority();
           const newCasinoCategories = new CasinoCategories({
             addedBy: userId,
             name: casinoCategories.name + ' (Copy)',
             description: casinoCategories.description,
             image: casinoCategories.image,
-            priority: newPriority,
             active: casinoCategories.active,
             addedDate: Date.now(),
             tenancies: req.session.user.tenancy // Set tenancy for duplicated category
@@ -162,7 +189,7 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
   });
   
   // Edit casino category
-  router.put('/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -173,7 +200,6 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
       name,
       description,
       image,
-      priority,
       active
     } = req.body;
   
@@ -184,7 +210,6 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
         name,
         description,
         image,
-        priority,
         active
       }, {
         modifiedBy: userId,
@@ -206,7 +231,7 @@ router.get('/casinos/categories', checkPermissions('manageCasinos'), (req, res) 
   });
   
   // Delete casino category
-  router.delete('/casinos/categories/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params;

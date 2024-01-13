@@ -13,9 +13,6 @@ const casinoCategoriesSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     },
-    priority: {
-      type: Number
-    },
     addedDate: {
       type: Date,
       default: Date.now
