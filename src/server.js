@@ -601,6 +601,20 @@ app.get('/dashboard/utils/twitch/wishlistbot', checkPermissions('manageTwitchWis
   }
 });
 
+app.get('/dataseteditor', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed dataset editor');
+    const user = req.session.user;
+
+    res.render('admin/dataset_editor', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 // Swagger API Documentation
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');

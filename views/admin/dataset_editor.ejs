@@ -35,16 +35,14 @@
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
                 <div class="ui container">
-                    <h2>Super: All Tasks</h2>
-                    <table id="tasksTable" class="ui compact celled table nowrap" style="width:100%">
+                    <h2>Data</h2>
+                    <table id="dataTable" class="ui compact celled table nowrap" style="width:100%">
                         <thead class="center aligned">
                             <tr>
-                                <th>Task ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
-                                <th>Status</th>
-                                <th>Attached to</th>
-                                <th>Created by</th>
-                                <th>Creation Date</th>
+                                <th>Description</th>
+                                <th>Actions</th>
                                 <!-- Add more columns here based on the data you want to display -->
                             </tr>
                         </thead>
@@ -55,25 +53,30 @@
     </div>
     <%- include('../partials/footer') %>
     <script>
+
+        const tableType = 'tasks';
+        const tableTypeColumns = ['id', 'name', 'description'];
+        const tableUrl = '/api/v1/casinos/providers/dash/';
+
         $(document).ready(function () {
-            getTasks();
+            getData();
         });
         
 
-        let tasksTable;
+        let dataTable;
 
-        function getTasks() {
+        function getData() {
             // Show the loading indicator
             $('#fetchingIndicator').show();
 
             // If the table has already been initialized, simply update it
-            if (tasksTable) {
-                tasksTable.ajax.reload();
+            if (dataTable) {
+                dataTable.ajax.reload();
                 return;
             }
 
             // Initialize the DataTable and populate it with data from your API endpoint
-            tasksTable = $('#tasksTable').DataTable({
+            dataTable = $('#dataTable').DataTable({
                 serverSide: true,
                 // processing: true,
                 loadingIndicator: true,
@@ -81,9 +84,9 @@
                 fixedHeader: true,
                 deferRender: true,
                 pageLength: 10,
-                order: [[5, 'desc']],
+                // order: [[1, 'desc']],
                 ajax: {
-                    url: '/api/v1/tasks/super',
+                    url: tableUrl,
                     data: function (d) {
                         d.page = d.start / d.length + 1;
                         d.search = d.search.value;
@@ -94,53 +97,26 @@
                     targets: '_all',
                     className: 'dt-body-center'
                 }, {
-                    targets: [0, 1, 3, 4],
+                    targets: [0, 1, 2],
                     orderable: false
                 }],
                 columns: [
                     {
-                        data: function (row) {
-                            if (row.id) {
-                                return row.id;
-                            } else if (row._id) {
-                                return row._id;
-                            }
+                        data: 'image_url',
+                        render: function (data, type, row) {
+                            return '<img src="' + data + '" style="width: 50px; height: 50px; border-radius: 50%;">';
                         }
                     },
                     {
                         data: 'name',
                     },
                     {
-                        data: function (row) {
-                            return row.status.status + '<br>(' + moment(row.status.date).format('DD.MM.YYYY HH:mm:ss') + ')';
-                        }
+                        data: 'description',
                     },
+
                     {
                         data: function (row) {
-                            if (row.service) {
-                                return 'Service<br>' + row.service.name;
-                            } else if (row.order) {
-                                return 'Order<br>' + row.order.order_number;
-                            } else {
-                                return 'unknown';
-                            }
-                        }
-                    },
-                    {
-                        data: function (row) {
-                            if (row.user) {
-                                return 'User<br>' + row.user.username;
-                            } else if (row.tenant) {
-                                return 'Tenant<br>' + row.tenant.name;
-                            } else {
-                                return 'unknown';
-                            }
-                        }
-                    },
-                    {
-                        data: 'date',
-                        render: function (data, type, row) {
-                            return moment(data).format('DD.MM.YYYY HH:mm:ss');
+                            return '<button class="ui icon button" onclick="editData(\'' + row._id + '\')"><i class="edit icon"></i></button>';
                         }
                     },
                     // Add more columns here based on the data you want to display
@@ -152,9 +128,9 @@
 
 
             // Add a click event handler to the rows
-            $('#tasksTable tbody').on('click', 'tr', function () {
+            $('#dataTable tbody').on('click', 'tr', function () {
                 var tr = $(this);
-                var row = tasksTable.row(tr);
+                var row = dataTable.row(tr);
 
                 if (row.child.isShown()) {
                     // If the detail row is already shown, hide it
@@ -163,8 +139,8 @@
                 } else {
                     $('#fetchingIndicator').show();
                     // Otherwise, fetch the details and show them
-                    $.get('/api/v1/tasks/super/' + row.data()._id, function (taskDetails) {
-                        row.child(format(taskDetails)).show();
+                    $.get(tableUrl + row.data()._id, function (dataDetails) {
+                        row.child(format(dataDetails)).show();
                         tr.addClass('shown');
                     $('#fetchingIndicator').hide();
 
@@ -173,53 +149,53 @@
                 }
             });
 
-            // A function to format the task details
-            function format(taskDetails) {
-                // for each task.logs entry, create a new displayable log entry
+            // A function to format the data details
+            function format(dataDetails) {
+                // for each data.logs entry, create a new displayable log entry
                 let logs = '';
-                for (let i = 0; i < taskDetails.logs.length; i++) {
+                for (let i = 0; i < dataDetails.logs.length; i++) {
                     logs += '<tr>' +
-                        '<td>' + moment(taskDetails.logs[i].date).format('DD.MM.YYYY HH:mm:ss') + '</td>' +
-                        '<td>' + taskDetails.logs[i].level + '</td>' +
-                        '<td>' + taskDetails.logs[i].message + '</td>' +
+                        '<td>' + moment(dataDetails.logs[i].date).format('DD.MM.YYYY HH:mm:ss') + '</td>' +
+                        '<td>' + dataDetails.logs[i].level + '</td>' +
+                        '<td>' + dataDetails.logs[i].message + '</td>' +
                         '</tr>';
                 }
                 return '<div class="">' +
-                    '<h4>Task Details</h4>' +
+                    '<h4>Data Details</h4>' +
                     '<div class="ui small cards">' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + taskDetails._id + '</div>' +
-                                '<div class="description">Task ID</div>' +
+                                '<div class="header">' + dataDetails._id + '</div>' +
+                                '<div class="description">ID</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + taskDetails.name + '</div>' +
-                                '<div class="description">Task Name</div>' +
+                                '<div class="header">' + dataDetails.name + '</div>' +
+                                '<div class="description">Name</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + taskDetails.status.status + '</div>' +
+                                '<div class="header">' + dataDetails.status.status + '</div>' +
                                 '<div class="description">Status</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + (taskDetails.service ? taskDetails.service.name : taskDetails.order.name) + '</div>' +
+                                '<div class="header">' + (dataDetails.service ? dataDetails.service.name : dataDetails.order.name) + '</div>' +
                                 '<div class="description">Attached to</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + (taskDetails.user ? taskDetails.user.username : taskDetails.tenant.name + '<br><small>(Tenant)</small>') + '</div>' +
+                                '<div class="header">' + (dataDetails.user ? dataDetails.user.username : dataDetails.tenant.name + '<br><small>(Tenant)</small>') + '</div>' +
                                 '<div class="description">Created by</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="card">' +
                             '<div class="content">' +
-                                '<div class="header">' + moment(taskDetails.date).format('DD.MM.YYYY HH:mm:ss') + '</div>' +
+                                '<div class="header">' + moment(dataDetails.date).format('DD.MM.YYYY HH:mm:ss') + '</div>' +
                                 '<div class="description">Creation Date</div>' +
                             '</div>' +
                         '</div>' +
@@ -242,10 +218,10 @@
         }
 
      //   setInterval( function () {
-     //           tasksTable.ajax.reload( null, false ); // user paging is not reset on reload
+     //           dataTable.ajax.reload( null, false ); // user paging is not reset on reload
      //   }, 1000 );
 
-        function editTask(id) {
+        function editData(id) {
             window.location.href = '/dashboard/super/task/' + id + '/edit';
         }
     </script>

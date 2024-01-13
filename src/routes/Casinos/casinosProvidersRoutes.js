@@ -5,6 +5,70 @@ const logger = require("../../modules/winston.js");
 const db = require("../../db/database.js");
 const checkPermissions = require("../../middlewares/permissionMiddleware.js");
 
+router.get("/dash", checkPermissions("manageCasinos"), async (req, res) => {
+  try {
+    console.log("Query:", req.query);
+    const draw = parseInt(req.query.draw);
+    const start = parseInt(req.query.start);
+    const length = parseInt(req.query.length);
+    const search = req.query.search;
+
+    // Create a list of column names
+    const columns = [
+      "_id",
+      "name",
+      "description",
+    ];
+
+    // Create the sort options
+    const sort = {};
+    if (req.query.order) {
+      req.query.order.forEach((order) => {
+        const columnName = columns[order.column];
+        sort[columnName] = order.dir === "asc" ? 1 : -1;
+      });
+    }
+
+    const searchQuery = {
+      tenancies: req.session.user.tenancy,
+    };
+
+    console.log("SearchQuery:", searchQuery);
+
+    const providers = await db.CasinoProvider.find(searchQuery)
+      .skip(start)
+      .limit(length)
+      .populate("addedBy")
+      .populate("image")
+
+    const totalProviders = await db.CasinoProvider.countDocuments(searchQuery);
+    console.log("TotalProviders:", totalProviders);
+    console.log("Amount of filtered Providers:", providers.length);
+
+    res.send({
+      draw: draw,
+      recordsTotal: totalProviders,
+      recordsFiltered: totalProviders,
+      search: search,
+      data: providers.map((provider) => ({
+        _id: provider._id,
+        name: provider.name,
+        description: provider.description,
+        image: provider.image,
+        active: provider.active,
+        addedDate: provider.addedDate,
+        addedBy: provider.addedBy,
+        modifiedDate: provider.modifiedDate,
+        modifiedBy: provider.modifiedBy,
+      })),
+    });
+  } catch (err) {
+    res.status(500).send({
+      error: "An error occurred while retrieving providers: " + err,
+    });
+  }
+});
+
 // Get count of all casino providers from MongoDB
 router.get("/count", checkPermissions("manageCasinos"), (req, res) => {
   db.CasinoProvider.countDocuments({
