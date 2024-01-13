@@ -88,7 +88,7 @@
                 const data = await response.json();
                 document.getElementById('usernameInput').value = data.username;
                 document.getElementById('nicknameInput').value = data.nickname;
-                document.getElementById('emailInput').value = data.email;
+                document.getElementById('emailInput').value = data.emails.email;
                 document.getElementById('tenancyDropdown').value = data.tenancy;
 
                 const tenanciesDropdown = document.getElementById('tenanciesDropdown');
