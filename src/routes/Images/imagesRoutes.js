@@ -34,7 +34,6 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
         };
       });
       res.json(updatedResults);
-      console.log(updatedResults);
     })
     .catch((error) => {
       console.error('Error retrieving images:', error);

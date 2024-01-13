@@ -19,7 +19,6 @@
                                     <th width="15%">Image</th>
                                     <th width="15%">Name</th>
                                     <th width="25%">Description</th>
-                                    <th width="20%">Priority (Sorting)</th>
                                     <th width="20%">Actions</th>
                                 </tr>
                             </thead>
@@ -81,11 +80,6 @@
                         const providersResponse = await fetch('/api/v1/casinos/providers');
                         const data = await providersResponse.json();
 
-                        // Sort the providers by priority
-                        data.sort(function (a, b) {
-                            return a.priority - b.priority;
-                        });
-
                         // Populate the table with data
                         for (const provider of data) {
                             try {
@@ -107,7 +101,7 @@
                                         '<div class="item" data-value="' +
                                         image._id +
                                         '"><img class="ui image" src="' +
-                                        image.imageUrl + '">' + image
+                                        image.image_url + '">' + image
                                         .name + '</div>';
                                     row += option;
                                 }
@@ -120,8 +114,6 @@
                                     .name + '</td>' +
                                     '<td contenteditable="true">' + providerDetails
                                     .description + '</td>' +
-                                    '<td contenteditable="true">' + providerDetails
-                                    .priority + '</td>' +
                                     '<td>' +
                                     '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                                     '<button class="ui small red button delete-btn">Delete</button>' +
@@ -179,10 +171,6 @@
                         '<label>Description</label>' +
                         '<input type="text" name="description" placeholder="Enter description">' +
                         '</div>' +
-                        '<div class="field">' +
-                        '<label>Priority</label>' +
-                        '<input type="text" name="priority" placeholder="Enter priority">' +
-                        '</div>' +
                         '</form>' +
                         '</div>' +
                         '<div class="actions">' +
@@ -209,11 +197,11 @@
                 // Function to add a new provider
                 function addProvider(formData) {
                     $.ajax({
-                        url: '/api/v1/casinos/providers/add',
+                        url: '/api/v1/casinos/providers',
                         method: 'POST',
                         data: formData,
                         success: function (data) {
-                            console.log('Success:', data);
+                            showToast('success', 'Provider added successfully');
                             loadInitialData();
                         },
                         error: function (error) {
@@ -262,7 +250,6 @@
                         data: {
                             name: $('#' + providerId + ' td:nth-child(2)').text(),
                             description: $('#' + providerId + ' td:nth-child(3)').text(),
-                            priority: $('#' + providerId + ' td:nth-child(4)').text(),
                             image: $('#' + providerId + ' .image-dropdown').dropdown('get value')
                         },
                         success: function (data) {
