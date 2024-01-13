@@ -7,7 +7,7 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 
 
 // Get all casino features from MongoDB
-router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) => {
+router.get('/', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -25,9 +25,46 @@ router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) =>
         });
       });
   });
+
+    // Insert casino feature into MongoDB
+    router.post('/', checkPermissions('manageCasinos'), (req, res) => {
+      const {
+        name,
+        description,
+        image,
+        priority,
+        active
+      } = req.body;
+      const {
+        userId
+      } = req.session.user;
+    
+      const casinoFeatures = new db.CasinoFeatures({
+        addedBy: userId,
+        name: name,
+        description: description,
+        image: image,
+        priority: priority,
+        active: active,
+        addedDate: Date.now(),
+        tenancies: req.session.user.tenancy // Add tenancies field
+      });
+    
+      casinoFeatures.save()
+        .then(() => {
+          logger.info('Casino feature inserted: ' + name);
+          res.status(201).json(casinoFeatures);
+        })
+        .catch((error) => {
+          console.error('Error inserting casino feature:', error);
+          res.status(500).json({
+            error: 'Internal server error'
+          });
+        });
+    });
   
   // Get count of all features from MongoDB
-  router.get('/casinos/features/count', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/count', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -48,7 +85,7 @@ router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) =>
   
   
   // Get details of a specific casino feature
-  router.get('/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params;
@@ -77,44 +114,10 @@ router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) =>
       });
   });
   
-  // Insert casino feature into MongoDB
-  router.post('/casinos/features/add', checkPermissions('manageCasinos'), (req, res) => {
-    const {
-      name,
-      description,
-      image,
-      priority,
-      active
-    } = req.body;
-    const {
-      userId
-    } = req.session.user;
-  
-    const casinoFeatures = new CasinoFeatures({
-      addedBy: userId,
-      name: name,
-      description: description,
-      image: image,
-      priority: priority,
-      active: active,
-      addedDate: Date.now(),
-      tenancies: req.session.user.tenancy // Add tenancies field
-    });
-  
-    casinoFeatures.save()
-      .then(() => {
-        res.redirect('/dashboard');
-      })
-      .catch((error) => {
-        console.error('Error inserting casino feature:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
+
   
   // Duplicate casino feature
-  router.post('/casinos/features/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -161,9 +164,39 @@ router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) =>
         });
       });
   });
+
+  // Get casinos assigned to a specific feature
+  router.get('/:id/casinos', checkPermissions('manageCasinos'), (req, res) => {
+    const {
+      id
+    } = req.params;
+    const {
+      tenancy
+    } = req.session.user;
+  
+    db.Casino.find({
+        features: id,
+        tenancies: tenancy
+      })
+      .then((casinos) => {
+        if (!casinos) {
+          return res.status(404).json({
+            error: 'Casinos not found'
+          });
+        }
+  
+        res.json(casinos);
+      })
+      .catch((error) => {
+        console.error('Error retrieving casinos:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  });
   
   // Edit casino feature
-  router.put('/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -207,7 +240,7 @@ router.get('/casinos/features', checkPermissions('manageCasinos'), (req, res) =>
   });
   
   // Delete casino feature
-  router.delete('/casinos/features/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params;
