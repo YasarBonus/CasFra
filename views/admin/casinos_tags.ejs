@@ -14,7 +14,6 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Priority (Sorting)</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -56,17 +55,13 @@
                     url: '/api/v1/casinos/tags',
                     method: 'GET',
                     success: function (data) {
-                        // Sort the tags by priority
-                        data.sort(function (a, b) {
-                            return a.priority - b.priority;
-                        });
+
 
                         // Populate the table with data
                         data.forEach(function (tag) {
                             var row = '<tr id="' + tag._id + '">' +
                                 '<td contenteditable="true">' + tag.name + '</td>' +
                                 '<td contenteditable="true">' + tag.description + '</td>' +
-                                '<td contenteditable="true">' + tag.priority + '</td>' +
                                 '<td>' +
                                 '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                                 '<button class="ui small red button delete-btn">Delete</button>' +
@@ -111,10 +106,6 @@
                     '<div class="field">' +
                     '<label>Description</label>' +
                     '<input type="text" name="description" placeholder="Enter description">' +
-                    '</div>' +
-                    '<div class="field">' +
-                    '<label>Priority</label>' +
-                    '<input type="text" name="priority" placeholder="Enter priority">' +
                     '</div>' +
                     '</form>' +
                     '</div>' +
@@ -179,10 +170,12 @@
                     url: '/api/v1/casinos/tags/' + tagId + '/duplicate',
                     method: 'POST',
                     success: function (data) {
+                        showToast('success', 'Tag duplicated successfully');
                         loadInitialData();
                     },
                     error: function (error) {
                         console.log('Error:', error);
+                        showToast('error', 'Error duplicating tag');
                     }
                 });
             }
@@ -195,7 +188,6 @@
                     data: {
                         name: $('#' + tagId + ' td:nth-child(1)').text(),
                         description: $('#' + tagId + ' td:nth-child(2)').text(),
-                        priority: $('#' + tagId + ' td:nth-child(3)').text()
                     },
                     success: function (data) {
                         console.log('Success:', data);

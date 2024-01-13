@@ -12,10 +12,6 @@ const casinoTagsSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     },
-    priority: {
-      type: Number,
-      default: generateRandomPriority()
-    },
     tenancies: [String],
   });
   

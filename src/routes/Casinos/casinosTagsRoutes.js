@@ -6,7 +6,7 @@ const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 
 
 // Insert casino tag into MongoDB
-router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
+router.post('/', checkPermissions('manageCasinos'), (req, res) => {
     const {
       name,
       description,
@@ -20,7 +20,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
       tenancy
     } = req.session.user;
   
-    const casinoTags = new CasinoTags({
+    const casinoTags = new db.CasinoTags({
       addedBy: userId,
       name: name,
       description: description,
@@ -45,7 +45,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   });
   
   // Get all casino tags from MongoDB
-  router.get('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -65,7 +65,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   });
   
   // Get amount of all tags
-  router.get('/casinos/tags/count', checkPermissions('manageCasinos'), (req, res) => {
+  router.get('/count', checkPermissions('manageCasinos'), (req, res) => {
     const {
       tenancy
     } = req.session.user;
@@ -84,38 +84,10 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
       });
   });
   
-  // Get details of a specific casino tag
-  router.get('/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
-    const {
-      id
-    } = req.params;
-    const {
-      tenancy
-    } = req.session.user;
   
-    db.CasinoTags.findOne({
-        _id: id,
-        tenancies: tenancy
-      })
-      .then((casinoTag) => {
-        if (!casinoTag) {
-          return res.status(404).json({
-            error: 'Casino tag not found'
-          });
-        }
-  
-        res.json(casinoTag);
-      })
-      .catch((error) => {
-        console.error('Error retrieving casino tag:', error);
-        res.status(500).json({
-          error: 'Internal server error'
-        });
-      });
-  });
   
   // Insert casino tag into MongoDB
-  router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/', checkPermissions('manageCasinos'), (req, res) => {
     const {
       name,
       description,
@@ -129,7 +101,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
       tenancy
     } = req.session.user;
   
-    const casinoTags = new CasinoTags({
+    const casinoTags = new db.CasinoTags({
       addedBy: userId,
       name: name,
       description: description,
@@ -151,8 +123,38 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
       });
   });
   
+// Get details of a specific casino tag
+router.get('/:id', checkPermissions('manageCasinos'), (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    tenancy
+  } = req.session.user;
+
+  db.CasinoTags.findOne({
+      _id: id,
+      tenancies: tenancy
+    })
+    .then((casinoTag) => {
+      if (!casinoTag) {
+        return res.status(404).json({
+          error: 'Casino tag not found'
+        });
+      }
+
+      res.json(casinoTag);
+    })
+    .catch((error) => {
+      console.error('Error retrieving casino tag:', error);
+      res.status(500).json({
+        error: 'Internal server error'
+      });
+    });
+});
+
   // Duplicate casino tag
-  router.post('/casinos/tags/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
+  router.post('/:id/duplicate', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -171,13 +173,11 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
         if (!casinoTags) {
           throw new Error('Casino tag not found');
         } else {
-          const newPriority = generateRandomPriority();
-          const newCasinoTags = new CasinoTags({
+          const newCasinoTags = new db.CasinoTags({
             addedBy: userId,
             name: casinoTags.name + ' (Copy)',
             description: casinoTags.description,
             image: casinoTags.image,
-            priority: newPriority,
             active: casinoTags.active,
             addedDate: Date.now(),
             tenancies: casinoTags.tenancies, // Copy the tenancies from the original object
@@ -185,7 +185,9 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   
           newCasinoTags.save()
             .then(() => {
-              res.redirect('/dashboard');
+              res.status(200).json({
+                message: 'Casino tag duplicated'
+              });
             })
             .catch((error) => {
               console.error('Error duplicating casino tag:', error);
@@ -204,7 +206,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   });
   
   // Edit casino tag
-  router.put('/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.put('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       userId
     } = req.session.user;
@@ -215,7 +217,6 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
       name,
       description,
       image,
-      priority,
       active
     } = req.body;
     const {
@@ -230,7 +231,6 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
           name,
           description,
           image,
-          priority,
           active
         }, {
           modifiedBy: userId,
@@ -253,7 +253,7 @@ router.post('/casinos/tags', checkPermissions('manageCasinos'), (req, res) => {
   });
   
   // Delete casino tag
-  router.delete('/casinos/tags/:id', checkPermissions('manageCasinos'), (req, res) => {
+  router.delete('/:id', checkPermissions('manageCasinos'), (req, res) => {
     const {
       id
     } = req.params;
