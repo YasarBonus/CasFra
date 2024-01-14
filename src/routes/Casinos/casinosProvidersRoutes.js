@@ -7,7 +7,6 @@ const checkPermissions = require("../../middlewares/permissionMiddleware.js");
 
 router.get("/dash", checkPermissions("manageCasinos"), async (req, res) => {
   try {
-    console.log("Query:", req.query);
     const draw = parseInt(req.query.draw);
     const start = parseInt(req.query.start);
     const length = parseInt(req.query.length);
