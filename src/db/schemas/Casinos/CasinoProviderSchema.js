@@ -1,29 +1,33 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
 // Define Casino provider schema
 const casinoProviderSchema = new mongoose.Schema({
     name: String,
     description: String,
-    image: String,
-    imageUrl: String,
-    tenancies: [String],
-  
+    image: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Image'
+    },
+    tenancies: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Tenancies'
+    },
     active: {
       type: Boolean,
       default: true
     },
-    priority: {
-      type: Number,
-      default: generateRandomPriority()
-    },
     addedDate: {
       type: Date,
-      default: Date.now
     },
-    addedBy: String,
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
     modifiedDate: Date,
-    modifiedBy: String
+    modifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
   });
   
   const CasinoProvider = mongoose.model('CasinoProvider', casinoProviderSchema);
