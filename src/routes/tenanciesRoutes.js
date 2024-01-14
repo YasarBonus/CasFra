@@ -30,7 +30,7 @@ router.post('/', checkPermissions('manageTenancies'), (req, res) => {
     return;
   }
 
-  const tenancie = new db.Tenancie({
+  const tenancie = new db.Tenancies({
     name,
     notes,
     createdBy: userId,
