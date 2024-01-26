@@ -6,7 +6,7 @@ const casinoProviderSchema = new mongoose.Schema({
     description: String,
     image: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Image'
+      ref: 'Images'
     },
     tenancies: {
       type: [mongoose.Schema.Types.ObjectId],
