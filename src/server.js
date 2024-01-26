@@ -17,6 +17,9 @@ const logger = require('./modules/winston.js');
 const emailVerificator = require('./services/emailVerificationService.js');
 const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
 
+const notificator = require('./services/notificationService.js');
+const addNotification = notificator.addNotification;
+
 // Database Engine
 const db = require('./db/database.js');
 
@@ -919,8 +922,6 @@ app.get('/:shortUrl', async (req, res, next) => {
     next(err);
   }
 });
-
-// addNotification('65834f6fefa5bb088ca50288', 'info', 'Na', 'Test', 'email');
 
 // Error handler
 app.use(errorHandler);
