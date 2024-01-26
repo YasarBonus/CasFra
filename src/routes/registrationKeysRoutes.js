@@ -68,16 +68,25 @@ router.get('/', checkPermissions('manageRegistrationKeys'), (req, res) => {
   
   // Delete registration key from MongoDB by ID
   router.delete('/:id', checkPermissions('manageRegistrationKeys'), (req, res) => {
-    const {
-      id
-    } = req.params.id;
-    db.RegistrationKey.deleteOne({
-        _id: id
+    const { id } = req.params;
+
+    db.RegistrationKey.findById(id)
+      .then((registrationKey) => {
+        if (!registrationKey) {
+          throw new Error('Registration key not found');
+        }
+
+        if (registrationKey.used) {
+          throw new Error('Cannot delete a used registration key');
+        }
+
+        return db.RegistrationKey.deleteOne({ _id: id });
       })
       .then((result) => {
         if (result.deletedCount === 0) {
           throw new Error('Registration key not found');
         }
+
         res.json({
           success: true,
           id: id,
