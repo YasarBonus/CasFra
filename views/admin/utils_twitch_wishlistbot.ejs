@@ -4,12 +4,13 @@
 <%- include('../partials/head') %>
 <%- include('../partials/header') %>
 
-<body class="bg-yasarred">
+<body>
     <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px;">
         <div class="ui segment">
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
                     <h2>Twitch Wish List Bot</h2>
+                    <div id="randomWishButton" class="ui primary button">Play Random Wish</div>
                     <table id="wishListTable" class="ui celled table">
                         <thead>
                             <tr>
@@ -28,6 +29,27 @@
     </div>
     <%- include('../partials/footer') %>
     <script>
+        // add event listener to the random wish button to play a random wish from the list of pending wishes in the database
+        $(document).ready(function () {
+            $('#randomWishButton').click(function () {
+                $.ajax({
+                    url: '/api/v1/utils/twitchwishlistbot/random',
+                    method: 'POST',
+                    success: function (response) {
+                        showToast('success', 'Wish played',
+                            'The wish has been played successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error playing wish:', error);
+                        showToast('error', 'Error playing wish',
+                            'There was an error playing the wish. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            });
+        });
+
         $(document).ready(function () {
             // Function to get Casino Wish List Bot Items from the API
             // and populate the table with them.
