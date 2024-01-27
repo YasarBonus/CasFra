@@ -85,19 +85,19 @@ router.post('/register', async (req, res) => {
         const existingKey = await db.RegistrationKey.findOne({
             regkey: registrationKey
         });
-        //if (!existingKey) {
-        //    res.status(400).json({
-        //        error: 'Invalid registration key'
-        //    });
-        //    return;
-        //}
+        if (!existingKey) {
+            res.status(400).json({
+                error: 'Invalid registration key'
+            });
+            return;
+        }
 //
-        //if (existingKey.used) {
-        //    res.status(400).json({
-        //        error: 'Registration key already used'
-        //    });
-        //    return;
-        //}
+        if (existingKey.used) {
+            res.status(400).json({
+                error: 'Registration key already used'
+            });
+            return;
+        }
 
         const existingUser = await db.User.findOne({
             $or: [{
@@ -206,7 +206,7 @@ router.post('/register', async (req, res) => {
         await existingKey.save();
 
         // Send the verification code by email to the user
-        // sendVerificationCodeByEmail(user.email, registrationVerificationCode);
+        addNotification(user._id, 'email', 'Activate your account', 'Please verify your account by clicking this link: https://casfra.com/verify/' + registrationVerificationLinkCode, 'email');
 
         res.status(201).json({
             success: true
@@ -218,6 +218,55 @@ router.post('/register', async (req, res) => {
         });
     }
 });
+/**
+ * @openapi
+ * /verify/{verificationCode}:
+ *   get:
+ *     summary: Verify a user account
+ *     tags: [User]
+ */
+router.get('/verify/:verificationCode', async (req, res) => {
+    try {
+        const {
+            verificationCode
+        } = req.params;
+
+        const user = await db.User.findOne({
+            'registration.registration_code_link': verificationCode
+        });
+        if (!user) {
+            res.status(400).json({
+                error: 'Invalid verification code'
+            });
+            return;
+        }
+
+        const currentDate = new Date();
+        const codeExpiryDate = new Date(user.registration.registration_code_expires);
+        if (currentDate > codeExpiryDate) {
+            res.status(400).json({
+                error: 'Verification code expired'
+            });
+            return;
+        }
+
+        user.status.verified = true;
+        user.status.active = true;
+        user.registration.registration_code = null;
+        user.registration.registration_code_link = null;
+        user.registration.registration_code_expires = null;
+        await user.save();
+
+        res.redirect('https://casfra.com/login');
+        console.log('User', user._id, 'verified');
+    } catch (error) {
+        console.error('Error verifying user:', error);
+        res.status(500).json({
+            error: 'Internal server error'
+        });
+    }
+});
+
 
 /**
  * @openapi

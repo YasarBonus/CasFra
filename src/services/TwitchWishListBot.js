@@ -28,6 +28,28 @@ const client = new tmi.Client({
 
 client.connect();
 
+// retrieve the messages from the database and store them in an array
+
+const messages = [];
+
+async function getMessages() {
+    try {
+        const twitchWishListBotMessages = await db.TwitchWishListBotMessages.find();
+
+        twitchWishListBotMessages.forEach(message => {
+            messages.push(message.message);
+            messages.push(message.identifier);
+        });
+    } catch (error) {
+        logger.error('Error getting messages:', error);
+    } finally {
+        console.log('Messages:', messages);
+    }
+}
+
+getMessages();
+
+
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
 
