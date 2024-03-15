@@ -1,5 +1,5 @@
 const email = require('./emailService.js');
-
+const db = require('../db/database.js');
 const logger = require('../modules/winston.js');
 
 // Function to hand over notifications to the different handlers
