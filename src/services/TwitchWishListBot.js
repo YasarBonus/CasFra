@@ -59,7 +59,11 @@ client.on('message', (channel, tags, message, self) => {
         client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes`);
     }
     else if (commandName.startsWith('!allwishes')) {
-        listWishes(channel, tags);
+        if (tags.username === '@Joshua2504') {
+            listWishes(channel, tags);
+        } else {
+            client.say(channel, `@${tags.username}, du hast keine Berechtigung, alle Wünsche anzuzeigen!`);
+        }
     } else if (commandName.startsWith('!wishes')) {
         listUserWishes(channel, tags);
     } else if (commandName.startsWith('!wish')) {
