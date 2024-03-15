@@ -149,7 +149,7 @@ async function listUserWishes(channel, tags) {
 
         // Check if there are any wishes
         if (twitchWishListBot.length === 0) {
-            client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
+            client.say(channel, `@${tags.username}, in deiner Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
             twitchWishListBot.forEach(wish => {
