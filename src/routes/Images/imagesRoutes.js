@@ -48,11 +48,10 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
 router.get('/categories/:categoryId/images', checkPermissions('manageImages'), (req, res) => {
   const categoryId = req.params.categoryId;
   const userTenancy = req.session.user.tenancy;
+  const userId = req.session.user.userId;
 
-  db.Images.find({
-      category: categoryId,
-      tenancies: userTenancy
-    })
+  const query = userTenancy ? { category: categoryId, tenancies: userTenancy } : { category: categoryId, users: userId };
+  db.Images.find(query)
     .then((results) => {
       const updatedResults = results.map((image) => {
         return {
