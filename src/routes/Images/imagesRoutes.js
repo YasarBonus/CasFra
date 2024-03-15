@@ -139,7 +139,7 @@ router.post('/', checkPermissions('manageImages'), async (req, res) => {
 
     // 3. delete image from SFTP if MongoDB save fails
     try {
-      await sftp.delete(process.env.CDN_SFTP_DESTINATION + file.name);
+      await sftp.delete(process.env.CDN_SFTP_DESTINATION_PATH + file.name);
       console.log('Image ' + file.name + ' deleted from SFTP');
     } catch (error) {
       console.error('Error deleting image from SFTP:', error);
