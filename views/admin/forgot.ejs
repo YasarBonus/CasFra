@@ -22,7 +22,7 @@
           <h2 class="ui image header">
             <img src="https://cdn.treudler.net/web/logo/256x256.png" class="image">
             <div class="content">
-              Register new account
+              Request a new Password
             </div>
           </h2>
           <form class="ui large form" id="userForm">
@@ -36,35 +36,11 @@
               </div>
               <div class="field">
                 <div class="ui left icon input">
-                  <i class="user icon"></i>
-                  <input type="text" name="nickname" placeholder="Nickname">
-                </div>
-              </div>
-              <div class="field">
-                <div class="ui left icon input">
                   <i class="mail icon"></i>
                   <input type="text" name="email" placeholder="Email">
                 </div>
               </div>
-              <div class="field">
-                <div class="ui left icon input">
-                  <i class="lock icon"></i>
-                  <input type="password" name="password" placeholder="Password">
-                </div>
-              </div>
-              <div class="field">
-                <div class="ui left icon input">
-                  <i class="lock icon"></i>
-                  <input type="password" name="passwordRepeat" placeholder="Password Repeat">
-                </div>
-              </div>
-              <div class="field">
-                <div class="ui left icon input">
-                  <i class="key icon"></i>
-                  <input type="password" name="registrationKey" placeholder="Registration Key">
-                </div>
-              </div>
-              <button id="saveButton" class="ui fluid large submit button">Login</button>
+              <button id="saveButton" class="ui fluid large submit button">Request a new Password</button>
             </div>
       
             <div class="ui error message"></div>
@@ -72,7 +48,7 @@
           </form>
       
           <div class="ui message">
-            <a href="/login">Login</a> - <a href="/forgot">Reset Password</a>
+            <a href="/register">Create Account</a> - <a href="/login">Login</a>
           </div>
         </div>
       </div>
@@ -84,7 +60,7 @@
 
                       
                       <script>
-                        showActionButton('saveButton','register');
+                        showActionButton('saveButton','resetPassword');
                         // showLoader('formLoaderPersonalDetails', 'disabled');
                         // showLoader('formLoaderPaymentInformation', 'disabled');
                         // showLoader('formLoaderReceipt', 'disabled');
@@ -101,23 +77,18 @@
                           var formData = {
                             username: $('input[name="username"]').val(),
                             email: $('input[name="email"]').val(),
-                            password: $('input[name="password"]').val(),
-                            passwordRepeat: $('input[name="passwordRepeat"]').val(),
-                            registrationKey: $('input[name="registrationKey"]').val(),
-                            language: "en",
-                            nickname: $('input[name="nickname"]').val(),
                           };
                           console.log('form', formData);
                           $.ajax({
                             type: 'POST',
-                            url: '/api/v1/user/register',
+                            url: '/api/v1/auth/requestNewPassword',
                             data: formData,
                             success: function(data) {
                               console.log(data);
                               showLoader('formLoaderAccountDetails', 'success');
 
                               showActionButton(button,'success');
-                              showToast('success', 'Account created', 'Your account has been created successfully. Redirecting...');
+                              showToast('success', 'Password reset requested', 'A new password has been sent to your e-mail address.');
                               // Redirect to /login after 3 seconds
                               setTimeout(function() {
                                 window.location.href = '/login';
@@ -125,7 +96,7 @@
                             },
                             error: function(xhr, status, error) {
                               var errorMessage = JSON.parse(xhr.responseText).error;
-                              showActionButton(button,'error', 'Error creating account', errorMessage, 'register');
+                              showActionButton(button,'error', 'Error resetting password', errorMessage, 'resetPassword');
                               showLoader('formLoaderAccountDetails', 'success');
                             },
                             complete: function() {

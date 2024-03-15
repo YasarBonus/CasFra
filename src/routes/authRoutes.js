@@ -372,4 +372,98 @@ router.post('/logout', checkPermissions('authenticate'), (req, res) => {
     });
 });
 
+/**
+ * @openapi
+ * /auth/requestNewPassword:
+ *   post:
+ *     summary: Request a new password by username and email
+ *     tags: [Authentication]
+ *     security:
+ *       - session: []
+ *     responses:
+ *       '200':
+ *         description: New password successfully requested
+ *       '500':
+ *         description: Internal server error
+ */
+
+router.post('/requestNewPassword', (req, res) => {
+    const {
+        username,
+        email
+    } = req.body;
+
+    if (!username || typeof username !== 'string') {
+        res.status(400).json({
+            error: 'Username is required and must be a string'
+        });
+        return;
+    }
+
+    if (!email || typeof email !== 'string') {
+        res.status(400).json({
+            error: 'Email is required and must be a string'
+        });
+        return;
+    }
+
+    db.User.findOne({
+            username
+        })
+        .then((user) => {
+            if (!user) {
+                res.status(404).json({
+                    error: 'User not found'
+                });
+                return;
+            }
+
+            if (user.emails.email !== email) {
+                res.status(400).json({
+                    error: 'Email does not match the user'
+                });
+                return;
+            }
+
+            // Generate a new password
+            const newPassword = Math.random().toString(36).slice(-8);
+
+            // Hash the new password
+            bcrypt.hash(newPassword, 10, (err, hash) => {
+                if (err) {
+                    logger.error('Error hashing new password:', err);
+                    res.status(500).json({
+                        error: 'Internal server error'
+                    });
+                    return;
+                }
+
+                user.password = hash;
+                user.save()
+                    .then(() => {
+                        // Send the new password to the user's email
+                        // email.sendEmail(user.emails.email, 'New password', `Your new password is: ${newPassword}`);
+                        addNotification(user._id, 'email', 'New password', `Your new password is: ${newPassword}`, 'email');
+
+                        res.json({
+                            success: true
+                        });
+                    })
+                    .catch((error) => {
+                        logger.error('Error saving new password:', error);
+                        res.status(500).json({
+                            error: 'Internal server error'
+                        });
+                    });
+            });
+        })
+        .catch((error) => {
+            logger.error('Error retrieving user:', error);
+            res.status(500).json({
+                error: 'Internal server error'
+            });
+        });
+}
+);
+
 module.exports = router;

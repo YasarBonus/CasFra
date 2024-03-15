@@ -260,6 +260,10 @@ app.get('/login', (req, res) => {
   res.render('admin/login');
 });
 
+app.get('/forgot', (req, res) => {
+  res.render('admin/forgot');
+});
+
 app.get('/register', (req, res) => {
   res.render('admin/register');
 });
