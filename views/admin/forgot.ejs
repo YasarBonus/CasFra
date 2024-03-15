@@ -60,7 +60,7 @@
 
                       
                       <script>
-                        showActionButton('saveButton','register');
+                        showActionButton('saveButton','resetPassword');
                         // showLoader('formLoaderPersonalDetails', 'disabled');
                         // showLoader('formLoaderPaymentInformation', 'disabled');
                         // showLoader('formLoaderReceipt', 'disabled');
@@ -88,7 +88,7 @@
                               showLoader('formLoaderAccountDetails', 'success');
 
                               showActionButton(button,'success');
-                              showToast('success', 'Account created', 'Your account has been created successfully. Redirecting...');
+                              showToast('success', 'Password reset requested', 'A new password has been sent to your e-mail address.');
                               // Redirect to /login after 3 seconds
                               setTimeout(function() {
                                 window.location.href = '/login';
@@ -96,7 +96,7 @@
                             },
                             error: function(xhr, status, error) {
                               var errorMessage = JSON.parse(xhr.responseText).error;
-                              showActionButton(button,'error', 'Error creating account', errorMessage, 'register');
+                              showActionButton(button,'error', 'Error resetting password', errorMessage, 'resetPassword');
                               showLoader('formLoaderAccountDetails', 'success');
                             },
                             complete: function() {
