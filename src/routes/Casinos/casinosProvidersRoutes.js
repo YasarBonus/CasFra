@@ -152,49 +152,6 @@ router.get("/:id", checkPermissions("manageCasinos"), (req, res) => {
     });
 });
 
-// Duplicate casino provider
-router.post("/:id/duplicate", checkPermissions("manageCasinos"), (req, res) => {
-  const { userId, tenancy } = req.session.user;
-  const { id } = req.params;
-
-  db.CasinoProvider.findOne({
-    _id: id,
-    tenancies: tenancy,
-  })
-    .then((casinoProviders) => {
-      if (!casinoProviders) {
-        throw new Error("Casino provider not found");
-      } else {
-        const newCasinoProviders = new db.CasinoProvider({
-          addedBy: userId,
-          name: casinoProviders.name + " (Copy)",
-          description: casinoProviders.description,
-          image: casinoProviders.image,
-          active: casinoProviders.active,
-          addedDate: Date.now(),
-        });
-
-        newCasinoProviders
-          .save()
-          .then(() => {
-            res.redirect("/dashboard");
-          })
-          .catch((error) => {
-            console.error("Error duplicating casino provider:", error);
-            res.status(500).json({
-              error: "Internal server error",
-            });
-          });
-      }
-    })
-    .catch((error) => {
-      console.error("Error duplicating casino provider:", error);
-      res.status(500).json({
-        error: "Internal server error",
-      });
-    });
-});
-
 // Edit casino provider
 router.put("/:id", checkPermissions("manageCasinos"), (req, res) => {
   const { userId, tenancy } = req.session.user;
@@ -209,10 +166,8 @@ router.put("/:id", checkPermissions("manageCasinos"), (req, res) => {
     {
       name,
       description,
-      image,
+      ...(image && { image }), // Set image only if it is provided
       active,
-    },
-    {
       modifiedBy: userId,
       modifiedDate: Date.now(),
     }
