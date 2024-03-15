@@ -442,7 +442,8 @@ router.post('/requestNewPassword', (req, res) => {
                 user.save()
                     .then(() => {
                         // Send the new password to the user's email
-                        email.sendEmail(user.emails.email, 'New password', `Your new password is: ${newPassword}`);
+                        // email.sendEmail(user.emails.email, 'New password', `Your new password is: ${newPassword}`);
+                        addNotification(user._id, 'email', 'New password', `Your new password is: ${newPassword}`, 'email');
 
                         res.json({
                             success: true
