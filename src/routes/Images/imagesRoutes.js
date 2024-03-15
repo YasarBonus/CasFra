@@ -31,7 +31,7 @@ router.get('/', checkPermissions('manageImages'), (req, res) => {
       const updatedResults = results.map((image) => {
         return {
           ...image._doc,
-          imageUrl: `/img/images/${image.filename}`
+          imageUrl: process.env.CDN_URL + `${image.filename}`
         };
       });
       res.json(updatedResults);
