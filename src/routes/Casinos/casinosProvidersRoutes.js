@@ -110,8 +110,8 @@ router.post("/", checkPermissions("manageCasinos"), (req, res) => {
   const casinoProvider = new db.CasinoProvider({
     addedBy: userId,
     name: name,
-    description: description,
-    image: image,
+    ...(description && { description }), // Set description only if it is provided
+    ...(image && { image }), // Set image only if it is provided
     active: active,
     addedDate: Date.now(),
     tenancies: [tenancy],

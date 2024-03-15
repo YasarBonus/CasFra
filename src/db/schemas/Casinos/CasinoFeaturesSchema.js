@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 // Define Casino features schema
 const casinoFeaturesSchema = new mongoose.Schema({
     name: String,
-    description: String,
+    description: {
+      type: String,
+      default: ''
+    },
     image: String,
     active: {
       type: Boolean,

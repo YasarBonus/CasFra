@@ -159,6 +159,7 @@
       method: "POST",
       data: {
         name: $("#newProviderName").val(),
+        description: "",
       },
       success: function (data) {
         showToast("success", "Provider added successfully");
