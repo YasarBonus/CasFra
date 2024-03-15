@@ -33,7 +33,7 @@ const api = require('./services/TwitchWishListBot.js');
 const { processOrders } = require('./modules/Tasks/servicesOrderHandler.js');
 
 const cron = require('node-cron');
-cron.schedule('*/10 * * * * *', () => {
+cron.schedule('*/1 * * * * *', () => {
   console.log('Calling processOrders()');
     processOrders();
 });
