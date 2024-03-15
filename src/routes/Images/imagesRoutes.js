@@ -19,6 +19,7 @@ const minioClient = new Minio.Client({
 });
 
 const checkPermissions = require('../../middlewares/permissionMiddleware.js');
+const Client = require('ssh2-sftp-client');
 
 // Get all images from MongoDB
 router.get('/', checkPermissions('manageImages'), (req, res) => {
@@ -71,21 +72,16 @@ router.get('/categories/:categoryId/images', checkPermissions('manageImages'), (
 });
 
 // Upload images
-// 1. upload image to Minio
+// 1. upload image to SFTP
 // 2. save image data to MongoDB
-// 3. delete image from Minio if MongoDB save fails
+// 3. delete image from SFTP if MongoDB save fails
 
-// 1. upload image to Minio
-router.post('/', checkPermissions('manageImages'), (req, res) => {
-  const {
-    userId,
-    tenancy
-  } = req.session.user;
-  const {
-    description,
-    active,
-    category,
-  } = req.body;
+const sftp = new Client();
+
+// 1. upload image to SFTP
+router.post('/', checkPermissions('manageImages'), async (req, res) => {
+  const { userId, tenancy } = req.session.user;
+  const { description, active, category } = req.body;
   let name = req.body.name;
   const file = req.files.image;
 
@@ -101,53 +97,56 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
   const newFilename = timestamp + '_' + randomNumber + '.' + file.originalname.split('.').pop();
   file.name = newFilename;
 
-  // 1. upload image to Minio
-  minioClient.putObject('casfra-images', file.name, file.data, function (err, etag) {
-    if (err) {
-      console.error('Error uploading image to Minio:', err);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
-    } else {
-      // 2. save image data to MongoDB
-      const images = new db.Images({
-        name: name,
-        filename: file.name,
-        originalname: file.originalname,
-        size: file.size,
-        mimetype: file.mimetype,
-        description: description,
-        addedDate: Date.now(),
-        addedBy: userId,
-        category: category,
-        active: active,
-        tenancies: tenancy ? [tenancy] : [],
-        users: tenancy ? [] : [userId],
-        image_url: 'http://localhost:9000/casfra-images/' + file.name
-      });
+  try {
+    await sftp.connect({
+      host: process.env.CDN_SFTP_HOST,
+      port: parseInt(process.env.CDN_SFTP_PORT),
+      username: process.env.CDN_SFTP_USERNAME,
+      privateKey: process.env.CDN_SSH_PRIVATE_KEY,
+      passphrase: process.env.CDN_SSH_PASSPHRASE || undefined,
+      password: process.env.CDN_SFTP_PASSWORD || undefined
+    });
 
-      images.save()
-        .then(() => {
-          res.status(200).json({
-            message: 'Image ' + images.originalname + ' uploaded successfully: ' + images.filename
-          });
-        })
-        .catch((error) => {
-          console.error('Error saving image to MongoDB:', error);
-          res.status(500).json({
-            error: 'Internal server error'
-          });
-          // 3. delete image from Minio if MongoDB save fails
-          minioClient.removeObject('images', file.name, function (err) {
-            if (err) {
-              console.error('Error deleting image from Minio:', err);
-            } else {
-              console.log('Image ' + file.name + ' deleted from Minio');
-            }
-          });
-        });
+    await sftp.put(file.data, process.env.CDN_SFTP_DESTINATION_PATH + file.name);
+
+    // 2. save image data to MongoDB
+    const images = new db.Images({
+      name: name,
+      filename: file.name,
+      originalname: file.originalname,
+      size: file.size,
+      mimetype: file.mimetype,
+      description: description,
+      addedDate: Date.now(),
+      addedBy: userId,
+      category: category,
+      active: active,
+      tenancies: tenancy ? [tenancy] : [],
+      users: tenancy ? [] : [userId],
+      image_url: process.env.CDN_URL + file.name
+    });
+
+    await images.save();
+
+    res.status(200).json({
+      message: 'Image ' + images.originalname + ' uploaded successfully: ' + images.filename
+    });
+  } catch (error) {
+    console.error('Error uploading image to SFTP:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+
+    // 3. delete image from SFTP if MongoDB save fails
+    try {
+      await sftp.delete(process.env.CDN_SFTP_DESTINATION + file.name);
+      console.log('Image ' + file.name + ' deleted from SFTP');
+    } catch (error) {
+      console.error('Error deleting image from SFTP:', error);
     }
-  });
+  } finally {
+    sftp.end();
+  }
 });
 
 
