@@ -117,7 +117,6 @@
             providerDetails.description +
             "</td>" +
             "<td>" +
-            '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
             '<button class="ui small red button delete-btn">Delete</button>' +
             "</td>" +
             "</tr>";
@@ -140,12 +139,6 @@
       updateStatus("error", "Error loading data");
     }
   }
-
-  // Event listener for duplicate button
-  $(document).on("click", ".duplicate-btn", function () {
-    var providerId = $(this).closest("tr").attr("id");
-    duplicateProvider(providerId);
-  });
 
   // Event listener for delete button
   $(document).on("click", ".delete-btn", function () {
@@ -224,20 +217,6 @@
   $(document).on("click", "#saveAllBtn", function () {
     saveAllProviders();
   });
-
-  // Function to duplicate a provider
-  function duplicateProvider(providerId) {
-    $.ajax({
-      url: "/api/v1/casinos/providers/" + providerId + "/duplicate",
-      method: "POST",
-      success: function (data) {
-        loadInitialData();
-      },
-      error: function (error) {
-        console.log("Error:", error);
-      },
-    });
-  }
 
   // Function to save a provider
   function saveProvider(providerId) {
