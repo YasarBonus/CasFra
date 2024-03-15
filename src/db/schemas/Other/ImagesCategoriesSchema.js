@@ -9,13 +9,8 @@ const imagesCategoriesSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    priority: {
-        type: Number,
-        default: generateRandomPriority()
-    },
     addedDate: {
         type: Date,
-        default: Date.now
     },
     addedBy: {
         type: String,
@@ -29,6 +24,10 @@ const imagesCategoriesSchema = new mongoose.Schema({
     tenancies: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenancies'
+    },
+    users: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 

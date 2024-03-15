@@ -5,22 +5,27 @@ const db = require('../../db/database.js');
 
 const Minio = require('minio');
 
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 // Erstellen Sie eine neue Instanz des MinIO-Clients
 const minioClient = new Minio.Client({
-  endPoint: '127.0.0.1',
-  port: 9000,
-  useSSL: false,
-  accessKey: 'casfra-api-images',
-  secretKey: 'Shohjahr7IJoh7OmeeBaec9ahlaiyi'
+  endPoint: process.env.MINIO_ENDPOINT,
+  port: parseInt(process.env.MINIO_PORT),
+  useSSL: process.env.MINIO_USE_SSL === 'true',
+  accessKey: process.env.MINIO_ACCESS_KEY,
+  secretKey: process.env.MINIO_SECRET_KEY
 });
 
 const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 
 // Get all images from MongoDB
 router.get('/', checkPermissions('manageImages'), (req, res) => {
-  db.Images.find({
-      tenancies: req.session.user.tenancy
-    })
+  const { tenancy, userId } = req.session.user;
+  const query = tenancy ? { tenancies: tenancy } : { users: userId };
+
+  db.Images.find(query)
     .then((results) => {
       const updatedResults = results.map((image) => {
         return {
@@ -116,7 +121,8 @@ router.post('/', checkPermissions('manageImages'), (req, res) => {
         addedBy: userId,
         category: category,
         active: active,
-        tenancies: tenancy,
+        tenancies: tenancy ? [tenancy] : [],
+        users: tenancy ? [] : [userId],
         image_url: 'http://localhost:9000/casfra-images/' + file.name
       });
 

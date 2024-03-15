@@ -1,258 +1,260 @@
 <!DOCTYPE html>
 <html>
-    <%- include('../partials/head') %>
-    <%- include('../partials/header') %>
-    <body class="bg-yasarred" >
-        <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
-            <div class="ui segment" >
-                <%- include('./partials/dashboard-menu') %>
-                <div class="ui segment">
-                    <h2>Image Categories</h2>
-                        <table id="imageCategoriesTable" class="ui celled table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Priority (Sorting)</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Table rows will be dynamically added here -->
-                            </tbody>
-                        </table>
-                        <div class="ui green button" id="saveAllBtn">Save All</div> <div class="ui blue button" id="addNewBtn">Add New</div>
-                    </div>
-                </div>
-            </div>
+  <%- include('../partials/head') %> <%- include('../partials/header') %>
+  <body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px">
+      <div class="ui segment">
+        <%- include('./partials/dashboard-menu') %>
+        <div class="ui segment">
+          <h2>Image Categories</h2>
+          <% if (user.tenancy) { %>
+          <div class="ui info message">
+            <div class="header">You are editing your tenants Image Categories.</div>
+            <p>To edit your images, please leave your current tenant in the right upper menu.</p>
+          </div>
+          <% } else { %>
+          <div class="ui info message">
+            <div class="header">You are editing your personal images.</div>
+            <p>To edit the images of a tenant, please select a tenant in the right upper menu.</p>
+          </div>
+          <% } %> 
+          
+          <table id="imageCategoriesTable" class="ui celled table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Table rows will be dynamically added here -->
+            </tbody>
+          </table>
+          <div class="ui green button" id="saveAllBtn">Save All</div>
+          <div class="ui blue button" id="addNewBtn">Add New</div>
         </div>
-        <%- include('../partials/footer') %>
-    </body>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </body>
 </html>
 
 <script>
-    $(document).ready(function() {
-        // Function to load initial data from API endpoint
-        function loadInitialData() {
-            // Clear the table
-            $('#imageCategoriesTable tbody').empty();
+  $(document).ready(function () {
+    // Function to load initial data from API endpoint
+    function loadInitialData() {
+      // Clear the table
+      $("#imageCategoriesTable tbody").empty();
 
-            $.ajax({
-                url: '/api/v1/images/categories',
-                method: 'GET',
-                success: function(data) {
-                    // Sort the categories by priority
-                    data.sort(function(a, b) {
-                        return a.priority - b.priority;
-                    });
+      $.ajax({
+        url: "/api/v1/images/categories",
+        method: "GET",
+        success: function (data) {
+          // Sort the categories by priority
+          data.sort(function (a, b) {
+            return a.priority - b.priority;
+          });
 
-                    // Populate the table with data
-                    data.forEach(function(category) {
-                        var row = '<tr id="' + category._id + '">' +
-                            '<td contenteditable="true">' + category.name + '</td>' +
-                            '<td contenteditable="true">' + category.description + '</td>' +
-                            '<td contenteditable="true">' + category.priority + '</td>' +
-                            '<td>' +
-                            '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
-                            '<button class="ui small red button delete-btn">Delete</button>' +
-                            '</td>' +
-                            '</tr>';
-                        $('#imageCategoriesTable tbody').append(row);
-                    });
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
+          // Populate the table with data
+          data.forEach(function (category) {
+            var row =
+              '<tr id="' +
+              category._id +
+              '">' +
+              '<td contenteditable="true">' +
+              category.name +
+              "</td>" +
+              '<td contenteditable="true">' +
+              category.description +
+              "</td>" +
+              "<td>" +
+              '<button class="ui small red button delete-btn">Delete</button>' +
+              "</td>" +
+              "</tr>";
+            $("#imageCategoriesTable tbody").append(row);
+          });
+        },
+        error: function (error) {
+          console.log("Error:", error);
+        },
+      });
+    }
 
-        // Call the function to load initial data
-        loadInitialData();
+    // Call the function to load initial data
+    loadInitialData();
 
-        // Event listener for duplicate button
-        $(document).on('click', '.duplicate-btn', function() {
-            var categoryId = $(this).closest('tr').attr('id');
-            duplicateCategory(categoryId);
-        });
-
-        // Event listener for delete button
-        $(document).on('click', '.delete-btn', function() {
-            var categoryId = $(this).closest('tr').attr('id');
-            showDeleteConfirmation(categoryId);
-        });
-
-        // Event listener for save all button
-        $(document).on('click', '#saveAllBtn', function() {
-            saveAllCategories();
-        });
-
-        // Function to duplicate a category
-        function duplicateCategory(categoryId) {
-            $.ajax({
-                url: '/api/v1/images/categories/' + categoryId + '/duplicate',
-                method: 'POST',
-                success: function(data) {
-                    loadInitialData();
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Function to save a category
-        function saveCategory(categoryId) {
-            $.ajax({
-                url: '/api/v1/images/categories/' + categoryId,
-                method: 'PUT',
-                data: {
-                    name: $('#' + categoryId + ' td:nth-child(1)').text(),
-                    description: $('#' + categoryId + ' td:nth-child(2)').text(),
-                    priority: $('#' + categoryId + ' td:nth-child(3)').text()
-                },
-                success: function(data) {
-                    console.log('Success:', data);
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Function to save all categories
-        function saveAllCategories() {
-            $('#imageCategoriesTable tbody tr').each(function() {
-                var categoryId = $(this).attr('id');
-                saveCategory(categoryId);
-            });
-            loadInitialData();
-        }
-
-        // Function to show delete confirmation dialog
-        function showDeleteConfirmation(categoryId) {
-            $.ajax({
-                url: '/api/v1/images/categories/' + categoryId + '/images',
-                method: 'GET',
-                success: function(images) {
-                    var dialogExists = $('.ui.modal.confirmDelete').length;
-                    if (dialogExists) {
-                        $('.ui.modal.confirmDelete').remove();
-                    }
-                    var dialogContent = '<div class="ui small modal confirmDelete">' +
-                        '<div class="header">Delete Confirmation</div>' +
-                        '<div class="content">' +
-                        '<p>Are you sure you want to delete the category <b>' + $('#' + categoryId + ' td:nth-child(1)').text() + '</b>?</p>' +
-                        '<p>This is potentially a destructive operation and cannot be undone.</p>' +
-                        '<p>Images in this category will no longer have a category assigned:</p>' +
-                        '<ul>';
-                    images.forEach(function(image) {
-                        dialogContent += '<li>' + image.name + '</li>';
-                    });
-                    dialogContent += '</ul>' +
-                        '</div>' +
-                        '<div class="actions">' +
-                        '<div class="ui red button">Cancel</div>' +
-                        '<div class="ui green button deleteBtn" data-category-id="' + categoryId + '">Delete</div>' +
-                        '</div>' +
-                        '</div>';
-
-                    $('body').append(dialogContent);
-                    $('.ui.modal.confirmDelete').modal('show');
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Event listener for delete button
-        $(document).on('click', '.deleteBtn', function() {
-            var categoryId = $(this).data('category-id');
-            deleteCategory(categoryId);
-            $('.ui.modal.confirmDelete').modal('hide');
-        });
-
-        // Function to delete a category
-        function deleteCategory(categoryId) {
-            $.ajax({
-                url: '/api/v1/images/categories/' + categoryId,
-                method: 'DELETE',
-                success: function(data) {
-                    console.log('Category deleted successfully');
-                    showToast('success', 'Category deleted successfully');
-                    loadInitialData();
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-
-        // Function to create and show add new dialog
-        function showAddNewDialog() {
-            var dialogExists = $('.ui.modal.addNew').length;
-            if (dialogExists) {
-                $('.ui.modal.addNew').remove();
-            }
-            var dialogContent = '<div class="ui small modal addNew">' +
-                '<div class="header">Add New Category</div>' +
-                '<div class="content">' +
-                '<div class="ui form">' +
-                '<div class="field">' +
-                '<label>Name</label>' +
-                '<input type="text" name="name" placeholder="Name">' +
-                '</div>' +
-                '<div class="field">' +
-                '<label>Description</label>' +
-                '<input type="text" name="description" placeholder="Description">' +
-                '</div>' +
-                '<div class="field">' +
-                '<label>Priority</label>' +
-                '<input type="text" name="priority" placeholder="Priority">' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<div class="actions">' +
-                '<div class="ui red button">Cancel</div>' +
-                '<div class="ui green button saveNewBtn">Add New</div>' +
-                '</div>' +
-                '</div>';
-
-            $('body').append(dialogContent);
-            $('.ui.modal.addNew').modal('show');
-        }
-
-        // Event listener for add new button
-        $(document).on('click', '#addNewBtn', function() {
-            showAddNewDialog();
-        });
-
-        // Event listener for save new button
-        $(document).on('click', '.saveNewBtn', function() {
-            var name = $('input[name="name"]').val();
-            var description = $('input[name="description"]').val();
-            var priority = $('input[name="priority"]').val();
-
-            $.ajax({
-                url: '/api/v1/images/categories/add',
-                method: 'POST',
-                data: {
-                    name: name,
-                    description: description,
-                    priority: priority
-                },
-                success: function(data) {
-                    console.log('Category created successfully');
-                    showToast('success', 'Category created successfully');
-                    loadInitialData();
-                    $('.ui.modal.addNew').modal('hide');
-                },
-                error: function(error) {
-                    console.log('Error:', error);
-                }
-            });
-        });
-
-
+    // Event listener for delete button
+    $(document).on("click", ".delete-btn", function () {
+      var categoryId = $(this).closest("tr").attr("id");
+      showDeleteConfirmation(categoryId);
     });
+
+    // Event listener for save all button
+    $(document).on("click", "#saveAllBtn", function () {
+      saveAllCategories();
+    });
+
+    // Function to save a category
+    function saveCategory(categoryId) {
+      $.ajax({
+        url: "/api/v1/images/categories/" + categoryId,
+        method: "PUT",
+        data: {
+          name: $("#" + categoryId + " td:nth-child(1)").text(),
+          description: $("#" + categoryId + " td:nth-child(2)").text(),
+        },
+        success: function (data) {
+          console.log("Success:", data);
+          showToast("success", "Category saved successfully: " + data.imageCategory.name);
+        },
+        error: function (error) {
+          console.log("Error:", error);
+          showToast("error", "Error saving category: " + error.responseText);
+        },
+      });
+    }
+
+    // Function to save all categories
+    function saveAllCategories() {
+      $("#imageCategoriesTable tbody tr").each(function () {
+        var categoryId = $(this).attr("id");
+        var description = $(this).find("td:nth-child(2)").text();
+        saveCategory(categoryId);
+      });
+      loadInitialData();
+    }
+
+    // Function to show delete confirmation dialog
+    function showDeleteConfirmation(categoryId) {
+      $.ajax({
+        url: "/api/v1/images/categories/" + categoryId + "/images",
+        method: "GET",
+        success: function (images) {
+          var dialogExists = $(".ui.modal.confirmDelete").length;
+          if (dialogExists) {
+            $(".ui.modal.confirmDelete").remove();
+          }
+          var dialogContent =
+            '<div class="ui small modal confirmDelete">' +
+            '<div class="header">Delete Confirmation</div>' +
+            '<div class="content">' +
+            "<p>Are you sure you want to delete the category <b>" +
+            $("#" + categoryId + " td:nth-child(1)").text() +
+            "</b>?</p>" +
+            "<p>This is potentially a destructive operation and cannot be undone.</p>";
+          if (images.length === 0) {
+            dialogContent += '<div class="ui positive message"><p>There are no images in this category.</p><p>Deleting this image category is a save action.</p></div>';
+          } else {
+            dialogContent += '<div class="ui negative message"><p>There are ' + images.length + ' image(s) in this category.</p><p>Deleting this image category is a destructive action.</p><p>The following images will no longer have a category assigned and might be deleted automagically.</p>';
+            dialogContent += "<ul>";
+            images.forEach(function (image) {
+              dialogContent += "<li>" + image.name + "</li>";
+            });
+            dialogContent += "</ul>";
+            dialogContent += "</div>";
+
+          }
+          dialogContent +=
+            "</div>" +
+            '<div class="actions">' +
+            '<div class="ui red button">Cancel</div>' +
+            '<div class="ui green button deleteBtn" data-category-id="' +
+            categoryId +
+            '">Delete</div>' +
+            "</div>" +
+            "</div>";
+
+          $("body").append(dialogContent);
+          $(".ui.modal.confirmDelete").modal("show");
+        },
+        error: function (error) {
+          console.log("Error:", error);
+        },
+      });
+    }
+
+    // Event listener for delete button
+    $(document).on("click", ".deleteBtn", function () {
+      var categoryId = $(this).data("category-id");
+      deleteCategory(categoryId);
+      $(".ui.modal.confirmDelete").modal("hide");
+    });
+
+    // Function to delete a category
+    function deleteCategory(categoryId) {
+      $.ajax({
+        url: "/api/v1/images/categories/" + categoryId,
+        method: "DELETE",
+        success: function (data) {
+          console.log("Category deleted successfully");
+          showToast("success", "Category deleted successfully");
+          loadInitialData();
+        },
+        error: function (error) {
+          console.log("Error:", error);
+        },
+      });
+    }
+
+    // Function to create and show add new dialog
+    function showAddNewDialog() {
+      var dialogExists = $(".ui.modal.addNew").length;
+      if (dialogExists) {
+        $(".ui.modal.addNew").remove();
+      }
+      var dialogContent =
+        '<div class="ui small modal addNew">' +
+        '<div class="header">Add New Category</div>' +
+        '<div class="content">' +
+        '<div class="ui form">' +
+        '<div class="field">' +
+        "<label>Name</label>" +
+        '<input type="text" name="name" placeholder="Name">' +
+        "</div>" +
+        '<div class="field">' +
+        "<label>Description</label>" +
+        '<input type="text" name="description" placeholder="Description">' +
+        "</div>" +
+        "</div>" +
+        "</div>" +
+        '<div class="actions">' +
+        '<div class="ui red button">Cancel</div>' +
+        '<div class="ui green button saveNewBtn">Add New</div>' +
+        "</div>" +
+        "</div>";
+
+      $("body").append(dialogContent);
+      $(".ui.modal.addNew").modal("show");
+    }
+
+    // Event listener for add new button
+    $(document).on("click", "#addNewBtn", function () {
+      showAddNewDialog();
+    });
+
+    // Event listener for save new button
+    $(document).on("click", ".saveNewBtn", function () {
+      var name = $('input[name="name"]').val();
+      var description = $('input[name="description"]').val();
+
+      $.ajax({
+        url: "/api/v1/images/categories/add",
+        method: "POST",
+        data: {
+          name: name,
+          description: description,
+        },
+        success: function (data) {
+          console.log("Category created successfully");
+          showToast("success", "Category created successfully");
+          loadInitialData();
+          $(".ui.modal.addNew").modal("hide");
+        },
+        error: function (error) {
+          console.log("Error:", error);
+        },
+      });
+    });
+  });
 </script>

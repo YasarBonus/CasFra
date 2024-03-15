@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const generateRandomPriority = require('../../../utils/generateRandomPriority');
 
 // Define Casino features schema
 const casinoFeaturesSchema = new mongoose.Schema({
@@ -9,10 +8,6 @@ const casinoFeaturesSchema = new mongoose.Schema({
     active: {
       type: Boolean,
       default: true
-    },
-    priority: {
-      type: Number,
-      default: generateRandomPriority()
     },
     addedDate: {
       type: Date,

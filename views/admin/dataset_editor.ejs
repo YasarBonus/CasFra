@@ -1,0 +1,264 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %> <%- include('../partials/header') %>
+
+  <link
+    href="https://cdn.datatables.net/1.13.8/css/dataTables.semanticui.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.semanticui.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.semanticui.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/datetime/1.5.1/css/dataTables.dateTime.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/rowreorder/1.4.1/css/rowReorder.semanticui.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/searchbuilder/1.6.0/css/searchBuilder.semanticui.min.css"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.datatables.net/select/1.7.0/css/select.semanticui.min.css"
+    rel="stylesheet" />
+
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.semanticui.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.semanticui.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+  <script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
+  <script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+  <script src="https://cdn.datatables.net/rowreorder/1.4.1/js/dataTables.rowReorder.min.js"></script>
+  <script src="https://cdn.datatables.net/searchbuilder/1.6.0/js/dataTables.searchBuilder.min.js"></script>
+  <script src="https://cdn.datatables.net/searchbuilder/1.6.0/js/searchBuilder.semanticui.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+
+  <!-- those 2 belong together! -->
+  <script
+    type="text/javascript"
+    src="https://cdn.datatables.net/plug-ins/1.13.7/dataRender/datetime.js"></script>
+  <script
+    type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+  <body>
+    <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px">
+      <div class="ui segment">
+        <%- include('./partials/dashboard-menu') %>
+        <div class="ui segment">
+          <div class="ui container">
+            <h2>Data</h2>
+            <table id="dataTable" class="ui compact celled table nowrap" style="width: 100%">
+              <thead class="center aligned">
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                  <!-- Add more columns here based on the data you want to display -->
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+    <script>
+      const tableType = "tasks";
+      const tableTypeColumns = ["id", "name", "description"];
+      const tableUrl = "/api/v1/casinos/providers/dash/";
+
+      $(document).ready(function () {
+        getData();
+      });
+
+      let dataTable;
+
+      function getData() {
+        // Show the loading indicator
+        $("#fetchingIndicator").show();
+
+        // If the table has already been initialized, simply update it
+        if (dataTable) {
+          dataTable.ajax.reload();
+          return;
+        }
+
+        // Initialize the DataTable and populate it with data from your API endpoint
+        dataTable = $("#dataTable").DataTable({
+          serverSide: true,
+          // processing: true,
+          loadingIndicator: true,
+          scrollCollapse: true,
+          fixedHeader: true,
+          deferRender: true,
+          pageLength: 10,
+          // order: [[1, 'desc']],
+          ajax: {
+            url: tableUrl,
+            data: function (d) {
+              d.page = d.start / d.length + 1;
+              d.search = d.search.value;
+              d.sort = d.columns[d.order[0].column].data;
+            },
+          },
+          columnDefs: [
+            {
+              targets: "_all",
+              className: "dt-body-center",
+            },
+            {
+              targets: "_all", // [0, 1, 2],
+              orderable: false,
+            },
+          ],
+          columns: [
+            {
+              data: "image.image_url",
+              render: function (data, type, row) {
+                return '<img src="' + data + '" style="width: 50px">';
+              },
+            },
+            {
+              data: "name",
+            },
+            {
+              data: "description",
+            },
+            {
+              data: function (row) {
+                return (
+                  '<button class="ui icon button" onclick="editData(\'' +
+                  row._id +
+                  '\')"><i class="edit icon"></i></button>'
+                );
+              },
+            },
+            // Add more columns here based on the data you want to display
+          ],
+          drawCallback: function () {
+            $("#fetchingIndicator").hide();
+          },
+        });
+
+        // Add a click event handler to the rows
+        $("#dataTable tbody").on("click", "tr", function () {
+          var tr = $(this);
+          var row = dataTable.row(tr);
+
+          if (row.child.isShown()) {
+            // If the detail row is already shown, hide it
+            row.child.hide();
+            tr.removeClass("shown");
+          } else {
+            $("#fetchingIndicator").show();
+            // Otherwise, fetch the details and show them
+            $.get(tableUrl + row.data()._id, function (dataDetails) {
+              row.child(format(dataDetails)).show();
+              tr.addClass("shown");
+              $("#fetchingIndicator").hide();
+            });
+          }
+        });
+
+        // A function to format the data details
+        function format(dataDetails) {
+          // for each data.logs entry, create a new displayable log entry
+          let logs = "";
+          for (let i = 0; i < dataDetails.logs.length; i++) {
+            logs +=
+              "<tr>" +
+              "<td>" +
+              moment(dataDetails.logs[i].date).format("DD.MM.YYYY HH:mm:ss") +
+              "</td>" +
+              "<td>" +
+              dataDetails.logs[i].level +
+              "</td>" +
+              "<td>" +
+              dataDetails.logs[i].message +
+              "</td>" +
+              "</tr>";
+          }
+          return (
+            '<div class="">' +
+            "<h4>Data Details</h4>" +
+            '<div class="ui small cards">' +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            dataDetails._id +
+            "</div>" +
+            '<div class="description">ID</div>' +
+            "</div>" +
+            "</div>" +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            dataDetails.name +
+            "</div>" +
+            '<div class="description">Name</div>' +
+            "</div>" +
+            "</div>" +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            dataDetails.status.status +
+            "</div>" +
+            '<div class="description">Status</div>' +
+            "</div>" +
+            "</div>" +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            (dataDetails.service ? dataDetails.service.name : dataDetails.order.name) +
+            "</div>" +
+            '<div class="description">Attached to</div>' +
+            "</div>" +
+            "</div>" +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            (dataDetails.user
+              ? dataDetails.user.username
+              : dataDetails.tenant.name + "<br><small>(Tenant)</small>") +
+            "</div>" +
+            '<div class="description">Created by</div>' +
+            "</div>" +
+            "</div>" +
+            '<div class="card">' +
+            '<div class="content">' +
+            '<div class="header">' +
+            moment(dataDetails.date).format("DD.MM.YYYY HH:mm:ss") +
+            "</div>" +
+            '<div class="description">Creation Date</div>' +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "<h4>Logs</h4>" +
+            '<table class="ui celled collapsing table">' +
+            "<thead>" +
+            "<tr>" +
+            "<th>Date</th>" +
+            "<th>Level</th>" +
+            "<th>Message</th>" +
+            "</tr>" +
+            "</thead>" +
+            "<tbody>" +
+            logs +
+            "</tbody>" +
+            "</div>"
+          );
+        }
+      }
+
+      function editData(id) {
+        window.location.href = "/dashboard/super/task/" + id + "/edit";
+      }
+    </script>
+  </body>
+</html>

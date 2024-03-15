@@ -13,7 +13,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Description</th>
-                                    <th>Priority (Sorting)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -22,6 +21,7 @@
                             </tbody>
                         </table>
                         <div class="ui green button" id="saveAllBtn">Save All</div>
+                        <div class="ui blue button" id="addNewBtn">Add New</div>
                     </div>
                 </div>
             </div>
@@ -41,17 +41,12 @@
                 url: '/api/v1/casinos/features',
                 method: 'GET',
                 success: function(data) {
-                    // Sort the features by priority
-                    data.sort(function(a, b) {
-                        return a.priority - b.priority;
-                    });
 
                     // Populate the table with data
                     data.forEach(function(feature) {
                         var row = '<tr id="' + feature._id + '">' +
                             '<td contenteditable="true">' + feature.name + '</td>' +
                             '<td contenteditable="true">' + feature.description + '</td>' +
-                            '<td contenteditable="true">' + feature.priority + '</td>' +
                             '<td>' +
                             '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
                             '<button class="ui small red button delete-btn">Delete</button>' +
@@ -86,6 +81,69 @@
             saveAllFeatures();
         });
 
+        // Event listener for add new button
+        $(document).on('click', '#addNewBtn', function() {
+            showAddNewModal();
+        });
+
+        // Function to create a modal with a form to add a new feature
+        function showAddNewModal() {
+            var dialogExists = $('.ui.modal.addNew').length;
+            if (dialogExists) {
+                $('.ui.modal.addNew').remove();
+            }
+            var dialogContent = '<div class="ui small modal addNew">' +
+                '<div class="header">Add New Feature</div>' +
+                '<div class="content">' +
+                '<div class="ui form">' +
+                '<div class="field">' +
+                '<label>Name</label>' +
+                '<input type="text" id="name" placeholder="Name">' +
+                '</div>' +
+                '<div class="field">' +
+                '<label>Description</label>' +
+                '<input type="text" id="description" placeholder="Description">' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="actions">' +
+                '<div class="ui red button">Cancel</div>' +
+                '<div class="ui green button" id="addNewFeatureBtn">Add New</div>' +
+                '</div>' +
+                '</div>';
+
+            $('body').append(dialogContent);
+            $('.ui.modal.addNew').modal('show');
+        }
+
+        // Event listener for add new button in modal
+        $(document).on('click', '#addNewFeatureBtn', function() {
+            var name = $('#name').val();
+            var description = $('#description').val();
+            addNewFeature(name, description);
+            $('.ui.modal.addNew').modal('hide');
+        });
+
+        // Function to add new feature
+        function addNewFeature(name, description) {
+            $.ajax({
+                url: '/api/v1/casinos/features',
+                method: 'POST',
+                data: {
+                    name: name,
+                    description: description
+                },
+                success: function(data) {
+                    console.log('Success:', data);
+                    showToast('success', 'Feature added successfully');
+                    loadInitialData();
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
         // Function to duplicate a feature
         function duplicateFeature(featureId) {
             $.ajax({
@@ -108,7 +166,6 @@
                 data: {
                     name: $('#' + featureId + ' td:nth-child(1)').text(),
                     description: $('#' + featureId + ' td:nth-child(2)').text(),
-                    priority: $('#' + featureId + ' td:nth-child(3)').text()
                 },
                 success: function(data) {
                     console.log('Success:', data);

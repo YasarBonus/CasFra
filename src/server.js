@@ -17,6 +17,9 @@ const logger = require('./modules/winston.js');
 const emailVerificator = require('./services/emailVerificationService.js');
 const checkUnverifiedEmails = emailVerificator.checkUnverifiedEmails;
 
+const notificator = require('./services/notificationService.js');
+const addNotification = notificator.addNotification;
+
 // Database Engine
 const db = require('./db/database.js');
 
@@ -218,8 +221,8 @@ app.use(pathV1 + '/casinos/wagertypes', casinosWagerTypesRoutes);
 const casinosTagsRoutes = require('./routes/Casinos/casinosTagsRoutes.js');
 app.use(pathV1 + '/casinos/tags', casinosTagsRoutes);
 
-// const casinosRoutes = require('./routes/Casinos/casinosRoutes.js');
-// app.use(pathV1 + '/casinos', casinosRoutes);
+const casinosRoutes = require('./routes/Casinos/casinosRoutes.js');
+app.use(pathV1 + '/casinos', casinosRoutes);
 
 const imagesCategoriesRoutes = require('./routes/Images/imagesCategoriesRoutes.js');
 app.use(pathV1 + '/images/categories', imagesCategoriesRoutes);
@@ -601,6 +604,20 @@ app.get('/dashboard/utils/twitch/wishlistbot', checkPermissions('manageTwitchWis
   }
 });
 
+app.get('/dataseteditor', checkPermissions('manageCasinos'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId +
+      ') accessed dataset editor');
+    const user = req.session.user;
+
+    res.render('admin/dataset_editor', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 // Swagger API Documentation
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -905,8 +922,6 @@ app.get('/:shortUrl', async (req, res, next) => {
     next(err);
   }
 });
-
-// addNotification('65834f6fefa5bb088ca50288', 'info', 'Na', 'Test', 'email');
 
 // Error handler
 app.use(errorHandler);

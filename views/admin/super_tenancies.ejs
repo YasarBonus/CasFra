@@ -9,13 +9,14 @@
                 <%- include('./partials/dashboard-menu') %>
                 <div class="ui segment">
                     <div class="ui container">
-                        <h2>Tenancies</h2>
+                        <h2>Tenants</h2>
                         <button id="addTenancyBtn" class="ui primary button">Add</button>
                         <table id="tenanciesTable" class="ui celled table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Tenant</th>
+                                    <th>Notes</th>
                                     <th>Created on</th>
                                     <th>Active</th>
                                     <th>Actions</th>
@@ -106,7 +107,7 @@
                 const type = document.querySelector('#addTenancyForm select[name="type"]').value;
                 const data = { name, type };
 
-                fetch('/api/v1/tenancies/add', {
+                fetch('/api/v1/tenancies/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

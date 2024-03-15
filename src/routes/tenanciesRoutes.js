@@ -30,7 +30,7 @@ router.post('/', checkPermissions('manageTenancies'), (req, res) => {
     return;
   }
 
-  const tenancie = new db.Tenancie({
+  const tenancie = new db.Tenancies({
     name,
     notes,
     createdBy: userId,
@@ -73,6 +73,27 @@ router.get('/', checkPermissions('manageTenancies'), (req, res) => {
         });
       });
   } );
+
+/**
+ * @openapi
+ * /tenancies/types:
+ *   get:
+ *     summary: Get all tenancies types
+ *     tags: [Tenants, Super]
+ */
+router.get('/types', checkPermissions('manageTenancies'), (req, res) => {
+    db.TenanciesTypes.find()
+      .then((types) => {
+        res.json(types);
+      })
+      .catch((error) => {
+        console.error('Error getting tenancies types:', error);
+        res.status(500).json({
+          error: 'Internal server error'
+        });
+      });
+  }
+);
 
     /**
  * @openapi

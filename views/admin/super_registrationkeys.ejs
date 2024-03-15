@@ -56,7 +56,8 @@
 
                         // Add keys to the table
                         data.forEach(function(item) {
-                            $('#keys-table tbody').append('<tr><td>' + item.regkey  + '</td><td>' + item.created  + '</td><td>' + item.used  + '</td><td>' + item.userId  + '</td><td>' + item.userIp  + '</td><td>' + item.usedDate  + '</td><td><button class="ui red small button delete-button" data-id="' + item.id + '">Delete</button></td></tr>');
+                            var deleteButton = item.used ? '' : '<button class="ui red small button delete-button" data-id="' + item._id + '">Delete</button>';
+                            $('#keys-table tbody').append('<tr><td>' + item.regkey + '<br>' + item._id + '</td><td>' + item.created  + '</td><td>' + item.used  + '</td><td>' + item.userId  + '</td><td>' + item.userIp  + '</td><td>' + item.usedDate  + '</td><td>' + deleteButton + '</td></tr>');
                         });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -91,21 +92,19 @@
                     // Get key ID from data attribute
                     var id = $(this).data('id');
 
+                    console.log(id);
                     // Delete key
                     $.ajax({
-                        url: '/api/v1/registrationkeys',
+                        url: '/api/v1/registrationkeys/' + id,
                         type: 'DELETE',
-                        data: {
-                            id: id
-                        },
                         success: function(data) {
                             // Reload keys
                             loadRegistrationKeys();
-                            
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             // Error handling
                             console.error(textStatus, errorThrown);
+                            showToast('Error deleting key', 'error');
                         }
                     });
                 });

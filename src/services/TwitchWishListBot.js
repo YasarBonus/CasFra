@@ -28,12 +28,37 @@ const client = new tmi.Client({
 
 client.connect();
 
+// retrieve the messages from the database and store them in an array
+
+const messages = [];
+
+async function getMessages() {
+    try {
+        const twitchWishListBotMessages = await db.TwitchWishListBotMessages.find();
+
+        twitchWishListBotMessages.forEach(message => {
+            messages.push(message.message);
+            messages.push(message.identifier);
+        });
+    } catch (error) {
+        logger.error('Error getting messages:', error);
+    } finally {
+        console.log('Messages:', messages);
+    }
+}
+
+getMessages();
+
+
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
 
     const commandName = message.trim();
 
-    if (commandName.startsWith('!allwishes')) {
+    if (commandName.startsWith('!help')) {
+        client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes`);
+    }
+    else if (commandName.startsWith('!allwishes')) {
         listWishes(channel, tags);
     } else if (commandName.startsWith('!wishes')) {
         listUserWishes(channel, tags);
@@ -119,8 +144,8 @@ async function listWishes(channel, tags) {
 // list user wishes by twitch username
 async function listUserWishes(channel, tags) {
     try {
-        // Get all the wishes from the db
-        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username, status: 'pending' });
+        // Get all the wishes from the db with status pending or playing
+        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username});
 
         // Check if there are any wishes
         if (twitchWishListBot.length === 0) {
@@ -128,7 +153,11 @@ async function listUserWishes(channel, tags) {
         } else {
             // Loop through the wishes and send them to the chat
             twitchWishListBot.forEach(wish => {
-                client.say(channel, `@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
+                if (wish.status === 'playing') {
+                    client.say(channel, `@${tags.username}, dein Wunsch "${wish.wish}" wird gerade gespielt!`);
+                } else  if (wish.status === 'pending') {
+                    client.say(channel, `@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
+                }
             });
         }
     } catch (error) {

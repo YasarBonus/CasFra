@@ -1,307 +1,294 @@
 <!DOCTYPE html>
 <html>
-<%- include('../partials/head') %>
-<%- include('../partials/header') %>
+  <%- include('../partials/head') %> <%- include('../partials/header') %>
 
-<body class="bg-yasarred">
-    <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px;">
+  <body class="bg-yasarred">
+    <div class="ui wide container" style="margin-top: 100px !important; padding-bottom: 100px">
+      <div class="ui segment">
+        <%- include('./partials/dashboard-menu') %>
+        <h2>Casino Providers</h2>
+
         <div class="ui segment">
+          <div class="ui primary button" id="saveAllBtn">Save All</div>
+          <div class="ui primary button" id="addProviderBtn">Add Provider</div>
+          <table id="casinoProvidersTable" class="ui celled table">
+            <thead>
+              <tr>
+                <th width="15%">Image</th>
+                <th width="15%">Name</th>
+                <th width="25%">Description</th>
+                <th width="20%">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sortable">
+              <!-- Table rows will be dynamically added here -->
+            </tbody>
+          </table>
+          <div class="ui primary button" id="saveAllBtn">Save All</div>
+          <div class="ui primary button" id="addProviderBtn">Add Provider</div>
+        </div>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
 
-                    <%- include('./partials/dashboard-menu') %>
-                    <h2>Casino Providers</h2>
-
-                    <div class="ui segment">
-                        <div class="ui primary button" id="saveAllBtn">Save All</div>
-                        <div class="ui primary button" id="addProviderBtn">Add Provider</div>
-                        <table id="casinoProvidersTable" class="ui celled table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Image</th>
-                                    <th width="15%">Name</th>
-                                    <th width="25%">Description</th>
-                                    <th width="20%">Priority (Sorting)</th>
-                                    <th width="20%">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sortable"></tbody>
-                                <!-- Table rows will be dynamically added here -->
-                            </tbody>
-                        </table>
-                        <div class="ui primary button" id="saveAllBtn">Save All</div>
-                        <div class="ui primary button" id="addProviderBtn">Add Provider</div>
-                    </div>
-                </div>
-            </div>
-            <%- include('../partials/footer') %>
-
-            <!-- Fomantic UI small modal -->
-            <div id="deleteModal" class="ui small modal">
-                <div class="header">Delete Provider</div>
-                <div class="content">
-                    <p>Are you sure you want to delete this provider?</p>
-                </div>
-                <div class="actions">
-                    <div class="ui negative button">Cancel</div>
-                    <div class="ui positive button" id="confirmDeleteBtn">Delete</div>
-                </div>
-            </div>
-        </body>
-
+    <div id="deleteModal" class="ui small modal">
+      <div class="header">Delete Provider</div>
+      <div class="content">
+        <p>Are you sure you want to delete this provider?</p>
+      </div>
+      <div class="actions">
+        <div class="ui negative button">Cancel</div>
+        <div class="ui positive button" id="confirmDeleteBtn">Delete</div>
+      </div>
+    </div>
+  </body>
 </html>
 
-        <script>
-            $(document).ready(function () {
+<script>
+  // Function to load initial data from API endpoint
+  async function loadInitialData() {
+    updateStatus("loading", "Fetching available images");
+    // Clear the table
+    $("#casinoProvidersTable tbody").empty();
 
-                // Function to load initial data from API endpoint
-                async function loadInitialData() {
-                    updateStatus('loading', 'Fetching available images');
-                    // Clear the table
-                    $('#casinoProvidersTable tbody').empty();
+    try {
+      // Fetch available images from /api/v1/images
+      const imagesResponse = await fetch("/api/v1/images");
+      const images = await imagesResponse.json();
 
-                    try {
-                        // Fetch available images from /api/v1/images
-                        const imagesResponse = await fetch('/api/v1/images');
-                        const images = await imagesResponse.json();
+      // Call the function to populate the table with data
+      await populateTable(images);
+      updateStatus("success", "Data loaded successfully");
+    } catch (error) {
+      console.log("Error:", error);
+      // Hide loading indicator
+      updateStatus("error", "Error loading data");
+    }
+  }
 
-                        // Call the function to populate the table with data
-                        await populateTable(images);
-                        updateStatus('success', 'Data loaded successfully');
-                    } catch (error) {
-                        console.log('Error:', error);
-                        // Hide loading indicator
-                        updateStatus('error', 'Error loading data');
-                    }
-                }
+  async function populateTable(images) {
+    updateStatus("loading", "Fetching providers");
 
-                async function populateTable(images) {
-                    updateStatus('loading', 'Fetching providers');
+    try {
+      // Fetch providers from /api/v1/casinos/providers
+      const providersResponse = await fetch("/api/v1/casinos/providers");
+      const data = await providersResponse.json();
 
-                    try {
-                        // Fetch providers from /api/v1/casinos/providers
-                        const providersResponse = await fetch('/api/v1/casinos/providers');
-                        const data = await providersResponse.json();
+      // Populate the table with data
+      for (const provider of data) {
+        try {
+          // Fetch provider details from /api/v1/casinos/providers/:id
+          const providerDetailsResponse = await fetch("/api/v1/casinos/providers/" + provider._id);
+          const providerDetails = await providerDetailsResponse.json();
 
-                        // Sort the providers by priority
-                        data.sort(function (a, b) {
-                            return a.priority - b.priority;
-                        });
+          var row =
+            '<tr id="' +
+            provider._id +
+            '">' +
+            "<td>" +
+            '<div class="ui fluid search selection dropdown image-dropdown">' +
+            '<input type="hidden" name="image">' +
+            '<i class="dropdown icon"></i>' +
+            '<div class="default text">Image</div>' +
+            '<div class="menu">';
 
-                        // Populate the table with data
-                        for (const provider of data) {
-                            try {
-                                // Fetch provider details from /api/v1/casinos/providers/:id
-                                const providerDetailsResponse = await fetch('/api/v1/casinos/providers/' + provider._id);
-                                const providerDetails = await providerDetailsResponse.json();
+          // Add options to the dropdown
+          for (const image of images) {
+            var option =
+              '<div class="item" data-value="' +
+              image._id +
+              '"><img class="ui image" src="' +
+              image.image_url +
+              '">' +
+              image.name +
+              "</div>";
+            row += option;
+          }
 
-                                var row = '<tr id="' + provider._id + '">' +
-                                    '<td>' +
-                                    '<div class="ui fluid search selection dropdown image-dropdown">' +
-                                    '<input type="hidden" name="image">' +
-                                    '<i class="dropdown icon"></i>' +
-                                    '<div class="default text">Image</div>' +
-                                    '<div class="menu">';
+          // Set the selected image based on provider.image
+          row +=
+            "</div>" +
+            "</div>" +
+            "</td>" +
+            '<td contenteditable="true">' +
+            providerDetails.name +
+            "</td>" +
+            '<td contenteditable="true">' +
+            providerDetails.description +
+            "</td>" +
+            "<td>" +
+            '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
+            '<button class="ui small red button delete-btn">Delete</button>' +
+            "</td>" +
+            "</tr>";
 
-                                // Add options to the dropdown
-                                for (const image of images) {
-                                    var option =
-                                        '<div class="item" data-value="' +
-                                        image._id +
-                                        '"><img class="ui image" src="' +
-                                        image.imageUrl + '">' + image
-                                        .name + '</div>';
-                                    row += option;
-                                }
+          $("#casinoProvidersTable tbody").append(row);
+          // Set the selected image based on provider.image
+          $("#" + provider._id + " .image-dropdown").dropdown("set selected", provider.image);
+        } catch (error) {
+          console.log("Error:", error);
+        }
+      }
 
-                                // Set the selected image based on provider.image
-                                row += '</div>' +
-                                    '</div>' +
-                                    '</td>' +
-                                    '<td contenteditable="true">' + providerDetails
-                                    .name + '</td>' +
-                                    '<td contenteditable="true">' + providerDetails
-                                    .description + '</td>' +
-                                    '<td contenteditable="true">' + providerDetails
-                                    .priority + '</td>' +
-                                    '<td>' +
-                                    '<button class="ui small blue button duplicate-btn">Duplicate</button>' +
-                                    '<button class="ui small red button delete-btn">Delete</button>' +
-                                    '</td>' +
-                                    '</tr>';
+      // Initialize the dropdowns
+      $(".image-dropdown").dropdown();
 
-                                $('#casinoProvidersTable tbody').append(row);
-                                // Set the selected image based on provider.image
-                                $('#' + provider._id + ' .image-dropdown')
-                                    .dropdown('set selected', provider.image);
-                            } catch (error) {
-                                console.log('Error:', error);
-                            }
-                        }
+      updateStatus("success", "Data loaded successfully");
+    } catch (error) {
+      console.log("Error:", error);
+      // Hide loading indicator
+      updateStatus("error", "Error loading data");
+    }
+  }
 
-                        // Initialize the dropdowns
-                        $('.image-dropdown').dropdown();
+  // Event listener for duplicate button
+  $(document).on("click", ".duplicate-btn", function () {
+    var providerId = $(this).closest("tr").attr("id");
+    duplicateProvider(providerId);
+  });
 
-                        updateStatus('success', 'Data loaded successfully');
-                    } catch (error) {
-                        console.log('Error:', error);
-                        // Hide loading indicator
-                        updateStatus('error', 'Error loading data');
-                    }
-                }
-            
+  // Event listener for delete button
+  $(document).on("click", ".delete-btn", function () {
+    var providerId = $(this).closest("tr").attr("id");
+    showDeleteModal(providerId);
+  });
 
-                // Call the function to load initial data
-                loadInitialData();
+  // Function to create a modal with a form to add a new provider
+  function createAddProviderModal() {
+    var modal =
+      '<div id="addProviderModal" class="ui modal">' +
+      '<div class="header">Add New Provider</div>' +
+      '<div class="content">' +
+      '<form id="addProviderForm" class="ui form">' +
+      '<div class="field">' +
+      "<label>Name</label>" +
+      '<input type="text" name="name" placeholder="Enter name">' +
+      "</div>" +
+      '<div class="field">' +
+      "<label>Description</label>" +
+      '<input type="text" name="description" placeholder="Enter description">' +
+      "</div>" +
+      "</form>" +
+      "</div>" +
+      '<div class="actions">' +
+      '<div class="ui primary button" id="saveProviderBtn">Save</div>' +
+      '<div class="ui button" id="cancelProviderBtn">Cancel</div>' +
+      "</div>" +
+      "</div>";
 
-                // Event listener for duplicate button
-                $(document).on('click', '.duplicate-btn', function () {
-                    var providerId = $(this).closest('tr').attr('id');
-                    duplicateProvider(providerId);
-                });
+    $("body").append(modal);
 
-                // Event listener for delete button
-                $(document).on('click', '.delete-btn', function () {
-                    var providerId = $(this).closest('tr').attr('id');
-                    showDeleteModal(providerId);
-                });
+    // Event listener for save provider button
+    $(document).on("click", "#saveProviderBtn", function () {
+      var formData = $("#addProviderForm").serialize();
+      addProvider(formData);
+      $("#addProviderModal").modal("hide");
+    });
 
+    // Event listener for cancel button
+    $(document).on("click", "#cancelProviderBtn", function () {
+      $("#addProviderModal").modal("hide");
+    });
+  }
 
-                // Function to create a modal with a form to add a new provider
-                function createAddProviderModal() {
-                    var modal = '<div id="addProviderModal" class="ui modal">' +
-                        '<div class="header">Add New Provider</div>' +
-                        '<div class="content">' +
-                        '<form id="addProviderForm" class="ui form">' +
-                        '<div class="field">' +
-                        '<label>Name</label>' +
-                        '<input type="text" name="name" placeholder="Enter name">' +
-                        '</div>' +
-                        '<div class="field">' +
-                        '<label>Description</label>' +
-                        '<input type="text" name="description" placeholder="Enter description">' +
-                        '</div>' +
-                        '<div class="field">' +
-                        '<label>Priority</label>' +
-                        '<input type="text" name="priority" placeholder="Enter priority">' +
-                        '</div>' +
-                        '</form>' +
-                        '</div>' +
-                        '<div class="actions">' +
-                        '<div class="ui primary button" id="saveProviderBtn">Save</div>' +
-                        '<div class="ui button" id="cancelProviderBtn">Cancel</div>' +
-                        '</div>' +
-                        '</div>';
+  // Function to add a new provider
+  function addProvider(formData) {
+    $.ajax({
+      url: "/api/v1/casinos/providers",
+      method: "POST",
+      data: formData,
+      success: function (data) {
+        showToast("success", "Provider added successfully");
+        loadInitialData();
+      },
+      error: function (error) {
+        console.log("Error:", error);
+      },
+    });
+  }
 
-                    $('body').append(modal);
+  // Event listener for add provider button
+  $(document).on("click", "#addProviderBtn", function () {
+    createAddProviderModal();
+    $("#addProviderModal").modal("show");
+  });
 
-                    // Event listener for save provider button
-                    $(document).on('click', '#saveProviderBtn', function () {
-                        var formData = $('#addProviderForm').serialize();
-                        addProvider(formData);
-                        $('#addProviderModal').modal('hide');
-                    });
+  // Event listener for confirm delete button
+  $(document).on("click", "#confirmDeleteBtn", function () {
+    var providerId = $(this).closest(".modal").data("providerId");
+    deleteProvider(providerId);
+    $("#deleteModal").modal("hide");
+  });
 
-                    // Event listener for cancel button
-                    $(document).on('click', '#cancelProviderBtn', function () {
-                        $('#addProviderModal').modal('hide');
-                    });
-                }
+  // Event listener for save all button
+  $(document).on("click", "#saveAllBtn", function () {
+    saveAllProviders();
+  });
 
-                // Function to add a new provider
-                function addProvider(formData) {
-                    $.ajax({
-                        url: '/api/v1/casinos/providers/add',
-                        method: 'POST',
-                        data: formData,
-                        success: function (data) {
-                            console.log('Success:', data);
-                            loadInitialData();
-                        },
-                        error: function (error) {
-                            console.log('Error:', error);
-                        }
-                    });
-                }
+  // Function to duplicate a provider
+  function duplicateProvider(providerId) {
+    $.ajax({
+      url: "/api/v1/casinos/providers/" + providerId + "/duplicate",
+      method: "POST",
+      success: function (data) {
+        loadInitialData();
+      },
+      error: function (error) {
+        console.log("Error:", error);
+      },
+    });
+  }
 
-                // Event listener for add provider button
-                $(document).on('click', '#addProviderBtn', function () {
-                    createAddProviderModal();
-                    $('#addProviderModal').modal('show');
-                });
+  // Function to save a provider
+  function saveProvider(providerId) {
+    $.ajax({
+      url: "/api/v1/casinos/providers/" + providerId,
+      method: "PUT",
+      data: {
+        name: $("#" + providerId + " td:nth-child(2)").text(),
+        description: $("#" + providerId + " td:nth-child(3)").text(),
+        image: $("#" + providerId + " .image-dropdown").dropdown("get value"),
+      },
+      success: function (data) {
+        console.log("Success:", data);
+      },
+      error: function (error) {
+        console.log("Error:", error);
+      },
+    });
+  }
 
-                // Event listener for confirm delete button
-                $(document).on('click', '#confirmDeleteBtn', function () {
-                    var providerId = $(this).closest('.modal').data('providerId');
-                    deleteProvider(providerId);
-                    $('#deleteModal').modal('hide');
-                });
+  // Function to save all providers
+  function saveAllProviders() {
+    $("#casinoProvidersTable tbody tr").each(function () {
+      var providerId = $(this).attr("id");
+      saveProvider(providerId);
+    });
+    loadInitialData();
+  }
 
-                // Event listener for save all button
-                $(document).on('click', '#saveAllBtn', function () {
-                    saveAllProviders();
-                });
+  // Function to delete a provider
+  function deleteProvider(providerId) {
+    $.ajax({
+      url: "/api/v1/casinos/providers/" + providerId,
+      method: "DELETE",
+      success: function (data) {
+        console.log("Provider deleted successfully");
+        loadInitialData();
+      },
+      error: function (error) {
+        console.log("Error:", error);
+      },
+    });
+  }
 
-                // Function to duplicate a provider
-                function duplicateProvider(providerId) {
-                    $.ajax({
-                        url: '/api/v1/casinos/providers/' + providerId + '/duplicate',
-                        method: 'POST',
-                        success: function (data) {
-                            loadInitialData();
-                        },
-                        error: function (error) {
-                            console.log('Error:', error);
-                        }
-                    });
-                }
+  // Function to show delete modal
+  function showDeleteModal(providerId) {
+    $("#deleteModal").data("providerId", providerId).modal("show");
+  }
 
-                // Function to save a provider
-                function saveProvider(providerId) {
-                    $.ajax({
-                        url: '/api/v1/casinos/providers/' + providerId,
-                        method: 'PUT',
-                        data: {
-                            name: $('#' + providerId + ' td:nth-child(2)').text(),
-                            description: $('#' + providerId + ' td:nth-child(3)').text(),
-                            priority: $('#' + providerId + ' td:nth-child(4)').text(),
-                            image: $('#' + providerId + ' .image-dropdown').dropdown('get value')
-                        },
-                        success: function (data) {
-                            console.log('Success:', data);
-                        },
-                        error: function (error) {
-                            console.log('Error:', error);
-                        }
-                    });
-                }
-
-                // Function to save all providers
-                function saveAllProviders() {
-                    $('#casinoProvidersTable tbody tr').each(function () {
-                        var providerId = $(this).attr('id');
-                        saveProvider(providerId);
-                    });
-                    loadInitialData();
-                }
-
-                // Function to delete a provider
-                function deleteProvider(providerId) {
-                    $.ajax({
-                        url: '/api/v1/casinos/providers/' + providerId,
-                        method: 'DELETE',
-                        success: function (data) {
-                            console.log('Provider deleted successfully');
-                            loadInitialData();
-                        },
-                        error: function (error) {
-                            console.log('Error:', error);
-                        }
-                    });
-                }
-
-                // Function to show delete modal
-                function showDeleteModal(providerId) {
-                    $('#deleteModal').data('providerId', providerId).modal('show');
-                }
-
-            });
-        </script>
+  $(document).ready(function () {
+    // Call the function to load initial data
+    loadInitialData();
+  });
+</script>

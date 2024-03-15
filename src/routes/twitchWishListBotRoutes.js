@@ -65,6 +65,24 @@ router.get('/pending', checkPermissions('manageTwitchWishListBot'), async (req, 
     }
 } );
 
+// Pick a random pending wish list item and change the status to playing
+// Permissions: manageTwitchWishListBot
+// POST /random
+// This will pick a random pending wish list item and change the status to playing
+
+router.post('/random', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+    try {
+        const wishList = await db.TwitchWishListBot.find({ status: 'pending' });
+        const randomWish = wishList[Math.floor(Math.random() * wishList.length)];
+        randomWish.status = 'playing';
+        await randomWish.save();
+        res.json(randomWish);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
 // Change the status of a wish list item to playing
 // Permissions: manageTwitchWishListBot
 // POST /:id/playing
@@ -135,5 +153,7 @@ router.post('/:id/pend', checkPermissions('manageTwitchWishListBot'), async (req
         res.status(500).json({ message: err.message });
     }
 } );
+
+
 
 module.exports = router;

@@ -1,7 +1,5 @@
 const email = require('./emailService.js');
-const db = require('../db/database.js');
-const generateRandomPriority = require('../utils/generateRandomPriority.js')
-const errorHandler = require('../modules/errorHandler.js');
+
 const logger = require('../modules/winston.js');
 
 // Function to hand over notifications to the different handlers
@@ -20,7 +18,7 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
-addNotification('6592e50e3e88dcf3e2da995d', 'email', 'Test subject', 'Test message', 'email');
+addNotification('65963403b3f747a775596d9d', 'email', 'Test subject', 'Test message', 'email');
 
 async function addNotificationEmail(userId, type, subject, message) {
   try {
@@ -38,33 +36,37 @@ async function addNotificationEmail(userId, type, subject, message) {
     // Add the notification email to the queue
     await db.NotificationEmailQueue.create({
       notificationId: notificationEmail._id
-    });
+      });
+      console.log('Notification added to queue');
   } catch (error) {
     console.error('Error adding notification email:', error);
   }
 }
 
-
-
 async function sendNotificationEmails() {
+  console.log('Sending notification emails');
   try {
     // Get the first entry from the db.NotificationEmailQueue
     const notificationEmailQueue = await db.NotificationEmailQueue.findOne().sort({
       _id: 1
     });
+    console.log('notification to process:', notificationEmailQueue);
 
     if (notificationEmailQueue) {
       // Get the NotificationEmail by its id
       const notificationEmail = await db.NotificationEmails.findById(notificationEmailQueue.notificationId);
+      console.log('notificationEmail found:', notificationEmail);
 
       // Get the user by its id
       const user = await db.User.findById(notificationEmail.userId);
+      console.log('user ID is', user.userIduser, ', found:', user);
 
       // Get the primary email address of the user
-      const primaryEmail = user.emails.find(email => email.is_primary);
+      const primaryEmail = user.emails.email;
+      console.log('primaryEmail is', primaryEmail);
 
       // Send the email to the user's primary email address
-      await email.sendEmail(primaryEmail.email, notificationEmail.subject, notificationEmail.message);
+      email.sendEmail(primaryEmail, notificationEmail.subject, notificationEmail.message);
       // Set the NotificationEmail emailDelivered to true and emailDeliveredDate to current date and emailDeliveredTo to the user's email address
       notificationEmail.emailDelivered = true;
       notificationEmail.emailDeliveredDate = new Date();
@@ -77,6 +79,8 @@ async function sendNotificationEmails() {
       await db.NotificationEmailQueue.deleteOne({
         notificationId: notificationEmail._id
       });
+
+      console.log('Notification email sent');
 
       // Call the function again to send the next NotificationEmail
       setTimeout(sendNotificationEmails, 1000);
@@ -93,17 +97,15 @@ async function sendNotificationEmails() {
   }
 }
 
-// sleep function
+// Function to sleep for a given number of milliseconds
 function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 sendNotificationEmails();
 
 module.exports = {
-    addNotification
+    addNotification,
     };
     
 // Path: www/private/core/modules/emailService.js

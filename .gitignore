@@ -1,6 +1,3 @@
-# minio
-minio/
-
 # Logs
 logs
 *.log
@@ -134,3 +131,4 @@ dist
 
 # macOS files
 .DS_Store
+

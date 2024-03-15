@@ -97,7 +97,7 @@ router.get('/', checkPermissions('manageCasinos'), async (req, res) => {
       userId,
       tenancy
     } = req.session.user; // Get the user ID from the session data
-  
+
     // Create a new casino object
     const newCasino = new db.Casino({
       addedBy: userId,
