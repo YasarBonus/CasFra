@@ -105,7 +105,7 @@ function sleep(ms) {
 sendNotificationEmails();
 
 module.exports = {
-    addNotification,
-    };
+  addNotification,
+};
     
 // Path: www/private/core/modules/emailService.js
