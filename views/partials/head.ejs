@@ -113,7 +113,12 @@
           actionButton.classList.add('red');
           actionButton.classList.remove('disabled');
           actionButton.textContent = 'Delete';
-      }
+      } else if (status === 'resetPassword') {
+          icon.classList.add('lock');
+          actionButton.classList.add('green');
+          actionButton.classList.remove('disabled');
+          actionButton.textContent = 'Reset Password ';
+      } 
       actionButton.appendChild(icon);
     }
 
