@@ -39,7 +39,6 @@ cron.schedule('*/10 * * * * *', () => {
 });
 
 
-
 io.on('connection', (socket) => {
   logger.info('New client connected');
 
@@ -901,7 +900,7 @@ checkUnverifiedEmails();
 app.get('/:shortUrl', async (req, res, next) => {
   try {
     const {
-      shortUl
+      shortUrl
     } = req.params;
     const url = await db.ShortLinks.findOne({
       shortUrl
