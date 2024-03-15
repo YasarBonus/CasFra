@@ -168,8 +168,8 @@ router.put('/:id', checkPermissions('manageImages'), (req, res) => {
 
   db.Images.findOne({
       _id: id,
-      tenancies: req.session.user.tenancy
-    }) // Add condition for tenancies
+      ...(req.session.user.tenancy ? { tenancies: req.session.user.tenancy } : { users: req.session.user.userId })
+    }) 
     .then((image) => {
       if (!image) {
         res.status(404).json({
@@ -213,7 +213,7 @@ router.delete('/:id', checkPermissions('manageImages'), async (req, res) => {
   try {
     const image = await db.Images.findOne({
       _id: id,
-      tenancies: req.session.user.tenancy
+      ...(req.session.user.tenancy ? { tenancies: req.session.user.tenancy } : { users: req.session.user.userId })
     });
 
     if (!image) {
