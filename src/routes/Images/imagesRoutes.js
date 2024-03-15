@@ -206,54 +206,52 @@ router.put('/:id', checkPermissions('manageImages'), (req, res) => {
     });
 });
 
-// Delete image from MongoDB and Minio storage
-router.delete('/:id', checkPermissions('manageImages'), (req, res) => {
-  const {
-    id
-  } = req.params;
+// Delete image from MongoDB and SFTP storage
+router.delete('/:id', checkPermissions('manageImages'), async (req, res) => {
+  const { id } = req.params;
 
-  db.Images.findOne({
+  try {
+    const image = await db.Images.findOne({
       _id: id,
       tenancies: req.session.user.tenancy
-    }) // Add condition for tenancies
-    .then((image) => {
-      if (!image) {
-        res.status(404).json({
-          error: 'Image not found'
-        });
-      } else {
-        // Delete image from Minio
-        minioClient.removeObject('casfra-images', image.filename, function (err) {
-          if (err) {
-            console.error('Error deleting image from Minio:', err);
-          } else {
-            console.log('Image ' + image.filename + ' deleted from Minio');
-          }
-        });
-
-        // Delete image from MongoDB
-        db.Images.deleteOne({
-            _id: id
-          })
-          .then(() => {
-            res.status(200).json({
-              message: 'Image ' + image.name + ' deleted successfully'
-            });
-          })
-          .catch((error) => {
-            console.error('Error deleting image from MongoDB:', error);
-            res.status(500).json({
-              error: 'Internal server error'
-            });
-          });
-      }
-    })
-    .catch((error) => {
-      console.error('Error deleting image:', error);
-      res.status(500).json({
-        error: 'Internal server error'
-      });
     });
+
+    if (!image) {
+      res.status(404).json({
+        error: 'Image not found'
+      });
+    } else {
+      const sftp = new Client();
+      await sftp.connect({
+        host: process.env.CDN_SFTP_HOST,
+        port: parseInt(process.env.CDN_SFTP_PORT),
+        username: process.env.CDN_SFTP_USERNAME,
+        privateKey: process.env.CDN_SSH_PRIVATE_KEY || undefined,
+        passphrase: process.env.CDN_SSH_PASSPHRASE || undefined,
+        password: process.env.CDN_SFTP_PASSWORD || undefined
+      });
+
+      // Delete image from SFTP
+      await sftp.delete(process.env.CDN_SFTP_DESTINATION_PATH + image.filename);
+      console.log('Image ' + image.filename + ' deleted from SFTP');
+
+      // Delete image from MongoDB
+      await db.Images.deleteOne({
+        _id: id
+      });
+
+      res.status(200).json({
+        message: 'Image ' + image.name + ' deleted successfully'
+      });
+
+      sftp.end();
+    }
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
 });
 
 module.exports = router;
