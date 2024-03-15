@@ -1,0 +1,110 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <style type="text/css">
+      body {
+        background-color: #DADADA;
+      }
+      body > .grid {
+        height: 100%;
+      }
+      .image {
+        margin-top: -100px;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+    <body>
+      <div class="ui middle aligned center aligned grid">
+        <div class="column">
+          <h2 class="ui image header">
+            <img src="https://cdn.treudler.net/web/logo/256x256.png" class="image">
+            <div class="content">
+              Request a new Password
+            </div>
+          </h2>
+          <form class="ui large form" id="userForm">
+            <div class="ui stacked segment">
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="user icon"></i>
+                  <input type="text" name="username" placeholder="Username">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="mail icon"></i>
+                  <input type="text" name="email" placeholder="Email">
+                </div>
+              </div>
+              <button id="saveButton" class="ui fluid large submit button">Request a new Password</button>
+            </div>
+      
+            <div class="ui error message"></div>
+      
+          </form>
+      
+          <div class="ui message">
+            <a href="/register">Create Account</a> - <a href="/login">Login</a>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+                      
+                      <script>
+                        showActionButton('saveButton','register');
+                        // showLoader('formLoaderPersonalDetails', 'disabled');
+                        // showLoader('formLoaderPaymentInformation', 'disabled');
+                        // showLoader('formLoaderReceipt', 'disabled');
+
+                        $('#userForm').submit(function(e) {
+                          const button = 'saveButton';
+                          e.preventDefault();
+                          showLoader('formLoaderAccountDetails', 'saving');
+
+                          showActionButton(button,'loading');
+
+
+
+                          var formData = {
+                            username: $('input[name="username"]').val(),
+                            email: $('input[name="email"]').val(),
+                          };
+                          console.log('form', formData);
+                          $.ajax({
+                            type: 'POST',
+                            url: '/api/v1/auth/requestNewPassword',
+                            data: formData,
+                            success: function(data) {
+                              console.log(data);
+                              showLoader('formLoaderAccountDetails', 'success');
+
+                              showActionButton(button,'success');
+                              showToast('success', 'Account created', 'Your account has been created successfully. Redirecting...');
+                              // Redirect to /login after 3 seconds
+                              setTimeout(function() {
+                                window.location.href = '/login';
+                              }, 3000);
+                            },
+                            error: function(xhr, status, error) {
+                              var errorMessage = JSON.parse(xhr.responseText).error;
+                              showActionButton(button,'error', 'Error creating account', errorMessage, 'register');
+                              showLoader('formLoaderAccountDetails', 'success');
+                            },
+                            complete: function() {
+
+                            }
+                          });
+                        });
+                      </script>
+                      <%- include('../partials/footer') %>
+                        </body>
+                    </html>
