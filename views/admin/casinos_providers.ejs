@@ -10,7 +10,10 @@
 
         <div class="ui segment">
           <div class="ui primary button" id="saveAllBtn">Save All</div>
-          <div class="ui primary button" id="addProviderBtn">Add Provider</div>
+          <div class="ui action input">
+            <input type="text" id="newProviderName" placeholder="Add new...">
+            <button class="ui button" id="saveProviderBtn">Add</button>
+          </div>
           <table id="casinoProvidersTable" class="ui celled table">
             <thead>
               <tr>
@@ -146,50 +149,18 @@
     showDeleteModal(providerId);
   });
 
-  // Function to create a modal with a form to add a new provider
-  function createAddProviderModal() {
-    var modal =
-      '<div id="addProviderModal" class="ui modal">' +
-      '<div class="header">Add New Provider</div>' +
-      '<div class="content">' +
-      '<form id="addProviderForm" class="ui form">' +
-      '<div class="field">' +
-      "<label>Name</label>" +
-      '<input type="text" name="name" placeholder="Enter name">' +
-      "</div>" +
-      '<div class="field">' +
-      "<label>Description</label>" +
-      '<input type="text" name="description" placeholder="Enter description">' +
-      "</div>" +
-      "</form>" +
-      "</div>" +
-      '<div class="actions">' +
-      '<div class="ui primary button" id="saveProviderBtn">Save</div>' +
-      '<div class="ui button" id="cancelProviderBtn">Cancel</div>' +
-      "</div>" +
-      "</div>";
-
-    $("body").append(modal);
-
-    // Event listener for save provider button
-    $(document).on("click", "#saveProviderBtn", function () {
-      var formData = $("#addProviderForm").serialize();
-      addProvider(formData);
-      $("#addProviderModal").modal("hide");
+  $(document).on("click", "#saveProviderBtn", function () {
+      addProvider();
     });
-
-    // Event listener for cancel button
-    $(document).on("click", "#cancelProviderBtn", function () {
-      $("#addProviderModal").modal("hide");
-    });
-  }
 
   // Function to add a new provider
-  function addProvider(formData) {
+  function addProvider() {
     $.ajax({
       url: "/api/v1/casinos/providers",
       method: "POST",
-      data: formData,
+      data: {
+        name: $("#newProviderName").val(),
+      },
       success: function (data) {
         showToast("success", "Provider added successfully");
         loadInitialData();
@@ -199,12 +170,6 @@
       },
     });
   }
-
-  // Event listener for add provider button
-  $(document).on("click", "#addProviderBtn", function () {
-    createAddProviderModal();
-    $("#addProviderModal").modal("show");
-  });
 
   // Event listener for confirm delete button
   $(document).on("click", "#confirmDeleteBtn", function () {
