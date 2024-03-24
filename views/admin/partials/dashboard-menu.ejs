@@ -63,7 +63,7 @@
 <script>
   var currentUri = window.location.pathname;
   var uriParts = currentUri.split('/').filter(part => part !== '');
-  var breadcrumbHtml = '<div class="ui breadcrumb">';
+  var breadcrumbHtml = 'You are here: <div class="ui breadcrumb">';
   uriParts.forEach((part, index) => {
     breadcrumbHtml += '<a href="/' + uriParts.slice(0, index + 1).join('/') + '" class="section">' + part + '</a>';
     if (index !== uriParts.length - 1) {
