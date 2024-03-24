@@ -145,7 +145,7 @@
   // Event listener for delete button
   $(document).on("click", ".delete-btn", function () {
     var providerId = $(this).closest("tr").attr("id");
-    showDeleteModal(providerId);
+    deleteProvider(providerId);
   });
 
   $(document).on("click", "#saveProviderBtn", function () {
@@ -170,13 +170,6 @@
       },
     });
   }
-
-  // Event listener for confirm delete button
-  $(document).on("click", "#confirmDeleteBtn", function () {
-    var providerId = $(this).closest(".modal").data("providerId");
-    deleteProvider(providerId);
-    $("#deleteModal").modal("hide");
-  });
 
   // Event listener for save all button
   $(document).on("click", "#saveAllBtn", function () {
@@ -224,11 +217,6 @@
         console.log("Error:", error);
       },
     });
-  }
-
-  // Function to show delete modal
-  function showDeleteModal(providerId) {
-    $("#deleteModal").data("providerId", providerId).modal("show");
   }
 
   $(document).ready(function () {
