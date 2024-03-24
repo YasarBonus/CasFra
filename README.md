@@ -6,7 +6,7 @@
 npm install
 ``
 
-### Min.io Server
+### Min.io Server (NOT IN USE RIGHT NOW, using sftp with environment variable support right now)
 
 minio is currently used as storage engine for the images API.
 
