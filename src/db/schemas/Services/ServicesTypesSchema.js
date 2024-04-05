@@ -9,7 +9,7 @@ const ServicesTypesAdapterSchema = new mongoose.Schema({
     },
     internal_name: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
         trim: true,
     },
@@ -28,7 +28,7 @@ const ServicesTypesSchema = new mongoose.Schema({
     },
     internal_name: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
         trim: true,
     },
@@ -69,10 +69,12 @@ const ServicesTypesData = [
     {
         name: 'Domain',
         active: true,
+        internal_name: 'domain',
     },
     {
         name: 'SSL',
-        active: false
+        active: false,
+        internal_name: 'ssl',
     },
 ];
 
