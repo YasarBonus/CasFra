@@ -16,7 +16,9 @@ const transporter = nodemailer.createTransport({
 // Reusable function to send a email
 const sendEmail = (email, subject, text) => {
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: "'" + process.env.SMTP_FROM_NAME + "'" + "<" + process.env.SMTP_FROM + ">",
+    name: process.env.SMTP_FROM_NAME,
+    replyTo: process.env.SMTP_REPLYTO,
     to: email,
     subject,
     text
