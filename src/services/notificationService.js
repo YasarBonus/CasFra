@@ -18,30 +18,35 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
-addNotification('65963403b3f747a775596d9d', 'email', 'Test subject', 'Test message', 'email');
 
-async function addNotificationEmail(userId, type, subject, message) {
-  try {
-    // Create a new NotificationEmail object
-    const notificationEmail = await db.NotificationEmails.create({
-      userId,
-      type,
-      subject,
-      message,
-      emailDelivered: false,
-      emailDeliveredDate: null,
-      emailDeliveredTo: null,
-    });
 
-    // Add the notification email to the queue
-    await db.NotificationEmailQueue.create({
-      notificationId: notificationEmail._id
-      });
-      console.log('Notification added to queue');
-  } catch (error) {
-    console.error('Error adding notification email:', error);
-  }
-}
+// get the userId for Joshua2504 from the database and Call the addNotification function with the userId, transporter type, subject, message and transporter
+
+//   addNotification('660feaf6b1ec63388ceebd4b', 'email', 'Test subject', 'Test message', 'email');
+// 
+// 
+// async function addNotificationEmail(userId, type, subject, message) {
+//   try {
+//     // Create a new NotificationEmail object
+//     const notificationEmail = await db.NotificationEmails.create({
+//       userId,
+//       type,
+//       subject,
+//       message,
+//       emailDelivered: false,
+//       emailDeliveredDate: null,
+//       emailDeliveredTo: null,
+//     });
+// 
+//     // Add the notification email to the queue
+//     await db.NotificationEmailQueue.create({
+//       notificationId: notificationEmail._id
+//       });
+//       console.log('Notification added to queue');
+//   } catch (error) {
+//     console.error('Error adding notification email:', error);
+//   }
+// }
 
 async function sendNotificationEmails() {
   console.log('Sending notification emails');
@@ -59,7 +64,7 @@ async function sendNotificationEmails() {
 
       // Get the user by its id
       const user = await db.User.findById(notificationEmail.userId);
-      console.log('user ID is', user.userIduser, ', found:', user);
+      console.log('user ID is', user[0], ', found:', user);
 
       // Get the primary email address of the user
       const primaryEmail = user.emails.email;
@@ -102,7 +107,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-sendNotificationEmails();
+// sendNotificationEmails();
 
 module.exports = {
   addNotification,

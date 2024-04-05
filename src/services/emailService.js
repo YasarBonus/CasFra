@@ -31,6 +31,8 @@ const sendEmail = (email, subject, text) => {
   });
 };
 
+// sendEmail('joshua@treudler.net', 'Test Email', 'This is a test email');
+
 // Exportieren Sie die Funktionen, die Sie benötigen
 module.exports = {
   sendEmail
