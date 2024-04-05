@@ -3,20 +3,9 @@ const router = express.Router();
 const logger = require('../../modules/winston.js');
 const db = require('../../db/database.js');
 
-const Minio = require('minio');
-
 const dotenv = require('dotenv');
 
 dotenv.config();
-
-// Erstellen Sie eine neue Instanz des MinIO-Clients
-const minioClient = new Minio.Client({
-  endPoint: process.env.MINIO_ENDPOINT,
-  port: parseInt(process.env.MINIO_PORT),
-  useSSL: process.env.MINIO_USE_SSL === 'true',
-  accessKey: process.env.MINIO_ACCESS_KEY,
-  secretKey: process.env.MINIO_SECRET_KEY
-});
 
 const checkPermissions = require('../../middlewares/permissionMiddleware.js');
 const Client = require('ssh2-sftp-client');
