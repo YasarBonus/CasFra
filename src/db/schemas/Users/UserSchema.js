@@ -3,6 +3,7 @@ const userEmailsSchema = require('./UserEmailsSchema');
 const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAddressSchema = require('./UserPersonalAddressSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
+const UserGroup = require('./UserGroupSchema');
 const bcrypt = require('bcrypt');
 
 const userStatusSchema = new mongoose.Schema({
@@ -89,6 +90,8 @@ const UserSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', UserSchema);
 
+
+
 // add a default admin user to the database
 const defaultAdminUser = new User({
     username: 'admin',
@@ -102,6 +105,7 @@ const defaultAdminUser = new User({
     status: {
       active: true
     },
+    group: '660fe60fcb34849e14187284'
 });
 
 // check if the default admin user exists in the database
@@ -125,6 +129,7 @@ async function addDefaultAdminUser() {
       user.status = {
         active: true
       };
+      user.group = '660fe60fcb34849e14187284';
       await user.save();
       console.log('Default admin user updated');
     }
