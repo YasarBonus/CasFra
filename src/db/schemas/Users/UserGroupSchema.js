@@ -66,6 +66,11 @@ const userGroupSchema = new mongoose.Schema({
     name: 'User',
     permissions: ['authenticate', 'viewDashboard', 'manageAccount']
   });
+
+  const userTwitchBotGroup = new UserGroup({
+    name: 'TwitchBot',
+    permissions: ['authenticate', 'viewDashboard', 'manageTwitchWishListBot', 'manageAccount']
+  });
   
   const saveDefaultUserDatabaseData = async () => {
     try {
@@ -77,6 +82,9 @@ const userGroupSchema = new mongoose.Schema({
       });
       const operatorGroup = await UserGroup.findOne({
         name: 'Operator'
+      });
+      const twitchBotGroup = await UserGroup.findOne({
+        name: 'TwitchBot'
       });
   
       const promises = [];
@@ -107,7 +115,16 @@ const userGroupSchema = new mongoose.Schema({
         promises.push(userGroup.save());
         console.log('UserGroup "User" permissions updated:', userUserGroup.permissions);
       }
-  
+
+      if (!twitchBotGroup) {
+        promises.push(userTwitchBotGroup.save());
+        console.log('UserGroup "TwitchBot" saved with Permissions:', userTwitchBotGroup.permissions);
+      } else if (twitchBotGroup.permissions.toString() !== userTwitchBotGroup.permissions.toString()) {
+        twitchBotGroup.permissions = userTwitchBotGroup.permissions;
+        promises.push(twitchBotGroup.save());
+        console.log('UserGroup "TwitchBot" permissions updated:', userTwitchBotGroup.permissions);
+      }
+        
   
       await Promise.all(promises);
     } catch (error) {
