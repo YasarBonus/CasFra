@@ -71,6 +71,29 @@ const UserSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', UserSchema);
 
+// add a default admin user to the database
+const defaultAdminUser = new User({
+    username: 'admin',
+    email: 'system@treudler.net',
+    password: 'password',
+    emails: {
+      email: 'system@treudler.net',
+      is_primary: true,
+      is_confirmed: true
+    },
+});
+
+// add the default admin user to the database if the user does not exist
+User.findOne({
+    username: 'admin'
+  }).then((user) => {
+    if (!user) {
+      defaultAdminUser.save();
+    }
+  });
+
+
+
   module.exports = User;
 
     // function to set a new password for a user based on the user Id
