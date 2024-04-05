@@ -24,3 +24,13 @@ this will use the ``minio`` directory. the admin login is default (``minioadmin`
 * editing images for users is not possible, probably due to tenancies check.
 
 #### 
+
+#### Seems Done:
+* Casino Categories "OK"
+* Casino Tags "OK"
+* Casino Features "OK"
+* Casino Providers "OK"
+
+#### Needs to be done, doesn't work:
+* Casino Payment Methods
+* Casino Licenses
