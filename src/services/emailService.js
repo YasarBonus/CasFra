@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: 'mail.behindthemars.de',
-  port: 587,
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
   secure: false,
   auth: {
-    user: 'system@treudler.net',
-    pass: 'iongai5ge9Quah4Ya9leizaeMie5oo8equee4It1eiyuuz1Voi'
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   },
   tls: {
     rejectUnauthorized: false
@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 // Reusable function to send a email
 const sendEmail = (email, subject, text) => {
   const mailOptions = {
-    from: 'system@treudler.net',
+    from: process.env.SMTP_FROM,
     to: email,
     subject,
     text
