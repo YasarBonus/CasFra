@@ -290,6 +290,7 @@ router.get('/', checkPermissions('authenticate'), (req, res) => {
             }
 
             res.json(user);
+            console.log('User details retrieved:', user);
         })
         .catch((error) => {
             console.error('Error retrieving user details:', error);
