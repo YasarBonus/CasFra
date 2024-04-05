@@ -2,10 +2,28 @@ const mongoose = require('mongoose');
 const userEmailsSchema = require('./UserEmailsSchema');
 const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
 const userPersonalAddressSchema = require('./UserPersonalAddressSchema');
-const userStatusSchema = require('./UserStatusSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
 const bcrypt = require('bcrypt');
 
+const userStatusSchema = new mongoose.Schema({
+  active: {
+      type: Boolean,
+      default: false,
+      required: true
+  },
+  banned: {
+      type: Boolean,
+      default: false
+  },
+  online: {
+      type: Boolean,
+      default: false
+  },
+  last_seen: {
+      type: Date,
+      maxlength: 50
+  },
+});
 
 // Define User schema
 const UserSchema = new mongoose.Schema({
@@ -77,22 +95,45 @@ const defaultAdminUser = new User({
     email: 'system@treudler.net',
     password: 'password',
     emails: {
-      email: 'system@treudler.net',
+      email: 'joshua@treudler.net',
       is_primary: true,
       is_confirmed: true
     },
+    status: {
+      active: true
+    },
 });
 
-// add the default admin user to the database if the user does not exist
-User.findOne({
-    username: 'admin'
-  }).then((user) => {
+// check if the default admin user exists in the database
+// if not, add it
+// if yes, update it
+
+async function addDefaultAdminUser() {
+  try {
+    const user = await User.findOne({ username: 'admin' });
     if (!user) {
-      defaultAdminUser.save();
+      await defaultAdminUser.save();
+      console.log('Default admin user added');
+    } else {
+      user.email = 'joshua@treudler.net';
+      // user.password = 'password';
+      user.emails = {
+        email: 'joshua@treudler.net',
+        is_primary: true,
+        is_confirmed: true
+      };
+      user.status = {
+        active: true
+      };
+      await user.save();
+      console.log('Default admin user updated');
     }
-  });
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-
+addDefaultAdminUser();
 
   module.exports = User;
 
