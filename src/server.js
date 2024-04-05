@@ -34,7 +34,7 @@ const { processOrders } = require('./modules/Tasks/servicesOrderHandler.js');
 
 const cron = require('node-cron');
 cron.schedule('*/60 * * * * *', () => {
-  console.log('Calling processOrders()');
+  // console.log('Calling processOrders()');
     processOrders();
 });
 
