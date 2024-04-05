@@ -154,6 +154,4 @@ router.post('/:id/pend', checkPermissions('manageTwitchWishListBot'), async (req
     }
 } );
 
-
-
 module.exports = router;
