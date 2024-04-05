@@ -5,11 +5,25 @@ const logger = require('../modules/winston.js');
 // Function to hand over notifications to the different handlers
 // This function will check the transporter types and call the appropriate handler
 
+// async function addNotification(userId, type, subject, message, transporter) {
+//   try {
+//     if (transporter === 'email') {
+//       // Call the addNotificationEmail function
+//       await addNotificationEmail(userId, type, subject, message);
+//     } else {
+//       console.error('Error adding notification: Invalid transporter type');
+//     }
+//   } catch (error) {
+//     console.error('Error adding notification:', error);
+//   }
+// }
+
 async function addNotification(userId, type, subject, message, transporter) {
   try {
     if (transporter === 'email') {
-      // Call the addNotificationEmail function
-      await addNotificationEmail(userId, type, subject, message);
+      // get the user email from database and send the email
+      const user = await db.User.findById(userId);
+      email.sendEmail(user.email, subject, message);
     } else {
       console.error('Error adding notification: Invalid transporter type');
     }
@@ -18,7 +32,7 @@ async function addNotification(userId, type, subject, message, transporter) {
   }
 }
 
-
+addNotification('660feaf6b1ec63388ceebd4b', 'email', 'Email Notifications OK', 'Email Notifications are working', 'email');
 
 // get the userId for Joshua2504 from the database and Call the addNotification function with the userId, transporter type, subject, message and transporter
 
