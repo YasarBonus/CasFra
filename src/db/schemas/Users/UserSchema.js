@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const userEmailsSchema = require('./UserEmailsSchema');
-const userPersonalDetailsSchema = require('./UserPersonalDetailsSchema');
-const userPersonalAddressSchema = require('./UserPersonalAddressSchema');
 const userRegistrationSchema = require('./UserRegistrationSchema');
 const UserGroup = require('./UserGroupSchema');
 const bcrypt = require('bcrypt');
@@ -23,6 +21,61 @@ const userStatusSchema = new mongoose.Schema({
   last_seen: {
       type: Date,
       maxlength: 50
+  },
+});
+
+const userPersonalDetailsSchema = new mongoose.Schema({
+  first_name: {
+      type: String,
+      maxlength: 50
+  },
+  second_name: {
+      type: String,
+      maxlength: 50
+  },
+  last_name: {
+      type: String,
+      maxlength: 50
+  },
+  nationality: {
+      type: String,
+      maxlength: 50
+  },
+  date_of_birth: {
+      type: Date,
+      maxlength: 50
+  },
+  place_of_birth: {
+      type: String,
+      maxlength: 50
+  },
+});
+
+const userPersonalAddressSchema = new mongoose.Schema({
+  street: {
+      type: String,
+      maxlength: 50,
+      default: '',
+  },
+  house_number: {
+      type: String,
+      maxlength: 50
+  },
+  city: {
+      type: String,
+      maxlength: 50
+  },
+  country: {
+      type: String,
+      maxlength: 50
+  },
+  zip_code: {
+      type: String,
+      maxlength: 50
+  },
+  additional_info: {
+      type: String,
+      maxlength: 1000
   },
 });
 
@@ -105,7 +158,17 @@ const defaultAdminUser = new User({
     status: {
       active: true
     },
-    group: '660fe60fcb34849e14187284'
+    group: '660fe60fcb34849e14187284',
+    personal_details: {
+      first_name: 'Joshua',
+      last_name: 'Treudler',
+    },
+    personal_address: {
+      street: '123 Main Street',
+      city: 'Anytown',
+      country: 'USA',
+      zip_code: '12345',
+    },
 });
 
 // check if the default admin user exists in the database
@@ -130,6 +193,16 @@ async function addDefaultAdminUser() {
         active: true
       };
       user.group = '660fe60fcb34849e14187284';
+      user.personal_details = {
+        first_name: 'Joshua',
+        last_name: 'Treudler',
+      };
+      user.personal_address = {
+        street: '123 Main Street',
+        city: 'Anytown',
+        country: 'USA',
+        zip_code: '12345',
+      };
       await user.save();
       console.log('Default admin user updated');
     }
