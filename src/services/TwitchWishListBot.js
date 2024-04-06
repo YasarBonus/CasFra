@@ -53,9 +53,15 @@ getMessages();
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
 
+    if (process.env.NODE_ENV === 'development') {
+        botPrefix = "!dev";
+      } else if (process.env.NODE_ENV === 'production') {
+        botPrefix = "!";
+      }
+
     const commandName = message.trim();
 
-    if (commandName.startsWith('!help')) {
+    if (commandName.startsWith(botPrefix + 'help')) {
         client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes, !deletewish`);
     }
     else if (commandName.startsWith('!allwishes')) {
