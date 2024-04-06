@@ -124,8 +124,6 @@ router.post('/login', (req, res) => {
                                     user.last_login_ip = req.ip;
                                     user.save()
                                         .then(() => {
-                                            // Add notification after successful login
-                                            addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
 
                                             res.json({
                                                 success: true
@@ -144,9 +142,6 @@ router.post('/login', (req, res) => {
                                         permissions: userGroup.permissions,
                                         tenancies: user.tenancies,
                                     };
-
-                                    // Add notification after successful login
-                                    addNotification(user._id, 'info', 'Login successful', 'You have successfully logged in', 'email');
 
                                     res.json({
                                         success: true
