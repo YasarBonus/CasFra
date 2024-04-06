@@ -93,7 +93,7 @@ router.get('/html', async (req, res) => {
         const wishList = await db.TwitchWishListBot.find({ status: 'pending' });
         let html = '';
         wishList.forEach(wish => {
-            html += `${wish.wish} - ${wish.twitch_user}<br>`;
+            html += `${wish.twitch_user}: ${wish.wish}<br>`;
         });
         html += '';
         res.send(html);
