@@ -77,6 +77,8 @@ client.on('message', (channel, tags, message, self) => {
             console.log('Wish:', wish);
             addWish(channel, tags, wish);
         }
+    } else if (commandName.startsWith('!deletewish')) {
+        deleteWish(channel, tags);
     }
 });
 
@@ -98,7 +100,7 @@ async function addWish(channel, tags, wish) {
         const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending' || wish.status === 'playing');
 
         if (pendingWish) {
-            client.say(channel, `@${tags.username}, in deiner Wunschliste befindet sich bereits ein Wunsch!`);
+            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich bereits ein Wunsch von dir!`);
         } else {
             // Check if the user has a completed wish in the last 10 minutes
             const completedWish = twitchWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
@@ -166,5 +168,26 @@ async function listUserWishes(channel, tags) {
         }
     } catch (error) {
         logger.error('Error listing wishes:', error);
+    }
+}
+
+// Delete the pending wish of the user
+async function deleteWish(channel, tags) {
+    try {
+        // Get the pending wish of the user from the db
+        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username, status: 'pending' });
+
+        // Check if the user has a pending wish
+        if (twitchWishListBot.length === 0) {
+            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich kein Wunsch von dir!`);
+        } else {
+            // Delete the pending wish of the user from the db
+            await db.TwitchWishListBot.deleteOne({ twitch_user: tags.username, status: 'pending' });
+
+            // Send a message to the chat that the wish has been deleted from the wishlist
+            client.say(channel, `@${tags.username}, dein Wunsch wurde aus der Wunschliste gelöscht!`);
+        }
+    } catch (error) {
+        logger.error('Error deleting wish:', error);
     }
 }
