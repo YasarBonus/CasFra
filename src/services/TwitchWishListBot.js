@@ -56,7 +56,7 @@ client.on('message', (channel, tags, message, self) => {
     const commandName = message.trim();
 
     if (commandName.startsWith('!help')) {
-        client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes`);
+        client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes, !deletewish`);
     }
     else if (commandName.startsWith('!allwishes')) {
         if (tags.username === '@Joshua2504') {
@@ -100,7 +100,7 @@ async function addWish(channel, tags, wish) {
         const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending' || wish.status === 'playing');
 
         if (pendingWish) {
-            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich bereits ein Wunsch von dir!`);
+            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich bereits ein Wunsch von dir! Verwende !wishes um deine Wünsche anzuzeigen, oder !deletewish um deinen Wunsch aus der Warteschlange zu löschen!`);
         } else {
             // Check if the user has a completed wish in the last 10 minutes
             const completedWish = twitchWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
