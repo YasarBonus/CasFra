@@ -83,6 +83,26 @@ router.post('/random', checkPermissions('manageTwitchWishListBot'), async (req, 
     }
 } );
 
+// Get all pending wishes and output as HTML
+// Permissions: none
+// GET /html
+// This will return all pending wish list items as HTML
+
+router.get('/html', async (req, res) => {
+    try {
+        const wishList = await db.TwitchWishListBot.find({ status: 'pending' });
+        let html = '';
+        wishList.forEach(wish => {
+            html += `${wish.wish} - ${wish.twitch_user}<br>`;
+        });
+        html += '';
+        res.send(html);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
 // Change the status of a wish list item to playing
 // Permissions: manageTwitchWishListBot
 // POST /:id/playing
@@ -153,5 +173,7 @@ router.post('/:id/pend', checkPermissions('manageTwitchWishListBot'), async (req
         res.status(500).json({ message: err.message });
     }
 } );
+
+
 
 module.exports = router;
