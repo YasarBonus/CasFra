@@ -85,10 +85,10 @@ router.post('/random', checkPermissions('manageTwitchWishListBot'), async (req, 
 
 // Get all pending wishes and output as HTML
 // Permissions: none
-// GET /html
+// GET /html/pendingwishes
 // This will return all pending wish list items as HTML
 
-router.get('/html', async (req, res) => {
+router.get('/html/pendingwishes', async (req, res) => {
     try {
         const wishList = await db.TwitchWishListBot.find({ status: 'pending' });
         let html = '';
@@ -96,6 +96,25 @@ router.get('/html', async (req, res) => {
             html += `${wish.twitch_user}: ${wish.wish}<br>`;
         });
         html += '';
+        res.send(html);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
+// Show the currently playing wish list item as HTML
+// Permissions: none
+// GET /html/currentlyplaying
+// This will return the currently playing wish list item as HTML
+
+router.get('/html/currentlyplaying', async (req, res) => {
+    try {
+        const wishList = await db.TwitchWishListBot.findOne({ status: 'playing' });
+        let html = '';
+        if (wishList) {
+            html = `${wishList.twitch_user}: ${wishList.wish}`;
+        }
         res.send(html);
     } catch (err) {
         logger.error(err);
