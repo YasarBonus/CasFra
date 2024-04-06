@@ -20,19 +20,21 @@ const logger = require('../modules/winston.js');
 
 async function addNotification(userId, type, subject, message, transporter) {
   try {
-    if (transporter === 'email') {
+    if (transporter == 'email') {
       // get the user email from database and send the email
       const user = await db.User.findById(userId);
       email.sendEmail(user.email, subject, message);
     } else {
-      console.error('Error adding notification: Invalid transporter type');
+      // get the user email from database and send the email
+      const user = await db.User.findById(userId);
+      email.sendEmail(user.email, subject, message);
     }
   } catch (error) {
     console.error('Error adding notification:', error);
   }
 }
 
-addNotification('660feaf6b1ec63388ceebd4b', 'email', 'Email Notifications OK', 'Email Notifications are working', 'email');
+addNotification('65963403b3f747a775596d9d', 'info', 'Email Notifications OK', 'Email Notifications are working', 'email');
 
 // get the userId for Joshua2504 from the database and Call the addNotification function with the userId, transporter type, subject, message and transporter
 
