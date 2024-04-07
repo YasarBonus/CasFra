@@ -30,14 +30,14 @@ router.post('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =
     }
 } );
 
-// Get all wish list items
+// Get all wish list items, apart from archived items
 // Permissions: manageTwitchWishListBot
 // GET /
 // This will return all wish list items
 
 router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.find()
+        const wishList = await db.TwitchWishListBot.find({ status: { $nin: ['completed', 'rejected'] } });
 
         // sort the wish list by created_at date in descending order
         wishList.sort((a, b) => b.created_at - a.created_at);
@@ -47,7 +47,7 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
         logger.error(err);
         res.status(500).json({ message: err.message });
     }
-} );
+});
 
 // Get all wish list items with status = pending
 // Permissions: none
@@ -149,6 +149,8 @@ router.post('/:id/complete', checkPermissions('manageTwitchWishListBot'), async 
         const wishList = await db.TwitchWishListBot.findById(req.params.id);
         wishList.status = 'completed';
         wishList.completed_at = Date.now();
+        wishList.archived = true;
+        wishList.status_changed = Date.now();
         await wishList.save();
         res.json(wishList);
     } catch (err) {
