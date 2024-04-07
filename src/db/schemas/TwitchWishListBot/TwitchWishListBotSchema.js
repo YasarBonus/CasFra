@@ -58,6 +58,10 @@ const TwitchWishListBotSchema = new mongoose.Schema({
         required: true,
     },
     added_manually: Boolean,
+    archived: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const TwitchWishListBot = mongoose.model('TwitchWishListBot', TwitchWishListBotSchema);
