@@ -10,16 +10,16 @@
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
                     <h2>Twitch Wish List Bot</h2>
-                    <div id="randomWishButton" class="ui primary button">Play Random Wish</div>
+                    <div id="randomWishButton" class="ui primary button">Zufälligen Wunsch spielen</div>
                     <table id="wishListTable" class="ui celled table">
                         <thead>
                             <tr>
-                                <th>Wish</th>
-                                <th>Twitch User</th>
-                                <th>Added</th>
+                                <th>Wunsch</th>
+                                <th>Zuschauer</th>
+                                <th>Hinzugefügt</th>
                                 <th>Status</th>
-                                <th>Completed</th>
-                                <th>Actions</th>
+                                <th>Abgeschlossen</th>
+                                <th>Aktionen</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -77,14 +77,14 @@
                                 var actionsCell = $('<td>');
 
                                 var playButton = $('<button>').addClass(
-                                    'ui green button').text('Play');
+                                    'ui green button').text('Spielen');
                                 playButton.click(function () {
                                     playWish(item._id);
                                 });
                                 actionsCell.append(playButton);
 
                                 var rejectButton = $('<button>').addClass('ui red button')
-                                    .text('Reject');
+                                    .text('Ablehnen');
                                 rejectButton.click(function () {
                                     rejectWish(item._id);
                                 });
@@ -97,14 +97,14 @@
                                 var actionsCell = $('<td>');
 
                                 var completeButton = $('<button>').addClass(
-                                    'ui green button').text('Complete');
+                                    'ui green button').text('Abschließen');
                                 completeButton.click(function () {
                                     completeWish(item._id);
                                 });
                                 actionsCell.append(completeButton);
 
                                 var rejectButton = $('<button>').addClass('ui red button')
-                                    .text('Reject');
+                                    .text('Ablehnen');
                                 rejectButton.click(function () {
                                     rejectWish(item._id);
                                 });
