@@ -74,7 +74,7 @@ const scriptSrcUrls = [
   "https://cdn.socket.io/",
   "https://cdn.datatables.net/",
   "https://cdnjs.cloudflare.com/",
-  "https://cdn.ckeditor.com",
+  "https://cdn.ckeditor.com/",
   "code.highcharts.com/",
   "'unsafe-inline'"
 ];
@@ -114,6 +114,7 @@ app.use(
               "https://cdn.treudler.net/" ,
               "http://localhost:9000/",
               "https://cdn.datatables.net/",
+              "https://yasarbonus.com/",
 
           ],
           fontSrc: ["'self'", ...fontSrcUrls],
