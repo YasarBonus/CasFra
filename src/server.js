@@ -48,11 +48,11 @@ exec('git log -1 --pretty=format:"%h %ad" --date=iso', (err, stdout, stderr) => 
     return;
   }
   global.currentCommit = stdout;
+  global.currentEnvironment = process.env.NODE_ENV;
+  console.log('Current commit:', global.currentCommit);
+  console.log('Current environment:', global.currentEnvironment);
 });
 
-setTimeout(() => {
-  console.log('Current commit:', global.currentCommit);
-}, 5000);
 
 
 io.on('connection', (socket) => {
@@ -205,6 +205,11 @@ const pathV1 = '/api/v1';
 // a route that prints the current commit and time from global.currentCommit
 app.get(pathV1 + '/commit', (req, res) => {
   res.send(global.currentCommit);
+});
+
+// a route that prints the current environment from global.currentEnvironment
+app.get(pathV1 + '/environment', (req, res) => {
+  res.send(global.currentEnvironment);
 });
 
 const authRoutes = require('./routes/authRoutes.js');
