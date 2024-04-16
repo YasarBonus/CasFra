@@ -1,3 +1,17 @@
-
+<div style="text-align: center;">
+    <div id="commit"></div>
+</div>
 
 <script src="/js/backToTop.js"></script>
+<script>
+    // Make an AJAX request to get the current commit
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/v1/commit', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var commit = xhr.responseText;
+            document.getElementById('commit').innerText = "Version: " + commit;
+        }
+    };
+    xhr.send();
+</script>

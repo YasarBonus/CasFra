@@ -38,7 +38,21 @@ cron.schedule('*/60 * * * * *', () => {
     processOrders();
 });
 
+// on program start, get the current commit and date + time and store it in a global variable for later use
+const {
+  exec
+} = require('child_process');
+exec('git log -1 --pretty=format:"%h %ad" --date=iso', (err, stdout, stderr) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  global.currentCommit = stdout;
+});
 
+setTimeout(() => {
+  console.log('Current commit:', global.currentCommit);
+}, 5000);
 
 
 io.on('connection', (socket) => {
@@ -187,6 +201,11 @@ const getTenancyByUserId = async (userId) => {
 // API Routes
 
 const pathV1 = '/api/v1';
+
+// a route that prints the current commit and time from global.currentCommit
+app.get(pathV1 + '/commit', (req, res) => {
+  res.send(global.currentCommit);
+});
 
 const authRoutes = require('./routes/authRoutes.js');
 app.use(pathV1 + '/auth', authRoutes);
