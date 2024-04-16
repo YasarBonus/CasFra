@@ -64,15 +64,15 @@ client.on('message', (channel, tags, message, self) => {
     if (commandName.startsWith(botPrefix + 'help')) {
         client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes, !deletewish`);
     }
-    else if (commandName.startsWith('!allwishes')) {
+    else if (commandName.startsWith(botPrefix + 'allwishes')) {
         if (tags.username === '@Joshua2504') {
             listWishes(channel, tags);
         } else {
             client.say(channel, `@${tags.username}, du hast keine Berechtigung, alle Wünsche anzuzeigen!`);
         }
-    } else if (commandName.startsWith('!wishes')) {
+    } else if (commandName.startsWith(botPrefix + 'wishes')) {
         listUserWishes(channel, tags);
-    } else if (commandName.startsWith('!wish')) {
+    } else if (commandName.startsWith(botPrefix + 'wish')) {
         const wish = commandName.slice(6).trim();
 
         if (wish.length === 0) {
@@ -85,7 +85,7 @@ client.on('message', (channel, tags, message, self) => {
             console.log('Wish:', wish);
             addWish(channel, tags, wish);
         }
-    } else if (commandName.startsWith('!deletewish')) {
+    } else if (commandName.startsWith(botPrefix + 'deletewish')) {
         deleteWish(channel, tags);
     }
 });
