@@ -81,7 +81,7 @@ client.on('message', (channel, tags, message, self) => {
             client.say(channel, `${botInfo}@${tags.username}, du musst einen Wunsch angeben!`);
         } else if (wish.length < 1) {
             client.say(channel, `${botInfo}@${tags.username}, dein Wunsch ist zu kurz (min. 1 Zeichen)!`);
-        } else if (wish.length > 30) {
+        } else if (wish.length > 25) {
             client.say(channel, `${botInfo}@${tags.username}, Bitte wünsch dir eine Slot, einen Roman kannst du privat verfassen.`);
         } else {
             console.log('Wish:', wish);
