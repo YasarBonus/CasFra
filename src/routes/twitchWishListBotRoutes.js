@@ -113,7 +113,7 @@ router.get('/html/currentlyplaying', async (req, res) => {
         const wishList = await db.TwitchWishListBot.findOne({ status: 'playing' });
         let html = '';
         if (wishList) {
-            html = `<div style="background-color:#00ff00;height:150px"><p><img style="float: left;" src="https://yasarbonus.com/wp-content/uploads/2022/08/logo-egon-animated.gif" alt="Yasarbonus.com" width="135" height="135" /></p><br> <p><strong>N&auml;chster Wunsch: ${wishList.twitch_user} - ${wishList.wish}</strong></p></div>`;
+            html = `<div style="background-color:#00ff00;height:150px"><p><img style="float: left;" src="https://yasarbonus.com/wp-content/uploads/2022/08/logo-egon-animated.gif" alt="Yasarbonus.com" width="135" height="135" /></p><br> <p><strong>N&auml;chster Wunsch:<br><br>${wishList.twitch_user} - ${wishList.wish}</strong></p></div>`;
         }
         res.send(html);
     } catch (err) {
