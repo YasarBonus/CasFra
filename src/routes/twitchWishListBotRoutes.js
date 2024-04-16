@@ -110,7 +110,7 @@ router.get('/html/pendingwishes', async (req, res) => {
 
 router.get('/html/currentlyplaying', async (req, res) => {
     try {
-        const wishList = await db.TwitchWishListBot.findOne({ status: 'playing' });
+        const wishList = await db.TwitchWishListBot.findOne({ status: 'playing', status_changed: { $gte: new Date(Date.now() - 10000) } });
         let html = '';
         if (wishList) {
             html = `<div style="background-color:#00ff00;height:150px"><p><img style="float: left;" src="https://yasarbonus.com/wp-content/uploads/2022/08/logo-egon-animated.gif" alt="Yasarbonus.com" width="135" height="135" /></p><br> <p><strong>N&auml;chster Wunsch:<br><br>${wishList.twitch_user} - ${wishList.wish}</strong></p></div>`;
@@ -120,7 +120,7 @@ router.get('/html/currentlyplaying', async (req, res) => {
         logger.error(err);
         res.status(500).json({ message: err.message });
     }
-} );
+});
 
 // Change the status of a wish list item to playing
 // Permissions: manageTwitchWishListBot
