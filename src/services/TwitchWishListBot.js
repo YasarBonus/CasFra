@@ -55,20 +55,22 @@ client.on('message', (channel, tags, message, self) => {
 
     if (process.env.NODE_ENV === 'development') {
         botPrefix = "!dev";
+        botInfo = "[DEV] ";
       } else if (process.env.NODE_ENV === 'production') {
         botPrefix = "!";
+        botInfo = "";
       }
 
     const commandName = message.trim();
 
     if (commandName.startsWith(botPrefix + 'help')) {
-        client.say(channel, `@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes, !deletewish`);
+        client.say(channel, `${botInfo}@${tags.username}, die Befehle sind: !wish <Wunsch>, !wishes, !allwishes, !deletewish`);
     }
     else if (commandName.startsWith(botPrefix + 'allwishes')) {
         if (tags.username === '@Joshua2504') {
             listWishes(channel, tags);
         } else {
-            client.say(channel, `@${tags.username}, du hast keine Berechtigung, alle Wünsche anzuzeigen!`);
+            client.say(channel, `${botInfo}@${tags.username}, du hast keine Berechtigung, alle Wünsche anzuzeigen!`);
         }
     } else if (commandName.startsWith(botPrefix + 'wishes')) {
         listUserWishes(channel, tags);
@@ -76,11 +78,11 @@ client.on('message', (channel, tags, message, self) => {
         const wish = commandName.slice(6).trim();
 
         if (wish.length === 0) {
-            client.say(channel, `@${tags.username}, du musst einen Wunsch angeben!`);
+            client.say(channel, `${botInfo}@${tags.username}, du musst einen Wunsch angeben!`);
         } else if (wish.length < 1) {
-            client.say(channel, `@${tags.username}, dein Wunsch ist zu kurz (min. 1 Zeichen)!`);
+            client.say(channel, `${botInfo}@${tags.username}, dein Wunsch ist zu kurz (min. 1 Zeichen)!`);
         } else if (wish.length > 30) {
-            client.say(channel, `@${tags.username}, Bitte wünsch dir eine Slot, einen Roman kannst du privat verfassen.`);
+            client.say(channel, `${botInfo}@${tags.username}, Bitte wünsch dir eine Slot, einen Roman kannst du privat verfassen.`);
         } else {
             console.log('Wish:', wish);
             addWish(channel, tags, wish);
@@ -108,13 +110,13 @@ async function addWish(channel, tags, wish) {
         const pendingWish = twitchWishListBot.find(wish => wish.status === 'pending' || wish.status === 'playing');
 
         if (pendingWish) {
-            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich bereits ein Wunsch von dir! Verwende !wishes um deine Wünsche anzuzeigen, oder !deletewish um deinen Wunsch aus der Warteschlange zu löschen!`);
+            client.say(channel, `${botInfo}@${tags.username}, in der Wunschliste befindet sich bereits ein Wunsch von dir! Verwende !wishes um deine Wünsche anzuzeigen, oder !deletewish um deinen Wunsch aus der Warteschlange zu löschen!`);
         } else {
             // Check if the user has a completed wish in the last 10 minutes
             const completedWish = twitchWishListBot.find(wish => wish.status === 'completed' && wish.completed_at > Date.now() - 10 * 60 * 1000);
 
             if (completedWish) {
-                client.say(channel, `@${tags.username}, dir wurde bereits ein Wunsch in den letzten 10 Minuten erfüllt!`);
+                client.say(channel, `${botInfo}@${tags.username}, dir wurde bereits ein Wunsch in den letzten 10 Minuten erfüllt!`);
             } else {
                 // Add the wish to the db with the twitch_user, status "pending" and the current date
                 const newWish = new db.TwitchWishListBot({
@@ -143,11 +145,11 @@ async function listWishes(channel, tags) {
 
         // Check if there are any wishes
         if (twitchWishListBot.length === 0) {
-            client.say(channel, `@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
+            client.say(channel, `${botInfo}@${tags.username}, in der Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
             twitchWishListBot.forEach(wish => {
-                client.say(channel, `@${tags.username}, ${wish.twitch_user} wünscht sich ${wish.wish}!`);
+                client.say(channel, `${botInfo}@${tags.username}, ${wish.twitch_user} wünscht sich ${wish.wish}!`);
             });
         }
     } catch (error) {
@@ -163,14 +165,14 @@ async function listUserWishes(channel, tags) {
 
         // Check if there are any wishes
         if (twitchWishListBot.length === 0) {
-            client.say(channel, `@${tags.username}, in deiner Wunschliste befinden sich keine Wünsche!`);
+            client.say(channel, `${botInfo}@${tags.username}, in deiner Wunschliste befinden sich keine Wünsche!`);
         } else {
             // Loop through the wishes and send them to the chat
             twitchWishListBot.forEach(wish => {
                 if (wish.status === 'playing') {
-                    client.say(channel, `@${tags.username}, dein Wunsch "${wish.wish}" wird gerade gespielt!`);
+                    client.say(channel, `${botInfo}@${tags.username}, dein Wunsch "${wish.wish}" wird gerade gespielt!`);
                 } else  if (wish.status === 'pending') {
-                    client.say(channel, `@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
+                    client.say(channel, `${botInfo}@${tags.username}, du hast dir am ${wish.created_at} "${wish.wish}" gewünscht!`);
                 }
             });
         }
@@ -187,13 +189,13 @@ async function deleteWish(channel, tags) {
 
         // Check if the user has a pending wish
         if (twitchWishListBot.length === 0) {
-            client.say(channel, `@${tags.username}, in der Wunschliste befindet sich kein Wunsch von dir!`);
+            client.say(channel, `${botInfo}@${tags.username}, in der Wunschliste befindet sich kein Wunsch von dir!`);
         } else {
             // Delete the pending wish of the user from the db
             await db.TwitchWishListBot.deleteOne({ twitch_user: tags.username, status: 'pending' });
 
             // Send a message to the chat that the wish has been deleted from the wishlist
-            client.say(channel, `@${tags.username}, dein Wunsch wurde aus der Wunschliste gelöscht!`);
+            client.say(channel, `${botInfo}@${tags.username}, dein Wunsch wurde aus der Wunschliste gelöscht!`);
         }
     } catch (error) {
         logger.error('Error deleting wish:', error);
