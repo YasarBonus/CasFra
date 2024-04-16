@@ -143,7 +143,12 @@ const UserSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', UserSchema);
 
-
+// choose the group based on environment
+if (process.env.NODE_ENV === 'development') {
+  group = '658361b4cd18680f4d0f4eb7';
+} else if (process.env.NODE_ENV === 'production') {
+  group = '660fe60fcb34849e14187284';
+}
 
 // add a default admin user to the database
 const defaultAdminUser = new User({
@@ -158,7 +163,7 @@ const defaultAdminUser = new User({
     status: {
       active: true
     },
-    group: '660fe60fcb34849e14187284',
+    group: group,
     personal_details: {
       first_name: 'Joshua',
       last_name: 'Treudler',
@@ -192,7 +197,7 @@ async function addDefaultAdminUser() {
       user.status = {
         active: true
       };
-      user.group = '660fe60fcb34849e14187284';
+      user.group = group;
       user.personal_details = {
         first_name: 'Joshua',
         last_name: 'Treudler',
