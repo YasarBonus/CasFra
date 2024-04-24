@@ -911,10 +911,11 @@ updateShortLinksStatistics();
 setInterval(updateShortLinksStatistics, 60 * 60 * 1000);
 
 createShortLinks();
+setInterval(createShortLinks, 60 * 60 * 1000);
+
 
 // Run the function on startup, then every hour
 deleteUnusedRegistrationKeys();
-setInterval(deleteUnusedRegistrationKeys, 60 * 60 * 1000);
 
 setCasinoImageUrl();
 setInterval(setCasinoImageUrl, 60 * 60 * 1000);
