@@ -11,7 +11,7 @@
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var commit = xhr.responseText;
-            document.getElementById('commit').innerText = "Version: " + commit;
+            document.getElementById('commit').innerText = "Commit: " + commit;
         }
     };
     xhr.send();
