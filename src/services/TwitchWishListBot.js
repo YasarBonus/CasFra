@@ -161,7 +161,7 @@ async function listWishes(channel, tags) {
 async function listUserWishes(channel, tags) {
     try {
         // Get all the wishes from the db with status pending or playing
-        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username});
+        const twitchWishListBot = await db.TwitchWishListBot.find({ twitch_user: tags.username, status: { $in: ['pending', 'playing'] } });
 
         // Check if there are any wishes
         if (twitchWishListBot.length === 0) {
