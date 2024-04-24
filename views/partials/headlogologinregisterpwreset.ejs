@@ -1,1 +1,17 @@
-<img src="https://cdn.treudler.net/web/logo/256x256.png" class="image">
+<img id="logoImage" class="image"></img>
+
+<script>
+  // Get the current domain name
+  var domain = window.location.hostname;
+
+  // Set the src attribute based on the domain name
+  var logoImage = document.getElementById("logoImage");
+  logoImage.src = "https://cdn.treudler.net/web/logo/256x256.png"; // Default image URL
+
+  if (domain === "casfra.yasarbonus.com") {
+    logoImage.src = "/img/logo-egon-animated.gif";
+  } else if (domain === "localhost") {
+    logoImage.src = "/img/shreck.png";
+  }
+  // Add more conditions for other domain names if needed
+</script>
