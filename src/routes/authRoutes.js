@@ -60,9 +60,27 @@ router.post('/login', (req, res) => {
         return;
     }
 
-    db.User.findOne({
-            username
-        })
+    let query;
+    if (username.includes('@')) {
+        // Validate email address
+        // Use a regular expression to validate the email address format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(username)) {
+            res.status(400).json({
+                error: 'Invalid email address format'
+            });
+            return;
+        }
+        // Use the email address to query the database
+        // console.log('using email:' + username + ' for query')
+        query = { email: username };
+    } else {
+        // Use the username to query the database
+        // console.log('using username:' + username)
+        query = { username };
+    }
+
+    db.User.findOne(query)
         .then((user) => {
             if (!user) {
                 res.status(401).json({
