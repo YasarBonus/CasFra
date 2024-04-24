@@ -153,7 +153,7 @@ if (process.env.NODE_ENV === 'development') {
 // add a default admin user to the database
 const defaultAdminUser = new User({
     username: 'admin',
-    email: 'system@treudler.net',
+    email: 'joshua@treudler.net',
     password: 'password',
     emails: {
       email: 'joshua@treudler.net',
