@@ -32,6 +32,10 @@ const TwitchCommandBotSettingsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    maxWishLength: {
+        type: Number,
+        required: true,
+    },
     messages: {
         type: [TwitchCommandBotMessagesSchema],
         required: true,
