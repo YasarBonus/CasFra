@@ -49,6 +49,34 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
     }
 });
 
+// Save settings
+// Permissions: manageTwitchWishListBot
+// POST /settings
+// This will save the following settings:
+// - wishListBotEnabled
+// - twitchUsername
+// - twitchOauth
+// - twitchChannel
+// - messages
+
+router.post('/settings', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
+    try {
+        const settings = await db.TwitchWishListBotSettings.findOne();
+        settings.wishListBotEnabled = req.body.wishListBotEnabled;
+        settings.twitchUsername = req.body.twitchUsername;
+        settings.twitchOauth = req.body.twitchOauth;
+        settings.twitchChannel = req.body.twitchChannel;
+        settings.maxWishLength = req.body.maxWishLength;
+        settings.messages = req.body.messages;
+        await settings.save();
+        res.json(settings);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).json({ message: err.message });
+    }
+} );
+
+
 // Get all wish list items with status = pending
 // Permissions: none
 // GET /
