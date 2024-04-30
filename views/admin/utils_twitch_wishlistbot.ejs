@@ -10,7 +10,7 @@
             <%- include('./partials/dashboard-menu') %>
             <div class="ui segment">
                     <h2>Twitch Wishlist Bot</h2>
-                    <div id="randomWishButton" class="ui primary button">Zufälligen Wunsch spielen</div>
+                    <div id="randomWishButton" class="ui primary button">Zufälligen Wunsch spielen</div><div id="settingsButton" class="ui button">Einstellungen</div>
                     <table id="wishListTable" class="ui celled table">
                         <thead>
                             <tr>
@@ -49,6 +49,7 @@
                 });
             });
         });
+
 
         $(document).ready(function () {
             // Function to get Casino Wish List Bot Items from the API
@@ -228,7 +229,92 @@
             }, 1000);
             
         });
+
     </script>
+
+    <script>
+         // add event listener to the settings button to open the settings modal
+         $(document).ready(function () {
+            $('#settingsButton').click(function () {
+                $('.ui.modal').modal('show');
+            });
+        });
+
+        // add event listener to the save settings button to save the settings
+        $(document).ready(function () {
+            $('#saveSettingsButton').click(function () {
+                var settings = {
+                    maxWishes: $('#maxWishes').val(),
+                    maxWishesPerUser: $('#maxWishesPerUser').val(),
+                    maxWishLength: $('#maxWishLength').val()
+                };
+                $.ajax({
+                    url: '/api/v1/utils/twitchwishlistbot/settings',
+                    method: 'POST',
+                    data: settings,
+                    success: function (response) {
+                        showToast('success', 'Settings saved',
+                            'The settings have been saved successfully.');
+                        getWishList();
+                    },
+                    error: function (error) {
+                        console.log('Error saving settings:', error);
+                        showToast('error', 'Error saving settings',
+                            'There was an error saving the settings. Please try again. This incident has been logged.'
+                        );
+                    }
+                });
+            });
+        });
+
+        // add event listener to the cancel settings button to close the settings modal
+        $(document).ready(function () {
+            $('#cancelSettingsButton').click(function () {
+                $('.ui.modal').modal('hide');
+            });
+        });
+    </script>
+
+    <!-- settings modal -->
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+            Einstellungen
+        </div>
+        <div class="content">
+            <div class="ui form">
+                <div class="field">
+                    <label>Twitch OAuth Username</label>
+                    <input type="text" id="twitchUsername" placeholder="mustermann">
+                </div>
+                <div class="field">
+                    <label>Twitch OAuth Token</label>
+                    <input type="text" id="twitchOauth" placeholder="oauth:1234567890abcdef">
+                </div>
+                <div class="field">
+                    <label>Channel</label>
+                    <input type="number" id="twitchChannel" placeholder="5">
+                </div>
+                <div class="field">
+                    <label>Maximale Wünsche pro Benutzer</label>
+                    <input type="number" id="maxWishesPerUser" placeholder="1">
+                </div>
+                <div class="field">
+                    <label>Maximale Wunschlänge</label>
+                    <input type="number" id="maxWishLength" placeholder="50">
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button" id="cancelSettingsButton">
+                Abbrechen
+            </div>
+            <div class="ui positive right labeled icon button" id="saveSettingsButton">
+                Speichern
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
