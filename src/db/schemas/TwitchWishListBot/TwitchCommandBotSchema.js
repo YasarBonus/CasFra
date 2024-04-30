@@ -16,7 +16,7 @@ const TwitchCommandBotMessagesSchema = new mongoose.Schema({
 const TwitchCommandBotMessages = mongoose.model('TwitchCommandBotMessages', TwitchCommandBotMessagesSchema);
 
 const TwitchCommandBotSettingsSchema = new mongoose.Schema({
-    TwitchWishListBotEnabled:
+    botEnabled:
     {
         type: Boolean,
         required: true,
