@@ -13,6 +13,59 @@ const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
+// /auth/create2fa
+router.post('/create2fa', checkPermissions('authenticate'), async (req, res) => {
+    const userId = req.session.user.userId;
+    const user = await db.User.findById(userId);
+    const secret = speakeasy.generateSecret();
+    const otpauth_url = secret.otpauth_url;
+    const qrCode = await qrcode.toDataURL(otpauth_url);
+    user.two_factor_auth = {
+        secret: secret.base32,
+        temp_secret: secret.base32,
+        data_url: qrCode,
+        otpauth_url: otpauth_url,
+        active: false,
+    };
+    await user.save();
+    notificator.addNotification(userId, '2FA', '2FA setup initiated', '2FA setup has been initiated for your account', 'email');
+    res.json({
+        success: true,
+        qrCode: qrCode,
+        otpauth_url: otpauth_url,
+        secret: secret.base32,
+    });
+}
+);
+
+// auth/verify2fa
+router.post('/verify2fa', checkPermissions('authenticate'), async (req, res) => {
+    const userId = req.session.user.userId;
+    const user = await db.User.findById(userId);
+    const {
+        code
+    } = req.body;
+    const verified = speakeasy.totp.verify({
+        secret: user.two_factor_auth.secret,
+        encoding: 'base32',
+        token: code,
+    });
+    console.log('Got data:', verified, user.two_factor_auth.secret, code);
+    if (verified) {
+        user.two_factor_auth.active = true;
+        await user.save();
+        notificator.addNotification(userId, '2FA', '2FA setup completed', '2FA setup has been completed for your account', 'email');
+        res.json({
+            success: true,
+        });
+    } else {
+        res.status(401).json({
+            error: 'Invalid token',
+        });
+    }
+}
+);
+
 /**
  * @openapi
  * /auth/login:
