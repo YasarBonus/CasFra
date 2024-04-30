@@ -139,8 +139,23 @@ const UserSchema = new mongoose.Schema({
       type: String
     },
     registration: userRegistrationSchema,
-    twoFactorSecret: {
-      type: String
+    two_factor_auth: {
+      secret: {
+        type: String
+      },
+      temp_secret: {
+        type: String
+      },
+      data_url: {
+        type: String
+      },
+      otpauth_url: {
+        type: String
+      },
+      active: {
+        type: Boolean,
+        default: false
+      },
     },
   });
   

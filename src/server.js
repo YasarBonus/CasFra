@@ -319,6 +319,18 @@ app.get('/dashboard/account', checkPermissions('manageAccount'), (req, res, next
   }
 });
 
+app.get('/dashboard/account/2fa', checkPermissions('manageAccount'), (req, res, next) => {
+  try {
+    console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed 2FA');
+    const user = req.session.user;
+    res.render('admin/account_2fa', {
+      user: user
+    });
+  } catch (err) {
+    next(err);
+  }
+} );
+
 app.get('/dashboard/super/registrationkeys', checkPermissions('manageRegistrationKeys'), (req, res, next) => {
   try {
     console.log('User ' + req.session.user.username + '(' + req.session.user.userId + ') accessed ' + req.url);

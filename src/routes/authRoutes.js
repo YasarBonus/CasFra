@@ -5,6 +5,10 @@ const db = require('../db/database.js');
 const bcrypt = require('bcrypt');
 const bodymen = require('bodymen');
 
+// libraries for 2FA
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
+
 const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
