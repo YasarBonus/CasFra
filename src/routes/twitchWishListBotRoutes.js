@@ -62,7 +62,7 @@ router.get('/', checkPermissions('manageTwitchWishListBot'), async (req, res) =>
 router.post('/settings', checkPermissions('manageTwitchWishListBot'), async (req, res) => {
     try {
         const settings = await db.TwitchWishListBotSettings.findOne();
-        settings.wishListBotEnabled = req.body.wishListBotEnabled;
+        settings.botEnabled = req.body.botEnabled;
         settings.twitchUsername = req.body.twitchUsername;
         settings.twitchOauth = req.body.twitchOauth;
         settings.twitchChannel = req.body.twitchChannel;
