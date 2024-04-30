@@ -1,0 +1,79 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <style type="text/css">
+      body {
+        background-color: #DADADA;
+      }
+      body > .grid {
+        height: 100%;
+      }
+      .image {
+        margin-top: -100px;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+    <body>
+      <div class="ui middle aligned center aligned grid">
+        <div class="column">
+          <h2 class="ui image header">
+            <div class="image"><%- include('../partials/headlogologinregisterpwreset') %></div>
+            <div class="content">
+              2FA
+            </div>
+          </h2>
+          <form class="ui large form" id="userForm">
+            <div class="ui segment">
+              <div id="formLoaderAccountDetails" class="ui inverted dimmer"></div>
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="password" name="code" placeholder="">
+                </div>
+              </div>
+              <button id="saveButton" class="ui fluid large green submit button">Authenticate</button>
+            </div>
+      
+            <div class="ui error message"></div>
+      
+          </form>
+      
+          <div class="ui message">
+            <a href="/register">Create Account</a> - <a href="/forgot">Reset Password</a>
+          </div>
+        </div>
+      </div>
+
+
+                  
+                      <script>
+                            document.getElementById('saveButton').addEventListener('click', function (event) {
+                                event.preventDefault();
+                                document.getElementById('formLoaderAccountDetails').classList.add('active');
+                                const code = document.querySelector('input[name="code"]').value;
+                                fetch('/api/v1/auth/validate2fa', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ token: code })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        document.getElementById('formLoaderAccountDetails').classList.remove('active');
+                                        if (data.success) {
+                                            alert('2FA is enabled');
+                                        } else {
+                                            alert(data.error);
+                                        }
+                                    })
+                                    .catch(error => console.error(error));
+                            });
+                
+                      </script>
+                      <%- include('../partials/footer') %>
+                        </body>
+                    </html>
