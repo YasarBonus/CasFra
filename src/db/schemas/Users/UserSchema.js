@@ -139,6 +139,9 @@ const UserSchema = new mongoose.Schema({
       type: String
     },
     registration: userRegistrationSchema,
+    twoFactorSecret: {
+      type: String
+    },
   });
   
   const User = mongoose.model('User', UserSchema);
