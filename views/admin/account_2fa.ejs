@@ -1,0 +1,60 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+        <div class="ui segment">
+            <%- include('./partials/dashboard-menu') %>
+            <div class="ui segment">
+                <div class="ui container">
+                    <h2>My 2FA settings</h2>
+                    <button onclick="create2FA()">Generate 2FA</button>
+                    <div id="secretCode"></div>
+                    <div id="qrCode"></div>
+                </div>
+                <div class="ui container">
+                    <h2>Validate 2FA</h2>
+                    <input type="text" id="2faCode" placeholder="Enter 2FA code">
+                    <button onclick="verify2FA()">Validate 2FA</button>
+            </div>
+        </div>
+        <script>
+            function create2FA() {
+                fetch('/api/v1/auth/create2fa', {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('secretCode').innerText = 'Secret Code: ' + data.secret;
+                        document.getElementById('qrCode').innerHTML = '<img src="' + data.qrCode + '" alt="QR Code">';
+                    })
+                    .catch(error => console.error(error));
+            }
+
+            function verify2FA() {
+                const code = document.getElementById('2faCode').value;
+                fetch('/api/v1/auth/verify2fa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('2FA is enabled');
+                        } else {
+                            alert('Invalid 2FA code');
+                        }
+                    })
+                    .catch(error => console.error(error));
+            }
+        </script>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>
