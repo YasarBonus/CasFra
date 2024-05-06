@@ -287,6 +287,10 @@ app.get('/login', (req, res) => {
   res.render('admin/login');
 });
 
+app.get('/2fa-email', (req, res) => {
+  res.render('admin/2fa_email');
+});
+
 app.get('/forgot', (req, res) => {
   res.render('admin/forgot');
 });

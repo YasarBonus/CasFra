@@ -1,0 +1,57 @@
+<!-- media.ejs -->
+<!DOCTYPE html>
+<html>
+    <%- include('../partials/head') %>
+    <style type="text/css">
+      body {
+        background-color: #DADADA;
+      }
+      body > .grid {
+        height: 100%;
+      }
+      .image {
+        margin-top: -100px;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+    <body>
+      <div class="ui middle aligned center aligned grid">
+        <div class="column">
+          <h2 class="ui image header">
+            <div class="image"><%- include('../partials/headlogologinregisterpwreset') %></div>
+            <div class="content">
+              Enter 2FA Code
+            </div>
+          </h2>
+          <form class="ui large form" id="userForm">
+            <div class="ui segment">
+              <div class="field">
+                <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="text" name="code" placeholder="Code">
+                </div>
+              </div>
+              <button id="saveButton" class="ui fluid large submit button">Authenticate</button>
+            </div>
+      
+            <div class="ui error message"></div>
+      
+          </form>
+      
+          <div class="ui message">
+            <a href="/register">Create Account</a> - <a href="/forgot">Reset Password</a>
+          </div>
+        </div>
+      </div>
+
+
+                  
+                      <script>
+                        
+                        
+                      </script>
+                      <%- include('../partials/footer') %>
+                        </body>
+                    </html>

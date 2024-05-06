@@ -9,6 +9,41 @@ const notificator = require('../services/notificationService.js');
 const checkPermissions = require('../middlewares/permissionMiddleware.js');
 const addNotification = notificator.addNotification;
 
+// /auth/2fa/email
+// verify 2FA code sent to email, if valid, set session 2FA code
+router.post('/2fa/email', async (req, res) => {
+    const {
+        code
+    } = req.body;
+
+    if (!code || typeof code !== 'string') {
+        res.status(400).json({
+            error: '2FA code is required and must be a string'
+        });
+        return;
+    }
+
+    const userId = req.session.user.userId;
+    const user = await db.User.findById(userId);
+
+    if (!user) {
+        return res.status(403).json({
+            error: 'Forbidden'
+        });
+    }
+
+    if (user.two_factor_auth_email.code === code) {
+        req.session.user.twoFactorAuthCode = code;
+        res.json({
+            success: true
+        });
+    } else {
+        res.status(401).json({
+            error: 'Invalid 2FA code'
+        });
+    }
+});
+
 /**
  * @openapi
  * /auth/login:
