@@ -1,189 +1,611 @@
 <!DOCTYPE html>
 <html>
-  <%- include('../partials/head') %>
-  <%- include('../partials/header') %>
+  <%- include('../partials/head') %> <%- include('../partials/header') %>
 
-<body class="bg-yasarred">
-      <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px;">
+  <script>
+    const apiUrl = "http://159.69.244.229:1337";
+    const apiPopulate = "";
 
+    fetchFiltersData();
+    fetchCasinosData();
+
+    function fetchFiltersData() {
+      console.log("fetching filters data");
+      $.ajax({
+        url: apiUrl + "/api/filters?populate=*&filters[id][$eq]=1&",
+        type: "GET",
+        success: function (data) {
+          console.log("Got filters data:", data.data[0].attributes);
+          populateFilterDropdowns(data.data[0].attributes);
+        },
+        error: function (err) {
+          console.log(err);
+        },
+      });
+    }
+
+    function populateFilterDropdowns(filters) {
+      filters.categories.data.forEach(function (category) {
+        $("#categoryFilter").append(
+          `<option value="${category.id}">${category.attributes.Name}</option>`
+        );
+      });
+
+      filters.payment_methods.data.forEach(function (payment_method) {
+        $("#paymentmethodsFilter").append(
+          `<option value="${payment_method.id}">${payment_method.attributes.Name}</option>`
+        );
+      });
+
+      filters.providers.data.forEach(function (provider) {
+        $("#providerFilter").append(
+          `<option value="${provider.id}">${provider.attributes.Name}</option>`
+        );
+      });
+
+      filters.companies.data.forEach(function (company) {
+        $("#companyFilter").append(
+          `<option value="${company.id}">${company.attributes.Name}</option>`
+        );
+      });
+
+      filters.features.data.forEach(function (feature) {
+        $("#featuresFilter").append(
+          `<div class="ui checkbox"><input id="feature${feature.id}" type="checkbox" onchange="useFilters();"><label for="${feature.id}">${feature.attributes.Name}</label></div>`
+        );
+      });
+
+      filters.tags.data.forEach(function (tag) {
+        $("#tagsFilter").append(
+          `<div class="ui checkbox"><input id="tag${tag.id}" type="checkbox" onchange="useFilters();"><label for="${tag.id}">${tag.attributes.Name}</label></div>`
+        );
+      });
+
+      // enable dropdowns
+      $(".ui.dropdown").dropdown({
+        clearable: true,
+      });
+
+      $("#bonusFilter").slider({
+        min: 0,
+        max: 1000,
+        step: 10,
+        start: [0, 1000],
+        range: true,
+        values: [0, 1000],
+        slide: function (event, ui) {
+          $("#bonusFilter")
+            .siblings(".labeled")
+            .html(
+              '<div class="ui left pointing label">' +
+                ui.values[0] +
+                '</div><div class="ui right pointing label">' +
+                ui.values[1] +
+                "</div>"
+            );
+        },
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // listen to changes in any of the dropdown filters
+      $(".ui.dropdown").on("change", function() {
+        useFilters();
+      });
+    });
+
+    function useFilters() {
+      $('#fetchingIndicator').show();
+      console.log("using filters...");
+
+      var dropdownFilters = {
+          category: $("#categoryFilter").val(),
+          payment_methods: $("#paymentmethodsFilter").val(),
+          providers: $("#providerFilter").val(),
+      };
+      console.log("dropdownFilters:", dropdownFilters);
+
+      var checkboxFilters = {};
+      $("[id^=feature]").each(function() {
+        if ($(this).is(":checked")) {
+          var featureId = $(this).attr("id").replace("feature", "");
+          if (!checkboxFilters.features) {
+        checkboxFilters.features = [];
+          }
+          checkboxFilters.features.push(featureId);
+        }
+      });
+
+      $("[id^=tag]").each(function() {
+        if ($(this).is(":checked")) {
+          var tagId = $(this).attr("id").replace("tag", "");
+          if (!checkboxFilters.tags) {
+        checkboxFilters.tags = [];
+          }
+          checkboxFilters.tags.push(tagId);
+        }
+      });
+
+      console.log("checkboxFilters:", checkboxFilters);
+
+      const filters = {
+          ...dropdownFilters,
+          ...checkboxFilters,
+      };
+
+      console.log("filters:", filters);
+
+      // build the filter string to be passed to the API.
+      // e.g. "[payment_methods][$in][0]=1&[payment_methods][$in][1]=2&[category][$in][0]=1"
+      let filterString = "";
+      Object.keys(filters).forEach((key) => {
+        if (filters[key]) {
+          filters[key].forEach((value, index) => {
+            filterString += `&filters[${key}][$eq][${index}]=${value}&`;
+          });
+        }
+      });
+
+      console.log("filterString:", filterString);
+      fetchCasinosData(filterString);
+    }
+
+
+    function fetchCasinosData(filters) {
+      $('#fetchingIndicator').show();
+      console.log("fetching casinos data");
+      $.ajax({
+        url:
+          apiUrl +
+          "/api/casinos/?filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
+        type: "GET",
+        success: function (data) {
+          console.log("API URL:", apiUrl + "/api/casinos/?filter=" + filters);
+          console.log("Got casinos data:", data.data);
+
+          if (data.data.length === 0) {
+            $("#noCasinosFound").show();
+          } else {
+            $("#noCasinosFound").hide();
+          }
+
+          populateCasinos(data.data);
+        },
+        error: function (err) {
+          console.log(err);
+        },
+      });
+    }
+
+    function populateCasinos(data) {
+      console.log("populating casinos...");
+      // clear the response container
+      $("#responseContainer").empty();
+
+      data.forEach(function (casino) {
+        $("#responseContainer").append(
+          '<div class="top attached ui segment" id="casino' +
+            casino.id +
+            '" style="background-color: beige">' +
+            '<div class="ui styled six column grid" style="">' +
+            '<div class="ui four wide column">' +
+            (casino.attributes.Label
+              ? '<div class="ui teal large ribbon label">' + casino.attributes.Label + "</div>"
+              : "") +
+            "</div>" +
+            '<div class="ui three wide left aligned column"></div>' +
+            '<div class="ui nine wide right aligned column" style="padding-right: 10px">' +
+            '<a data-tooltip="Prohibited Games Protection" onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)" class="ui right floated small blue circular label"><i class="lock icon"></i> PGP</a>' +
+            '<a data-tooltip="Sportbets available" onclick="setCheckboxAndFetchData(sportbetsFilter, true)" class="ui right floated small blue circular label"><i class="plus icon"></i> Sportbets</a>' +
+            '<a data-tooltip="Non-Sticky Bonus" onclick="setCheckboxAndFetchData(nonstickyFilter, true)" class="ui right floated small purple circular label">Non-Sticky</a>' +
+            '<a data-tooltip="Bonushunt is allowed" onclick="setCheckboxAndFetchData(bonushuntFilter, true)" class="ui right floated small green circular label"><i class="check icon"></i> Bonushunt</a>' +
+            '<a data-tooltip="VPN is allowed" onclick="setCheckboxAndFetchData(vpnFilter, true)" class="ui right floated small green circular label"><i class="check icon"></i> VPN</a>' +
+            "</div>" +
+            "</div>" +
+            '<div class="ui styled three column grid" style="">' +
+            '<div class="ui three wide column" style="padding-left: 15px">' +
+            '<img style="width: 160px" src="' +
+            apiUrl +
+            casino.attributes.Logo.data.attributes.url +
+            '" alt="' +
+            casino.attributes.Name +
+            '" />' +
+            "</div>" +
+            '<div class="ui ten wide center aligned column">' +
+            '<div class="ui center aligned four column grid">' +
+            '<div class="row" style="padding-top: 20px">' +
+            '<div class="four wide computer eight wide mobile column">' +
+            '<div class="bonustext">' +
+            casino.attributes.Boni[0].Percent +
+            " %</div>" +
+            '<div style="font-size: 18px; padding-top: 15px">up to ' +
+            casino.attributes.Boni[0].upTo +
+            " €</div>" +
+            '<div class="bonushead">Bonus</div>' +
+            "</div>" +
+            '<div class="three wide computer eight wide mobile column">' +
+            '<div class="bonustext">' +
+            casino.attributes.MaxBet +
+            " €</div>" +
+            '<div class="bonushead">Max Bet</div>' +
+            "</div>" +
+            '<div class="three wide computer eight wide mobile column">' +
+            '<div class="bonustext">' +
+            (casino.attributes.MaxCashout ? casino.attributes.MaxCashout + " €" : "No") +
+            "</div>" +
+            '<div class="bonushead">Max Cashout</div>' +
+            "</div>" +
+            '<div class="five wide computer eight wide mobile column">' +
+            '<div class="bonustext">' +
+            casino.attributes.Wager +
+            "x" +
+            " (" +
+            casino.attributes.WagerType +
+            ")</div>" +
+            '<div class="bonushead">Wager</div>' +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            '<div class="ui three wide right aligned column">' +
+            '<div class="ui right floated" style="padding-right:15px">' +
+            '<a href="/go/' +
+            casino.attributes.slug +
+            '" target="_blank" class="ui large green button">' +
+            "PLAY NOW" +
+            '<!-- i class="right chevron icon"></i -->' +
+            "</a>" +
+            '<div class="attached">' +
+            '<div style="text-align: center;">T&C apply</div>' +
+            "</div>" +
+            "</div>" +
+            `
+                    </div>
+                    ` +
+            "</div>" +
+            `
+<div id="div${casino.id}details" style="display:none;">
+  <div class="attached ui segment" style="border: 0px; background-color: beige">
+    <div class="ui styled four column grid">
+      <div class="eight wide column">
+        <h3>Casino Bonus</h3>
+        <ul class="ui list">
+          ${casino.attributes.Boni.map(
+            (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} €</div>`
+          ).join("")}
+        </ul>
+      </div>
+
+      <div class="eight wide column">
+        <h3>Casino Features</h3>
+        <ul class="ui list">
+          ${casino.attributes.Boni.map(
+            (feature) => `<div class="item">${feature.percent}</div>`
+          ).join("")}
+        </ul>
+      </div>
+      <div class="eight wide column">
+        <h3>Provider</h3>
+        <div class="ui five column grid container">
+          ${casino.attributes.Boni.map(
+            (provider) =>
+              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${provider.attributes}" alt="${provider.Name}" /></div>`
+          ).join("")}
+        </div>
+      </div>
+      <div class="eight wide column">
+        <h3>Payment Methods</h3>
+
+        <div class="ui five column grid container">
+          ${casino.attributes.Boni.map(
+            (payment_method) =>
+              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${payment_method}" alt="${payment_method.Name}" /></div>`
+          ).join("")}
+
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+</div>
+
+<div class="bottom attached ui button" id="toggleBtn${casino.id}" onclick="toggleDetails(${
+              casino.id
+            })">Details</div>
+`
+        );
+      });
+    $('#fetchingIndicator').hide();
+    }
+
+    // if details button is clicked, toggle the details div of the casino
+    // dynamically load the details of the caisno from API and populate DIVs in the details div
+    function toggleDetails(casinoId) {
+      console.log("toggling details for casino:", casinoId);
+      $("#div" + casinoId + "details").toggle();
+      populateCasinoDetails(casinoId);
+    }
+
+    function populateCasinoDetails(casinoId) {
+      console.log("populating casino details for casino:", casinoId);
+      $.ajax({
+        url:
+          apiUrl +
+          "/api/casinos/" +
+          casinoId +
+          "?populate[payment_methods][populate][0]=Logo&populate[features][populate][0]=Logo&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&",
+        type: "GET",
+        success: function (data) {
+          console.log("got details for casino ", casinoId, ":", data);
+          populateCasinoDetailsDiv(data);
+        },
+        error: function (err) {
+          console.log(err);
+        },
+      });
+    }
+
+    function populateCasinoDetailsDiv(data) {
+      console.log("populating casino details div");
+      var casino = data.data;
+      console.log("casino details:", casino);
+
+      $("#div" + casino.id + "details").empty();
+
+      $("#div" + casino.id + "details").append(
+        '<div class="attached ui segment" style="border: 0px; background-color: beige">' +
+          '<div class="ui styled four column grid">' +
+          '<div class="eight wide column">' +
+          "<h3>Casino Bonus</h3>" +
+          '<ul class="ui list">' +
+                    casino.attributes.Boni.map(
+                      (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} €</div>`
+                    ).join('') +
+                    "</ul>" +
+          "</div>" +
+          '<div class="eight wide column">' +
+          '<h3>Casino Features</h3>' +
+          '<ul class="ui list">' +
+          casino.attributes.features.data.map(
+            (feature) => `<div class="item">${feature.attributes.Name}</div>`
+          ).join('') +
+          "</ul>" +
+          "</div>" +
+          '<div class="eight wide column">' +
+          "<h3>Provider</h3>" +
+          '<div class="ui five column grid container">' +
+          casino.attributes.providers.data.map(
+            (provider) =>
+              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${provider.attributes.Logo.data.attributes.url}" alt="${provider.attributes.Name}" /></div>`
+          ) +
+          "</div>" +
+          "</div>" +
+          '<div class="eight wide column">' +
+          '<h3>Payment Methods</h3>' +
+          '<div class="ui five column grid container">' +
+          casino.attributes.payment_methods.data.map(
+            (payment_method) =>
+              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
+          ) +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          "</div>"
+      );
+    }
+
+    // if reset filters button is clicked, reset all filters
+    function resetFilters() {
+      console.log("resetting filters...");
+      $("#categoryFilter").dropdown("clear");
+      $("#paymentmethodsFilter").dropdown("clear");
+      $("#providerFilter").dropdown("clear");
+      $("#companyFilter").dropdown("clear");
+      $("#featuresFilter input").prop("checked", false);
+      $("#tagsFilter input").prop("checked", false);
+      $("#bonusFilter").slider("values", [0, 1000]);
+      // $("#resetFiltersBtn").hide();
+      fetchCasinosData();
+    }
+
+    // other functions
+    // Copy text into clipboard
+    function copyText(textInput) {
+        navigator.clipboard.writeText
+            (textInput);
+    }
+
+  </script>
+
+  <body class="bg-yasarred">
+    <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px">
       <div class="ui two column stackable grid">
-        <div class="sixteen wide mobile sixteen wide tablet four wide computer four wide large screen four wide widescreen column">
-            <div class="ui segment">                     
+        <div
+          class="sixteen wide mobile sixteen wide tablet four wide computer four wide large screen four wide widescreen column">
+          <div class="ui segment">
             <div class="ui container grid filter">
-                <div class="sixteen wide eight wide tablet eight wide mobile column" style="padding:none">
+              <div
+                class="sixteen wide eight wide tablet eight wide mobile column"
+                style="padding: none">
                 <div class="filteritem">
-                    <div class="filterhead"><i class="compass icon"></i> Category</div>
-                        <select multiple class="ui fluid dropdown" id="categoryFilter">
-                            <option value="">All</option>
-                            <option value="sticky">Sticky</option>
-                            <option value="nonsticky">Non-Sticky</option>
-                            <option value="wagerfree">Wagerfree</option>
-                        </select>
-                </div>
-                <div class="filteritem">
-                    <div class="filterhead"><i class="credit card outline icon"></i> Payment Methods</div>
-                        <select multiple class="ui fluid dropdown" id="paymentmethodsFilter">
-                            <option value="">All</option>
-                            <option value="ApplePay">ApplePay</option>
-                            <option value="AstroPay">AstroPay</option>
-                            <option value="BankTransfer">BankTransfer</option>
-                            <option value="CashtoCode">CashtoCode</option>
-                            <option value="Crypto">Crypto</option>
-                            <option value="BankTransfer">BankTransfer</option>
-                            <option value="Flexespin">Flexespin</option>
-                            <option value="GiroPay">GiroPay</option>
-                            <option value="GooglePay">GooglePay</option>
-                            <option value="Jeton">Jeton</option>
-                            <option value="Mastercard">Mastercard</option>
-                            <option value="mercuryo">Mercuryo (buy Crypto)</option>
-                            <option value="Neteller">Neteller</option>
-                            <option value="N26">N26</option>
-                            <option value="Paysafecard">Paysafecard</option>
-                            <option value="Revolut">Revolut</option>
-                            <option value="Skinsback">Skinsback</option>
-                            <option value="Skrill">Skrill</option>
-                            <option value="Sofort">Sofort</option>
-                            <option value="Visa">Visa</option>
-                            <option value="eZeeWallet">eZeeWallet</option>
-                            <option value="ecoPayz">ecoPayz</option>
-                        </select>
+                  <div class="filterhead"><i class="compass icon"></i> Category</div>
+                  <select multiple class="ui fluid dropdown" id="categoryFilter">
+                    <option value="">All</option>
+                  </select>
                 </div>
                 <div class="filteritem">
-                    <div class="filterhead"><i class="handshake outline icon"></i> Provider</div>
-                        <select multiple class="ui fluid dropdown" id="providerFilter">
-                            <option value="">All</option>
-                            <option value="AvatarUx">AvatarUX</option>
-                            <option value="BGaming">BGaming</option>
-                            <option value="BigTimeGaming">BigTimeGaming</option>
-                            <option value="Elk">BigTimeGaming</option>
-                            <option value="Endorphina">Endorphina</option>
-                            <option value="gamomat">BigTimeGaming</option>
-                            <option value="hacksaw">BigTimeGaming</option>
-                            <option value="merkur">BigTimeGaming</option>
-                            <option value="netent">BigTimeGaming</option>
-                            <option value="nolimit">BigTimeGaming</option>
-                            <option value="novomatic">BigTimeGaming</option>
-                            <option value="playngo">BigTimeGaming</option>
-                            <option value="playson">BigTimeGaming</option>
-                            <option value="pragmaticplay">BigTimeGaming</option>
-                            <option value="pushagming">BigTimeGaming</option>
-                            <option value="quickspin">BigTimeGaming</option>
-                            <option value="redtiger">BigTimeGaming</option>
-                            <option value="relax">BigTimeGaming</option>
-                            <option value="skinsback">BigTimeGaming</option>
-                            <option value="thunderkick">BigTimeGaming</option>
-                            <option value="yggdrasil">BigTimeGaming</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="sixteen wide eight wide tablet eight wide mobile column" style="padding:none">
-                <div class="filteritem">
-                    <div class="filterhead"><i class="tags icon"></i> Features</div>
-                    <div class="grid">
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="vpnFilter">
-                            <label>VPN allowed</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="bonushuntFilter">
-                            <label>Bonushunt allowed</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="nomaxcashoutFilter">
-                            <label>No Max Cashout</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="sportbetsFilter">
-                            <label>Sportbets</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="nodepositFilter">
-                            <label>No Deposit Bonus</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="prohibitedgamesprotectionFilter">
-                            <label>Prohibited Games Protection</label>
-                        </div>
-                    </div>
-                </div>
+                  <div class="filterhead">
+                    <i class="credit card outline icon"></i> Payment Methods
+                  </div>
+                  <select multiple class="ui fluid dropdown" id="paymentmethodsFilter">
+                    <option value="">All</option>
+                  </select>
                 </div>
                 <div class="filteritem">
-                    <div class="filterhead"><i class="star icon"></i> Specials</div>
-                    <div class="grid">
-                    <div class="field">
-                        <div class="ui checkbox">
-                            <input type="checkbox" id="egonsbestFilter">
-                            <label>Egon's Best</label>
-                        </div>
-                    </div>
+                  <div class="filterhead"><i class="handshake outline icon"></i> Provider</div>
+                  <select multiple class="ui fluid dropdown" id="providerFilter">
+                    <option value="">All</option>
+                  </select>
                 </div>
+              </div>
+              <div
+                class="sixteen wide eight wide tablet eight wide mobile column"
+                style="padding: none">
+                <div class="filteritem" id="featuresFilter">
+                  <div class="filterhead"><i class="tags icon"></i> Features</div>
+                  <div class="grid"></div>
+                </div>
+                <div class="filteritem" id="tagsFilter">
+                  <div class="filterhead"><i class="star icon"></i> Specials</div>
+                  <div class="grid"></div>
                 </div>
                 <div class="filteritem">
-                    <div class="filterhead"><i class="hand holding usd icon"></i> Minimum Bonus</div>
-                    <div id="">
+                  <div class="filterhead"><i class="hand holding usd icon"></i> Minimum Bonus</div>
+                  <div id="">
                     <div class="ui labeled bonus slider" id="bonusFilter"></div>
+                  </div>
                 </div>
-                </div>
-                <script>
-                    $('.ui.labeled.bonus.slider')
-                        .slider({
-                            min: 100,
-                            max: 250,
-                            start: 100,
-                            step: 50,
-                            smooth: true,
-                            onChange: function(value) {
-                                fetchData();
-                            }
-                        });                    
-                </script>
+                <script></script>
                 <div class="filteritem">
-                    <div class="filterhead"><i class="building icon"></i> Company</div>
-                        <select class="ui fluid company dropdown" id="companyFilter">
-                            <option value="">None</option>
-                            <!-- option value="n1">N1 Interactive Ltd.</option -->
-                            <option value="hollycorn">Hollycorn NV</option>
-                            <option value="dama">Dama NV</option>
-                            <option value="rabidi">Rabidi NV</option>
-                        </select>
+                  <div class="filterhead"><i class="building icon"></i> Company</div>
+                  <select class="ui fluid company dropdown" id="companyFilter">
+                    <option value="">None</option>
+                  </select>
                 </div>
                 <script>
-                    $('.ui.fluid.company.dropdown')
-                    .dropdown({
-                        clearable: true
-                    })
-                    ;
+                  $(".ui.fluid.company.dropdown").dropdown({
+                    clearable: true,
+                  });
                 </script>
+              </div>
+              <div class="filteritem" id="resetFiltersBtn" style="display: none">
+                <div class="center aligned medium orange ui button">Reset Filter</div>
+              </div>
+              <div id="" class="ui active"></div>
             </div>
-                <div class="filteritem" id="resetFiltersBtn" style="display:none">
-                    <div class="center aligned medium orange ui button">Reset Filter</div>
-                </div>
-                <div id="" class="ui active">
-                </div>
-            </div>
-        </div>
+          </div>
         </div>
 
-        
-        
         <div class="sixteen wide mobile sixteen wide tablet twelve wide computer twelve wide large screen twelve wide widescreen column">
+          <!-- no casinos found message -->
+          <div class="ui icon message" id="noCasinosFound" style="display:none">
+            <i class="user secret icon"></i>
+            <div class="content">
+              <div class="header">No Casinos found</div>
+              <p>Try a different filter.</p>
+            </div>
+            <div class="filteritem" onclick="resetFilters()">
+              <div class="center aligned medium orange ui button">Reset Filters</div>
+            </div>
+          </div>
+          <!-- end no casinos found message -->
 
-           
+          <!-- casinos list -->
 
-            <div id="responseContainer">
-              <div class="ui segment" >
-              <div class="ui fluid placeholder" style="background-color: beige;">
+          <!-- div class="top attached ui segment" id="casinoggbet200" style="background-color: beige">
+            <div class="ui styled six column grid">
+              <div class="ui four wide column">
+                <div class="ui teal large ribbon label">Exclusive</div>
+              </div>
+              <div class="ui three wide left aligned column"></div>
+              <div class="ui nine wide right aligned column" style="padding-right: 10px">
+                <a
+                  data-tooltip="Prohibited Games Protection"
+                  onclick="setCheckboxAndFetchData(prohibitedgamesprotectionFilter, true)"
+                  class="ui right floated small blue circular label"
+                  ><i class="lock icon"></i> PGP</a
+                >
+              </div>
+              <div class="ui one wide column">
+              <div class="ui orange right corner label"><i class="heart icon"></i></div>
+              </div>
+            </div>
+            <div class="ui styled three column grid">
+              <div class="ui three wide column" style="padding-left: 15px">
+                <img style="width: 160px" src="img/casinos/ggbet200.png" alt="ggbet200 " />
+              </div>
+              <div class="ui ten wide center aligned column">
+                <div class="ui center aligned four column grid">
+                  <div class="row" style="padding-top: 20px">
+                    <div class="four wide computer eight wide mobile column">
+                      <div class="bonustext">200 %</div>
+                      <div style="font-size: 18px; padding-top: 15px">up to 340 €</div>
+                      <div class="bonushead">Bonus</div>
+                    </div>
+                    <div class="three wide computer eight wide mobile column">
+                      <div class="bonustext">5 €</div>
+                      <div class="bonushead">Max Bet</div>
+                    </div>
+                    <div class="three wide computer eight wide mobile column">
+                      <div class="bonustext">No</div>
+                      <div class="bonushead">Max Cashout</div>
+                    </div>
+                    <div class="five wide computer eight wide mobile column">
+                      <div class="bonustext">40x (B)</div>
+                      <div class="bonushead">Wager</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ui three wide right aligned column">
+                <div class="ui right floated" style="padding-right: 15px">
+                  <a href="/go/ggbet200" target="_blank" class="ui large green button">
+                    PLAY NOW
+                    <i class="right chevron icon"></i>
+                  </a>
+                  <div class="attached">
+                    <div style="text-align: center">T&amp;C apply</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="divggbet200details">
+              <div class="attached ui segment" style="border: 0px; background-color: beige">
+                <div class="ui styled four column grid">
+                  <div class="eight wide column">
+                    <h3>Casino Bonus</h3>
+                    <ul class="ui list">
+                      <div class="item">200% up to 340 €</div>
+                    </ul>
+                  </div>
+
+                  <div class="eight wide column">
+                    <h3>Casino Features</h3>
+                    <ul class="ui list">
+                      <div class="item">VPN Friendly ( only Austria)</div>
+                      <div class="item">Weekly Bonus 150% up to 500 € +65 Freespins</div>
+                    </ul>
+                  </div>
+                  <div class="eight wide column">
+                    <h3>Provider</h3>
+                    <div class="ui five column grid container">
+                      <div class="column">
+                        <img style="max-width: 60px" src="img/provider/Bgaming.png" alt="Bgaming" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="eight wide column">
+                    <h3>Payment Methods</h3>
+
+                    <div class="ui five column grid container">
+                      <div class="column">
+                        <img
+                          style="max-width: 60px"
+                          src="img/paymentmethods/ApplePay.png"
+                          alt="ApplePay" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </!-->
+
+          <!-- div class="bottom attached ui button" id="toggleBtnggbet200">Details</!-->
+
+          <div id="responseContainer">
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
                 <div class="image header">
                   <div class="line"></div>
                   <div class="line"></div>
@@ -194,130 +616,131 @@
                   <div class="line"></div>
                 </div>
               </div>
-      </div>
-      <div class="ui segment" >
-        <div class="ui fluid placeholder" style="background-color: beige;">
-          <div class="image header">
-            <div class="line"></div>
-            <div class="line"></div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <div class="ui segment">
+              <div class="ui fluid placeholder" style="background-color: beige">
+                <div class="image header">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="paragraph">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line"></div>
-          </div>
-        </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div><div class="ui segment" >
-  <div class="ui fluid placeholder" style="background-color: beige;">
-    <div class="image header">
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <div class="paragraph">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-</div>
-    
-    
-    </div>
-        </div>
         </div>
       </div>
     </div>
 
-   <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>
 
-   <script src="js/casinos.js"></script>
-
-
-
-
-</body>
+    <script src="js/casinos.js"></script>
+  </body>
 </html>

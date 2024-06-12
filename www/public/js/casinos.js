@@ -1,29 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    checkLastVisit();
-    setFilters();
-    clearUrlFilters();
-    checkFilterElementsForResetFiltersBtn();
+    // checkLastVisit();
+    // setFilters();
+    // clearUrlFilters();
+    // checkFilterElementsForResetFiltersBtn();
 
-    fetchData();
+    // fetchData();
     $('#fetchingIndicator').hide();
 });
-
-function dryRun() {
-    console.log('dryRun');
-    checkFilterElementsForResetFiltersBtn();
-    fetchData();
-}
-
-function getBonusFilterRangeValue() {
-    const bonusFilterRangeValue = $('#bonusFilter').slider('get value');
-    console.log('bonusFilterRangeValue', bonusFilterRangeValue);
-    return bonusFilterRangeValue;
-}
-
-function hideResetFiltersBtn() {
-    $('#resetFiltersBtn').hide();
-}
-
 
 // Display a message if the user has not visited the site before or the last visit was more than X days ago
 function checkLastVisit() {
@@ -175,7 +158,7 @@ function fetchData() {
     fetch(fetchUrl)
         .then(response => response.text())
         .then(html => {
-            $('#responseContainer').html(html);
+            // $('#responseContainer').html(html);
             $('#fetchingIndicator').hide();
             // console.log('API response:', html);
         })
@@ -183,103 +166,3 @@ function fetchData() {
         
 
 }
-
-// Load the data automatically and each time the filters are changed
-
-const filterElements = ['#categoryFilter', '#paymentmethodsFilter', '#providerFilter', '#nomaxcashoutFilter', '#vpnFilter', '#bonushuntFilter', '#sportbetsFilter', '#egonsbestFilter', '#nodepositFilter', '#prohibitedgamesprotectionFilter', '#companyFilter', '#bonusFilter'];
-
-$(filterElements.join(', ')).on('change', async function() {
-    // $('div[id^="casino"]').remove();
-    // $('div[id^="toggleBtn"]').remove();
-    $('#fetchingIndicator').show();
-    clearUrlFilters();
-    checkFilterElementsForResetFiltersBtn();
-    fetchData();
-
-
-});
-
-function checkFilterElementsForResetFiltersBtn() {
-    const resetFiltersBtn = $('#resetFiltersBtn');
-    const isAnyFilterSet = filterElements.some(filterElement => {
-        if ($(filterElement).is(':checked') || $(filterElement).val() !== '') {
-            return true;
-        }
-    });
-
-    if (isAnyFilterSet || $('#bonusFilter').slider('get value') !== '100') {
-        resetFiltersBtn.show();
-    } else {
-        resetFiltersBtn.hide();
-    }
-}
-
-
-
-
-
-
-// Copy text into clipboard
-
-function copyText(textInput) {
-    /* Copy text into clipboard */
-    navigator.clipboard.writeText
-        (textInput);
-}
-
-
-// Reset all filters function
-
-function resetFilters() {
-    // Reset checkbox filters
-    $('#vpnFilter').prop('checked', false);
-    $('#nomaxcashoutFilter').prop('checked', false);
-    $('#bonushuntFilter').prop('checked', false);
-    $('#sportbetsFilter').prop('checked', false);
-    $('#nodepositFilter').prop('checked', false);
-    $('#egonsbestFilter').prop('checked', false);
-    $('#prohibitedgamesprotectionFilter').prop('checked', false);
-
-    // Reset dropdown filters
-    $('#paymentmethodsFilter').dropdown('clear');
-    $('#providerFilter').dropdown('clear');
-    $('#companyFilter').dropdown('clear');
-    $('#categoryFilter').dropdown('clear');
-
-    // Reset Slider filter
-    $('#bonusFilter').slider('set value', 100);
-
-    clearUrlFilters();
-    fetchData();
-}
-
-function clearUrlFilters() {
-    history.replaceState(null, '', window.location.pathname);
-}
-
-// Call the resetFilters function when the reset button is clicked and hide it
-$('#resetFiltersBtn').on('click', function() {
-    resetFilters();
-    $(this).hide();
-});
-
-
-// Set the checkbox and fetch data
-function setCheckboxAndFetchData(checkboxId, value) {
-    if ($(checkboxId).prop('checked')) {
-        $(checkboxId).prop('checked', false);
-    } else {
-        $(checkboxId).prop('checked', value);
-    }
-    clearUrlFilters();
-    fetchData();
-}
-
-// Set the dropdown and fetch data
-function setDropdownAndFetchData(dropdownId, value) {
-    $(dropdownId).val(value);
-    clearUrlFilters();
-    fetchData();
-}
-
-
