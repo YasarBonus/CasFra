@@ -7,7 +7,6 @@
     const apiPopulate = "";
 
     fetchFiltersData();
-    fetchCasinosData();
 
     function fetchFiltersData() {
       console.log("fetching filters data");
@@ -152,7 +151,6 @@
 
 
     function fetchCasinosData(filters) {
-      $('#fetchingIndicator').show();
       console.log("fetching casinos data");
       $.ajax({
         url:
@@ -638,7 +636,7 @@
     </div>
 
     <%- include('../partials/footer') %>
+    <script src="js/ageCheck.js"></script>
 
-    <script src="js/casinos.js"></script>
   </body>
 </html>
