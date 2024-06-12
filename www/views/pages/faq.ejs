@@ -2,60 +2,22 @@
 <html>
   <%- include('../partials/head') %>
   <%- include('../partials/header') %>
+  <style>
+    body {
+padding: 1em;
+}
+.ui.accordion .active.title > .plus.icon,
+.ui.accordion .title:not(.active) > .minus.icon {
+display: none;
+}
+
+  </style>
 
 <body class="bg-yasarred" >
   <div class="ui container"style="margin-top: 100px !important; padding-bottom: 100px;">
     <div class="ui segment" >
       <h1>Casino FAQ</h1>
-
-      <!-- section class="accordion">
-        <div class="tab">
-          <input type="checkbox" name="accordion-1" id="cb1" checked>
-          <label for="cb1" class="tab__label">Checkbox</label>
-          <div class="tab__content">
-            <p>Pure CSS accordion based on the "input:checked + label" style trick.</p>
-          </div>
-        </div>
-        <div class="tab">
-          <input type="checkbox" name="accordion-1" id="cb2">
-          <label for="cb2" class="tab__label">Open multiple</label>
-          <div class="tab__content">
-            <p>Using <code>&lt;input type="checkbox"&gt;</code> allows to have several tabs open at the same time.</p>
-          </div>
-        </div>
-      </section>
       
-      <section class="accordion accordion--radio">
-        <div class="tab">
-          <input type="radio" name="accordion-2" id="rd1">
-          <label for="rd1" class="tab__label">Radio</label>
-          <div class="tab__content">
-            <p>If you want to have only one tab open, you can use <code>&lt;input type="checkbox"&gt;</code>.</p>
-          </div>
-        </div>
-        <div class="tab">
-          <input type="radio" name="accordion-2" id="rd2">
-          <label for="rd2" class="tab__label">Open single</label>
-          <div class="tab__content">
-            <p>But if you wanna close the opened tab, you must add a "close" button somewhere, like the one below, that is just another styled radio input.</p>
-          </div>
-        </div>
-        <div class="tab">
-          <input type="radio" name="accordion-2" id="rd3">
-          <label for="rd3" class="tab__close">Close open tab &times;</label>
-        </div>
-      </section -->
-      
-      <style>
-        body {
-  padding: 1em;
-}
-.ui.accordion .active.title > .plus.icon,
-.ui.accordion .title:not(.active) > .minus.icon {
-  display: none;
-}
-
-      </style>
       <script>
         $('.ui.segment').accordion({
 	exclusive: false
@@ -67,11 +29,15 @@
       
 
         <script>
+
+          const apiUrl = "http://159.69.244.229:1337";
+
           // Fetch the FAQ data from the API URL
-          fetch('/api/faq')
+          fetch(`${apiUrl}/api/faqs?populate=*`)
             .then(response => response.json())
             .then(data => {
               // Generate the HTML content for the FAQ
+              console.log(data);
               const faqContainer = document.getElementById('faq-container');
               const faqHTML = generateFAQHTML(data);
               faqContainer.innerHTML = faqHTML;
@@ -85,16 +51,17 @@
             let html = '';
 
             // Iterate over each FAQ item
-            faqData.forEach(item => {
+            faqData.data.forEach(item => {
+              console.log(item);
               html += `
               <div class="ui segment">
           <div class="title">
             <i class="plus icon"></i>
             <i class="minus icon"></i>
-            ${item.question}
+            ${item.attributes.Title}
           </div>
           <div class="content">
-            <p>${item.answer}</p>
+            <p>${item.attributes.Description}</p>
           </div>
         </div>
               `;
