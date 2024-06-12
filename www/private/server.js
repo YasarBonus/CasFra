@@ -6,6 +6,12 @@ const port = 3000;
 app.use(express.static('public'));
 app.set('view engine', 'ejs')
 
+// Enable CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -43,6 +49,8 @@ db.run(`CREATE TABLE IF NOT EXISTS link_hits (
   date TEXT,
   time TEXT
 )`);
+
+
 
 
 app.get('/', (req, res) => {
