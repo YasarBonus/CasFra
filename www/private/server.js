@@ -30,14 +30,26 @@ db.run(`CREATE TABLE IF NOT EXISTS link_hits (
   time TEXT
 )`);
 
+const i18n = require('i18n');
+
+i18n.configure({
+  locales:['en', 'de'],
+  directory: __dirname + '/locales'
+});
+
+app.use(i18n.init);
+
+console.log(i18n.__('Hello'));
+
 app.get('/', (req, res) => {
   const user = {
     firstName: 'Tim',
     lastName: 'Cook',
   };
   res.render('pages/index', {
-      user: user
-  })
+      user: user,
+      i18n: res
+    })
 });
 
 app.get('/faq', (req, res) => {
