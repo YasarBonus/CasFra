@@ -292,7 +292,7 @@
           apiUrl +
           "/api/casinos/" +
           casinoId +
-          "?populate[payment_methods][populate][0]=Logo&populate[features][populate][0]=Logo&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&",
+          "?populate[payment_methods][populate][0]=Logo&populate[license][populate][0]=Logo&populate[features][populate][0]=Image&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&",
         type: "GET",
         success: function (data) {
           console.log("got details for casino ", casinoId, ":", data);
@@ -317,10 +317,10 @@
           '<div class="eight wide column">' +
           "<h3>Casino Bonus</h3>" +
           '<ul class="ui list">' +
-                    casino.attributes.Boni.map(
-                      (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.Freespins ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
-                    ).join('') +
-                    "</ul>" +
+          casino.attributes.Boni.map(
+            (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.Freespins ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
+          ).join('') +
+          "</ul>" +
           "</div>" +
           '<div class="eight wide column">' +
           '<h3>Casino Features</h3>' +
@@ -346,6 +346,17 @@
             (payment_method) =>
               `<div class="column"><img style="max-width: 60px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
           ) +
+          (casino.attributes.license
+              ? '<div class="eight wide column">' +
+                "<h3>License</h3>" +
+                '<div class="ui five column grid container">' +
+                '<div class="column"><img style="max-width: 60px" src="' +
+                apiUrl +
+                casino.attributes.license.data.attributes.Logo.data.attributes.url +
+                '" alt="" /></div>' +
+                '</div>' +
+                '</div>'
+              : '') +
           "</div>" +
           "</div>" +
           "</div>" +
