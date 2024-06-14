@@ -30,7 +30,7 @@ display: none;
 
         <script>
           // Fetch the FAQ data from the API URL
-          fetch(`${apiUrl}/api/faqs?populate=*`)
+          fetch(`${apiUrl}/api/faqs?locale=${lang}&populate=*`)
             .then(response => response.json())
             .then(data => {
               // Generate the HTML content for the FAQ
