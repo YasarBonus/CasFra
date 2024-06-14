@@ -1,11 +1,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="img/favicon.png" type="image/png">
+    <link id="website-favicon" rel="icon" type="image/png">
 
-    <title>YasarBonus Casino Comparison</title>
-    <meta name="description" content="Yasarbonus is a website that compares online casinos and their bonuses.">
-    <meta name="keywords" content="yasarbonus, yasarbonus, yasar, bonus, casino, online casino, online casinos, casino bonus, casino bonuses, bonus comparison, casino comparison, casino reviews, casino review, casino bonus comparison, casino bonus comparisons, casino bonus comparison, casino bonus comparison">
+    <title id="website-title"></title>
+    <meta id="website-description" name="description">
+    <meta id="website-keywords" name="keywords">
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -17,6 +17,21 @@
     <script src="https://kit.fontawesome.com/a35631f35d.js" crossorigin="anonymous"></script>
 
     <!-- Matomo -->
+    <script>
+      const apiUrl = "https://api.yasarbonus.com";
+      fetch(`${apiUrl}/api/website?populate=*&filters[id][$eq][0]=1`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('website-title').innerText = data.data.attributes.Title;
+          document.getElementById('website-description').content = data.data.attributes.Description;
+          document.getElementById('website-keywords').content = data.data.attributes.Keywords;
+          document.getElementById('website-favicon').href = apiUrl + data.data.attributes.Favicon.data.attributes.url;
+          document.getElementById('website-logo').src = apiUrl + data.data.attributes.Logo.data.attributes.url;
+        })
+        .catch(error => {
+          console.error('Error fetching metadata:', error);
+        });
+    </script>
   <script>
     var _paq = window._paq = window._paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */

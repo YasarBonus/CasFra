@@ -3,7 +3,6 @@
   <%- include('../partials/head') %> <%- include('../partials/header') %>
 
   <script>
-    const apiUrl = "https://api.yasarbonus.com";
     const apiPopulate = "";
 
     fetchFiltersData();
@@ -309,9 +308,7 @@
 </div>
 </div>
 
-<div class="bottom attached ui button" id="toggleBtn${casino.id}" onclick="toggleDetails(${
-              casino.id
-            })">Details</div>
+<div class="bottom attached ui button" id="toggleBtn${casino.id}" onclick="toggleDetails(${casino.id})">Details</div>
 `
         );
       });
