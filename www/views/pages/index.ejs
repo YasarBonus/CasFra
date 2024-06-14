@@ -266,47 +266,7 @@
             "</div>" +
             `
 <div id="div${casino.id}details" style="display:none;">
-  <div class="attached ui segment" style="border: 0px; background-color: beige">
-    <div class="ui styled four column grid">
-      <div class="eight wide column">
-        <h3>Casino Bonus</h3>
-        <ul class="ui list">
-          ${casino.attributes.Boni.map(
-            (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} €</div>`
-          ).join("")}
-        </ul>
-      </div>
-
-      <div class="eight wide column">
-        <h3>Casino Features</h3>
-        <ul class="ui list">
-          ${casino.attributes.Boni.map(
-            (feature) => `<div class="item">${feature.percent}</div>`
-          ).join("")}
-        </ul>
-      </div>
-      <div class="eight wide column">
-        <h3>Provider</h3>
-        <div class="ui five column grid container">
-          ${casino.attributes.Boni.map(
-            (provider) =>
-              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${provider.attributes}" alt="${provider.Name}" /></div>`
-          ).join("")}
-        </div>
-      </div>
-      <div class="eight wide column">
-        <h3>Payment Methods</h3>
-
-        <div class="ui five column grid container">
-          ${casino.attributes.Boni.map(
-            (payment_method) =>
-              `<div class="column"><img style="max-width: 60px" src="${apiUrl}${payment_method}" alt="${payment_method.Name}" /></div>`
-          ).join("")}
-
-        </div>
-      </div>
-      </div>
-  </div>
+ 
 </div>
 </div>
 
@@ -358,7 +318,7 @@
           "<h3>Casino Bonus</h3>" +
           '<ul class="ui list">' +
                     casino.attributes.Boni.map(
-                      (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} €</div>`
+                      (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.Freespins ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
                     ).join('') +
                     "</ul>" +
           "</div>" +
