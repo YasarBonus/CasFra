@@ -8,9 +8,10 @@
     fetchFiltersData();
 
     function fetchFiltersData() {
+      userLang = "en";
       console.log("fetching filters data");
       $.ajax({
-        url: apiUrl + "/api/filters?populate=*&filters[id][$eq]=1&",
+        url: apiUrl + "/api/filters?locale=" + userLang + "&populate=*&",
         type: "GET",
         success: function (data) {
           console.log("Got filters data:", data.data[0].attributes);
@@ -156,7 +157,7 @@
       $.ajax({
         url:
           apiUrl +
-          "/api/casinos/?filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
+          "/api/casinos/?locale=" + userLang + "&filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
         type: "GET",
         success: function (data) {
           console.log("API URL:", apiUrl + "/api/casinos/?filter=" + filters);
