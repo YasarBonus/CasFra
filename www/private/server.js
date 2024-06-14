@@ -52,18 +52,6 @@ app.get('/faq', (req, res) => {
 
 const ejs = require('ejs');
 
-
-// Close the database connection when the server is shut down
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Closed the database connection.');
-    process.exit(0);
-  });
-});
-
 // 301 Redirect
 app.get('/casinos', (req, res) => {
   res.redirect(301, '/');
@@ -78,6 +66,17 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('500 - Internal Server Error');
+});
+
+// Close the database connection when the server is shut down
+process.on('SIGINT', () => {
+  db.close((err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Closed the database connection.');
+    process.exit(0);
+  });
 });
 
 // Server starten
