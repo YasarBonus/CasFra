@@ -18,8 +18,23 @@
 
     <!-- Matomo -->
     <script>
+
+      // get users language from browser
+      var userLang = navigator.language || navigator.userLanguage;
+      console.log('User language:', userLang);
+
+      // check if user has custom language set in local storage
+      if (localStorage.getItem('userLang')) {
+        var userLang = localStorage.getItem('userLang');
+        console.log('User language from local storage:', userLang);
+      } else {
+        localStorage.setItem('userLang', userLang);
+      }
+
+      console.log("User language is now set to:", userLang);
       const apiUrl = "https://api.yasarbonus.com";
-      fetch(`${apiUrl}/api/website?populate=*&filters[id][$eq][0]=1`)
+
+      fetch(`${apiUrl}/api/website?locale=${userLang}&populate=*`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('website-title').innerText = data.data.attributes.Title;
