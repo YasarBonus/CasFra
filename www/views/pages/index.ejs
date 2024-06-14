@@ -292,7 +292,7 @@
           apiUrl +
           "/api/casinos/" +
           casinoId +
-          "?populate[payment_methods][populate][0]=Logo&populate[license][populate][0]=Logo&populate[features][populate][0]=Image&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&",
+          "?populate[payment_methods][populate][0]=Logo&populate[license][populate][0]=Logo&populate[features][populate][0]=Image&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&populate[company][populate][0]=Name&",
         type: "GET",
         success: function (data) {
           console.log("got details for casino ", casinoId, ":", data);
@@ -325,6 +325,7 @@
           '<div class="eight wide column">' +
           '<h3>Casino Features</h3>' +
           '<ul class="ui list">' +
+          '<div class="item">' + casino.attributes.company.data.attributes.Name + '</div> ' +
           casino.attributes.features.data.map(
             (feature) => `<div class="item">${feature.attributes.Name}</div>`
           ).join('') +
