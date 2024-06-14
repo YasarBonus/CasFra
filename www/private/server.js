@@ -13,26 +13,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const TelegramBot = require('node-telegram-bot-api');
-
-// Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual bot token
-const botToken = '6546958683:AAEypJoQoWEDta6xESHcRIBpMscRTY2-r1Y';
-const chatId = '-933586473';
-
-// Create a new instance of the Telegram Bot
-const bot = new TelegramBot(botToken, { polling: true });
-
-// Function to send a message to the Telegram channel
-function sendTelegram(message) {
-  bot.sendMessage(chatId, message)
-    .then(() => {
-      console.log('Message sent successfully');
-    })
-    .catch((error) => {
-      console.error('Error sending message:', error);
-    });
-};
-
 // Routen
 
 const fs = require('fs');
@@ -49,9 +29,6 @@ db.run(`CREATE TABLE IF NOT EXISTS link_hits (
   date TEXT,
   time TEXT
 )`);
-
-
-
 
 app.get('/', (req, res) => {
   const user = {
