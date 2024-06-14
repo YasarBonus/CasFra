@@ -103,6 +103,7 @@
           category: $("#categoryFilter").val(),
           payment_methods: $("#paymentmethodsFilter").val(),
           providers: $("#providerFilter").val(),
+          companies: $("#companyFilter").val(),
       };
       console.log("dropdownFilters:", dropdownFilters);
 
@@ -465,16 +466,13 @@
                 </div>
                 <script></script>
                 <div class="filteritem">
-                  <div class="filterhead"><i class="building icon"></i> Company</div>
-                  <select class="ui fluid company filter dropdown" id="companyFilter">
+                  <div class="filterhead">
+                    <i class="building icon"></i> Company
+                  </div>
+                  <select multiple class="ui fluid filter dropdown" id="companyFilter">
                     <option value="">None</option>
                   </select>
                 </div>
-                <script>
-                  $(".ui.fluid.company.dropdown").dropdown({
-                    clearable: true,
-                  });
-                </script>
               </div>
               <div class="filteritem" id="resetFiltersBtn" style="display: none">
                 <div class="center aligned medium orange ui button">Reset Filter</div>
