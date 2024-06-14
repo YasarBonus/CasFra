@@ -8,10 +8,9 @@
     fetchFiltersData();
 
     function fetchFiltersData() {
-      userLang = "en";
       console.log("fetching filters data");
       $.ajax({
-        url: apiUrl + "/api/filters?locale=" + userLang + "&populate=*&",
+        url: apiUrl + "/api/filters?locale=" + lang + "&populate=*&",
         type: "GET",
         success: function (data) {
           console.log("Got filters data:", data.data[0].attributes);
@@ -61,7 +60,7 @@
       });
 
       // enable dropdowns
-      $(".ui.dropdown").dropdown({
+      $(".ui.filter.dropdown").dropdown({
         clearable: true,
       });
 
@@ -88,10 +87,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       // listen to changes in any of the dropdown filters
-      $(".ui.dropdown").on("change", function() {
+      $(".ui.filter.dropdown").on("change", function() {
         useFilters();
       });
     });
+    
 
     function useFilters() {
 
@@ -157,7 +157,7 @@
       $.ajax({
         url:
           apiUrl +
-          "/api/casinos/?locale=" + userLang + "&filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
+          "/api/casinos/?locale=" + lang + "&filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
         type: "GET",
         success: function (data) {
           console.log("API URL:", apiUrl + "/api/casinos/?filter=" + filters);
@@ -426,8 +426,8 @@
                 class="sixteen wide eight wide tablet eight wide mobile column"
                 style="padding: none">
                 <div class="filteritem">
-                  <div class="filterhead"><i class="compass icon"></i> Category</div>
-                  <select multiple class="ui fluid dropdown" id="categoryFilter">
+                  <div class="filterhead"><i class="compass icon"></i> <%= i18n.__('Category') %></div>
+                  <select multiple class="ui fluid filter dropdown" id="categoryFilter">
                     <option value="">All</option>
                   </select>
                 </div>
@@ -435,13 +435,13 @@
                   <div class="filterhead">
                     <i class="credit card outline icon"></i> Payment Methods
                   </div>
-                  <select multiple class="ui fluid dropdown" id="paymentmethodsFilter">
+                  <select multiple class="ui fluid filter dropdown" id="paymentmethodsFilter">
                     <option value="">All</option>
                   </select>
                 </div>
                 <div class="filteritem">
                   <div class="filterhead"><i class="handshake outline icon"></i> Provider</div>
-                  <select multiple class="ui fluid dropdown" id="providerFilter">
+                  <select multiple class="ui fluid filter dropdown" id="providerFilter">
                     <option value="">All</option>
                   </select>
                 </div>
@@ -466,7 +466,7 @@
                 <script></script>
                 <div class="filteritem">
                   <div class="filterhead"><i class="building icon"></i> Company</div>
-                  <select class="ui fluid company dropdown" id="companyFilter">
+                  <select class="ui fluid company filter dropdown" id="companyFilter">
                     <option value="">None</option>
                   </select>
                 </div>
