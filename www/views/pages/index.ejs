@@ -158,7 +158,7 @@
       $.ajax({
         url:
           apiUrl +
-          "/api/casinos/?locale=" + lang + "&filter=" + filters + "fields[0]=Name&fields[1]=slug&fields[2]=affiliateUrl&fields[3]=MaxBet&fields[4]=MaxCashout&fields[5]=Wager&fields[6]=WagerType&fields[7]=Label&populate[Logo][fields][8]=url&populate[Boni][fields][9]=Percent&populate[Boni][fields][10]=upTo&populate[Boni][fields][11]=PromoCode&populate[Boni][fields][12]=PromoCodeDescription&populate[Boni][fields][13]=Freespins&",
+          "/api/casinos/?locale=" + lang + "&filter=" + filters + "&populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[features][fields][0]=Name&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[Logo][fields][0]=url&fields[0]=Name&fields[1]=MaxBet&fields[2]=Wager&fields[3]=WagerType&fields[4]=Label&fields[5]=Slug&fields[6]=MaxCashout&",
         type: "GET",
         success: function (data) {
           console.log("API URL:", apiUrl + "/api/casinos/?filter=" + filters);
@@ -292,7 +292,7 @@
           apiUrl +
           "/api/casinos/" +
           casinoId +
-          "?populate[payment_methods][populate][0]=Logo&populate[license][populate][0]=Logo&populate[features][populate][0]=Image&populate[providers][populate][0]=Logo&populate[Boni][populate][0]=Logo&populate[category][populate][0]=Logo&populate[tags][populate][0]=Logo&populate[company][populate][0]=Name&",
+          "?populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[Boni][fields][2]=PromoCode&populate[Boni][fields][3]=PromoCodeDescription&populate[Boni][fields][4]=Freespins&populate[payment_methods][fields][0]=Name&populate[payment_methods][populate][Logo][fields][0]=url&populate[features][fields][0]=Name&populate[features][populate][icon][fields][0]=Alt&populate[features][populate][icon][populate][Image][fields][0]=url&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[providers][fields][0]=Name&populate[providers][populate][Logo][fields][0]=url&populate[company][fields][0]=Name&populate[license][fields][0]=Name&populate[license][populate][Logo][fields][0]=url&fields[0]=Name",
         type: "GET",
         success: function (data) {
           console.log("got details for casino ", casinoId, ":", data);
