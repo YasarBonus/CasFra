@@ -318,7 +318,7 @@
           "<h3>Casino Bonus</h3>" +
           '<ul class="ui list">' +
           casino.attributes.Boni.map(
-            (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.Freespins ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
+            (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.PromoCode ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
           ).join('') +
           "</ul>" +
           "</div>" +
