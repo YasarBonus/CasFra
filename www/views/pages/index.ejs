@@ -326,7 +326,7 @@
           '<ul class="ui list">' +
           '<div class="item">' + casino.attributes.company.data.attributes.Name + '</div> ' +
           casino.attributes.features.data.map(
-            (feature) => `<div class="item">${feature.attributes.Name}</div>`
+            (feature) => `<div class="item"><img width="12px" src="${apiUrl}${feature.attributes.icon.data.attributes.Image.data.attributes.url}" /> ${feature.attributes.Name}</div>`
           ).join('') +
           "</ul>" +
           "</div>" +
