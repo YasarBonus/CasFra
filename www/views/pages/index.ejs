@@ -336,8 +336,8 @@
           '<div class="ui four column grid container">' +
           casino.attributes.providers.data.map(
             (provider) =>
-              `<div class="column"><img style="max-width: 100px" src="${apiUrl}${provider.attributes.Logo.data.attributes.url}" alt="${provider.attributes.Name}" /></div>`
-          ) +
+              `<div class="column"><img style="max-width: 80px" src="${apiUrl}${provider.attributes.Logo.data.attributes.url}" alt="${provider.attributes.Name}" /></div>`
+          ).join('') +
           "</div>" +
           "</div>" +
           '<div class="eight wide column">' +
@@ -345,13 +345,13 @@
           '<div class="ui four column grid container">' +
           casino.attributes.payment_methods.data.map(
             (payment_method) =>
-              `<div class="column"><img style="max-width: 100px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
-          ) +
+              `<div class="column"><img style="max-width: 80px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
+          ).join('') +
           (casino.attributes.license.data.attributes.Logo.data.attributes.url
               ? '<div class="eight wide column">' +
                 "<h3>License</h3>" +
                 '<div class="ui column grid container">' +
-                '<div class="column"><img style="max-width: 100px" src="' +
+                '<div class="column"><img style="max-width: 80px" src="' +
                 apiUrl +
                 casino.attributes.license.data.attributes.Logo.data.attributes.url +
                 '" alt="" /></div>' +
