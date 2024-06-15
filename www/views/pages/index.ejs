@@ -147,15 +147,38 @@
       console.log("filters:", filters);
 
       // build the filter string to be passed to the API.
-      // e.g. "[payment_methods][$in][0]=1&[payment_methods][$in][1]=2&[category][$in][0]=1"
+      // e.g. "?filters[payment_methods][$eq][0]=1&filters[payment_methods][$eq][1]=2&[category][$eq][0]=1"
+      // if the filter is a feature, it should be "?filters[features][$in][0]=1&filters[$and][features][$in][1]=2" (note that ONLY starting from the second feature, the filter should be [$and][0][features][$in][1]=2)
       let filterString = "";
       Object.keys(filters).forEach((key) => {
         if (filters[key]) {
-          filters[key].forEach((value, index) => {
-            filterString += `&filters[${key}][$eq][${index}]=${value}&`;
-          });
+          if (key === "features") {
+            filters[key].forEach((value, index) => {
+              if (index === 0) {
+                filterString += `&filters[${key}][$in][${index}]=${value}`;
+              } else {
+                filterString += `&filters[$and][0][${key}][$in][${index}]=${value}`;
+              }
+            });
+          } else {
+            filters[key].forEach((value, index) => {
+              filterString += `&filters[${key}][$eq][${index}]=${value}`;
+            });
+          }
         }
       });
+
+
+      
+      
+      // old code
+      // Object.keys(filters).forEach((key) => {
+      //   if (filters[key]) {
+      //     filters[key].forEach((value, index) => {
+      //       filterString += `&filters[${key}][$eq][${index}]=${value}&`;
+      //     });
+      //   }
+      // });
 
       console.log("filterString:", filterString);
       fetchCasinosData(filterString);
