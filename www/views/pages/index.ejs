@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <%- include('../partials/head') %> <%- include('../partials/header') %>
-
   <script>
     const apiPopulate = "";
 
@@ -410,7 +409,7 @@
                 style="padding: none">
                 <div class="filteritem">
                   <div class="filterhead"><i class="compass icon"></i> <%= i18n.__('Category') %></div>
-                  <select multiple class="ui fluid filter dropdown" id="categoryFilter">
+                  <select multiple class="ui fluid search filter dropdown" id="categoryFilter">
                     <option value="">All</option>
                   </select>
                 </div>
@@ -418,13 +417,13 @@
                   <div class="filterhead">
                     <i class="credit card outline icon"></i> Payment Methods
                   </div>
-                  <select multiple class="ui fluid filter dropdown" id="paymentmethodsFilter">
+                  <select multiple class="ui fluid search filter dropdown" id="paymentmethodsFilter">
                     <option value="">All</option>
                   </select>
                 </div>
                 <div class="filteritem">
                   <div class="filterhead"><i class="handshake outline icon"></i> Provider</div>
-                  <select multiple class="ui fluid filter dropdown" id="providerFilter">
+                  <select multiple class="ui fluid search filter dropdown" id="providerFilter">
                     <option value="">All</option>
                   </select>
                 </div>
@@ -451,7 +450,7 @@
                   <div class="filterhead">
                     <i class="building icon"></i> Company
                   </div>
-                  <select multiple class="ui fluid filter dropdown" id="companyFilter">
+                  <select multiple class="ui fluid search filter dropdown" id="companyFilter">
                     <option value="">None</option>
                   </select>
                 </div>
