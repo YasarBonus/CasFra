@@ -158,7 +158,7 @@
       $.ajax({
         url:
           apiUrl +
-          "/api/casinos/?locale=" + lang + "&filter=" + filters + "&populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[features][fields][0]=Name&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[Logo][fields][0]=url&fields[0]=Name&fields[1]=MaxBet&fields[2]=Wager&fields[3]=WagerType&fields[4]=Label&fields[5]=Slug&fields[6]=MaxCashout&",
+          "/api/casinos/?locale=" + lang + "&filter=" + filters + "&populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[features][fields][0]=Name&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][fields][1]=Description&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][fontColor][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[Logo][fields][0]=url&fields[0]=Name&fields[1]=MaxBet&fields[2]=Wager&fields[3]=WagerType&fields[4]=Label&fields[5]=Slug&fields[6]=MaxCashout&",
         type: "GET",
         success: function (data) {
           console.log("API Filter URL:", apiUrl + "/api/casinos/?filter=" + filters);
@@ -184,6 +184,7 @@
       $("#responseContainer").empty();
 
       data.forEach(function (casino) {
+        console.log("casino features:", casino.attributes.features.data[0].attributes.Label.icon.data);
         $("#responseContainer").append(
           '<div class="top attached ui segment" id="casino' +
             casino.id +
@@ -196,6 +197,16 @@
             "</div>" +
             '<div class="ui three wide left aligned column"></div>' +
             '<div class="ui nine wide right aligned column" style="padding-right: 10px">' +
+              // for each entry in casino.attributes.features.data that has attributes.Label not null, create a label
+              casino.attributes.features.data
+                .filter((feature) => feature.attributes.Label)
+                .map(
+                  // if else here
+                  (feature) =>
+                    `<a ${feature.attributes.Label.Description ? 'data-tooltip="' + feature.attributes.Label.Description + '"' : ''} + class="ui right floated small circular label" style="${feature.attributes.Label.fontColor ? 'color:' + feature.attributes.Label.fontColor.data.attributes.Hex + ';' : ''}${feature.attributes.Label.color.data.attributes.Hex ? 'background:' + feature.attributes.Label.color.data.attributes.Hex + ';' : ''}">${feature.attributes.Label.Label}</a>`
+                )
+                .join("") +
+
             '<!-- a data-tooltip="Sportbets available" onclick="setCheckboxAndFetchData(sportbetsFilter, true)" class="ui right floated small blue circular label"><i class="plus icon"></i> Sportbets</>' +
             '<a data-tooltip="Non-Sticky Bonus" onclick="setCheckboxAndFetchData(nonstickyFilter, true)" class="ui right floated small purple circular label">Non-Sticky</a>' +
             '<a data-tooltip="Bonushunt is allowed" onclick="setCheckboxAndFetchData(bonushuntFilter, true)" class="ui right floated small green circular label"><i class="check icon"></i> Bonushunt</a>' +

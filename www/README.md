@@ -14,9 +14,12 @@ Use this: https://docs.strapi.io/dev-docs/api/rest/interactive-query-builder
       fields: ['Name'],
       populate: {
         Label: {
-          fields: ['Label'],
+          fields: ['Label','Description'],
           populate: {
             color: {
+              fields: ['Hex']
+          },
+          fontColor: {
               fields: ['Hex']
           },
           icon: {
