@@ -217,7 +217,7 @@
         $("#responseContainer").append(
           '<div class="top attached ui segment" id="casino' +
             casino.id +
-            '" style="background-color: beige">' +
+            '" style="border:0px">' +
             '<div class="ui styled six column grid" style="">' +
             '<div class="ui four wide column">' +
             (casino.attributes.Label
@@ -309,7 +309,7 @@
 </div>
 </div>
 
-<div class="bottom attached ui button" id="toggleBtn${casino.id}" onclick="toggleDetails(${casino.id})">Details</div>
+<div class="bottom attached ui button detailsbutton" id="toggleBtn${casino.id}" onclick="toggleDetails(${casino.id})">Details</div>
 `
         );
       });
@@ -352,7 +352,7 @@
       $("#div" + casino.id + "details").empty();
 
       $("#div" + casino.id + "details").append(
-        '<div class="attached ui segment" style="border: 0px; background-color: beige">' +
+        '<div class="attached ui segment" style="border: 0px;">' +
           '<div class="ui styled four column grid">' +
           '<div class="eight wide column">' +
           "<h3>Casino Bonus</h3>" +
@@ -438,7 +438,7 @@
 
   </script>
 
-  <body class="bg-yasarred">
+  <body class="body">
     <div class="ui container" style="margin-top: 100px !important; padding-bottom: 100px">
       <div class="ui two column stackable grid">
         <div
@@ -520,136 +520,7 @@
 
           <!-- casinos list -->
           <div id="responseContainer">
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <div class="ui segment">
-              <div class="ui fluid placeholder" style="background-color: beige">
-                <div class="image header">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-                <div class="paragraph">
-                  <div class="line"></div>
-                  <div class="line"></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>

@@ -72,6 +72,10 @@
           document.getElementById('website-favicon').href = apiUrl + data.data.attributes.Favicon.data.attributes.url;
           document.getElementById('website-logo').src = apiUrl + data.data.attributes.Logo.data.attributes.url;
           document.getElementById('website-name').innerText = data.data.attributes.Name;
+          // load custom CSS
+          if (data.data.attributes.CustomCSS) {
+          document.head.innerHTML += '<style>' + data.data.attributes.CustomCSS + '</style>';
+          }
 
           for (let i = 0; i < data.data.attributes.Menu.length; i++) {
             document.getElementById('header-menu-links').innerHTML += '<a href="' + data.data.attributes.Menu[i].Target + '" class="item">' + data.data.attributes.Menu[i].Name + '</a>';

@@ -2,6 +2,20 @@
   background-color: beige;
 }
 
+.ui .button {
+  background-color: beige;
+  color: white;
+}
+
+.ui .button:hover {
+  background-color: beige;
+  color: white;
+}
+
+.body {
+  background-color: #BD504E;
+}
+
 
 #scroll {
   position:fixed;
@@ -32,19 +46,6 @@
   background-color:#e74c3c;
   opacity:1;filter:"alpha(opacity=100)";
   -ms-filter:"alpha(opacity=100)";
-}
-
-
-.bg-yasarred {
-  background-color: #BD504E!important;
-}
-
-.bc-yasarred {
-  border-color: #BD504E!important;
-}
-
-.bg-yasarpink {
-  background-color: #B151BD!important;
 }
 
 .bonustext {
@@ -90,154 +91,3 @@
     transform: rotate(359deg);
   }
 }
-
-/*.ui.grid>.column:not(.row), .ui.grid>.row>.column {
-  position: relative;
-  display: inline-block;
-  width: 6.25%;
-  padding-left: 0rem;
-  padding-right: 0rem;
-  vertical-align: top;
-}*/
-
-
-/* @import url(https://db.onlinewebfonts.com/c/91f73e4ff49f2826f489894acdb18c6a?family=Cresci+LP+W01+Regular);
-
-    @font-face {
-      font-family: 'Candara Regular';
-      src: url('fonts/candara_regular.ttf') format('truetype');
-    }
-    .body {
-      /* font-family: "Candara Regular", monospace;}*/
-    
-    /* .navbar-brand img {
-      max-width: 80px;
-      padding-right: 20px;
-    }
-    .navbar-brand {
-      font-size: 26px;
-    }
-    .paymentMethod img {
-      max-width: 50px;
-    }
-    
-    .regnum-font-2 {
-      font-family: "Cresci LP W01 Regular";
-      font-weight: 600;
-    }
-
-    .display-logo-mobile {
-      display: none;
-    }
-
-    .display-link-mobile {
-      display: none;
-    }
-
-    .display-logo {
-      padding-left: 0%;
-    }
-
-    .success {
-      background-color: #04AA6D;
-    }
-
-    /* Gray */
-   /* .casino-link-button {
-      box-shadow: 0px 0px 0px 0px #3dc21b;
-      background-color: #5CBF2A;
-      border-radius: 30px;
-      display: inline-block;
-      cursor: pointer;
-      color: #ffffff;
-      font-size: 20px;
-      font-weight: bold;
-      padding: 12px 25px !important;
-      text-decoration: none !important;
-    }
-
-    .casino-link-button:hover {
-      background-color: #5cbf2a !important;
-    }
-
-    .casino-link-button:active {
-      position: relative;
-      top: 1px;
-    }
-
-    .display-extended-wrapper {
-      width: 100%;
-      margin: auto;
-      display: grid;
-      grid-template-rows: repeat(2, 1fr);
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      text-align: top;
-    }
-
-    .display-extended-box {
-      border: 2px solid;
-      border-color: #BD504E;
-      padding: 20px;
-    }
-
-    .display-extended-head {
-      font-weight: bold;
-      font-size: 26px;
-    }
-    .display-wrapper2-mobile {
-        display: none;
-      }
-    @media only screen and (max-device-width: 600px) {
-      .display-head-row {
-        grid-template-columns: repeat(2, 2fr);
-        width: 80%;
-        padding-left: 0px;
-        padding-right: 0px;
-      }
-
-      .display-logo-mobile {
-        display: grid;
-      }
-
-      .display-logo {
-        display: none;
-      }
-
-      .display-link-mobile {
-        display: none;
-      }
-
-      .display-link {
-        display: none
-      }
-
-      .display-wrapper {
-        width: 100%;
-        margin: auto;
-        display: grid;
-        grid-template-columns: 3fr;
-        gap: 8px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-
-      .display-wrapper2-mobile {
-        width: 90%;
-        margin: auto;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-
-      .foo-table img {
-        width: 220px;
-        padding-top: 5px;
-      }
-      .show-more-button {
-        display: none!important;
-      }
-      .display-link {display: none;}
-    }
