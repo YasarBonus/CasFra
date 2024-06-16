@@ -334,7 +334,7 @@
           apiUrl +
           "/api/casinos/" +
           casinoId +
-          "?populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[Boni][fields][2]=PromoCode&populate[Boni][fields][3]=PromoCodeDescription&populate[Boni][fields][4]=Freespins&populate[payment_methods][fields][0]=Name&populate[payment_methods][populate][Logo][fields][0]=url&populate[features][fields][0]=Name&populate[features][populate][icon][fields][0]=Alt&populate[features][populate][icon][populate][Image][fields][0]=url&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[providers][fields][0]=Name&populate[providers][populate][Logo][fields][0]=url&populate[company][fields][0]=Name&populate[license][fields][0]=Name&populate[license][populate][Logo][fields][0]=url&fields[0]=Name",
+          "?populate[Boni][fields][0]=Percent&populate[Boni][fields][1]=upTo&populate[Boni][fields][2]=PromoCode&populate[Boni][fields][3]=PromoCodeDescription&populate[Boni][fields][4]=Freespins&populate[EgonsReview][fields][0]=Title&populate[EgonsReview][fields][1]=Description&populate[payment_methods][fields][0]=Name&populate[payment_methods][populate][Logo][fields][0]=url&populate[features][fields][0]=Name&populate[features][populate][icon][fields][0]=Alt&populate[features][populate][icon][populate][Image][fields][0]=url&populate[features][populate][Label][fields][0]=Label&populate[features][populate][Label][populate][color][fields][0]=Hex&populate[features][populate][Label][populate][icon][fields][0]=Alt&populate[features][populate][Label][populate][icon][populate][Image][fields][0]=url&populate[providers][fields][0]=Name&populate[providers][populate][Logo][fields][0]=url&populate[company][fields][0]=Name&populate[license][fields][0]=Name&populate[license][populate][Logo][fields][0]=url&fields[0]=Name",
         type: "GET",
         success: function (data) {
           console.log("got details for casino ", casinoId, ":", data);
@@ -389,7 +389,7 @@
             (payment_method) =>
               `<div class="column"><img style="max-width: 80px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
           ).join('') +
-          (casino.attributes.license.data.attributes.Logo.data.attributes.url
+          (casino.attributes.license !== null
               ? '<div class="eight wide column">' +
                 "<h3>License</h3>" +
                 '<div class="ui column grid container">' +
@@ -400,6 +400,13 @@
                 '</div>' +
                 '</div>'
               : '') +
+              (casino.attributes.EgonsReview !== null
+              ? '<div class="eight wide column">' +
+              `<h3>Egon's Review</h3>` +
+                `<p>${casino.attributes.EgonsReview.Title}<br>${casino.attributes.EgonsReview.Description[0].children[0].text}</p>` +
+                "</div>"
+              : '') 
+          +
           "</div>" +
           "</div>" +
           "</div>" +
