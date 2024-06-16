@@ -319,6 +319,7 @@
     // if details button is clicked, toggle the details div of the casino
     // dynamically load the details of the caisno from API and populate DIVs in the details div
     function toggleDetails(casinoId) {
+      $('#fetchingIndicator').show();
       console.log("toggling details for casino:", casinoId);
       $("#div" + casinoId + "details").toggle();
       populateCasinoDetails(casinoId);
@@ -410,6 +411,7 @@
           "</div>" +
           "</div>"
       );
+      $('#fetchingIndicator').hide();
     }
 
     // if reset filters button is clicked, reset all filters
