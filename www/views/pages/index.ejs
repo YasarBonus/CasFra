@@ -414,6 +414,7 @@
 
     // if reset filters button is clicked, reset all filters
     function resetFilters() {
+      $('#fetchingIndicator').show();
       console.log("resetting filters...");
       $("#categoryFilter").dropdown("clear");
       $("#paymentmethodsFilter").dropdown("clear");
