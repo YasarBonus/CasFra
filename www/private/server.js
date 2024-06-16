@@ -64,6 +64,62 @@ app.get('/faq', (req, res) => {
 
 const ejs = require('ejs');
 
+// function to
+// fetch available shortlinks from the API at https://api.yasarbonus.com/api/shortlinks?populate=*&pagination[pageSize]=1000&filters[Slug][$eq][0]= and save them in a variable
+
+
+// shortlinks path at /go/:slug
+app.get('/go/:slug', (req, res) => {
+  const slug = req.params.slug;
+
+  // fetch the shortlink from the API
+  fetch(`https://api.yasarbonus.com/api/shortlinks?populate=*&filters[Slug][$eq][0]=${slug}`)
+    .then(response => response.json())
+    .then(data => {
+      // check if the shortlink exists
+      if (data.data.length > 0) {
+        // redirect to the shortlink URL
+        res.redirect(302, data.data[0].attributes.Target);
+        // and save the hit in the database
+        db.run('INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)', [slug, new Date().toLocaleDateString(), new Date().toLocaleTimeString()]);
+      } else {
+        // check if there is a casino with the slug
+        fetch(`https://api.yasarbonus.com/api/casinos?fields[0]=Slug&pagination[pageSize]=500&fields[1]=affiliateUrl`)
+          .then(response => response.json())
+          .then(data => {
+            console.log("Api Response:" + data.data);
+            // check if the casino exists with the slug by filtering the data
+            const casino = data.data.find(casino => casino.attributes.Slug === slug);
+            
+            console.log("Got casino: " + casino);
+            if (casino) {
+              // if the casino exists, redirect to the casino affiliateUrl
+              res.redirect(302, casino.attributes.affiliateUrl);
+              // and save the hit in the database
+              db.run('INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)', [slug, new Date().toLocaleDateString(), new Date().toLocaleTimeString()]);              
+            } else {
+              // if the shortlink and casino do not exist, return a 404 error
+              res.status(404).send('404 - Page not found');
+            }
+            
+          })
+          .catch(error => {
+            console.error(error);
+            // return a 500 error if there was an error fetching the casino
+            res.status(500).send('500 - Internal Server Error');
+          });
+
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      // return a 500 error if there was an error fetching the shortlink
+      res.status(500).send('500 - Internal Server Error');
+    });
+});
+
+
+
 // 301 Redirect
 app.get('/casinos', (req, res) => {
   res.redirect(301, '/');
