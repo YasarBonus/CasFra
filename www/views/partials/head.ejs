@@ -72,8 +72,14 @@
           document.getElementById('website-favicon').href = apiUrl + data.data.attributes.Favicon.data.attributes.url;
           document.getElementById('website-logo').src = apiUrl + data.data.attributes.Logo.data.attributes.url;
           document.getElementById('website-name').innerText = data.data.attributes.Name;
+
           for (let i = 0; i < data.data.attributes.Menu.length; i++) {
             document.getElementById('header-menu-links').innerHTML += '<a href="' + data.data.attributes.Menu[i].Target + '" class="item">' + data.data.attributes.Menu[i].Name + '</a>';
+          }
+
+          for (let i = 0; i < data.data.attributes.SocialLinks.length; i++) {
+            // add social links to the beginning of the social menu
+            document.getElementById('header-menu-right').innerHTML = '<a href="' + data.data.attributes.SocialLinks[i].Target + '" target="_blank" class="item"><i class="fa-brands fa-' + data.data.attributes.SocialLinks[i].FaBrandsIcon + '"></i></a>' + document.getElementById('header-menu-right').innerHTML;
           }
         })
         .catch(error => {
