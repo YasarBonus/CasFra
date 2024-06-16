@@ -71,6 +71,7 @@
           document.getElementById('website-keywords').content = data.data.attributes.Keywords;
           document.getElementById('website-favicon').href = apiUrl + data.data.attributes.Favicon.data.attributes.url;
           document.getElementById('website-logo').src = apiUrl + data.data.attributes.Logo.data.attributes.url;
+          document.getElementById('website-name').innerText = data.data.attributes.Name;
         })
         .catch(error => {
           console.error('Error fetching metadata:', error);

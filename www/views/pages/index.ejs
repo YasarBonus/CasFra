@@ -167,9 +167,6 @@
           }
         }
       });
-
-
-      
       
       // old code
       // Object.keys(filters).forEach((key) => {
@@ -389,7 +386,7 @@
             (payment_method) =>
               `<div class="column"><img style="max-width: 80px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
           ).join('') +
-          (casino.attributes.license !== null
+          (casino.attributes.license
               ? '<div class="eight wide column">' +
                 "<h3>License</h3>" +
                 '<div class="ui column grid container">' +
@@ -404,6 +401,7 @@
               ? '<div class="eight wide column">' +
               `<h3>Egon's Review</h3>` +
                 `<p>${casino.attributes.EgonsReview.Title}<br>${casino.attributes.EgonsReview.Description[0].children[0].text}</p>` +
+                "</div>" +
                 "</div>"
               : '') 
           +
