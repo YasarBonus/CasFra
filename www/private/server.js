@@ -4,7 +4,7 @@ const port = 3000;
 
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static('public'));
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
 // Enable CORS
 app.use((req, res, next) => {
@@ -14,8 +14,6 @@ app.use((req, res, next) => {
 });
 
 // Routen
-
-const fs = require('fs');
 
 const sqlite3 = require('sqlite3').verbose();
 
@@ -41,6 +39,13 @@ app.use(i18n.init);
 
 console.log(i18n.__('Hello'));
 
+
+const MatomoTracker = require('matomo-tracker');
+const matomo = new MatomoTracker(13, 'https://analytics.yasarbonus.com/matomo.php');
+matomo.on('error', function(err) {
+  console.log('error tracking request: ', err);
+});
+
 app.get('/', (req, res) => {
   const user = {
     firstName: 'Tim',
@@ -62,12 +67,6 @@ app.get('/faq', (req, res) => {
   })
 });
 
-const ejs = require('ejs');
-
-// function to
-// fetch available shortlinks from the API at https://api.yasarbonus.com/api/shortlinks?populate=*&pagination[pageSize]=1000&filters[Slug][$eq][0]= and save them in a variable
-
-
 // shortlinks path at /go/:slug
 app.get('/go/:slug', (req, res) => {
   const slug = req.params.slug;
@@ -80,11 +79,20 @@ app.get('/go/:slug', (req, res) => {
       if (data.data.length > 0) {
         // redirect to the shortlink URL
         res.redirect(302, data.data[0].attributes.Target);
-        // and save the hit in the database
-        db.run('INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)', [slug, new Date().toLocaleDateString(), new Date().toLocaleTimeString()]);
+        // log the hit in matomo
+        matomo.track({
+          url: `https://yasarbonus.com/go/${slug}`,
+          action_name: `shortlink hit`,
+          cvar: JSON.stringify({1: ['slug', slug], 2: ['shortlinkId', data.data[0].id], 3: ['target', data.data[0].attributes.Target]}),
+          rand: Math.random(),
+          ip: req.ip,
+          ua: req.get('User-Agent'),
+          lang: req.get('Accept-Language'),
+          res: `${req.query.w}x${req.query.h}`,
+        });
       } else {
         // check if there is a casino with the slug
-        fetch(`https://api.yasarbonus.com/api/casinos?fields[0]=Slug&pagination[pageSize]=500&fields[1]=affiliateUrl`)
+        fetch(`https://api.yasarbonus.com/api/casinos?fields[0]=Slug&pagination[pageSize]=500&fields[1]=affiliateUrl&fields[2]=Name`)
           .then(response => response.json())
           .then(data => {
             console.log("Api Response:" + data.data);
@@ -95,8 +103,18 @@ app.get('/go/:slug', (req, res) => {
             if (casino) {
               // if the casino exists, redirect to the casino affiliateUrl
               res.redirect(302, casino.attributes.affiliateUrl);
-              // and save the hit in the database
-              db.run('INSERT INTO link_hits (name, date, time) VALUES (?, ?, ?)', [slug, new Date().toLocaleDateString(), new Date().toLocaleTimeString()]);              
+              // log the hit in matomo
+              matomo.track({
+                url: `https://yasarbonus.com/go/${slug}`,
+                action_name: `casino affiliate / link hit`,
+                cvar: JSON.stringify({1: ['slug', slug], 2: ['casinoId', casino.id], 3: ['casino', casino.attributes.Name], 4: ['affiliateUrl', casino.attributes.affiliateUrl]}),
+                rand: Math.random(),
+                ip: req.ip,
+                ua: req.get('User-Agent'),
+                lang: req.get('Accept-Language'),
+                res: `${req.query.w}x${req.query.h}`,
+              });
+
             } else {
               // if the shortlink and casino do not exist, return a 404 error
               res.status(404).send('404 - Page not found');
