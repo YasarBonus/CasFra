@@ -136,7 +136,36 @@ app.get('/go/:slug', (req, res) => {
     });
 });
 
+// auto generated pages for casinos
+app.get('/casino/:slug', (req, res) => {
+  const slug = req.params.slug;
 
+  // fetch the casino from the API
+  fetch(`https://api.yasarbonus.com/api/casinos?fields[0]=Slug&pagination[pageSize]=500&fields[1]=Name&fields[2]=id`)
+    .then(response => response.json())
+    .then(data => {
+      console.log("Api Response:" + data.data);
+      // check if the casino exists with the slug by filtering the data
+      const casino = data.data.find(casino => casino.attributes.Slug === slug);
+
+      console.log("Got casino: " + casino.id);
+      // check if the casino exists
+      if (casino) {
+        // render the casino page with the casino data
+        res.render('pages/casino', {
+          casino: casino,
+        });
+      } else {
+        // if the casino does not exist, return a 404 error
+        res.status(404).send('404 - Page not found');
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      // return a 500 error if there was an error fetching the casino
+      res.status(500).send('500 - Internal Server Error');
+    });
+});
 
 // 301 Redirect
 app.get('/casinos', (req, res) => {
