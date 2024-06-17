@@ -27,11 +27,13 @@
       var userLang = localStorage.getItem('userLang') || navigator.language || navigator.userLanguage;
       console.log('User language:', userLang);
 
+      // values here have been changed as long as we do not have german content.
+      // german users will see the english version of the website
       if (!localStorage.getItem('lang')) {
         if (userLang.includes('de')) {
-          localStorage.setItem('lang', 'de');
-          var lang = 'de';
-          var flag = 'de';
+          localStorage.setItem('lang', 'en'); // de
+          var lang = 'en'; // de
+          var flag = 'gb'; // de
         } else {
           localStorage.setItem('lang', 'en');
           var lang = 'en';
@@ -40,7 +42,7 @@
       } else {
         var lang = localStorage.getItem('lang');
         if (lang == 'de') {
-          var flag = 'de';
+          var flag = 'gb';
         } else {
           var flag = 'gb';
         }
