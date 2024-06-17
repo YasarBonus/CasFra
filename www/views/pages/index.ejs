@@ -221,17 +221,15 @@
       data.forEach(function (casino) {
         console.log("casino features:", casino.attributes.features.data[0].attributes.Label.icon.data);
         $("#responseContainer").append(
-          '<div class="top attached ui segment" id="casino' +
-            casino.id +
-            '" style="border:0px">' +
-            '<div class="ui styled six column grid" style="">' +
-            '<div class="ui four wide column">' +
-            (casino.attributes.Label
-              ? '<div class="ui teal large ribbon label">' + casino.attributes.Label + "</div>"
-              : "") +
-            "</div>" +
-            '<div class="ui three wide left aligned column"></div>' +
-            '<div class="ui nine wide right aligned column" style="padding-right: 10px">' +
+          `<div class="top attached ui segment" id="casino${casino.id}" style="border:0px">
+            <div class="ui styled six column grid" style="">
+            <div class="ui four wide column">
+            ${casino.attributes.Label
+              ? '<div class="ui teal large ribbon label">' + casino.attributes.Label + '</div>'
+              : ""}
+            </div>
+            <div class="ui three wide left aligned column"></div>
+            <div class="ui nine wide right aligned column" style="padding-right: 10px">` +
               // for each entry in casino.attributes.features.data that has attributes.Label not null, create a label
               casino.attributes.features.data
                 .filter((feature) => feature.attributes.Label)
@@ -241,70 +239,48 @@
                     `<a ${feature.attributes.Label.Description ? 'data-tooltip="' + feature.attributes.Label.Description + '"' : ''} + class="ui right floated small circular label" style="${feature.attributes.Label.fontColor ? 'color:' + feature.attributes.Label.fontColor.data.attributes.Hex + ';' : ''}${feature.attributes.Label.color.data.attributes.Hex ? 'background:' + feature.attributes.Label.color.data.attributes.Hex + ';' : ''}">${feature.attributes.Label.Label}</a>`
                 )
                 .join("") +
-            "</div>" +
-            "</div>" +
-            '<div class="ui styled three column grid" style="">' +
-            '<div class="ui three wide column" style="padding-left: 15px">' +
-            '<img style="width: 160px" src="' +
-            apiUrl +
-            casino.attributes.Logo.data.attributes.url +
-            '" alt="' +
-            casino.attributes.Name +
-            '" />' +
-            "</div>" +
-            '<div class="ui ten wide center aligned column">' +
-            '<div class="ui center aligned four column grid">' +
-            '<div class="row">' +
-            '<div class="four wide computer eight wide mobile column">' +
-            '<div class="bonustext">' +
-            casino.attributes.Boni[0].Percent +
-            " %</div>" +
-            '<div style="font-size: 1.2em; padding-top: 15px">up to ' +
-            casino.attributes.Boni[0].upTo +
-            " €</div>" +
-            '<div class="bonushead">Bonus</div>' +
-            "</div>" +
-            '<div class="three wide computer eight wide mobile column">' +
-            '<div class="bonustext">' +
-            casino.attributes.MaxBet +
-            " €</div>" +
-            '<div class="bonushead">Max Bet</div>' +
-            "</div>" +
-            '<div class="three wide computer eight wide mobile column">' +
-            '<div class="bonustext">' +
-            (casino.attributes.MaxCashout ? casino.attributes.MaxCashout + " €" : "No") +
-            "</div>" +
-            '<div class="bonushead">Max Cashout</div>' +
-            "</div>" +
-            '<div class="five wide computer eight wide mobile column">' +
-            '<div class="bonustext">' +
-            casino.attributes.Wager +
-            "x" +
-            " (" +
-            casino.attributes.WagerType +
-            ")</div>" +
-            '<div class="bonushead">Wager</div>' +
-            "</div>" +
-            "</div>" +
-            "</div>" +
-            "</div>" +
-            '<div class="ui three wide right aligned column">' +
-            '<div class="ui right floated" style="padding-right:15px">' +
-            '<a href="/go/' +
-            casino.attributes.Slug +
-            '" target="_blank" class="ui large green button">' +
-            "PLAY NOW" +
-            '<!-- i class="right chevron icon"></i -->' +
-            "</a>" +
-            '<div class="attached">' +
-            '<div style="text-align: center;">T&C apply</div>' +
-            "</div>" +
-            "</div>" +
-            `
+            `</div>
+            </div>
+            <div class="ui styled three column grid" style="">
+            <div class="ui three wide column" style="padding-left: 15px">
+            <img style="width: 160px" src="${apiUrl}${casino.attributes.Logo.data.attributes.url}" alt="${casino.attributes.Name}" />
+            </div>
+            <div class="ui ten wide center aligned column">
+            <div class="ui center aligned four column grid">
+            <div class="row">
+            <div class="four wide computer eight wide mobile column">
+            <div class="bonustext">${casino.attributes.Boni[0].Percent} %</div>
+            <div style="font-size: 1.2em; padding-top: 15px">up to ${casino.attributes.Boni[0].upTo} €</div>
+            <div class="bonushead">Bonus</div>
+            </div>
+            <div class="three wide computer eight wide mobile column">
+            <div class="bonustext">${casino.attributes.MaxBet} €</div>
+            <div class="bonushead">Max Bet</div>
+            </div>
+            <div class="three wide computer eight wide mobile column">
+            <div class="bonustext">
+            ${casino.attributes.MaxCashout ? casino.attributes.MaxCashout + " €" : "No"}
+            </div>
+            <div class="bonushead">Max Cashout</div>
+            </div>
+            <div class="five wide computer eight wide mobile column">
+            <div class="bonustext">${casino.attributes.Wager} x (${casino.attributes.WagerType})</div>
+            <div class="bonushead">Wager</div>
+            </div>
+            </div>
+            </div>
+            </div>
+            <div class="ui three wide right aligned column">
+            <div class="ui right floated" style="padding-right:15px">
+            <a href="/go/${casino.attributes.Slug}" target="_blank" class="ui large green button">PLAY NOW</a>
+            <div class="attached">
+            <div style="text-align: center;">T&C apply</div>
+            </div>
+            </div>
                     </div>
-                    ` +
-            "</div>" +
-            `
+                    
+            </div>
+            
 <div id="div${casino.id}details" style="display:none;">
  
 </div>
