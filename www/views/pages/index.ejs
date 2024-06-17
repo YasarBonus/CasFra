@@ -364,6 +364,28 @@
             (bonus) => `<div class="item">${bonus.Percent}% up to ${bonus.upTo} € ${bonus.Freespins ? ` <i>+ ${bonus.Freespins} Freespins` : ''} ${bonus.PromoCode ? ` Code: ${bonus.PromoCode}` : ''}</i></div>`
           ).join('') +
           "</ul>" +
+          (casino.attributes.EgonsReview !== null
+              ? 
+              `<h3>Egon's Review</h3>` +
+                `
+                  <div class="ui comments">
+  <div class="comment">
+    <a class="avatar">
+      <img src="img/logo-egon-animated.gif" />
+    </a>
+    <div class="content">
+      <a class="author">${casino.attributes.EgonsReview.Title}</a>
+      <div class="metadata">
+        <div class="date">2 days ago</div>
+      </div>
+      <div class="text">
+        ${casino.attributes.EgonsReview.Description[0].children[0].text}
+      </div>
+    </div>
+  </div>
+</div>
+                `
+              : '') +
           "</div>" +
           '<div class="eight wide column">' +
           '<h3>Casino Features</h3>' +
@@ -401,14 +423,6 @@
                 '</div>' +
                 '</div>'
               : '') +
-              (casino.attributes.EgonsReview !== null
-              ? '<div class="eight wide column">' +
-              `<h3>Egon's Review</h3>` +
-                `<p>${casino.attributes.EgonsReview.Title}<br>${casino.attributes.EgonsReview.Description[0].children[0].text}</p>` +
-                "</div>" +
-                "</div>"
-              : '') 
-          +
           "</div>" +
           "</div>" +
           "</div>" +
