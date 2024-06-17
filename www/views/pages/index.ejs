@@ -415,7 +415,7 @@
             (payment_method) =>
               `<div class="column"><img style="max-width: 80px" src="${apiUrl}${payment_method.attributes.Logo.data.attributes.url}" alt="${payment_method.attributes.Name}" /></div>`
           ).join('') +
-          (casino.attributes.license
+          (casino.attributes.license.data
               ? '<div class="eight wide column">' +
                 "<h3>License</h3>" +
                 '<div class="ui column grid container">' +
