@@ -13,6 +13,49 @@
 
 </body>
 
+<script>
+    // fetch the casino data from the API URL and populate it in the container div in a table format
+    // after dom content is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchCasino();
+    });
+    function fetchCasino() {
+    fetch(`${apiUrl}/api/casinos/<%= casino.id %>?locale=${lang}&populate=*`)
+      .then(response => response.json())
+      .then(data => {
+        const casinoContainer = document.getElementById('casino-container');
+        const casinoHTML = generateCasinoHTML(data);
+        casinoContainer.innerHTML = casinoHTML;
+      })
+      .catch(error => {
+        console.error('Error fetching casino:', error);
+      });
+    }
+
+    function generateCasinoHTML(casinoData) {
+      let html = '';
+      // auto-generated table from the casino data with all the attributes and their values and object keys
+        html += `<table class="ui celled table">
+            <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>`;
+        for (const [key, value] of Object.entries(casinoData.data.attributes)) {
+            html += `<tr>
+                <td>${key}</td>
+                <td>${value}</td>
+            </tr>`;
+        }
+        html += `</tbody>
+        </table>`;
+        return html;
+        
+    }
+</script>
+
 <%- include('../partials/footer') %>
 
 </html>
