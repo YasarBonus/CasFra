@@ -15,30 +15,12 @@ app.use((req, res, next) => {
 
 // Routen
 
-const sqlite3 = require('sqlite3').verbose();
-
-// Create a new SQLite database connection
-const db = new sqlite3.Database('private/data/link_hits.db');
-
-// Create a table to store link hits
-db.run(`CREATE TABLE IF NOT EXISTS link_hits (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  date TEXT,
-  time TEXT
-)`);
-
 const i18n = require('i18n');
 
 i18n.configure({
   locales:['en', 'de'],
   directory: __dirname + '/locales'
 });
-
-app.use(i18n.init);
-
-console.log(i18n.__('Hello'));
-
 
 const MatomoTracker = require('matomo-tracker');
 const matomo = new MatomoTracker(13, 'https://analytics.yasarbonus.com/matomo.php');
@@ -47,24 +29,13 @@ matomo.on('error', function(err) {
 });
 
 app.get('/', (req, res) => {
-  const user = {
-    firstName: 'Tim',
-    lastName: 'Cook',
-  };
   res.render('pages/index', {
-      user: user,
       i18n: res
     })
 });
 
 app.get('/faq', (req, res) => {
-  const user = {
-    firstName: 'Tim',
-    lastName: 'Cook',
-  };
-  res.render('pages/faq', {
-      user: user
-  })
+  res.render('pages/faq');
 });
 
 // shortlinks path at /go/:slug
@@ -183,19 +154,7 @@ app.use((err, req, res, next) => {
   res.status(500).send('500 - Internal Server Error');
 });
 
-// Close the database connection when the server is shut down
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Closed the database connection.');
-    process.exit(0);
-  });
-});
-
 // Server starten
-
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });
