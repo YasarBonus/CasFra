@@ -37,6 +37,6 @@
     "swagger-ui-express": "^5.0.0",
     "telegram-bot-api": "^2.0.1",
     "tmi.js": "^1.8.5",
-    "winston": "^3.11.0"
+    "winston": "^3.17.0"
   }
 }
