@@ -34,7 +34,7 @@
     "socket.io": "^4.8.1",
     "ssh2-sftp-client": "^10.0.3",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0",
+    "swagger-ui-express": "^5.0.1",
     "telegram-bot-api": "^2.0.1",
     "tmi.js": "^1.8.5",
     "winston": "^3.17.0"
