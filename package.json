@@ -11,7 +11,7 @@
     "url": "https://github.com/Joshua2504/casfra/issues"
   },
   "dependencies": {
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "bodymen": "^1.1.1",
